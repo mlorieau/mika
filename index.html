@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZONE85 — La Vendée, autrement</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ============================================================
+       ÉCRAN D'INTRO — Disparaît après 2,4s
+       ============================================================ -->
+  <div id="intro">
+    <div class="intro-content">
+      <div class="intro-logo">
+        <span class="logo-zone">ZONE</span><span class="logo-85">85</span>
+      </div>
+      <p class="intro-tagline">La Vendée, autrement.</p>
+      <div class="intro-line"></div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       APP PRINCIPALE
+       ============================================================ -->
+  <div id="app" class="hidden">
+
+    <!-- Fond de particules flottantes -->
+    <canvas id="particles-canvas"></canvas>
+
+    <!-- Lueur ambiante centrale (CSS) -->
+    <div id="ambient-glow"></div>
+
+    <!-- ── HEADER ── -->
+    <header id="main-header">
+      <div class="header-logo">
+        <span class="logo-zone">ZONE</span><span class="logo-85">85</span>
+      </div>
+      <nav class="header-nav">
+        <button class="nav-btn" data-section="invisibles">Les Invisibles</button>
+        <button class="nav-btn" data-section="patois">Chez nous…</button>
+        <button class="nav-btn" data-section="meteo">Météo 85</button>
+        <button class="nav-btn" data-section="balades">Balades</button>
+        <button class="nav-btn" data-section="memoire">Mémoire</button>
+        <button class="nav-btn" data-section="ovni">OVNI 85</button>
+      </nav>
+      <button class="header-menu-toggle" id="menu-toggle" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </header>
+
+    <!-- ── HERO : CARTE + TEXTES FLOTTANTS ── -->
+    <main id="hero">
+
+      <!-- Texte flottant haut -->
+      <p class="ambient-text" id="text-top">
+        Ici, on ne visite pas la Vendée.<br>
+        <em>On la fouille.</em>
+      </p>
+
+      <!-- Carte centrale Vendée -->
+      <div id="map-container">
+
+        <!-- Fragments décoratifs de quartz -->
+        <div class="quartz-fragment f1"></div>
+        <div class="quartz-fragment f2"></div>
+        <div class="quartz-fragment f3"></div>
+        <div class="quartz-fragment f4"></div>
+
+        <!-- SVG : contour animé de la Vendée -->
+        <svg id="vendee-map" viewBox="0 0 270 295" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <!-- Filtre lueur carte -->
+            <filter id="glow-soft" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="2.5" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <!-- Filtre lueur forte (point mobile) -->
+            <filter id="glow-strong" x="-100%" y="-100%" width="300%" height="300%">
+              <feGaussianBlur stdDeviation="5" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <!-- Remplissage gradient -->
+            <radialGradient id="fill-grad" cx="48%" cy="50%" r="52%">
+              <stop offset="0%"   stop-color="#1e3a4a" stop-opacity="0.55"/>
+              <stop offset="100%" stop-color="#080d18" stop-opacity="0.1"/>
+            </radialGradient>
+          </defs>
+
+          <!-- Zone remplie — apparaît après le tracé -->
+          <path id="vendee-fill" d="
+            M 140,14
+            C 162,9  186,16 208,30
+            L 232,50
+            C 248,66 256,86 256,108
+            L 254,136
+            C 256,158 250,178 242,196
+            L 230,218
+            C 220,234 206,246 190,254
+            L 168,264
+            C 150,272 130,273 111,267
+            L 88,255
+            C 66,242 50,220 42,196
+            L 32,168
+            C 24,146 24,122 30,100
+            L 42,75
+            C 54,50 76,28 104,16
+            L 122,12
+            Z
+          " fill="url(#fill-grad)" opacity="0"/>
+
+          <!-- Contour principal — animé par JS -->
+          <path id="vendee-path" d="
+            M 140,14
+            C 162,9  186,16 208,30
+            L 232,50
+            C 248,66 256,86 256,108
+            L 254,136
+            C 256,158 250,178 242,196
+            L 230,218
+            C 220,234 206,246 190,254
+            L 168,264
+            C 150,272 130,273 111,267
+            L 88,255
+            C 66,242 50,220 42,196
+            L 32,168
+            C 24,146 24,122 30,100
+            L 42,75
+            C 54,50 76,28 104,16
+            L 122,12
+            Z
+          " fill="none" stroke="#4a9eba" stroke-width="1.5"
+             stroke-linecap="round" stroke-linejoin="round"
+             filter="url(#glow-soft)"/>
+
+          <!-- Point lumineux qui trace le contour -->
+          <circle id="trace-glow" r="10" cx="140" cy="14"
+                  fill="none" stroke="rgba(184,220,236,0.5)" stroke-width="1"
+                  filter="url(#glow-strong)" opacity="0"/>
+          <circle id="trace-dot" r="3" cx="140" cy="14"
+                  fill="#ffffff" filter="url(#glow-strong)" opacity="0"/>
+        </svg>
+
+        <!-- ── HOTSPOTS ── -->
+        <!-- Les Invisibles — centre-est -->
+        <div class="hotspot" data-section="invisibles"
+             style="left:58%;top:46%">
+          <div class="hs-ring"></div>
+          <div class="hs-core"></div>
+          <div class="hs-label">Les Invisibles</div>
+          <div class="hs-tooltip">
+            <strong>Les Invisibles</strong>
+            <p>Un carnet retrouvé. Une société secrète. Une enquête qui commence.</p>
+          </div>
+        </div>
+
+        <!-- Chez nous — bocage est -->
+        <div class="hotspot" data-section="patois"
+             style="left:72%;top:32%">
+          <div class="hs-ring"></div>
+          <div class="hs-core hs-gold"></div>
+          <div class="hs-label">Chez nous…</div>
+          <div class="hs-tooltip">
+            <strong>Chez nous, on ne dit pas…</strong>
+            <p>Le patois, la fierté, les mots du coin. Et le fou rire.</p>
+          </div>
+        </div>
+
+        <!-- Météo — nord -->
+        <div class="hotspot" data-section="meteo"
+             style="left:38%;top:18%">
+          <div class="hs-ring"></div>
+          <div class="hs-core hs-sky"></div>
+          <div class="hs-label">Météo 85</div>
+          <div class="hs-tooltip">
+            <strong>Météo Zone85</strong>
+            <p>O va peuter ? Mi-figue mi-mogette ? On vous dit tout.</p>
+          </div>
+        </div>
+
+        <!-- Balades — côte ouest -->
+        <div class="hotspot" data-section="balades"
+             style="left:16%;top:50%">
+          <div class="hs-ring"></div>
+          <div class="hs-core hs-green"></div>
+          <div class="hs-label">Balades</div>
+          <div class="hs-tooltip">
+            <strong>Balades & coins à voir</strong>
+            <p>Marais, bocage, littoral… La Vendée à pied, les yeux ouverts.</p>
+          </div>
+        </div>
+
+        <!-- Mémoire — sud-est -->
+        <div class="hotspot" data-section="memoire"
+             style="left:62%;top:74%">
+          <div class="hs-ring"></div>
+          <div class="hs-core hs-amber"></div>
+          <div class="hs-label">Mémoire</div>
+          <div class="hs-tooltip">
+            <strong>Mémoire vendéenne</strong>
+            <p>Des histoires de familles, des lieux, des archives vivantes.</p>
+          </div>
+        </div>
+
+        <!-- OVNI — marais sud-ouest -->
+        <div class="hotspot" data-section="ovni"
+             style="left:28%;top:68%">
+          <div class="hs-ring"></div>
+          <div class="hs-core hs-purple"></div>
+          <div class="hs-label">OVNI 85</div>
+          <div class="hs-tooltip">
+            <strong>OVNI Zone85</strong>
+            <p>Des objets. Des mystères. Des zonautes qui répondent.</p>
+          </div>
+        </div>
+
+      </div><!-- /#map-container -->
+
+      <!-- Texte flottant bas -->
+      <div class="ambient-text" id="text-bottom">
+        <p>Des lieux, des histoires, des expressions, des indices…</p>
+        <p class="sub">et parfois, un vieux carnet qui n'aurait jamais dû refaire surface.</p>
+      </div>
+
+      <!-- Indicateur de navigation -->
+      <div id="explore-hint">
+        <span>Explorer la zone</span>
+        <div class="hint-line"></div>
+      </div>
+
+    </main><!-- /#hero -->
+
+    <!-- ── PANNEAU LATÉRAL DE CONTENU ── -->
+    <div id="panel-backdrop"></div>
+    <aside id="content-panel">
+      <button id="panel-close" aria-label="Fermer">✕</button>
+      <div id="panel-inner"></div>
+    </aside>
+
+    <!-- ── NAVIGATION MOBILE (overlay) ── -->
+    <div id="mobile-nav">
+      <button id="mobile-nav-close">✕</button>
+      <nav>
+        <button class="nav-btn" data-section="invisibles">Les Invisibles</button>
+        <button class="nav-btn" data-section="patois">Chez nous, on ne dit pas…</button>
+        <button class="nav-btn" data-section="meteo">Météo Zone85</button>
+        <button class="nav-btn" data-section="balades">Balades & coins</button>
+        <button class="nav-btn" data-section="memoire">Mémoire vendéenne</button>
+        <button class="nav-btn" data-section="ovni">OVNI Zone85</button>
+      </nav>
+    </div>
+
+  </div><!-- /#app -->
+
+  <script src="script.js"></script>
+</body>
+</html>
