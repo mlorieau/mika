@@ -25,6 +25,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:#07101a; }
   --gris:    rgba(255,255,255,0.38);
   --gris-2:  rgba(255,255,255,0.16);
   --or:      #C4A45A;
+  --alien:   #3de87a;   /* vert signal Zone 51 — accents discrets */
   --ease:    cubic-bezier(0.76,0,0.24,1);
 }
 
@@ -101,6 +102,38 @@ html, body { width:100%; height:100%; overflow:hidden; background:#07101a; }
   cursor: pointer;
   text-decoration: none;
   transition: color 0.3s;
+  position: relative;
+}
+/* Glitch discret au hover — clin d'œil Zone 51 */
+.nav-wordmark::before,
+.nav-wordmark::after {
+  content: 'Zone85';
+  position: absolute; inset: 0;
+  opacity: 0; pointer-events: none;
+  font-family: 'Playfair Display', serif;
+  font-size: 18px; font-weight: 500;
+}
+.nav-wordmark:hover::before {
+  color: var(--alien);
+  animation: wmGlitch1 0.35s steps(1) forwards;
+  clip-path: inset(30% 0 50% 0);
+}
+.nav-wordmark:hover::after {
+  color: var(--corail);
+  animation: wmGlitch2 0.35s steps(1) 0.05s forwards;
+  clip-path: inset(55% 0 20% 0);
+}
+@keyframes wmGlitch1 {
+  0%,100% { opacity: 0; transform: none; }
+  20%  { opacity: 1; transform: translateX(-3px); }
+  60%  { opacity: 1; transform: translateX(2px); }
+  90%  { opacity: 0; }
+}
+@keyframes wmGlitch2 {
+  0%,100% { opacity: 0; transform: none; }
+  15%  { opacity: 1; transform: translateX(4px); }
+  55%  { opacity: 1; transform: translateX(-2px); }
+  85%  { opacity: 0; }
 }
 
 .nav-links {
@@ -196,6 +229,15 @@ html, body { width:100%; height:100%; overflow:hidden; background:#07101a; }
   transform: translateY(-50%);
   z-index: 2;
   max-width: 480px;
+}
+.home-intro-zone51-ref {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; font-weight: 300;
+  letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--alien);
+  opacity: 0;
+  margin-bottom: 10px;
+  animation: fadeUp 1s 0.1s ease forwards;
 }
 .home-intro-label {
   font-family: 'DM Mono', monospace;
@@ -916,6 +958,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:#07101a; }
   padding: 0 40px;
 }
 .t-sep { color: var(--corail); opacity: 0.4; padding: 0 6px; letter-spacing: 0; }
+.t-alien { color: var(--alien) !important; opacity: 0.55 !important; }
 @keyframes ticker {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
@@ -1233,9 +1276,281 @@ html, body { width:100%; height:100%; overflow:hidden; background:#07101a; }
 }
 .pm-close:hover { background: rgba(0,0,0,0.07); color: rgba(0,0,0,0.65); }
 
+/* ══════════════════════════════════════════
+   CINÉMATIQUE D'INTRODUCTION
+══════════════════════════════════════════ */
+#cinematic {
+  position: fixed; inset: 0; z-index: 99999;
+  background: #00060a;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; text-align: center;
+  overflow: hidden;
+  animation: cineFadeOut 0.9s 8.6s ease-in both;
+}
+#cinematic.cine-gone { display: none; }
+@keyframes cineFadeOut {
+  to { opacity: 0; pointer-events: none; }
+}
+
+/* Scan lines effet CRT */
+.cine-scanlines {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px, transparent 2px,
+    rgba(0,0,0,0.18) 2px, rgba(0,0,0,0.18) 4px
+  );
+  animation: cineScanFade 0.6s 3.4s ease-in both;
+}
+@keyframes cineScanFade { to { opacity: 0; } }
+
+/* Radar — ambiance Zone 51 */
+.cine-radar {
+  position: absolute;
+  width: 800px; height: 800px;
+  top: 50%; left: 50%; transform: translate(-50%,-50%);
+  z-index: 0;
+  animation: cineRadarFade 0.8s 3.4s ease-in both;
+}
+@keyframes cineRadarFade { to { opacity: 0; } }
+.cine-ring {
+  position: absolute; inset: 0; border-radius: 50%;
+  border: 1px solid rgba(0,230,90,0.12);
+  animation: cineRingPulse 3.8s ease-out infinite;
+}
+.cine-ring.r2 { animation-delay: 1.2s; }
+.cine-ring.r3 { animation-delay: 2.4s; }
+@keyframes cineRingPulse {
+  0%   { transform: scale(0.05); opacity: 0.7; }
+  100% { transform: scale(1);    opacity: 0; }
+}
+
+/* Lueur verte — Zone 51 */
+.cine-glow-green {
+  position: absolute; width: 480px; height: 480px;
+  border-radius: 50%;
+  top: 50%; left: 50%; transform: translate(-50%,-50%);
+  background: radial-gradient(circle, rgba(0,220,80,0.09) 0%, transparent 70%);
+  animation: cineGlowGreenFade 0.7s 3.4s ease-in both;
+}
+@keyframes cineGlowGreenFade { to { opacity: 0; } }
+
+/* Lueur corail — Zone 85 */
+.cine-glow-coral {
+  position: absolute; width: 600px; height: 600px;
+  border-radius: 50%;
+  top: 50%; left: 50%; transform: translate(-50%,-50%);
+  background: radial-gradient(circle, rgba(224,106,82,0.12) 0%, transparent 70%);
+  opacity: 0;
+  animation: cineCoralIn 1.2s 3.6s ease both;
+}
+@keyframes cineCoralIn { to { opacity: 1; } }
+
+/* CLASSIFIED stamp */
+.cine-classified {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; letter-spacing: 7px; text-transform: uppercase;
+  color: rgba(0,230,80,0.5);
+  position: relative; z-index: 2;
+  margin-bottom: 24px;
+  border: 1px solid rgba(0,230,80,0.18);
+  padding: 6px 20px; display: inline-block;
+  animation:
+    cineFadeIn 0.5s 0.3s ease both,
+    cineFadeOutQ 0.4s 3.2s ease both;
+}
+
+/* ZONE — le mot commun */
+.cine-word-zone {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(70px, 12vw, 136px);
+  font-weight: 500; line-height: 1; letter-spacing: -2px;
+  color: rgba(255,255,255,0.88);
+  position: relative; z-index: 2;
+  animation: cineSlam 0.55s 0.8s cubic-bezier(0.15,0,0.08,1) both;
+}
+@keyframes cineSlam {
+  from { opacity: 0; transform: scale(1.35) translateY(-10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Conteneur des numéros (51 / 85 superposés) */
+.cine-numbers {
+  position: relative; z-index: 2;
+  height: clamp(72px, 11vw, 128px);
+  width: 100%;
+}
+.cine-num {
+  position: absolute; inset: 0;
+  font-family: 'DM Mono', monospace;
+  font-size: clamp(70px, 11vw, 128px);
+  font-weight: 300; line-height: 1; letter-spacing: -3px;
+  display: flex; align-items: center; justify-content: center;
+}
+/* 51 : vert alien */
+.cine-num-51 {
+  color: rgba(0,230,80,0.9);
+  animation:
+    cineSlam 0.4s 1.2s cubic-bezier(0.12,0,0.08,1) both,
+    cineGlitch51 0.65s 3.05s ease-in both;
+}
+/* 85 : corail vendéen */
+.cine-num-85 {
+  color: var(--corail);
+  opacity: 0;
+  animation: cineReveal85 0.55s 3.65s cubic-bezier(0.15,0,0.1,1) forwards;
+}
+
+@keyframes cineGlitch51 {
+  0%   { opacity: 1; clip-path: inset(0 0 0 0);   transform: none; filter: none; }
+  12%  { clip-path: inset(0 0 55% 0);  transform: translateX(12px); filter: hue-rotate(120deg) brightness(1.5); }
+  28%  { clip-path: inset(35% 0 25% 0); transform: translateX(-9px); }
+  44%  { clip-path: inset(15% 0 50% 0); transform: translateX(16px); opacity: 0.5; }
+  62%  { clip-path: inset(65% 0 0 0);  transform: translateX(-6px); filter: hue-rotate(200deg); }
+  80%  { opacity: 0.15; transform: translateX(5px); }
+  100% { opacity: 0; transform: none; clip-path: inset(0 0 100% 0); }
+}
+@keyframes cineReveal85 {
+  from { opacity: 0; transform: translateY(14px) scale(0.95); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Sous-titre Zone 51 */
+.cine-sub-z51 {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 3.5px; text-transform: uppercase;
+  color: rgba(0,230,80,0.3);
+  position: relative; z-index: 2; margin-top: 22px;
+  animation:
+    cineFadeIn 0.7s 1.9s ease both,
+    cineFadeOutQ 0.4s 3.1s ease both;
+}
+
+/* Séparateur — trait fin qui glisse */
+.cine-sep {
+  width: 0; height: 1px;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.12), transparent);
+  position: relative; z-index: 2; margin: 28px auto;
+  animation: cineSepIn 0.9s 4.1s ease both;
+}
+@keyframes cineSepIn { to { width: 320px; } }
+
+/* Révélation — "Les américains ont leur Zone 51…" */
+.cine-reveal {
+  position: relative; z-index: 2;
+  opacity: 0;
+  animation: cineFadeUp 0.7s 4.2s ease both;
+}
+.cine-reveal-line {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px; font-weight: 300;
+  color: rgba(255,255,255,0.28);
+  letter-spacing: 0.3px; line-height: 2;
+}
+.cine-reveal-line em {
+  font-family: 'Playfair Display', serif;
+  font-style: italic; font-weight: 500;
+  color: rgba(255,255,255,0.52);
+}
+.cine-reveal-line .hl85 { color: var(--corail); }
+
+/* Tagline finale */
+.cine-tagline {
+  position: relative; z-index: 2;
+  margin-top: 28px;
+  opacity: 0;
+  animation: cineFadeUp 0.85s 5.3s cubic-bezier(0.15,0,0.1,1) both;
+}
+.cine-des-gens {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; letter-spacing: 5px; text-transform: uppercase;
+  color: rgba(255,255,255,0.22);
+  margin-bottom: 10px;
+}
+.cine-extraordinaires {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(32px, 5.5vw, 58px);
+  font-weight: 500; line-height: 1; letter-spacing: -0.5px;
+}
+.cine-extra-em   { color: var(--corail); font-style: italic; }
+.cine-extra-rest { color: rgba(255,255,255,0.82); font-style: normal; }
+
+/* Bouton passer */
+#cineSkip {
+  position: absolute; bottom: 40px; right: 52px;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase;
+  color: rgba(255,255,255,0.18);
+  background: none; border: none; cursor: pointer;
+  z-index: 100; padding: 8px 0;
+  transition: color 0.3s;
+  animation: cineFadeIn 0.6s 0.6s ease both;
+}
+#cineSkip:hover { color: rgba(255,255,255,0.5); }
+
+/* Keyframes utilitaires */
+@keyframes cineFadeIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes cineFadeOutQ { from { opacity: 1; } to { opacity: 0; } }
+@keyframes cineFadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: none; }
+}
+
 </style>
 </head>
 <body>
+
+<!-- ═══ CINÉMATIQUE D'INTRO ═══ -->
+<div id="cinematic">
+
+  <!-- Effets d'ambiance Zone 51 -->
+  <div class="cine-scanlines"></div>
+  <div class="cine-radar">
+    <div class="cine-ring r1"></div>
+    <div class="cine-ring r2"></div>
+    <div class="cine-ring r3"></div>
+  </div>
+  <div class="cine-glow-green"></div>
+  <div class="cine-glow-coral"></div>
+
+  <!-- Stamp classifié -->
+  <div class="cine-classified">◼ Classified ◼</div>
+
+  <!-- ZONE (commun) -->
+  <div class="cine-word-zone">ZONE</div>
+
+  <!-- 51 → 85 -->
+  <div class="cine-numbers">
+    <div class="cine-num cine-num-51">51</div>
+    <div class="cine-num cine-num-85">85</div>
+  </div>
+
+  <!-- Sous-titre Zone 51 (disparaît) -->
+  <div class="cine-sub-z51">Nevada · U.S.A · Extraterrestres hypothétiques</div>
+
+  <!-- Séparateur -->
+  <div class="cine-sep"></div>
+
+  <!-- Révélation -->
+  <div class="cine-reveal">
+    <div class="cine-reveal-line">
+      Les américains ont leur <em>Zone 51</em>…
+    </div>
+    <div class="cine-reveal-line">
+      En Vendée, nous avons la <em><span class="hl85">Zone 85</span></em>
+    </div>
+  </div>
+
+  <!-- Tagline finale -->
+  <div class="cine-tagline">
+    <div class="cine-des-gens">des gens</div>
+    <div class="cine-extraordinaires">
+      <span class="cine-extra-em">Extra</span><span class="cine-extra-rest">ordinaires.</span>
+    </div>
+  </div>
+
+  <button id="cineSkip" onclick="skipCine()">Passer →</button>
+</div>
 
 <!-- RIDEAU -->
 <div id="curtain"></div>
@@ -1259,6 +1574,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:#07101a; }
   <div class="horizon-line"></div>
 
   <div class="home-intro">
+    <div class="home-intro-zone51-ref">Zone 51 · Nevada &nbsp;→&nbsp; Zone 85 · Vendée</div>
     <div class="home-intro-label">Communauté Vendéenne · 22 000 Zonautes</div>
     <h1 class="home-intro-title">
       La Vendée<br>
@@ -1625,21 +1941,29 @@ html, body { width:100%; height:100%; overflow:hidden; background:#07101a; }
 <div id="ticker">
   <div class="ticker-inner">
     <span class="t-item">Zonautes</span><span class="t-sep">·</span>
+    <span class="t-item t-alien">Zone 51 → Zone 85</span><span class="t-sep">·</span>
     <span class="t-item">Bocage Vendéen</span><span class="t-sep">·</span>
-    <span class="t-item">Marais Poitevin</span><span class="t-sep">·</span>
     <span class="t-item">Parlanjhe</span><span class="t-sep">·</span>
+    <span class="t-item t-alien">Gens Extraordinaires</span><span class="t-sep">·</span>
     <span class="t-item">Les Invisibles</span><span class="t-sep">·</span>
+    <span class="t-item">Marais Poitevin</span><span class="t-sep">·</span>
+    <span class="t-item t-alien">Signal Détecté · 85</span><span class="t-sep">·</span>
     <span class="t-item">Traces GPX</span><span class="t-sep">·</span>
     <span class="t-item">Légendes Locales</span><span class="t-sep">·</span>
+    <span class="t-item t-alien">Extraterrestres ? Non. Extra-ordinaires.</span><span class="t-sep">·</span>
     <span class="t-item">Goule Ouverte</span><span class="t-sep">·</span>
     <span class="t-item">L'Esprit Vendée</span><span class="t-sep">·</span>
     <span class="t-item">Zonautes</span><span class="t-sep">·</span>
+    <span class="t-item t-alien">Zone 51 → Zone 85</span><span class="t-sep">·</span>
     <span class="t-item">Bocage Vendéen</span><span class="t-sep">·</span>
-    <span class="t-item">Marais Poitevin</span><span class="t-sep">·</span>
     <span class="t-item">Parlanjhe</span><span class="t-sep">·</span>
+    <span class="t-item t-alien">Gens Extraordinaires</span><span class="t-sep">·</span>
     <span class="t-item">Les Invisibles</span><span class="t-sep">·</span>
+    <span class="t-item">Marais Poitevin</span><span class="t-sep">·</span>
+    <span class="t-item t-alien">Signal Détecté · 85</span><span class="t-sep">·</span>
     <span class="t-item">Traces GPX</span><span class="t-sep">·</span>
     <span class="t-item">Légendes Locales</span><span class="t-sep">·</span>
+    <span class="t-item t-alien">Extraterrestres ? Non. Extra-ordinaires.</span><span class="t-sep">·</span>
     <span class="t-item">Goule Ouverte</span><span class="t-sep">·</span>
     <span class="t-item">L'Esprit Vendée</span><span class="t-sep">·</span>
   </div>
@@ -1770,6 +2094,24 @@ html, body { width:100%; height:100%; overflow:hidden; background:#07101a; }
 </div>
 
 <script>
+/* ── CINÉMATIQUE ── */
+(function() {
+  const CINE_TOTAL = 9500; // ms avant disparition auto
+  let _skipped = false;
+
+  function endCine() {
+    if (_skipped) return;
+    _skipped = true;
+    const c = document.getElementById('cinematic');
+    c.style.transition = 'opacity 0.45s ease';
+    c.style.opacity = '0';
+    setTimeout(() => c.classList.add('cine-gone'), 460);
+  }
+
+  window.skipCine = function() { endCine(); };
+  setTimeout(endCine, CINE_TOTAL);
+})();
+
 /* ── NAVIGATION ── */
 let current = 'home';
 let busy = false;
