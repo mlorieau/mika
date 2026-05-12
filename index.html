@@ -3,255 +3,417 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ZONE85 — La Vendée, autrement</title>
+  <title>ZONE 85 — L'Esprit Vendée</title>
+  <meta name="description" content="La Vendée comme on la vit. Randonnées, patois, quiz, et bientôt le jeu. Bienvenue chez les Zonautes.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700&display=swap">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- ============================================================
-       ÉCRAN D'INTRO — Disparaît après 2,4s
-       ============================================================ -->
-  <div id="intro">
-    <div class="intro-content">
-      <div class="intro-logo">
-        <span class="logo-zone">ZONE</span><span class="logo-85">85</span>
-      </div>
-      <p class="intro-tagline">La Vendée, autrement.</p>
-      <div class="intro-line"></div>
-    </div>
-  </div>
+  <!-- ════════════════════════════════════════════════════════════
+       HEADER
+       ════════════════════════════════════════════════════════════ -->
+  <header class="site-header" id="siteHeader">
+    <div class="container header-inner">
+      <a href="#" class="brand" aria-label="Zone 85, retour à l'accueil">
+        <span class="brand-zone">ZONE</span>
+        <span class="brand-dot"></span>
+        <span class="brand-num">85</span>
+      </a>
 
-  <!-- ============================================================
-       APP PRINCIPALE
-       ============================================================ -->
-  <div id="app" class="hidden">
-
-    <!-- Fond de particules flottantes -->
-    <canvas id="particles-canvas"></canvas>
-
-    <!-- Lueur ambiante centrale (CSS) -->
-    <div id="ambient-glow"></div>
-
-    <!-- ── HEADER ── -->
-    <header id="main-header">
-      <div class="header-logo">
-        <span class="logo-zone">ZONE</span><span class="logo-85">85</span>
-      </div>
-      <nav class="header-nav">
-        <button class="nav-btn" data-section="invisibles">Les Invisibles</button>
-        <button class="nav-btn" data-section="patois">Chez nous…</button>
-        <button class="nav-btn" data-section="meteo">Météo 85</button>
-        <button class="nav-btn" data-section="balades">Balades</button>
-        <button class="nav-btn" data-section="memoire">Mémoire</button>
-        <button class="nav-btn" data-section="ovni">OVNI 85</button>
+      <nav class="primary-nav" aria-label="Navigation principale">
+        <a href="#randonnees">Randonnées</a>
+        <a href="#chez-nous">Chez nous</a>
+        <a href="#quiz">Quiz</a>
+        <a href="#le-jeu">Le Jeu</a>
+        <a href="#passeport">Passeport</a>
       </nav>
-      <button class="header-menu-toggle" id="menu-toggle" aria-label="Menu">
+
+      <div class="header-actions">
+        <a href="#connexion" class="btn btn-ghost">Se connecter</a>
+        <a href="#inscription" class="btn btn-coral">Rejoindre</a>
+      </div>
+
+      <button class="burger" id="burger" aria-label="Ouvrir le menu" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
-    </header>
-
-    <!-- ── HERO : CARTE + TEXTES FLOTTANTS ── -->
-    <main id="hero">
-
-      <!-- Texte flottant haut -->
-      <p class="ambient-text" id="text-top">
-        Ici, on ne visite pas la Vendée.<br>
-        <em>On la fouille.</em>
-      </p>
-
-      <!-- Carte centrale Vendée -->
-      <div id="map-container">
-
-        <!-- Fragments décoratifs de quartz -->
-        <div class="quartz-fragment f1"></div>
-        <div class="quartz-fragment f2"></div>
-        <div class="quartz-fragment f3"></div>
-        <div class="quartz-fragment f4"></div>
-
-        <!-- SVG : contour animé de la Vendée -->
-        <svg id="vendee-map" viewBox="0 0 270 295" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <!-- Filtre lueur carte -->
-            <filter id="glow-soft" x="-30%" y="-30%" width="160%" height="160%">
-              <feGaussianBlur stdDeviation="2.5" result="blur"/>
-              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-            <!-- Filtre lueur forte (point mobile) -->
-            <filter id="glow-strong" x="-100%" y="-100%" width="300%" height="300%">
-              <feGaussianBlur stdDeviation="5" result="blur"/>
-              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-            <!-- Remplissage gradient -->
-            <radialGradient id="fill-grad" cx="48%" cy="50%" r="52%">
-              <stop offset="0%"   stop-color="#1e3a4a" stop-opacity="0.55"/>
-              <stop offset="100%" stop-color="#080d18" stop-opacity="0.1"/>
-            </radialGradient>
-          </defs>
-
-          <!-- Zone remplie — apparaît après le tracé -->
-          <path id="vendee-fill" d="
-            M 140,14
-            C 162,9  186,16 208,30
-            L 232,50
-            C 248,66 256,86 256,108
-            L 254,136
-            C 256,158 250,178 242,196
-            L 230,218
-            C 220,234 206,246 190,254
-            L 168,264
-            C 150,272 130,273 111,267
-            L 88,255
-            C 66,242 50,220 42,196
-            L 32,168
-            C 24,146 24,122 30,100
-            L 42,75
-            C 54,50 76,28 104,16
-            L 122,12
-            Z
-          " fill="url(#fill-grad)" opacity="0"/>
-
-          <!-- Contour principal — animé par JS -->
-          <path id="vendee-path" d="
-            M 140,14
-            C 162,9  186,16 208,30
-            L 232,50
-            C 248,66 256,86 256,108
-            L 254,136
-            C 256,158 250,178 242,196
-            L 230,218
-            C 220,234 206,246 190,254
-            L 168,264
-            C 150,272 130,273 111,267
-            L 88,255
-            C 66,242 50,220 42,196
-            L 32,168
-            C 24,146 24,122 30,100
-            L 42,75
-            C 54,50 76,28 104,16
-            L 122,12
-            Z
-          " fill="none" stroke="#4a9eba" stroke-width="1.5"
-             stroke-linecap="round" stroke-linejoin="round"
-             filter="url(#glow-soft)"/>
-
-          <!-- Point lumineux qui trace le contour -->
-          <circle id="trace-glow" r="10" cx="140" cy="14"
-                  fill="none" stroke="rgba(184,220,236,0.5)" stroke-width="1"
-                  filter="url(#glow-strong)" opacity="0"/>
-          <circle id="trace-dot" r="3" cx="140" cy="14"
-                  fill="#ffffff" filter="url(#glow-strong)" opacity="0"/>
-        </svg>
-
-        <!-- ── HOTSPOTS ── -->
-        <!-- Les Invisibles — centre-est -->
-        <div class="hotspot" data-section="invisibles"
-             style="left:58%;top:46%">
-          <div class="hs-ring"></div>
-          <div class="hs-core"></div>
-          <div class="hs-label">Les Invisibles</div>
-          <div class="hs-tooltip">
-            <strong>Les Invisibles</strong>
-            <p>Un carnet retrouvé. Une société secrète. Une enquête qui commence.</p>
-          </div>
-        </div>
-
-        <!-- Chez nous — bocage est -->
-        <div class="hotspot" data-section="patois"
-             style="left:72%;top:32%">
-          <div class="hs-ring"></div>
-          <div class="hs-core hs-gold"></div>
-          <div class="hs-label">Chez nous…</div>
-          <div class="hs-tooltip">
-            <strong>Chez nous, on ne dit pas…</strong>
-            <p>Le patois, la fierté, les mots du coin. Et le fou rire.</p>
-          </div>
-        </div>
-
-        <!-- Météo — nord -->
-        <div class="hotspot" data-section="meteo"
-             style="left:38%;top:18%">
-          <div class="hs-ring"></div>
-          <div class="hs-core hs-sky"></div>
-          <div class="hs-label">Météo 85</div>
-          <div class="hs-tooltip">
-            <strong>Météo Zone85</strong>
-            <p>O va peuter ? Mi-figue mi-mogette ? On vous dit tout.</p>
-          </div>
-        </div>
-
-        <!-- Balades — côte ouest -->
-        <div class="hotspot" data-section="balades"
-             style="left:16%;top:50%">
-          <div class="hs-ring"></div>
-          <div class="hs-core hs-green"></div>
-          <div class="hs-label">Balades</div>
-          <div class="hs-tooltip">
-            <strong>Balades & coins à voir</strong>
-            <p>Marais, bocage, littoral… La Vendée à pied, les yeux ouverts.</p>
-          </div>
-        </div>
-
-        <!-- Mémoire — sud-est -->
-        <div class="hotspot" data-section="memoire"
-             style="left:62%;top:74%">
-          <div class="hs-ring"></div>
-          <div class="hs-core hs-amber"></div>
-          <div class="hs-label">Mémoire</div>
-          <div class="hs-tooltip">
-            <strong>Mémoire vendéenne</strong>
-            <p>Des histoires de familles, des lieux, des archives vivantes.</p>
-          </div>
-        </div>
-
-        <!-- OVNI — marais sud-ouest -->
-        <div class="hotspot" data-section="ovni"
-             style="left:28%;top:68%">
-          <div class="hs-ring"></div>
-          <div class="hs-core hs-purple"></div>
-          <div class="hs-label">OVNI 85</div>
-          <div class="hs-tooltip">
-            <strong>OVNI Zone85</strong>
-            <p>Des objets. Des mystères. Des zonautes qui répondent.</p>
-          </div>
-        </div>
-
-      </div><!-- /#map-container -->
-
-      <!-- Texte flottant bas -->
-      <div class="ambient-text" id="text-bottom">
-        <p>Des lieux, des histoires, des expressions, des indices…</p>
-        <p class="sub">et parfois, un vieux carnet qui n'aurait jamais dû refaire surface.</p>
-      </div>
-
-      <!-- Indicateur de navigation -->
-      <div id="explore-hint">
-        <span>Explorer la zone</span>
-        <div class="hint-line"></div>
-      </div>
-
-    </main><!-- /#hero -->
-
-    <!-- ── PANNEAU LATÉRAL DE CONTENU ── -->
-    <div id="panel-backdrop"></div>
-    <aside id="content-panel">
-      <button id="panel-close" aria-label="Fermer">✕</button>
-      <div id="panel-inner"></div>
-    </aside>
-
-    <!-- ── NAVIGATION MOBILE (overlay) ── -->
-    <div id="mobile-nav">
-      <button id="mobile-nav-close">✕</button>
-      <nav>
-        <button class="nav-btn" data-section="invisibles">Les Invisibles</button>
-        <button class="nav-btn" data-section="patois">Chez nous, on ne dit pas…</button>
-        <button class="nav-btn" data-section="meteo">Météo Zone85</button>
-        <button class="nav-btn" data-section="balades">Balades & coins</button>
-        <button class="nav-btn" data-section="memoire">Mémoire vendéenne</button>
-        <button class="nav-btn" data-section="ovni">OVNI Zone85</button>
-      </nav>
     </div>
+  </header>
 
-  </div><!-- /#app -->
+  <!-- Menu mobile -->
+  <div class="mobile-nav" id="mobileNav" aria-hidden="true">
+    <a href="#randonnees">Randonnées</a>
+    <a href="#chez-nous">Chez nous</a>
+    <a href="#quiz">Quiz</a>
+    <a href="#le-jeu">Le Jeu</a>
+    <a href="#passeport">Passeport</a>
+    <hr>
+    <a href="#connexion">Se connecter</a>
+    <a href="#inscription" class="btn btn-coral btn-block">Rejoindre les Zonautes</a>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════
+       HERO
+       ════════════════════════════════════════════════════════════ -->
+  <section class="hero">
+    <div class="container hero-grid">
+
+      <div class="hero-text">
+        <p class="eyebrow">
+          <span class="eyebrow-line"></span>
+          L'Esprit Vendée
+        </p>
+
+        <h1 class="hero-title">
+          La Vendée,<br>
+          <em>comme on la vit.</em>
+        </h1>
+
+        <p class="hero-lead">
+          Ici, pas de brochure. On marche, on raconte, on rigole en patois,
+          on se retrouve autour d'un quiz. Bienvenue chez les Zonautes —
+          la communauté qui fait vivre le 85 au quotidien.
+        </p>
+
+        <div class="hero-cta">
+          <a href="#randonnees" class="btn btn-coral btn-lg">Explorer les randos</a>
+          <a href="#le-jeu" class="btn btn-outline btn-lg">Découvrir le jeu</a>
+        </div>
+
+        <ul class="hero-stats" aria-label="La communauté en chiffres">
+          <li>
+            <span class="stat-num">22<small>k</small></span>
+            <span class="stat-label">Zonautes</span>
+          </li>
+          <li>
+            <span class="stat-num">1</span>
+            <span class="stat-label">Territoire</span>
+          </li>
+          <li>
+            <span class="stat-num">∞</span>
+            <span class="stat-label">Histoires</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="hero-visual" aria-hidden="true">
+        <!-- Carte Vendée stylisée, flat -->
+        <svg viewBox="0 0 360 400" class="vendee-svg" xmlns="http://www.w3.org/2000/svg">
+          <!-- Bloc terre derrière -->
+          <rect x="40" y="40" width="280" height="320" rx="8" fill="#E8D9C4"/>
+          <!-- Bloc sauge -->
+          <rect x="60" y="60" width="280" height="320" rx="8" fill="#C6D5B7"/>
+          <!-- Bloc bleu -->
+          <rect x="80" y="80" width="280" height="300" rx="8" fill="#B9CFDE"/>
+
+          <!-- Contour Vendée stylisé -->
+          <path d="
+            M 200,100
+            C 235,95  265,108 285,130
+            L 305,158
+            C 320,180 322,205 315,230
+            L 305,260
+            C 295,290 270,310 240,318
+            L 210,322
+            C 180,322 155,310 138,288
+            L 122,260
+            C 110,232 110,200 122,172
+            L 140,138
+            C 158,115 178,103 200,100
+            Z
+          " fill="#F4EFE6" stroke="#23303C" stroke-width="2.5" stroke-linejoin="round"/>
+
+          <!-- Points hotspot -->
+          <circle cx="170" cy="170" r="6" fill="#E5614A"/>
+          <circle cx="170" cy="170" r="14" fill="none" stroke="#E5614A" stroke-width="1.5" opacity="0.4"/>
+
+          <circle cx="240" cy="200" r="6" fill="#6F9FB8"/>
+          <circle cx="240" cy="200" r="14" fill="none" stroke="#6F9FB8" stroke-width="1.5" opacity="0.4"/>
+
+          <circle cx="200" cy="270" r="6" fill="#9DB089"/>
+          <circle cx="200" cy="270" r="14" fill="none" stroke="#9DB089" stroke-width="1.5" opacity="0.4"/>
+
+          <!-- Petite étiquette -->
+          <line x1="240" y1="200" x2="290" y2="180" stroke="#23303C" stroke-width="1"/>
+          <text x="294" y="184" font-family="Inter, sans-serif" font-size="11" fill="#23303C" font-weight="500">85</text>
+        </svg>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       BANDEAU FILET — manifeste
+       ════════════════════════════════════════════════════════════ -->
+  <section class="manifesto">
+    <div class="container">
+      <p>
+        Ici, on ne visite pas la Vendée.
+        <span class="coral-em">On la fouille, on la partage, on la chérit.</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       UNIVERS — 5 portes
+       ════════════════════════════════════════════════════════════ -->
+  <section class="universe" id="univers">
+    <div class="container">
+      <header class="section-head">
+        <p class="eyebrow"><span class="eyebrow-line"></span> Nos univers</p>
+        <h2>Cinq portes, une seule maison.</h2>
+        <p class="section-lead">
+          Choisis ton coin du 85. Que tu marches, que tu parles patois,
+          que tu joues ou que tu rêves du grand jeu : tu es chez toi.
+        </p>
+      </header>
+
+      <div class="universe-grid">
+
+        <!-- Randonnées -->
+        <a href="#randonnees" class="card card-sage" id="randonnees">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M3 20l5-10 4 6 3-4 6 8"/>
+              <circle cx="15" cy="5" r="2"/>
+            </svg>
+          </div>
+          <h3>Randonnées</h3>
+          <p>Textes vivants, galeries photo, traces GPX à télécharger. Le bocage, le marais, le littoral — à pied.</p>
+          <span class="card-arrow">Marcher avec nous →</span>
+        </a>
+
+        <!-- Chez nous -->
+        <a href="#chez-nous" class="card card-clay" id="chez-nous">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 21V10l8-6 8 6v11"/>
+              <path d="M9 21v-6h6v6"/>
+            </svg>
+          </div>
+          <h3>Chez nous, on ne dit pas…</h3>
+          <p>Le patois vendéen en visuels. Mots du coin, fierté locale, fou rire garanti.</p>
+          <span class="card-arrow">Apprendre les mots →</span>
+        </a>
+
+        <!-- Quiz -->
+        <a href="#quiz" class="card card-blue" id="quiz">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="9"/>
+              <path d="M9.5 9a2.5 2.5 0 015 .5c0 1.5-2.5 2-2.5 4"/>
+              <line x1="12" y1="17" x2="12" y2="17.5"/>
+            </svg>
+          </div>
+          <h3>Quiz</h3>
+          <p>Des quiz rigolos pour tester ton 85. On garde ton score — si tu es Zonaute connecté.</p>
+          <span class="card-arrow">Jouer un quiz →</span>
+        </a>
+
+        <!-- Le Jeu -->
+        <a href="#le-jeu" class="card card-coral">
+          <div class="card-badge">Octobre 2026</div>
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="7" width="18" height="12" rx="3"/>
+              <line x1="8" y1="13" x2="10" y2="13"/>
+              <line x1="9" y1="12" x2="9" y2="14"/>
+              <circle cx="15" cy="12" r="0.8" fill="currentColor"/>
+              <circle cx="17" cy="14" r="0.8" fill="currentColor"/>
+            </svg>
+          </div>
+          <h3>Le Jeu</h3>
+          <p>Notre jeu digital, fin 2026. Pré-inscris-toi maintenant pour être averti dès la mise en ligne.</p>
+          <span class="card-arrow">M'inscrire au teaser →</span>
+        </a>
+
+        <!-- Passeport -->
+        <a href="#passeport" class="card card-passport" id="passeport">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="5" y="3" width="14" height="18" rx="2"/>
+              <circle cx="12" cy="10" r="2.5"/>
+              <path d="M8 16c1-1.5 2.5-2.5 4-2.5s3 1 4 2.5"/>
+            </svg>
+          </div>
+          <h3>Le Passeport Zonaute</h3>
+          <p>Ton espace perso : photo, scores quiz, randos sauvegardées, achats. Ton 85 te suit partout.</p>
+          <span class="card-arrow">Créer mon passeport →</span>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       DERNIÈRES RANDONNÉES
+       ════════════════════════════════════════════════════════════ -->
+  <section class="latest">
+    <div class="container">
+      <header class="section-head section-head-row">
+        <div>
+          <p class="eyebrow"><span class="eyebrow-line"></span> Dernières randos</p>
+          <h2>Sur les chemins du 85.</h2>
+        </div>
+        <a href="#randonnees" class="btn btn-outline">Toutes les randos</a>
+      </header>
+
+      <div class="rando-grid">
+
+        <article class="rando-card">
+          <div class="rando-img rando-img-1" aria-hidden="true"></div>
+          <div class="rando-body">
+            <div class="rando-meta">
+              <span class="tag tag-sage">Bocage</span>
+              <span>12 km · 3h30</span>
+            </div>
+            <h3>Forêt de Grasla, sur les pas de Charette</h3>
+            <p>Un refuge historique, des chênes centenaires, et ce silence qui n'appartient qu'au bocage vendéen.</p>
+            <span class="link-arrow">Lire et télécharger le GPX →</span>
+          </div>
+        </article>
+
+        <article class="rando-card">
+          <div class="rando-img rando-img-2" aria-hidden="true"></div>
+          <div class="rando-body">
+            <div class="rando-meta">
+              <span class="tag tag-blue">Marais</span>
+              <span>8 km · 2h00</span>
+            </div>
+            <h3>Vallée de l'Yon, sur les traces du Temps</h3>
+            <p>Une rivière, un moulin, et des panoramas qui font dire qu'ici, le temps fait bien les choses.</p>
+            <span class="link-arrow">Lire et télécharger le GPX →</span>
+          </div>
+        </article>
+
+        <article class="rando-card">
+          <div class="rando-img rando-img-3" aria-hidden="true"></div>
+          <div class="rando-body">
+            <div class="rando-meta">
+              <span class="tag tag-clay">Littoral</span>
+              <span>15 km · 4h00</span>
+            </div>
+            <h3>Pointe d'Arçay, l'estuaire sauvage</h3>
+            <p>Sable, vase, ciel grand format. Une rando où l'on revient toujours avec les pieds mouillés et la tête au large.</p>
+            <span class="link-arrow">Lire et télécharger le GPX →</span>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       LE JEU — TEASER
+       ════════════════════════════════════════════════════════════ -->
+  <section class="le-jeu-teaser" id="le-jeu">
+    <div class="container teaser-grid">
+      <div class="teaser-text">
+        <p class="eyebrow eyebrow-light"><span class="eyebrow-line"></span> Le Jeu Zone 85</p>
+        <h2>Un jeu, pour de vrai. Fin 2026.</h2>
+        <p class="teaser-lead">
+          On y travaille en coulisses. Un jeu digital, vendéen jusque dans le moindre détail,
+          qui se révèlera <strong>en octobre 2026</strong> et s'achètera <strong>fin 2026</strong>.
+          Inscris-toi pour être prévenu en premier — et obtiens un tarif Zonaute.
+        </p>
+
+        <form class="teaser-form" onsubmit="event.preventDefault(); document.getElementById('teaserOk').hidden=false; this.reset();">
+          <label class="sr-only" for="teaserEmail">Adresse e-mail</label>
+          <input type="email" id="teaserEmail" placeholder="ton.email@vendée.fr" required>
+          <button type="submit" class="btn btn-coral">Me prévenir</button>
+        </form>
+        <p class="teaser-ok" id="teaserOk" hidden>✓ C'est noté. On te garde une place chaude.</p>
+      </div>
+
+      <div class="teaser-visual" aria-hidden="true">
+        <div class="ticket">
+          <div class="ticket-head">
+            <span>ZONE 85</span>
+            <span class="ticket-num">N° 0001</span>
+          </div>
+          <div class="ticket-body">
+            <p class="ticket-line">PRÉ-INSCRIPTION</p>
+            <p class="ticket-title">LE JEU</p>
+            <p class="ticket-date">10 / 2026</p>
+          </div>
+          <div class="ticket-footer">
+            <span>Zonaute</span>
+            <span>· Tarif privilégié ·</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       NEWSLETTER
+       ════════════════════════════════════════════════════════════ -->
+  <section class="newsletter">
+    <div class="container newsletter-inner">
+      <div>
+        <h2>Reste connecté au 85.</h2>
+        <p>Une lettre par mois, sans bla-bla : nouvelles randos, mots de patois, et le jeu qui avance.</p>
+      </div>
+      <form class="newsletter-form" onsubmit="event.preventDefault(); document.getElementById('nlOk').hidden=false; this.reset();">
+        <label class="sr-only" for="nlEmail">Adresse e-mail</label>
+        <input type="email" id="nlEmail" placeholder="ton e-mail" required>
+        <button type="submit" class="btn btn-ink">S'abonner</button>
+        <p class="nl-ok" id="nlOk" hidden>✓ Bienvenue à bord.</p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       FOOTER
+       ════════════════════════════════════════════════════════════ -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+
+      <div class="footer-brand">
+        <a href="#" class="brand brand-light">
+          <span class="brand-zone">ZONE</span>
+          <span class="brand-dot"></span>
+          <span class="brand-num">85</span>
+        </a>
+        <p class="footer-tag">L'Esprit Vendée, par les Zonautes.</p>
+      </div>
+
+      <div class="footer-cols">
+        <div>
+          <h4>Explorer</h4>
+          <a href="#randonnees">Randonnées</a>
+          <a href="#chez-nous">Chez nous</a>
+          <a href="#quiz">Quiz</a>
+          <a href="#le-jeu">Le Jeu</a>
+        </div>
+        <div>
+          <h4>Zonaute</h4>
+          <a href="#passeport">Mon passeport</a>
+          <a href="#connexion">Se connecter</a>
+          <a href="#inscription">Créer un compte</a>
+        </div>
+        <div>
+          <h4>Suivre</h4>
+          <a href="https://www.facebook.com/Zone85Vendee/" target="_blank" rel="noopener">Facebook</a>
+          <a href="https://x.com/zone85vendee" target="_blank" rel="noopener">X / Twitter</a>
+          <a href="#newsletter">Newsletter</a>
+        </div>
+        <div>
+          <h4>Maison</h4>
+          <a href="#mentions">Mentions légales</a>
+          <a href="#cgu">CGU</a>
+          <a href="#contact">Contact</a>
+        </div>
+      </div>
+
+    </div>
+    <div class="container footer-bottom">
+      <p>© Zone 85 — Tous droits réservés.</p>
+      <p>Fait en Vendée, pour les Zonautes.</p>
+    </div>
+  </footer>
 
   <script src="script.js"></script>
 </body>
