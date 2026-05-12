@@ -1,0 +1,2130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zone85 — L'Esprit Vendée</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=DM+Sans:wght@300;400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+
+/* ══════════════════════════════════════════
+   RESET & BASE
+══════════════════════════════════════════ */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; overflow:hidden; background:#07101a; }
+
+:root {
+  --corail:  #E06A52;
+  --bleu:    #2B4A6B;
+  --beige:   #F0EBE0;
+  --nuit:    #07101a;
+  --nuit-2:  #0d1c2b;
+  --nuit-3:  #142236;
+  --blanc:   #F8F5F0;
+  --gris:    rgba(255,255,255,0.38);
+  --gris-2:  rgba(255,255,255,0.16);
+  --or:      #C4A45A;
+  --ease:    cubic-bezier(0.76,0,0.24,1);
+}
+
+/* ══════════════════════════════════════════
+   OVERLAY DE TRANSITION
+══════════════════════════════════════════ */
+#curtain {
+  position: fixed; inset: 0; z-index: 9000;
+  background: var(--nuit);
+  transform-origin: bottom;
+  transform: scaleY(0);
+  pointer-events: none;
+  will-change: transform;
+}
+#curtain.down {
+  animation: curtainDown 0.6s var(--ease) forwards;
+}
+#curtain.up {
+  animation: curtainUp 0.5s var(--ease) forwards;
+}
+@keyframes curtainDown {
+  from { transform: scaleY(0); transform-origin: bottom; }
+  to   { transform: scaleY(1); transform-origin: bottom; }
+}
+@keyframes curtainUp {
+  from { transform: scaleY(1); transform-origin: top; }
+  to   { transform: scaleY(0); transform-origin: top; }
+}
+
+/* ══════════════════════════════════════════
+   PAGES
+══════════════════════════════════════════ */
+.page {
+  position: fixed; inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease;
+}
+.page.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ══════════════════════════════════════════
+   NAV — suggérée, presque absente
+══════════════════════════════════════════ */
+#nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 500;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 56px;
+  height: 72px;
+  /* Aucun fond par défaut — elle flotte sur le contenu */
+}
+
+/* Version claire pour les pages claires */
+#nav.light-nav .nav-wordmark { color: #1a1a1a; }
+#nav.light-nav .nav-item { color: rgba(0,0,0,0.4); }
+#nav.light-nav .nav-item:hover { color: #1a1a1a; }
+#nav.light-nav .nav-cta {
+  color: #1a1a1a !important;
+  border-color: rgba(0,0,0,0.2) !important;
+}
+#nav.light-nav .nav-cta:hover {
+  background: #1a1a1a !important;
+  color: white !important;
+}
+
+.nav-wordmark {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px; font-weight: 500;
+  color: rgba(255,255,255,0.85);
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.nav-links {
+  display: flex; align-items: center;
+  gap: 2px; list-style: none;
+}
+.nav-item {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; font-weight: 300;
+  letter-spacing: 2.5px; text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: color 0.3s;
+  border: none; background: none;
+}
+.nav-item:hover { color: rgba(255,255,255,0.85); }
+.nav-item.active { color: rgba(255,255,255,0.7); }
+
+.nav-cta {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; font-weight: 400;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(255,255,255,0.55) !important;
+  border: 1px solid rgba(255,255,255,0.18) !important;
+  padding: 7px 18px !important;
+  border-radius: 2px;
+  transition: background 0.3s, color 0.3s, border-color 0.3s !important;
+  cursor: pointer;
+  background: none;
+}
+.nav-cta:hover {
+  background: rgba(255,255,255,0.08) !important;
+  color: white !important;
+  border-color: rgba(255,255,255,0.4) !important;
+}
+
+/* ══════════════════════════════════════════
+   PAGE HOME — PORTAIL
+══════════════════════════════════════════ */
+#page-home {
+  background: var(--nuit);
+  display: flex; flex-direction: column;
+}
+
+/* Fond étoilé animé */
+.stars-canvas {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Brume centrale */
+.nebula {
+  position: absolute;
+  width: 60vw; height: 60vh;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(ellipse,
+    rgba(43,74,107,0.18) 0%,
+    rgba(43,74,107,0.06) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
+  animation: breathe 8s ease-in-out infinite;
+}
+@keyframes breathe {
+  0%,100% { opacity:0.7; transform:translate(-50%,-50%) scale(1); }
+  50%     { opacity:1;   transform:translate(-50%,-50%) scale(1.08); }
+}
+
+/* Ligne horizontale médiane décorative */
+.horizon-line {
+  position: absolute;
+  left: 56px; right: 56px;
+  bottom: 38%;
+  height: 1px;
+  background: linear-gradient(to right,
+    transparent 0%,
+    rgba(255,255,255,0.04) 20%,
+    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.04) 80%,
+    transparent 100%
+  );
+  z-index: 1;
+}
+
+/* Hero texte */
+.home-intro {
+  position: absolute;
+  top: 50%; left: 56px;
+  transform: translateY(-50%);
+  z-index: 2;
+  max-width: 480px;
+}
+.home-intro-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; font-weight: 300;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: var(--corail);
+  margin-bottom: 20px;
+  opacity: 0;
+  animation: fadeUp 1s 0.3s ease forwards;
+}
+.home-intro-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(38px, 4.5vw, 60px);
+  font-weight: 500;
+  color: rgba(255,255,255,0.88);
+  line-height: 1.08;
+  letter-spacing: -0.5px;
+  opacity: 0;
+  animation: fadeUp 1s 0.5s ease forwards;
+}
+.home-intro-title em {
+  font-style: italic;
+  color: rgba(255,255,255,0.55);
+}
+.home-intro-sub {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px; font-weight: 300;
+  color: rgba(255,255,255,0.28);
+  line-height: 1.75;
+  margin-top: 18px;
+  max-width: 380px;
+  opacity: 0;
+  animation: fadeUp 1s 0.7s ease forwards;
+}
+
+/* Stats flottantes */
+.home-stats {
+  position: absolute;
+  right: 56px; top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  display: flex; flex-direction: column;
+  gap: 28px; align-items: flex-end;
+  opacity: 0;
+  animation: fadeIn 1.2s 1s ease forwards;
+}
+.home-stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 36px; font-weight: 400;
+  color: rgba(255,255,255,0.55);
+  line-height: 1;
+  display: block;
+  text-align: right;
+}
+.home-stat-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; font-weight: 300;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(255,255,255,0.2);
+  display: block;
+  text-align: right;
+  margin-top: 2px;
+}
+
+/* ── PORTAIL BAS ── */
+.portail {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 38vh;
+  display: flex;
+  z-index: 2;
+  border-top: 1px solid rgba(255,255,255,0.04);
+  opacity: 0;
+  animation: fadeUp 1s 0.9s ease forwards;
+}
+
+.portal-door {
+  flex: 1;
+  position: relative;
+  display: flex; flex-direction: column;
+  justify-content: flex-end;
+  padding: 32px 36px;
+  cursor: pointer;
+  border-right: 1px solid rgba(255,255,255,0.04);
+  overflow: hidden;
+  transition: flex 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+.portal-door:last-child { border-right: none; }
+.portal-door:hover { flex: 1.6; }
+
+/* Fond de la porte */
+.door-bg {
+  position: absolute; inset: 0;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.portal-door:hover .door-bg { opacity: 1; }
+
+.door-bg-rando    { background: linear-gradient(160deg, rgba(18,40,22,0.9) 0%, rgba(26,56,30,0.6) 100%); }
+.door-bg-cheznous { background: linear-gradient(160deg, rgba(40,28,12,0.9) 0%, rgba(60,42,18,0.6) 100%); }
+.door-bg-quiz     { background: linear-gradient(160deg, rgba(12,24,42,0.9) 0%, rgba(24,42,72,0.6) 100%); }
+.door-bg-jeu      { background: linear-gradient(160deg, rgba(8,12,20,0.95) 0%, rgba(16,24,40,0.7) 100%); }
+.door-bg-passeport{ background: linear-gradient(160deg, rgba(32,18,28,0.9) 0%, rgba(50,28,44,0.6) 100%); }
+
+/* Ligne colorée en haut qui apparaît au hover */
+.door-line {
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 1px;
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.5s var(--ease);
+}
+.portal-door:hover .door-line { transform: scaleX(1); }
+.line-rando    { background: rgba(100,180,100,0.5); }
+.line-cheznous { background: rgba(196,164,90,0.5); }
+.line-quiz     { background: rgba(74,123,168,0.5); }
+.line-jeu      { background: rgba(224,106,82,0.5); }
+.line-passeport{ background: rgba(180,130,160,0.5); }
+
+.door-content { position: relative; z-index: 2; }
+
+.door-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; font-weight: 300;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.15);
+  display: block; margin-bottom: 14px;
+}
+
+.door-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 19px; font-weight: 500;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.2;
+  transition: color 0.4s;
+  display: block;
+  margin-bottom: 0;
+}
+.portal-door:hover .door-title {
+  color: rgba(255,255,255,0.92);
+}
+
+.door-desc {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px; font-weight: 300;
+  color: rgba(255,255,255,0);
+  line-height: 1.65;
+  margin-top: 10px;
+  max-width: 200px;
+  transition: color 0.4s 0.1s;
+}
+.portal-door:hover .door-desc {
+  color: rgba(255,255,255,0.38);
+}
+
+.door-enter {
+  display: block;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; font-weight: 300;
+  letter-spacing: 2.5px; text-transform: uppercase;
+  color: rgba(255,255,255,0);
+  margin-top: 20px;
+  transition: color 0.3s 0.15s, letter-spacing 0.4s;
+}
+.portal-door:hover .door-enter {
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 4px;
+}
+
+.door-badge {
+  position: absolute; top: 20px; right: 20px;
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; font-weight: 300;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: rgba(196,164,90,0.6);
+  border: 1px solid rgba(196,164,90,0.2);
+  padding: 4px 10px; border-radius: 1px;
+}
+
+/* ══════════════════════════════════════════
+   PAGE INTÉRIEURE — BASE COMMUNE
+══════════════════════════════════════════ */
+.inner-page {
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+/* Retour */
+.back-btn {
+  position: fixed; top: 72px; left: 56px;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; font-weight: 300;
+  letter-spacing: 2.5px; text-transform: uppercase;
+  color: rgba(255,255,255,0.25);
+  background: none; border: none; cursor: pointer;
+  transition: color 0.3s;
+  z-index: 400; padding: 8px 0;
+  display: flex; align-items: center; gap: 10px;
+}
+.back-btn::before {
+  content: '';
+  display: block; width: 20px; height: 1px;
+  background: rgba(255,255,255,0.25);
+  transition: width 0.3s, background 0.3s;
+}
+.back-btn:hover { color: rgba(255,255,255,0.7); }
+.back-btn:hover::before { width: 28px; background: rgba(255,255,255,0.5); }
+
+.back-btn.dark {
+  color: rgba(0,0,0,0.3);
+}
+.back-btn.dark::before { background: rgba(0,0,0,0.3); }
+.back-btn.dark:hover { color: rgba(0,0,0,0.7); }
+.back-btn.dark:hover::before { background: rgba(0,0,0,0.6); }
+
+/* Header de page intérieure */
+.inner-header {
+  min-height: 55vh; position: relative;
+  display: flex; align-items: flex-end;
+  padding: 0 80px 56px;
+  overflow: hidden;
+}
+.inner-header-bg {
+  position: absolute; inset: 0;
+}
+.inner-header-content { position: relative; z-index: 2; }
+.inner-page-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; font-weight: 300;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: var(--corail); margin-bottom: 16px;
+}
+.inner-page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(42px, 6vw, 72px);
+  font-weight: 500; color: white;
+  line-height: 1.04; letter-spacing: -0.5px;
+}
+.inner-page-title em { font-style: italic; }
+.inner-page-sub {
+  font-size: 14px; font-weight: 300;
+  color: rgba(255,255,255,0.4); line-height: 1.75;
+  margin-top: 14px; max-width: 500px;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.inner-body { padding: 64px 80px 80px; }
+
+/* ══════════════════════════════════════════
+   PAGE RANDONNÉES
+══════════════════════════════════════════ */
+#page-rando { background: var(--blanc); }
+#page-rando .inner-header-bg {
+  background: linear-gradient(160deg, #0b1e10 0%, #172e1a 50%, #1f3f22 100%);
+}
+#page-rando .back-btn { color: rgba(255,255,255,0.25); }
+
+.filters {
+  display: flex; gap: 6px; margin-bottom: 48px; flex-wrap: wrap;
+}
+.f-btn {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; font-weight: 300;
+  letter-spacing: 2px; text-transform: uppercase;
+  padding: 8px 18px; border-radius: 1px;
+  border: 1px solid #d8d0c4;
+  background: none; cursor: pointer;
+  color: #a0948a; transition: all 0.25s;
+}
+.f-btn:hover, .f-btn.on {
+  background: #1a1a1a; color: white; border-color: #1a1a1a;
+}
+
+.rando-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 28px;
+}
+.rando-card {
+  cursor: pointer;
+  border-bottom: 1px solid #e0d8ce;
+  padding-bottom: 28px;
+  transition: transform 0.3s;
+}
+.rando-card:hover { transform: translateY(-3px); }
+
+.rando-thumb {
+  height: 220px; margin-bottom: 20px;
+  position: relative; overflow: hidden; border-radius: 1px;
+}
+.rando-thumb-bg {
+  width: 100%; height: 100%;
+  transition: transform 0.5s ease;
+}
+.rando-card:hover .rando-thumb-bg { transform: scale(1.04); }
+
+.rando-thumb-tag {
+  position: absolute; top: 14px; left: 14px;
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; font-weight: 300;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: rgba(255,255,255,0.7);
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(4px);
+  padding: 4px 10px;
+}
+
+.rando-meta {
+  display: flex; gap: 16px; margin-bottom: 10px;
+}
+.rando-meta span {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; font-weight: 300;
+  color: #b0a898; letter-spacing: 0.5px;
+}
+.rando-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px; font-weight: 500;
+  color: #1a1a1a; line-height: 1.3; margin-bottom: 8px;
+}
+.rando-desc {
+  font-size: 13px; font-weight: 300;
+  color: #7a7068; line-height: 1.65;
+  font-family: 'DM Sans', sans-serif;
+  margin-bottom: 14px;
+}
+.rando-foot {
+  display: flex; justify-content: space-between; align-items: center;
+}
+.rando-author {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; color: #c0b8ae; letter-spacing: 0.5px;
+}
+.gpx-link {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; font-weight: 300;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--bleu); text-decoration: none;
+  border-bottom: 1px solid rgba(43,74,107,0.25);
+  padding-bottom: 2px;
+  transition: border-color 0.2s, color 0.2s;
+}
+.gpx-link:hover { color: var(--corail); border-color: var(--corail); }
+
+/* ══════════════════════════════════════════
+   PAGE CHEZ NOUS
+══════════════════════════════════════════ */
+#page-cheznous { background: var(--nuit-2); }
+#page-cheznous .inner-header-bg {
+  background: linear-gradient(160deg, #1e1006 0%, #2e1c0a 50%, #3a2410 100%);
+}
+
+.cn-grid {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 1px;
+  background: rgba(255,255,255,0.04);
+}
+.cn-cell {
+  aspect-ratio: 1;
+  position: relative; overflow: hidden; cursor: pointer;
+}
+.cn-cell:nth-child(5) { grid-column: span 2; aspect-ratio: 2/1; }
+.cn-cell-bg {
+  width:100%; height:100%;
+  transition: transform 0.6s ease;
+  display: flex; align-items: center; justify-content: center;
+}
+.cn-cell:hover .cn-cell-bg { transform: scale(1.06); }
+.cn-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%);
+  opacity: 0; transition: opacity 0.4s;
+  display: flex; flex-direction: column;
+  justify-content: flex-end; padding: 24px;
+}
+.cn-cell:hover .cn-overlay { opacity: 1; }
+.cn-word {
+  font-family: 'Playfair Display', serif;
+  font-style: italic; font-size: 24px;
+  color: white; line-height: 1.2; margin-bottom: 4px;
+}
+.cn-def {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px; font-weight: 300;
+  color: rgba(255,255,255,0.5);
+}
+.cn-tag {
+  position: absolute; top: 14px; right: 14px;
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+}
+
+/* ══════════════════════════════════════════
+   PAGE QUIZ
+══════════════════════════════════════════ */
+#page-quiz { background: var(--nuit-3); }
+#page-quiz .inner-header-bg {
+  background: linear-gradient(160deg, #07101a 0%, #0f1e30 50%, #182840 100%);
+}
+
+.quiz-list {
+  display: grid; grid-template-columns: repeat(2,1fr); gap: 1px;
+  background: rgba(255,255,255,0.04);
+}
+.quiz-item {
+  padding: 40px 44px;
+  background: rgba(255,255,255,0.015);
+  cursor: pointer;
+  transition: background 0.3s;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+.quiz-item:hover { background: rgba(255,255,255,0.04); }
+.qi-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; color: rgba(255,255,255,0.15);
+  letter-spacing: 2px; margin-bottom: 20px;
+}
+.qi-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px; font-weight: 500;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.2; margin-bottom: 10px;
+}
+.quiz-item:hover .qi-title { color: rgba(255,255,255,0.95); }
+.qi-desc {
+  font-size: 13px; font-weight: 300;
+  color: rgba(255,255,255,0.28); line-height: 1.65;
+  font-family: 'DM Sans', sans-serif; margin-bottom: 24px;
+}
+.qi-foot {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.qi-count {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; color: rgba(255,255,255,0.2); letter-spacing: 1px;
+}
+.qi-level {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 1.5px; text-transform: uppercase;
+  padding: 4px 12px; border-radius: 1px;
+}
+.lv-1 { color: rgba(100,180,100,0.7); border: 1px solid rgba(100,180,100,0.2); }
+.lv-2 { color: rgba(196,164,90,0.7);  border: 1px solid rgba(196,164,90,0.2); }
+.lv-3 { color: rgba(224,106,82,0.7);  border: 1px solid rgba(224,106,82,0.2); }
+
+/* ══════════════════════════════════════════
+   PAGE JEU — Les Invisibles
+══════════════════════════════════════════ */
+#page-jeu { background: var(--nuit); }
+
+.jeu-full {
+  height: 100vh; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column;
+  position: relative; overflow: hidden;
+  text-align: center; padding: 0 40px;
+}
+.jeu-full-bg {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 45%, #142236 0%, #07101a 65%);
+}
+.jeu-glow {
+  position: absolute;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(224,106,82,0.08) 0%, transparent 70%);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  animation: jeuGlow 5s ease-in-out infinite;
+}
+@keyframes jeuGlow {
+  0%,100% { opacity:0.5; transform:translate(-50%,-50%) scale(1); }
+  50%     { opacity:1;   transform:translate(-50%,-50%) scale(1.2); }
+}
+.jeu-stars-bg { position: absolute; inset: 0; z-index: 0; }
+.jeu-content  { position: relative; z-index: 2; max-width: 620px; }
+.jeu-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 3.5px; text-transform: uppercase;
+  color: var(--corail); margin-bottom: 22px;
+  opacity: 0.8;
+}
+.jeu-title {
+  font-family: 'Playfair Display', serif;
+  font-style: italic; font-size: clamp(52px,8vw,96px);
+  font-weight: 500; color: white;
+  line-height: 0.95; margin-bottom: 10px;
+  letter-spacing: -1px;
+}
+.jeu-sub {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px; font-weight: 300;
+  color: rgba(255,255,255,0.22);
+  letter-spacing: 5px; text-transform: uppercase;
+  margin-bottom: 32px;
+}
+.jeu-desc {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px; font-weight: 300;
+  color: rgba(255,255,255,0.42); line-height: 1.85;
+  margin-bottom: 48px; max-width: 500px; margin-left: auto; margin-right: auto;
+}
+.jeu-dates {
+  display: flex; gap: 1px; justify-content: center; margin-bottom: 48px;
+}
+.jd {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 16px 32px; text-align: center;
+}
+.jd-l {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(255,255,255,0.2); margin-bottom: 6px;
+}
+.jd-v {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px; color: rgba(255,255,255,0.7);
+}
+.jd-v.hot { color: var(--corail); }
+.cta-jeu {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; font-weight: 300;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: white; background: var(--corail);
+  border: none; padding: 16px 36px; cursor: pointer;
+  border-radius: 1px;
+  transition: background 0.3s, transform 0.3s;
+}
+.cta-jeu:hover { background: #c85a42; transform: translateY(-2px); }
+
+/* ══════════════════════════════════════════
+   PAGE PASSEPORT
+══════════════════════════════════════════ */
+#page-passeport {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+}
+
+.pass-left {
+  background: #0d1a28;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 80px; overflow-y: auto;
+}
+.pass-label-text {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; font-weight: 300;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: var(--corail); margin-bottom: 20px;
+}
+.pass-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(36px, 4vw, 52px);
+  font-weight: 500; color: white; line-height: 1.08;
+  margin-bottom: 18px;
+}
+.pass-title em { font-style: italic; color: rgba(255,255,255,0.5); }
+.pass-desc {
+  font-size: 14px; font-weight: 300;
+  color: rgba(255,255,255,0.35); line-height: 1.8;
+  margin-bottom: 36px; max-width: 380px;
+  font-family: 'DM Sans', sans-serif;
+}
+.pass-perks {
+  display: flex; flex-direction: column; gap: 12px; margin-bottom: 44px;
+}
+.pass-perk {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 300;
+  color: rgba(255,255,255,0.35);
+  display: flex; align-items: center; gap: 12px;
+}
+.perk-tick {
+  width: 14px; height: 1px;
+  background: var(--corail); flex-shrink: 0; opacity: 0.6;
+}
+.pass-form { display: flex; flex-direction: column; gap: 10px; max-width: 360px; }
+.pass-input {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+  padding: 14px 0;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px; font-weight: 300;
+  color: white; outline: none;
+  transition: border-color 0.3s;
+  background: none; border: none; border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+.pass-input::placeholder { color: rgba(255,255,255,0.2); }
+.pass-input:focus { border-bottom-color: rgba(255,255,255,0.45); }
+.pass-submit {
+  margin-top: 16px;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; font-weight: 300;
+  letter-spacing: 2.5px; text-transform: uppercase;
+  color: white; background: none;
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 15px 28px; cursor: pointer; border-radius: 1px;
+  transition: background 0.3s, border-color 0.3s;
+  align-self: flex-start;
+}
+.pass-submit:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.4); }
+.pass-login {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; color: rgba(255,255,255,0.2);
+  letter-spacing: 1px; margin-top: 14px;
+}
+.pass-login a { color: rgba(255,255,255,0.35); cursor: pointer; text-decoration: underline; }
+
+.pass-right {
+  background: var(--nuit);
+  display: flex; align-items: center; justify-content: center;
+  padding: 80px;
+  perspective: 1400px;
+  border-left: 1px solid rgba(255,255,255,0.04);
+}
+.pass-card {
+  width: 320px;
+  border-radius: 10px; overflow: hidden;
+  transform: rotateY(-12deg) rotateX(6deg);
+  transition: transform 0.5s ease;
+  box-shadow: 40px 50px 100px rgba(0,0,0,0.6);
+}
+.pass-card:hover { transform: rotateY(-4deg) rotateX(2deg); }
+.pc-top {
+  background: linear-gradient(135deg, #1e3650 0%, #0f1e2e 100%);
+  padding: 32px;
+}
+.pc-head {
+  display: flex; justify-content: space-between;
+  align-items: flex-start; margin-bottom: 28px;
+}
+.pc-brand {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px; color: rgba(255,255,255,0.7);
+}
+.pc-type {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 1.5px;
+  color: var(--corail); text-transform: uppercase; text-align: right;
+  line-height: 1.6;
+}
+.pc-avatar {
+  width: 60px; height: 60px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.06);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; margin-bottom: 14px;
+}
+.pc-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px; color: rgba(255,255,255,0.82);
+  margin-bottom: 2px;
+}
+.pc-id {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; color: rgba(255,255,255,0.22);
+  letter-spacing: 0.8px; margin-bottom: 24px;
+}
+.pc-fields {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 16px; padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.pcf-l {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: rgba(255,255,255,0.2); margin-bottom: 3px;
+}
+.pcf-v {
+  font-size: 13px; font-weight: 300;
+  color: rgba(255,255,255,0.6);
+  font-family: 'DM Sans', sans-serif;
+}
+.pc-bot {
+  background: #0a131f;
+  padding: 14px 32px;
+  display: flex; align-items: center; gap: 12px;
+}
+.pcb-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; color: rgba(255,255,255,0.15);
+  letter-spacing: 1.5px; text-transform: uppercase;
+}
+.pcb-bar {
+  flex:1; height: 2px;
+  background: rgba(255,255,255,0.06); border-radius: 1px;
+}
+.pcb-fill {
+  height: 100%; width: 68%; border-radius: 1px;
+  background: linear-gradient(to right, var(--corail), var(--or));
+}
+.pcb-pct {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; color: var(--or); font-weight: 400;
+}
+
+/* ══════════════════════════════════════════
+   TICKER
+══════════════════════════════════════════ */
+#ticker {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  z-index: 200; height: 32px;
+  display: flex; align-items: center; overflow: hidden;
+  border-top: 1px solid rgba(255,255,255,0.04);
+  background: rgba(7,16,26,0.9);
+  backdrop-filter: blur(8px);
+}
+.ticker-inner {
+  display: flex; white-space: nowrap;
+  animation: ticker 40s linear infinite;
+}
+.t-item {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; font-weight: 300;
+  letter-spacing: 2.5px; text-transform: uppercase;
+  color: rgba(255,255,255,0.18);
+  padding: 0 40px;
+}
+.t-sep { color: var(--corail); opacity: 0.4; padding: 0 6px; letter-spacing: 0; }
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ══════════════════════════════════════════
+   ANIMATIONS
+══════════════════════════════════════════ */
+@keyframes fadeUp {
+  from { opacity:0; transform: translateY(18px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity:0; }
+  to   { opacity:1; }
+}
+
+/* ══════════════════════════════════════════
+   BACKOFFICE
+══════════════════════════════════════════ */
+#page-backoffice {
+  background: #060d16;
+  display: grid !important;
+  grid-template-columns: 300px 1fr;
+  overflow: hidden;
+}
+.bo-side {
+  background: #0a1525;
+  border-right: 1px solid rgba(255,255,255,0.05);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.bo-side-head {
+  padding: 28px 24px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.bo-side-logo {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 3px; text-transform: uppercase;
+  color: rgba(255,255,255,0.2); margin-bottom: 16px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.bo-exit-btn {
+  background: none; border: none; cursor: pointer;
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: rgba(255,255,255,0.2); transition: color 0.2s;
+}
+.bo-exit-btn:hover { color: rgba(255,255,255,0.5); }
+.bo-new-btn {
+  width: 100%;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+  color: white; background: var(--corail);
+  border: none; padding: 11px 16px; cursor: pointer; border-radius: 1px;
+  transition: background 0.2s;
+}
+.bo-new-btn:hover { background: #c85a42; }
+.bo-pub-list { flex: 1; overflow-y: auto; padding: 8px 0; }
+.bo-pub-item {
+  padding: 14px 24px; cursor: pointer;
+  border-left: 2px solid transparent;
+  transition: background 0.2s, border-color 0.2s;
+}
+.bo-pub-item:hover { background: rgba(255,255,255,0.03); }
+.bo-pub-item.bo-active {
+  background: rgba(255,255,255,0.05);
+  border-left-color: var(--corail);
+}
+.bo-pi-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 13px; color: rgba(255,255,255,0.65);
+  margin-bottom: 5px; line-height: 1.3;
+}
+.bo-pi-meta {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 1px;
+  color: rgba(255,255,255,0.2);
+  display: flex; gap: 8px; align-items: center;
+}
+.bo-status {
+  padding: 2px 7px; border-radius: 1px;
+  font-size: 7px; letter-spacing: 1.5px; text-transform: uppercase;
+}
+.st-draft { color: rgba(196,164,90,0.7); border: 1px solid rgba(196,164,90,0.25); }
+.st-pub   { color: rgba(100,180,100,0.7); border: 1px solid rgba(100,180,100,0.25); }
+.bo-empty {
+  padding: 32px 24px;
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 1.5px;
+  color: rgba(255,255,255,0.12); line-height: 2;
+}
+
+.bo-main {
+  display: grid; grid-template-columns: 1fr 340px;
+  overflow: hidden;
+}
+.bo-form-area {
+  padding: 48px; overflow-y: auto;
+  border-right: 1px solid rgba(255,255,255,0.04);
+}
+.bo-form-heading {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px; color: rgba(255,255,255,0.75);
+  margin-bottom: 36px;
+}
+.bo-field { margin-bottom: 24px; }
+.bo-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(255,255,255,0.3); margin-bottom: 10px; display: block;
+}
+.bo-input, .bo-select, .bo-textarea {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 12px 16px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px; font-weight: 300;
+  color: rgba(255,255,255,0.75);
+  outline: none; border-radius: 1px;
+  transition: border-color 0.3s;
+}
+.bo-input:focus, .bo-select:focus, .bo-textarea:focus {
+  border-color: rgba(255,255,255,0.25);
+}
+.bo-textarea { height: 200px; resize: vertical; line-height: 1.7; }
+.bo-select { cursor: pointer; }
+.bo-select option { background: #0a1525; }
+
+.bo-color-grid { display: flex; gap: 10px; flex-wrap: wrap; }
+.bo-swatch {
+  width: 44px; height: 44px; border-radius: 4px; cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.2s, border-color 0.2s;
+  position: relative;
+}
+.bo-swatch:hover { transform: scale(1.1); }
+.bo-swatch.bo-sel { border-color: white; }
+.bo-swatch.bo-sel::after {
+  content: '✓'; position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 14px;
+}
+
+.bo-icon-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.bo-icon-btn {
+  width: 42px; height: 42px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  font-size: 20px; cursor: pointer; border-radius: 2px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s, border-color 0.2s;
+}
+.bo-icon-btn:hover { background: rgba(255,255,255,0.1); }
+.bo-icon-btn.bo-sel { border-color: var(--corail); background: rgba(224,106,82,0.12); }
+
+.bo-actions { display: flex; gap: 10px; margin-top: 32px; align-items: center; }
+.bo-act-draft {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  border: 1px solid rgba(255,255,255,0.12);
+  background: none; padding: 12px 22px; cursor: pointer; border-radius: 1px;
+  transition: all 0.2s;
+}
+.bo-act-draft:hover { border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.7); }
+.bo-act-publish {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+  color: white; background: var(--corail);
+  border: none; padding: 12px 28px; cursor: pointer; border-radius: 1px;
+  transition: background 0.2s;
+}
+.bo-act-publish:hover { background: #c85a42; }
+.bo-act-delete {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(255,255,255,0.2);
+  background: none; border: none; padding: 12px 16px; cursor: pointer;
+  margin-left: auto; transition: color 0.2s;
+}
+.bo-act-delete:hover { color: rgba(224,106,82,0.7); }
+
+.bo-preview-area {
+  padding: 40px 28px; overflow-y: auto;
+  background: rgba(0,0,0,0.2);
+}
+.bo-preview-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 2.5px; text-transform: uppercase;
+  color: rgba(255,255,255,0.2); margin-bottom: 20px;
+}
+
+/* ══════════════════════════════════════════
+   PUBLICATION CARDS
+══════════════════════════════════════════ */
+.pub-card {
+  border-radius: 8px; overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+}
+.pub-card-visual {
+  padding: 36px 24px 28px;
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center; min-height: 200px; justify-content: center;
+}
+.pub-card-icon { font-size: 52px; margin-bottom: 14px; display: block; }
+.pub-card-accroche {
+  font-family: 'Playfair Display', serif;
+  font-style: italic; font-size: 17px;
+  color: white; line-height: 1.3; font-weight: 500;
+}
+.pub-card-body { background: rgba(248,245,240,0.97); padding: 20px 22px; }
+.pub-card-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--corail); margin-bottom: 10px;
+}
+.pub-card-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 300;
+  color: #4a4540; line-height: 1.7;
+  display: -webkit-box; -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical; overflow: hidden;
+  margin-bottom: 10px;
+}
+.pub-card-htags {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 0.5px;
+  color: rgba(43,74,107,0.45);
+}
+.pub-card-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 14px; padding-top: 12px;
+  border-top: 1px solid rgba(0,0,0,0.06);
+}
+.pub-read-more {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--corail); cursor: pointer;
+  background: none; border: none; padding: 0;
+  transition: letter-spacing 0.3s;
+}
+.pub-read-more:hover { letter-spacing: 3px; }
+.pub-card-date {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; color: rgba(0,0,0,0.2); letter-spacing: 0.5px;
+}
+
+/* Publications section in Chez nous */
+.cn-pubs-section { padding: 48px 40px 80px; }
+.cn-pubs-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+  color: rgba(255,255,255,0.18); margin-bottom: 32px;
+}
+.cn-pubs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+.cn-pubs-empty {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 300;
+  color: rgba(255,255,255,0.15); line-height: 2;
+}
+
+/* ══════════════════════════════════════════
+   MODAL PUBLICATION (lecture)
+══════════════════════════════════════════ */
+#pub-modal {
+  position: fixed; inset: 0; z-index: 8000;
+  background: rgba(0,0,0,0.82); backdrop-filter: blur(10px);
+  display: none; align-items: center; justify-content: center;
+  padding: 40px;
+}
+#pub-modal.pm-open { display: flex; }
+.pm-inner {
+  background: white; border-radius: 10px;
+  max-width: 540px; width: 100%; overflow: hidden;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+  max-height: 88vh; overflow-y: auto;
+}
+.pm-visual {
+  padding: 48px 32px; text-align: center;
+}
+.pm-icon { font-size: 64px; display: block; margin-bottom: 18px; }
+.pm-accroche {
+  font-family: 'Playfair Display', serif;
+  font-style: italic; font-size: 24px; color: white; line-height: 1.25;
+}
+.pm-body { padding: 28px 32px; }
+.pm-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--corail); margin-bottom: 16px;
+}
+.pm-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px; font-weight: 300;
+  color: #3a342e; line-height: 1.85;
+  margin-bottom: 18px; white-space: pre-wrap;
+}
+.pm-htags {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; color: rgba(43,74,107,0.45);
+  letter-spacing: 0.5px; margin-bottom: 24px;
+}
+.pm-close {
+  display: block; width: 100%;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase;
+  color: rgba(0,0,0,0.35); background: rgba(0,0,0,0.04);
+  border: none; padding: 14px; cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.pm-close:hover { background: rgba(0,0,0,0.07); color: rgba(0,0,0,0.65); }
+
+</style>
+</head>
+<body>
+
+<!-- RIDEAU -->
+<div id="curtain"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <span class="nav-wordmark" id="navWordmark" onclick="handleLogoClick()">Zone85</span>
+  <ul class="nav-links">
+    <li><button class="nav-item" id="ni-rando"     onclick="goTo('rando')">Randonnées</button></li>
+    <li><button class="nav-item" id="ni-cheznous"  onclick="goTo('cheznous')">Chez nous</button></li>
+    <li><button class="nav-item" id="ni-quiz"      onclick="goTo('quiz')">Quiz</button></li>
+    <li><button class="nav-item" id="ni-jeu"       onclick="goTo('jeu')">Le Jeu</button></li>
+    <li><button class="nav-item nav-cta" id="ni-passeport" onclick="goTo('passeport')">Passeport</button></li>
+  </ul>
+</nav>
+
+<!-- ═══ PAGE HOME ═══ -->
+<div class="page active" id="page-home">
+  <canvas class="stars-canvas" id="starsCanvas"></canvas>
+  <div class="nebula"></div>
+  <div class="horizon-line"></div>
+
+  <div class="home-intro">
+    <div class="home-intro-label">Communauté Vendéenne · 22 000 Zonautes</div>
+    <h1 class="home-intro-title">
+      La Vendée<br>
+      comme vous<br>
+      ne l'avez<br>
+      jamais <em>vécue.</em>
+    </h1>
+    <p class="home-intro-sub">
+      Pas un office de tourisme.<br>Une tribu. La vôtre.
+    </p>
+  </div>
+
+  <div class="home-stats">
+    <div>
+      <span class="home-stat-num">22 K</span>
+      <span class="home-stat-label">Zonautes</span>
+    </div>
+    <div>
+      <span class="home-stat-num">48</span>
+      <span class="home-stat-label">Randonnées</span>
+    </div>
+    <div>
+      <span class="home-stat-num">169</span>
+      <span class="home-stat-label">Mots en parlanjhe</span>
+    </div>
+  </div>
+
+  <!-- PORTAIL 5 PORTES -->
+  <div class="portail">
+
+    <div class="portal-door" onclick="goTo('rando')">
+      <div class="door-bg door-bg-rando"></div>
+      <div class="door-line line-rando"></div>
+      <div class="door-content">
+        <span class="door-num">01</span>
+        <span class="door-title">Randonnées</span>
+        <p class="door-desc">Traces GPX, galeries et récits des chemins de Vendée.</p>
+        <span class="door-enter">Entrer</span>
+      </div>
+    </div>
+
+    <div class="portal-door" onclick="goTo('cheznous')">
+      <div class="door-bg door-bg-cheznous"></div>
+      <div class="door-line line-cheznous"></div>
+      <div class="door-content">
+        <span class="door-num">02</span>
+        <span class="door-title">Chez nous</span>
+        <p class="door-desc">Visuels vendéens et parlanjhe, l'âme du coin.</p>
+        <span class="door-enter">Entrer</span>
+      </div>
+    </div>
+
+    <div class="portal-door" onclick="goTo('quiz')">
+      <div class="door-bg door-bg-quiz"></div>
+      <div class="door-line line-quiz"></div>
+      <div class="door-content">
+        <span class="door-num">03</span>
+        <span class="door-title">Quiz</span>
+        <p class="door-desc">Culture, histoire, patois. T'as deux minutes ?</p>
+        <span class="door-enter">Entrer</span>
+      </div>
+    </div>
+
+    <div class="portal-door" onclick="goTo('jeu')">
+      <div class="door-bg door-bg-jeu"></div>
+      <div class="door-line line-jeu"></div>
+      <div class="door-badge">Bientôt</div>
+      <div class="door-content">
+        <span class="door-num">04</span>
+        <span class="door-title">Les Invisibles</span>
+        <p class="door-desc">Le jeu narratif. En Vendée, certaines légendes ne dorment pas.</p>
+        <span class="door-enter">Découvrir</span>
+      </div>
+    </div>
+
+    <div class="portal-door" onclick="goTo('passeport')">
+      <div class="door-bg door-bg-passeport"></div>
+      <div class="door-line line-passeport"></div>
+      <div class="door-content">
+        <span class="door-num">05</span>
+        <span class="door-title">Mon Passeport</span>
+        <p class="door-desc">Votre identité Zonaute. Scores, accès au jeu, newsletter.</p>
+        <span class="door-enter">Mon espace</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ PAGE RANDONNÉES ═══ -->
+<div class="page inner-page" id="page-rando">
+  <button class="back-btn" onclick="goTo('home')">Retour</button>
+  <div class="inner-header">
+    <div class="inner-header-bg"></div>
+    <div class="inner-header-content">
+      <div class="inner-page-label">Nos sentiers</div>
+      <h1 class="inner-page-title">Les chemins<br>des <em>Zonautes.</em></h1>
+      <p class="inner-page-sub">Traces GPX, galeries photo, récits de terrain. Chaque boucle a une histoire.</p>
+    </div>
+  </div>
+  <div class="inner-body">
+    <div class="filters">
+      <button class="f-btn on">Toutes</button>
+      <button class="f-btn">Bocage</button>
+      <button class="f-btn">Marais</button>
+      <button class="f-btn">Côte</button>
+      <button class="f-btn">Forêt</button>
+      <button class="f-btn">Facile</button>
+      <button class="f-btn">Moyen</button>
+    </div>
+    <div class="rando-grid">
+      <div class="rando-card">
+        <div class="rando-thumb">
+          <div class="rando-thumb-bg" style="background:linear-gradient(160deg,#0e2215,#1a3820);"></div>
+          <div class="rando-thumb-tag">Coup de cœur</div>
+        </div>
+        <div class="rando-meta"><span>Chaillé / La Boissière</span><span>12.7 km</span><span>3 h 30</span></div>
+        <div class="rando-title">La boucle de l'Yon — Deux millénaires d'histoire</div>
+        <div class="rando-desc">Entre Chaillé-sous-les-Ormeaux et La Boissière-des-Landes, cette boucle suit la vallée de l'Yon.</div>
+        <div class="rando-foot">
+          <span class="rando-author">Communauté Zone85</span>
+          <a class="gpx-link">Télécharger GPX</a>
+        </div>
+      </div>
+      <div class="rando-card">
+        <div class="rando-thumb">
+          <div class="rando-thumb-bg" style="background:linear-gradient(160deg,#121e10,#1e3018);"></div>
+          <div class="rando-thumb-tag">Bocage</div>
+        </div>
+        <div class="rando-meta"><span>Montaigu</span><span>8.2 km</span><span>2 h</span></div>
+        <div class="rando-title">Le bocage de la Maine</div>
+        <div class="rando-desc">Haies centenaires et chemins creux. La Vendée secrète, loin des routes.</div>
+        <div class="rando-foot">
+          <span class="rando-author">Communauté Zone85</span>
+          <a class="gpx-link">Télécharger GPX</a>
+        </div>
+      </div>
+      <div class="rando-card">
+        <div class="rando-thumb">
+          <div class="rando-thumb-bg" style="background:linear-gradient(160deg,#0e1c28,#182c40);"></div>
+          <div class="rando-thumb-tag">Marais</div>
+        </div>
+        <div class="rando-meta"><span>Maillé</span><span>11.4 km</span><span>3 h</span></div>
+        <div class="rando-title">La conche du marais breton</div>
+        <div class="rando-desc">Aigrettes, hérons et silence. Un circuit dans le marais où le temps s'étire.</div>
+        <div class="rando-foot">
+          <span class="rando-author">Communauté Zone85</span>
+          <a class="gpx-link">Télécharger GPX</a>
+        </div>
+      </div>
+      <div class="rando-card">
+        <div class="rando-thumb">
+          <div class="rando-thumb-bg" style="background:linear-gradient(160deg,#101828,#1c2e44);"></div>
+          <div class="rando-thumb-tag">Côte</div>
+        </div>
+        <div class="rando-meta"><span>Saint-Jean-de-Monts</span><span>9.8 km</span><span>2 h 30</span></div>
+        <div class="rando-title">La corniche et les dunes</div>
+        <div class="rando-desc">Vent, pin maritime, horizon atlantique. La côte vendéenne à pied.</div>
+        <div class="rando-foot">
+          <span class="rando-author">Communauté Zone85</span>
+          <a class="gpx-link">Télécharger GPX</a>
+        </div>
+      </div>
+      <div class="rando-card">
+        <div class="rando-thumb">
+          <div class="rando-thumb-bg" style="background:linear-gradient(160deg,#1a1008,#2e1c10);"></div>
+          <div class="rando-thumb-tag">Forêt</div>
+        </div>
+        <div class="rando-meta"><span>Les Herbiers</span><span>6.5 km</span><span>1 h 45</span></div>
+        <div class="rando-title">La forêt de Mervent en couleurs</div>
+        <div class="rando-desc">Feuilles rousses, brume légère, silence absolu. Mervent à l'automne.</div>
+        <div class="rando-foot">
+          <span class="rando-author">Communauté Zone85</span>
+          <a class="gpx-link">Télécharger GPX</a>
+        </div>
+      </div>
+      <div class="rando-card">
+        <div class="rando-thumb">
+          <div class="rando-thumb-bg" style="background:linear-gradient(160deg,#0e1e12,#182e1e);"></div>
+          <div class="rando-thumb-tag">Faune</div>
+        </div>
+        <div class="rando-meta"><span>Mareuil-sur-Lay</span><span>7.2 km</span><span>2 h</span></div>
+        <div class="rando-title">Les rives du Lay sauvage</div>
+        <div class="rando-desc">Martins-pêcheurs, loutres et vieilles meuneries. Une rivière encore intacte.</div>
+        <div class="rando-foot">
+          <span class="rando-author">Communauté Zone85</span>
+          <a class="gpx-link">Télécharger GPX</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PAGE CHEZ NOUS ═══ -->
+<div class="page inner-page" id="page-cheznous">
+  <button class="back-btn" onclick="goTo('home')">Retour</button>
+  <div class="inner-header">
+    <div class="inner-header-bg" style="background:linear-gradient(160deg,#1e1006,#2e1c0a,#3a2410);"></div>
+    <div class="inner-header-content">
+      <div class="inner-page-label">L'âme vendéenne</div>
+      <h1 class="inner-page-title">Chez nous,<br>on dit <em>autrement.</em></h1>
+      <p class="inner-page-sub">Parlanjhe et visuels. Les mots et les images de ceux qui connaissent le coin.</p>
+    </div>
+  </div>
+  <div style="padding:2px 2px 40px;">
+    <div class="cn-grid">
+      <div class="cn-cell"><div class="cn-cell-bg" style="background:linear-gradient(135deg,#2B4A6B,#1a2d42);min-height:280px;"></div><span class="cn-tag">Parlanjhe</span><div class="cn-overlay"><div class="cn-word">la goule</div><div class="cn-def">la bouche</div></div></div>
+      <div class="cn-cell"><div class="cn-cell-bg" style="background:linear-gradient(135deg,#1e3010,#2a4018);min-height:280px;"></div><span class="cn-tag">Visuel</span><div class="cn-overlay"><div class="cn-word">le bocage</div><div class="cn-def">haies centenaires</div></div></div>
+      <div class="cn-cell"><div class="cn-cell-bg" style="background:linear-gradient(135deg,#3a2810,#4a3818);min-height:280px;"></div><span class="cn-tag">Parlanjhe</span><div class="cn-overlay"><div class="cn-word">le bossu</div><div class="cn-def">le coq</div></div></div>
+      <div class="cn-cell"><div class="cn-cell-bg" style="background:linear-gradient(135deg,#1a2530,#243545);min-height:280px;"></div><span class="cn-tag">Visuel</span><div class="cn-overlay"><div class="cn-word">le marais</div><div class="cn-def">la Venise verte</div></div></div>
+      <div class="cn-cell" style="grid-column:span 2;"><div class="cn-cell-bg" style="background:linear-gradient(135deg,#201a10,#302818);min-height:280px;"></div><span class="cn-tag">Visuel</span><div class="cn-overlay"><div class="cn-word">le bocage en hiver</div><div class="cn-def">chênes nus, chemins gelés</div></div></div>
+      <div class="cn-cell"><div class="cn-cell-bg" style="background:linear-gradient(135deg,#1a2a1a,#283828);min-height:280px;"></div><span class="cn-tag">Parlanjhe</span><div class="cn-overlay"><div class="cn-word">la mogette</div><div class="cn-def">le haricot blanc</div></div></div>
+      <div class="cn-cell"><div class="cn-cell-bg" style="background:linear-gradient(135deg,#0d1a28,#142236);min-height:280px;"></div><span class="cn-tag">Parlanjhe</span><div class="cn-overlay"><div class="cn-word">le pichon</div><div class="cn-def">le petit</div></div></div>
+    </div>
+  </div>
+
+  <!-- Publications Chez nous -->
+  <div class="cn-pubs-section">
+    <div class="cn-pubs-label">Publications de la communauté</div>
+    <div class="cn-pubs-grid" id="cnPubsGrid">
+      <div class="cn-pubs-empty">Aucune publication pour l'instant.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══ PAGE QUIZ ═══ -->
+<div class="page inner-page" id="page-quiz">
+  <button class="back-btn" onclick="goTo('home')">Retour</button>
+  <div class="inner-header" style="background:linear-gradient(160deg,#07101a,#0f1e30,#182840);">
+    <div class="inner-header-bg" style="background:linear-gradient(160deg,#07101a,#0f1e30,#182840);"></div>
+    <div class="inner-header-content">
+      <div class="inner-page-label">Testez-vous</div>
+      <h1 class="inner-page-title">T'as deux<br><em>minutes ?</em></h1>
+      <p class="inner-page-sub">Culture, histoire, patois, faune... Choisissez un quiz, battez vos Zonautes préférés.</p>
+    </div>
+  </div>
+  <div style="padding:2px;">
+    <div class="quiz-list">
+      <div class="quiz-item">
+        <div class="qi-num">01 —</div>
+        <div class="qi-title">Les Guerres de Vendée</div>
+        <div class="qi-desc">Bleus, Blancs, Chouans... Connaissez-vous vraiment l'histoire qui a façonné notre pays ?</div>
+        <div class="qi-foot"><span class="qi-count">10 questions</span><span class="qi-level lv-2">Moyen</span></div>
+      </div>
+      <div class="quiz-item">
+        <div class="qi-num">02 —</div>
+        <div class="qi-title">Parlanjhe — Niveau 1</div>
+        <div class="qi-desc">Les mots de nos grands-parents. Savez-vous ce que veut dire "une goule" ?</div>
+        <div class="qi-foot"><span class="qi-count">8 questions</span><span class="qi-level lv-1">Facile</span></div>
+      </div>
+      <div class="quiz-item">
+        <div class="qi-num">03 —</div>
+        <div class="qi-title">La Faune du Marais</div>
+        <div class="qi-desc">Aigrettes, courlis, loutres... Reconnaissez-vous les habitants du marais poitevin ?</div>
+        <div class="qi-foot"><span class="qi-count">12 questions</span><span class="qi-level lv-1">Facile</span></div>
+      </div>
+      <div class="quiz-item">
+        <div class="qi-num">04 —</div>
+        <div class="qi-title">Gastronomie Vendéenne</div>
+        <div class="qi-desc">Mogette, brioche, préfou, jambon vendéen... La Vendée dans votre assiette.</div>
+        <div class="qi-foot"><span class="qi-count">10 questions</span><span class="qi-level lv-1">Facile</span></div>
+      </div>
+      <div class="quiz-item">
+        <div class="qi-num">05 —</div>
+        <div class="qi-title">Géographie Locale</div>
+        <div class="qi-desc">Communes, rivières, bocage, côte... Saurez-vous vous repérer les yeux fermés ?</div>
+        <div class="qi-foot"><span class="qi-count">15 questions</span><span class="qi-level lv-2">Moyen</span></div>
+      </div>
+      <div class="quiz-item">
+        <div class="qi-num">06 —</div>
+        <div class="qi-title">Le Grand Quiz Zonaute</div>
+        <div class="qi-desc">Toutes thématiques. Réservé aux vrais. Classement général des Zonautes en jeu.</div>
+        <div class="qi-foot"><span class="qi-count">20 questions</span><span class="qi-level lv-3">Expert</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PAGE JEU ═══ -->
+<div class="page" id="page-jeu">
+  <button class="back-btn" onclick="goTo('home')">Retour</button>
+  <div class="jeu-full">
+    <div class="jeu-full-bg"></div>
+    <div class="jeu-glow"></div>
+    <svg class="jeu-stars-bg" viewBox="0 0 1400 900" xmlns="http://www.w3.org/2000/svg">
+      <g fill="white" opacity="0.55">
+        <circle cx="80"  cy="80"  r="1.1"/><circle cx="280" cy="50"  r="0.7"/><circle cx="520" cy="110" r="1.4"/>
+        <circle cx="200" cy="150" r="0.5"/><circle cx="640" cy="75"  r="0.9"/><circle cx="60"  cy="190" r="0.8"/>
+        <circle cx="420" cy="60"  r="1.2"/><circle cx="700" cy="170" r="0.6"/><circle cx="160" cy="120" r="0.7"/>
+        <circle cx="580" cy="45"  r="1.0"/><circle cx="360" cy="190" r="0.5"/><circle cx="760" cy="130" r="1.3"/>
+        <circle cx="900" cy="55"  r="0.8"/><circle cx="1060" cy="130" r="1.1"/><circle cx="1240" cy="75"  r="0.7"/>
+        <circle cx="1020" cy="190" r="1.0"/><circle cx="820" cy="165" r="0.6"/><circle cx="1340" cy="140" r="1.2"/>
+        <circle cx="940" cy="100" r="0.5"/><circle cx="1160" cy="55"  r="0.9"/><circle cx="740" cy="45"  r="0.7"/>
+        <circle cx="1400" cy="90" r="0.8"/><circle cx="480" cy="30"  r="0.6"/><circle cx="1120" cy="200" r="1.1"/>
+        <circle cx="300" cy="220" r="0.8"/><circle cx="680" cy="250" r="0.6"/><circle cx="1200" cy="170" r="0.9"/>
+        <circle cx="140" cy="260" r="1.0"/><circle cx="860" cy="40"  r="0.7"/><circle cx="1380" cy="200" r="0.5"/>
+      </g>
+    </svg>
+    <div class="jeu-content">
+      <div class="jeu-label">Zone85 présente</div>
+      <h1 class="jeu-title">Les Invisibles</h1>
+      <div class="jeu-sub">L'Œuf de l'Oiseau du Temps</div>
+      <p class="jeu-desc">Un jeu narratif en ligne. En Vendée, certaines légendes ne dorment pas. Enquêtez, déchiffrez, traversez les siècles. Chaque partie vous rapproche d'un secret enfoui.</p>
+      <div class="jeu-dates">
+        <div class="jd"><div class="jd-l">Accès anticipé</div><div class="jd-v">Octobre 2026</div></div>
+        <div class="jd"><div class="jd-l">Lancement</div><div class="jd-v">Décembre 2026</div></div>
+        <div class="jd"><div class="jd-l">Statut</div><div class="jd-v hot">En dev ✦</div></div>
+      </div>
+      <button class="cta-jeu">M'inscrire sur la liste d'attente</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PAGE PASSEPORT ═══ -->
+<div class="page" id="page-passeport">
+  <div class="pass-left">
+    <button class="back-btn" style="position:relative;top:auto;left:auto;margin-bottom:48px;padding:0;" onclick="goTo('home')">Retour</button>
+    <div class="pass-label-text">Votre identité Zonaute</div>
+    <h1 class="pass-title">Le Passeport<br><em>Zonaute.</em></h1>
+    <p class="pass-desc">Un compte, une identité, une maison. Créez votre Passeport et retrouvez sur le site ce que vous vivez sur Facebook — en mieux.</p>
+    <div class="pass-perks">
+      <div class="pass-perk"><div class="perk-tick"></div>Newsletter Zone85 dans votre boîte</div>
+      <div class="pass-perk"><div class="perk-tick"></div>Accès au jeu Les Invisibles dès octobre</div>
+      <div class="pass-perk"><div class="perk-tick"></div>Scores et historique de vos quiz</div>
+      <div class="pass-perk"><div class="perk-tick"></div>Randonnées sauvegardées</div>
+      <div class="pass-perk"><div class="perk-tick"></div>Classement communautaire des Zonautes</div>
+    </div>
+    <div class="pass-form">
+      <input class="pass-input" type="text" placeholder="Prénom et nom">
+      <input class="pass-input" type="email" placeholder="Adresse email">
+      <input class="pass-input" type="password" placeholder="Mot de passe">
+      <button class="pass-submit">Créer mon Passeport</button>
+      <div class="pass-login">Déjà un compte ? <a>Se connecter</a></div>
+    </div>
+  </div>
+  <div class="pass-right">
+    <div class="pass-card" id="passCard">
+      <div class="pc-top">
+        <div class="pc-head">
+          <div class="pc-brand">Zone85</div>
+          <div class="pc-type">Passeport<br>Zonaute</div>
+        </div>
+        <div class="pc-avatar">🧑‍🌾</div>
+        <div class="pc-name">Marie-Hélène D.</div>
+        <div class="pc-id">ZONAUTE #00847 · Depuis 2024</div>
+        <div class="pc-fields">
+          <div><div class="pcf-l">Quiz</div><div class="pcf-v">12 complétés</div></div>
+          <div><div class="pcf-l">Score</div><div class="pcf-v">74 %</div></div>
+          <div><div class="pcf-l">Randos</div><div class="pcf-v">5 suivies</div></div>
+          <div><div class="pcf-l">Statut</div><div class="pcf-v" style="color:var(--corail);">Actif</div></div>
+        </div>
+      </div>
+      <div class="pc-bot">
+        <div class="pcb-label">Niveau</div>
+        <div class="pcb-bar"><div class="pcb-fill"></div></div>
+        <div class="pcb-pct">68 %</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TICKER -->
+<div id="ticker">
+  <div class="ticker-inner">
+    <span class="t-item">Zonautes</span><span class="t-sep">·</span>
+    <span class="t-item">Bocage Vendéen</span><span class="t-sep">·</span>
+    <span class="t-item">Marais Poitevin</span><span class="t-sep">·</span>
+    <span class="t-item">Parlanjhe</span><span class="t-sep">·</span>
+    <span class="t-item">Les Invisibles</span><span class="t-sep">·</span>
+    <span class="t-item">Traces GPX</span><span class="t-sep">·</span>
+    <span class="t-item">Légendes Locales</span><span class="t-sep">·</span>
+    <span class="t-item">Goule Ouverte</span><span class="t-sep">·</span>
+    <span class="t-item">L'Esprit Vendée</span><span class="t-sep">·</span>
+    <span class="t-item">Zonautes</span><span class="t-sep">·</span>
+    <span class="t-item">Bocage Vendéen</span><span class="t-sep">·</span>
+    <span class="t-item">Marais Poitevin</span><span class="t-sep">·</span>
+    <span class="t-item">Parlanjhe</span><span class="t-sep">·</span>
+    <span class="t-item">Les Invisibles</span><span class="t-sep">·</span>
+    <span class="t-item">Traces GPX</span><span class="t-sep">·</span>
+    <span class="t-item">Légendes Locales</span><span class="t-sep">·</span>
+    <span class="t-item">Goule Ouverte</span><span class="t-sep">·</span>
+    <span class="t-item">L'Esprit Vendée</span><span class="t-sep">·</span>
+  </div>
+</div>
+
+<!-- ═══ PAGE BACKOFFICE ═══ -->
+<div class="page" id="page-backoffice">
+
+  <!-- Sidebar: liste des publications -->
+  <div class="bo-side">
+    <div class="bo-side-head">
+      <div class="bo-side-logo">
+        Backoffice Zone85
+        <button class="bo-exit-btn" onclick="goTo('home')">← Quitter</button>
+      </div>
+      <button class="bo-new-btn" onclick="boNew()">+ Nouvelle publication</button>
+    </div>
+    <div class="bo-pub-list" id="boPubList">
+      <div class="bo-empty">Aucune publication.<br>Créez-en une →</div>
+    </div>
+  </div>
+
+  <!-- Zone principale: formulaire + aperçu -->
+  <div class="bo-main">
+
+    <div class="bo-form-area">
+      <div class="bo-form-heading" id="boHeading">Nouvelle publication</div>
+
+      <div class="bo-field">
+        <label class="bo-label">Accroche (phrase ou titre)</label>
+        <input class="bo-input" id="boAccroche" type="text"
+               placeholder="ex : I en pete de volàie !"
+               oninput="boPreview()">
+      </div>
+
+      <div class="bo-field">
+        <label class="bo-label">Catégorie</label>
+        <select class="bo-select" id="boTag" onchange="boPreview()">
+          <option value="Parlanjhe">Parlanjhe</option>
+          <option value="Humour">Humour</option>
+          <option value="Histoire">Histoire</option>
+          <option value="Gastronomie">Gastronomie</option>
+          <option value="Nature">Nature</option>
+          <option value="Visuel">Visuel</option>
+        </select>
+      </div>
+
+      <div class="bo-field">
+        <label class="bo-label">Texte de la publication</label>
+        <textarea class="bo-textarea" id="boText"
+                  placeholder="Rédigez votre publication..."
+                  oninput="boPreview()"></textarea>
+      </div>
+
+      <div class="bo-field">
+        <label class="bo-label">Hashtags</label>
+        <input class="bo-input" id="boHashtags" type="text"
+               placeholder="#vendée #zone85" oninput="boPreview()">
+      </div>
+
+      <div class="bo-field">
+        <label class="bo-label">Fond de la carte</label>
+        <div class="bo-color-grid" id="boColorGrid">
+          <div class="bo-swatch bo-sel"
+               data-c='["#c85040","#e07060"]'
+               style="background:linear-gradient(135deg,#c85040,#e07060)"
+               onclick="boPickColor(this)"></div>
+          <div class="bo-swatch"
+               data-c='["#1e3650","#2B4A6B"]'
+               style="background:linear-gradient(135deg,#1e3650,#2B4A6B)"
+               onclick="boPickColor(this)"></div>
+          <div class="bo-swatch"
+               data-c='["#0b1e10","#1a3820"]'
+               style="background:linear-gradient(135deg,#0b1e10,#1a3820)"
+               onclick="boPickColor(this)"></div>
+          <div class="bo-swatch"
+               data-c='["#1e1006","#3a2410"]'
+               style="background:linear-gradient(135deg,#1e1006,#3a2410)"
+               onclick="boPickColor(this)"></div>
+          <div class="bo-swatch"
+               data-c='["#1a0d28","#2e1a42"]'
+               style="background:linear-gradient(135deg,#1a0d28,#2e1a42)"
+               onclick="boPickColor(this)"></div>
+          <div class="bo-swatch"
+               data-c='["#0d1e28","#1a3040"]'
+               style="background:linear-gradient(135deg,#0d1e28,#1a3040)"
+               onclick="boPickColor(this)"></div>
+        </div>
+      </div>
+
+      <div class="bo-field">
+        <label class="bo-label">Icône / illustration</label>
+        <div class="bo-icon-row" id="boIconRow">
+          <button class="bo-icon-btn bo-sel" data-icon="👻" onclick="boPickIcon(this)">👻</button>
+          <button class="bo-icon-btn" data-icon="🐓" onclick="boPickIcon(this)">🐓</button>
+          <button class="bo-icon-btn" data-icon="🌾" onclick="boPickIcon(this)">🌾</button>
+          <button class="bo-icon-btn" data-icon="🧅" onclick="boPickIcon(this)">🧅</button>
+          <button class="bo-icon-btn" data-icon="🐸" onclick="boPickIcon(this)">🐸</button>
+          <button class="bo-icon-btn" data-icon="🌊" onclick="boPickIcon(this)">🌊</button>
+          <button class="bo-icon-btn" data-icon="🦅" onclick="boPickIcon(this)">🦅</button>
+          <button class="bo-icon-btn" data-icon="🏰" onclick="boPickIcon(this)">🏰</button>
+          <button class="bo-icon-btn" data-icon="🍖" onclick="boPickIcon(this)">🍖</button>
+          <button class="bo-icon-btn" data-icon="⚔️" onclick="boPickIcon(this)">⚔️</button>
+          <button class="bo-icon-btn" data-icon="🌿" onclick="boPickIcon(this)">🌿</button>
+          <button class="bo-icon-btn" data-icon="💨" onclick="boPickIcon(this)">💨</button>
+        </div>
+      </div>
+
+      <div class="bo-actions">
+        <button class="bo-act-draft"   onclick="boSave('draft')">Enregistrer brouillon</button>
+        <button class="bo-act-publish" onclick="boSave('published')">Publier →</button>
+        <button class="bo-act-delete"  id="boDeleteBtn" style="display:none" onclick="boDelete()">Supprimer</button>
+      </div>
+    </div>
+
+    <!-- Aperçu en direct -->
+    <div class="bo-preview-area">
+      <div class="bo-preview-label">Aperçu</div>
+      <div id="boPreviewPane"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL LECTURE PUBLICATION -->
+<div id="pub-modal" onclick="if(event.target===this)this.classList.remove('pm-open')">
+  <div class="pm-inner" id="pmInner"></div>
+</div>
+
+<script>
+/* ── NAVIGATION ── */
+let current = 'home';
+let busy = false;
+const curtain = document.getElementById('curtain');
+
+function goTo(target) {
+  if (target === current || busy) return;
+  busy = true;
+
+  curtain.className = 'down';
+
+  setTimeout(() => {
+    document.getElementById('page-' + current).classList.remove('active');
+    const next = document.getElementById('page-' + target);
+    next.classList.add('active');
+
+    // Nav style
+    const nav = document.getElementById('nav');
+    const lightPages = ['rando','cheznous'];
+    nav.className = lightPages.includes(target) ? 'light-nav' : '';
+
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    const ni = document.getElementById('ni-' + target);
+    if (ni) ni.classList.add('active');
+
+    current = target;
+    curtain.className = 'up';
+
+    setTimeout(() => {
+      curtain.className = '';
+      busy = false;
+    }, 520);
+  }, 580);
+}
+
+/* ── ÉTOILES CANVAS ── */
+const canvas = document.getElementById('starsCanvas');
+const ctx = canvas.getContext('2d');
+let stars = [];
+
+function resizeCanvas() {
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+function initStars() {
+  stars = [];
+  const count = Math.floor((canvas.width * canvas.height) / 6000);
+  for (let i = 0; i < count; i++) {
+    stars.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.2 + 0.2,
+      a: Math.random(),
+      speed: Math.random() * 0.004 + 0.001,
+      phase: Math.random() * Math.PI * 2
+    });
+  }
+}
+
+function drawStars(ts) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  stars.forEach(s => {
+    s.a = 0.15 + 0.35 * Math.abs(Math.sin(s.phase + ts * s.speed * 0.001));
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,255,255,${s.a.toFixed(2)})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+
+resizeCanvas(); initStars(); requestAnimationFrame(drawStars);
+window.addEventListener('resize', () => { resizeCanvas(); initStars(); });
+
+/* ── PASSEPORT 3D ── */
+const card = document.getElementById('passCard');
+if (card) {
+  const wrap = card.parentElement;
+  wrap.addEventListener('mousemove', e => {
+    const r = wrap.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width  - 0.5;
+    const y = (e.clientY - r.top)  / r.height - 0.5;
+    card.style.transform = `rotateY(${x * 18}deg) rotateX(${-y * 10}deg)`;
+  });
+  wrap.addEventListener('mouseleave', () => {
+    card.style.transform = 'rotateY(-12deg) rotateX(6deg)';
+  });
+}
+
+/* ── FILTRES RANDOS ── */
+document.querySelectorAll('.f-btn').forEach(b => {
+  b.addEventListener('click', function() {
+    document.querySelectorAll('.f-btn').forEach(x => x.classList.remove('on'));
+    this.classList.add('on');
+  });
+});
+
+/* ══════════════════════════════════════════
+   LOGO — triple-clic → backoffice
+══════════════════════════════════════════ */
+let _logoClicks = 0, _logoTimer = null;
+function handleLogoClick() {
+  _logoClicks++;
+  clearTimeout(_logoTimer);
+  if (_logoClicks >= 3) {
+    _logoClicks = 0;
+    goTo(current === 'backoffice' ? 'home' : 'backoffice');
+  } else {
+    _logoTimer = setTimeout(() => {
+      if (_logoClicks === 1) goTo('home');
+      _logoClicks = 0;
+    }, 420);
+  }
+}
+
+/* ══════════════════════════════════════════
+   PUBLICATIONS — stockage localStorage
+══════════════════════════════════════════ */
+let publications = [];
+try { publications = JSON.parse(localStorage.getItem('zone85_pubs') || '[]'); } catch(e) {}
+
+/* Publication de démonstration pré-chargée */
+if (publications.length === 0) {
+  publications.push({
+    id: 'demo-1',
+    accroche: 'I en pete de volàie !',
+    tag: 'Humour',
+    text: `Allez, aujourd'hui, on parle de talent !
+Oui, oui, parce que "pétaï de volàie", ce n'est pas juste faire du bruit avec son derrière, non !
+C'est une vraie maîtrise, c'est régulier, presque artistique, une performance qui arrive sans prévenir, souvent au pire moment… mais toujours avec une constance impressionnante.
+
+Le plus impressionnant, c'est le calme de l'auteur. Regard droit, air innocent, immobilité parfaite, comme si de rien n'était.
+Et pendant ce temps-là, autour, ça s'agite, les regards se croisent et les doutes s'installent, chacun fait son enquête en silence.
+
+Mais évidemment… personne n'a rien fait, silence gêné, soupçons, déni collectif.
+Et puis là… paf on entend une voix comme sortie d'outre tombe :
+"Bon d'là… i en pète de volàie !"
+Rideau.
+
+Moralité : en Vendée, on assume… mais toujours après le suspense 🤪.`,
+    hashtags: '#vendée #parlerlocal #expressionsvendéennes #zone85',
+    colors: ['#c85040', '#e07060'],
+    icon: '👻',
+    status: 'published',
+    createdAt: new Date().toISOString()
+  });
+  _pubsave();
+}
+
+function _pubsave() {
+  localStorage.setItem('zone85_pubs', JSON.stringify(publications));
+}
+
+/* ── Rendu dans Chez nous ── */
+function renderCnPubs() {
+  const grid = document.getElementById('cnPubsGrid');
+  if (!grid) return;
+  const pub = publications.filter(p => p.status === 'published');
+  if (pub.length === 0) {
+    grid.innerHTML = '<div class="cn-pubs-empty">Aucune publication pour l\'instant.</div>';
+    return;
+  }
+  grid.innerHTML = pub.map(p => {
+    const bg  = `linear-gradient(135deg,${p.colors[0]},${p.colors[1]})`;
+    const day = new Date(p.createdAt).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+    const ex  = p.text.replace(/\n/g,' ').substring(0,160) + (p.text.length > 160 ? '…' : '');
+    return `<div class="pub-card">
+      <div class="pub-card-visual" style="background:${bg}">
+        <span class="pub-card-icon">${p.icon}</span>
+        <div class="pub-card-accroche">${esc(p.accroche)}</div>
+      </div>
+      <div class="pub-card-body">
+        <div class="pub-card-tag">${esc(p.tag)}</div>
+        <div class="pub-card-text">${esc(ex)}</div>
+        <div class="pub-card-htags">${esc(p.hashtags)}</div>
+        <div class="pub-card-footer">
+          <button class="pub-read-more" onclick="openPubModal('${p.id}')">Lire la suite</button>
+          <span class="pub-card-date">${day}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openPubModal(id) {
+  const p = publications.find(x => x.id === id);
+  if (!p) return;
+  const bg = `linear-gradient(135deg,${p.colors[0]},${p.colors[1]})`;
+  document.getElementById('pmInner').innerHTML = `
+    <div class="pm-visual" style="background:${bg}">
+      <span class="pm-icon">${p.icon}</span>
+      <div class="pm-accroche">${esc(p.accroche)}</div>
+    </div>
+    <div class="pm-body">
+      <div class="pm-tag">${esc(p.tag)}</div>
+      <div class="pm-text">${esc(p.text)}</div>
+      <div class="pm-htags">${esc(p.hashtags)}</div>
+      <button class="pm-close" onclick="document.getElementById('pub-modal').classList.remove('pm-open')">Fermer</button>
+    </div>`;
+  document.getElementById('pub-modal').classList.add('pm-open');
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ── BACKOFFICE ── */
+let _editId   = null;
+let _boColors = ['#c85040','#e07060'];
+let _boIcon   = '👻';
+
+function renderBoPubList() {
+  const list = document.getElementById('boPubList');
+  if (!list) return;
+  if (publications.length === 0) {
+    list.innerHTML = '<div class="bo-empty">Aucune publication.<br>Créez-en une →</div>';
+    return;
+  }
+  list.innerHTML = publications.map(p => `
+    <div class="bo-pub-item${_editId===p.id?' bo-active':''}" onclick="boEdit('${p.id}')">
+      <div class="bo-pi-title">${esc(p.accroche||'Sans titre')}</div>
+      <div class="bo-pi-meta">
+        <span class="bo-status ${p.status==='published'?'st-pub':'st-draft'}">${p.status==='published'?'Publié':'Brouillon'}</span>
+        <span>${new Date(p.createdAt).toLocaleDateString('fr-FR')}</span>
+      </div>
+    </div>`).join('');
+}
+
+function boNew() {
+  _editId = null;
+  document.getElementById('boHeading').textContent = 'Nouvelle publication';
+  document.getElementById('boAccroche').value  = '';
+  document.getElementById('boTag').value       = 'Parlanjhe';
+  document.getElementById('boText').value      = '';
+  document.getElementById('boHashtags').value  = '#vendée #zone85';
+  document.getElementById('boDeleteBtn').style.display = 'none';
+  _boColors = ['#c85040','#e07060'];
+  _boIcon   = '👻';
+  document.querySelectorAll('.bo-swatch').forEach((s,i)=>s.classList.toggle('bo-sel',i===0));
+  document.querySelectorAll('.bo-icon-btn').forEach((b,i)=>b.classList.toggle('bo-sel',i===0));
+  renderBoPubList();
+  boPreview();
+}
+
+function boEdit(id) {
+  const p = publications.find(x => x.id === id);
+  if (!p) return;
+  _editId = id;
+  document.getElementById('boHeading').textContent = 'Modifier la publication';
+  document.getElementById('boAccroche').value  = p.accroche;
+  document.getElementById('boTag').value       = p.tag;
+  document.getElementById('boText').value      = p.text;
+  document.getElementById('boHashtags').value  = p.hashtags;
+  document.getElementById('boDeleteBtn').style.display = 'block';
+  _boColors = p.colors;
+  _boIcon   = p.icon;
+  document.querySelectorAll('.bo-swatch').forEach(s => {
+    const c = JSON.parse(s.dataset.c);
+    s.classList.toggle('bo-sel', c[0] === p.colors[0]);
+  });
+  document.querySelectorAll('.bo-icon-btn').forEach(b =>
+    b.classList.toggle('bo-sel', b.dataset.icon === p.icon));
+  renderBoPubList();
+  boPreview();
+}
+
+function boPickColor(el) {
+  document.querySelectorAll('.bo-swatch').forEach(s => s.classList.remove('bo-sel'));
+  el.classList.add('bo-sel');
+  _boColors = JSON.parse(el.dataset.c);
+  boPreview();
+}
+
+function boPickIcon(el) {
+  document.querySelectorAll('.bo-icon-btn').forEach(b => b.classList.remove('bo-sel'));
+  el.classList.add('bo-sel');
+  _boIcon = el.dataset.icon;
+  boPreview();
+}
+
+function boPreview() {
+  const accroche = document.getElementById('boAccroche')?.value || '';
+  const tag      = document.getElementById('boTag')?.value      || 'Parlanjhe';
+  const text     = document.getElementById('boText')?.value     || '';
+  const htags    = document.getElementById('boHashtags')?.value || '';
+  const pane     = document.getElementById('boPreviewPane');
+  if (!pane) return;
+  const bg  = `linear-gradient(135deg,${_boColors[0]},${_boColors[1]})`;
+  const ex  = text.replace(/\n/g,' ').substring(0,160) + (text.length > 160 ? '…' : '');
+  pane.innerHTML = `<div class="pub-card">
+    <div class="pub-card-visual" style="background:${bg}">
+      <span class="pub-card-icon">${_boIcon}</span>
+      <div class="pub-card-accroche">${esc(accroche||'Accroche…')}</div>
+    </div>
+    <div class="pub-card-body">
+      <div class="pub-card-tag">${esc(tag)}</div>
+      <div class="pub-card-text">${esc(ex||'Texte de la publication…')}</div>
+      <div class="pub-card-htags">${esc(htags)}</div>
+      <div class="pub-card-footer">
+        <button class="pub-read-more">Lire la suite</button>
+        <span class="pub-card-date">Aperçu</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function boSave(status) {
+  const accroche = (document.getElementById('boAccroche').value || '').trim();
+  if (!accroche) { document.getElementById('boAccroche').focus(); return; }
+  const pub = {
+    id:        _editId || ('pub-' + Date.now()),
+    accroche,
+    tag:       document.getElementById('boTag').value,
+    text:      (document.getElementById('boText').value || '').trim(),
+    hashtags:  (document.getElementById('boHashtags').value || '').trim(),
+    colors:    _boColors,
+    icon:      _boIcon,
+    status,
+    createdAt: _editId
+      ? (publications.find(p=>p.id===_editId)||{}).createdAt || new Date().toISOString()
+      : new Date().toISOString()
+  };
+  if (_editId) {
+    const idx = publications.findIndex(p => p.id === _editId);
+    if (idx !== -1) publications[idx] = pub;
+  } else {
+    _editId = pub.id;
+    publications.unshift(pub);
+    document.getElementById('boDeleteBtn').style.display = 'block';
+  }
+  _pubsave();
+  renderBoPubList();
+  renderCnPubs();
+  const btn = status === 'published'
+    ? document.querySelector('.bo-act-publish')
+    : document.querySelector('.bo-act-draft');
+  const orig = btn.textContent;
+  btn.textContent = status === 'published' ? 'Publié ✓' : 'Enregistré ✓';
+  setTimeout(() => { btn.textContent = orig; }, 1800);
+}
+
+function boDelete() {
+  if (!_editId || !confirm('Supprimer cette publication ?')) return;
+  publications = publications.filter(p => p.id !== _editId);
+  _pubsave();
+  renderBoPubList();
+  renderCnPubs();
+  boNew();
+}
+
+/* ── Init ── */
+renderCnPubs();
+renderBoPubList();
+boPreview();
+</script>
+</body>
+</html>
