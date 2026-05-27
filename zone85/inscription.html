@@ -100,10 +100,27 @@
   .clan-pts-note{font-size:.75rem;color:var(--text-muted);text-align:center;margin-top:-12px;margin-bottom:16px}
 
   /* ── AVATARS (étape 5) ── */
-  .avatar-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:20px}
+  .avatar-tabs{display:flex;gap:0;margin-bottom:16px;border-radius:var(--radius);overflow:hidden;border:2px solid var(--beige-dark)}
+  .avatar-tab-btn{flex:1;padding:10px 12px;background:var(--beige-light);border:none;font-family:'Inter',sans-serif;font-size:.82rem;font-weight:700;color:var(--text-muted);cursor:pointer;transition:all .2s;text-align:center}
+  .avatar-tab-btn.active{background:var(--navy-dark);color:#fff}
+  .avatar-panel{display:none}.avatar-panel.active{display:block}
+  .avatar-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:16px}
   .avatar-btn{aspect-ratio:1;border-radius:var(--radius);background:var(--beige-light);border:2px solid var(--beige-dark);font-size:1.5rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;user-select:none}
   .avatar-btn:hover{border-color:var(--primary);transform:scale(1.07)}
   .avatar-btn.selected{border-color:var(--primary);background:rgba(234,86,73,.08);transform:scale(1.07)}
+  .upload-zone{border:2px dashed var(--beige-dark);border-radius:var(--radius-lg);padding:32px 20px;text-align:center;background:var(--beige-light);cursor:pointer;transition:border-color .2s}
+  .upload-zone:hover{border-color:var(--primary)}
+  .upload-zone input[type="file"]{display:none}
+  .upload-preview{width:80px;height:80px;border-radius:50%;margin:0 auto 12px;overflow:hidden;background:var(--beige-dark);display:none}
+  .upload-preview img{width:100%;height:100%;object-fit:cover}
+  .upload-icon{font-size:2rem;margin-bottom:8px;display:block}
+  .upload-text{font-size:.84rem;color:var(--text-muted);line-height:1.5}
+  .upload-legal{font-size:.72rem;color:var(--text-muted);margin-top:10px;line-height:1.6;font-style:italic}
+  .check-group{display:flex;align-items:flex-start;gap:10px;padding:12px 0;border-top:1px solid var(--beige-dark)}
+  .check-group input[type="checkbox"]{width:18px;height:18px;flex-shrink:0;margin-top:2px;accent-color:var(--primary);cursor:pointer}
+  .check-group label{font-size:.84rem;color:var(--text-mid);line-height:1.55;cursor:pointer}
+  .check-group label a{color:var(--primary);text-decoration:underline}
+  .check-group.required label::before{content:'* ';color:var(--primary);font-weight:700}
   .char-count{font-size:.72rem;color:var(--text-muted);text-align:right;margin-top:4px}
 
   /* ── ÉTAPE 6 BIENVENUE ── */
@@ -405,21 +422,43 @@
         <span class="step-overline">Étape 5 — Ton identité dans la Zone</span>
         <h2 class="step-title">Comment tu seras connu·e</h2>
 
-        <div class="form-group" style="margin-bottom:12px">
+        <div class="form-group" style="margin-bottom:20px">
           <label>Ton avatar</label>
-          <div class="avatar-grid" id="avatar-grid">
-            <div class="avatar-btn selected" onclick="selectAvatar(this)" data-emoji="🧭">🧭</div>
-            <div class="avatar-btn" onclick="selectAvatar(this)" data-emoji="⚓">⚓</div>
-            <div class="avatar-btn" onclick="selectAvatar(this)" data-emoji="🗺️">🗺️</div>
-            <div class="avatar-btn" onclick="selectAvatar(this)" data-emoji="🏹">🏹</div>
-            <div class="avatar-btn" onclick="selectAvatar(this)" data-emoji="🌊">🌊</div>
-            <div class="avatar-btn" onclick="selectAvatar(this)" data-emoji="🌿">🌿</div>
-            <div class="avatar-btn" onclick="selectAvatar(this)" data-emoji="⚔️">⚔️</div>
-            <div class="avatar-btn" onclick="selectAvatar(this)" data-emoji="🦅">🦅</div>
-            <div class="avatar-btn" onclick="selectAvatar(this)" data-emoji="🔥">🔥</div>
-            <div class="avatar-btn" onclick="selectAvatar(this)" data-emoji="🥐">🥐</div>
-            <div class="avatar-btn" onclick="selectAvatar(this)" data-emoji="🌙">🌙</div>
-            <div class="avatar-btn" onclick="selectAvatar(this)" data-emoji="🐚">🐚</div>
+          <div class="avatar-tabs">
+            <button class="avatar-tab-btn active" onclick="switchAvatarTab('emoji',this)" type="button">Choisir un avatar</button>
+            <button class="avatar-tab-btn" onclick="switchAvatarTab('upload',this)" type="button">Uploader ma photo</button>
+          </div>
+
+          <!-- Panel : avatars emoji -->
+          <div class="avatar-panel active" id="avatar-panel-emoji">
+            <div class="avatar-grid" id="avatar-grid">
+              <div class="avatar-btn selected" onclick="selectAvatar(this)" data-emoji="🧭">🧭</div>
+              <div class="avatar-btn" onclick="selectAvatar(this)" data-emoji="⚓">⚓</div>
+              <div class="avatar-btn" onclick="selectAvatar(this)" data-emoji="🗺️">🗺️</div>
+              <div class="avatar-btn" onclick="selectAvatar(this)" data-emoji="🏹">🏹</div>
+              <div class="avatar-btn" onclick="selectAvatar(this)" data-emoji="🌊">🌊</div>
+              <div class="avatar-btn" onclick="selectAvatar(this)" data-emoji="🌿">🌿</div>
+              <div class="avatar-btn" onclick="selectAvatar(this)" data-emoji="⚔️">⚔️</div>
+              <div class="avatar-btn" onclick="selectAvatar(this)" data-emoji="🦅">🦅</div>
+              <div class="avatar-btn" onclick="selectAvatar(this)" data-emoji="🔥">🔥</div>
+              <div class="avatar-btn" onclick="selectAvatar(this)" data-emoji="🥐">🥐</div>
+              <div class="avatar-btn" onclick="selectAvatar(this)" data-emoji="🌙">🌙</div>
+              <div class="avatar-btn" onclick="selectAvatar(this)" data-emoji="🐚">🐚</div>
+            </div>
+          </div>
+
+          <!-- Panel : upload photo -->
+          <div class="avatar-panel" id="avatar-panel-upload">
+            <label class="upload-zone" for="photo-upload" onclick="document.getElementById('photo-upload').click()">
+              <input type="file" id="photo-upload" accept="image/*" onchange="handlePhotoUpload(this)">
+              <div class="upload-preview" id="upload-preview"><img id="upload-preview-img" src="" alt="Aperçu"></div>
+              <span class="upload-icon" id="upload-icon">📷</span>
+              <div class="upload-text" id="upload-text">
+                <strong>Clique pour choisir une photo</strong><br>
+                Choisis une photo carrée ou bien cadrée. Elle sera affichée sur ton profil.
+              </div>
+            </label>
+            <p class="upload-legal">En uploadant une photo, je confirme disposer des droits nécessaires et j'accepte qu'elle soit utilisée comme photo de profil sur Zone85.</p>
           </div>
         </div>
 
@@ -434,6 +473,23 @@
           <label for="bio">Ta phrase de présentation <span style="font-weight:400;color:var(--text-muted)">(optionnel, max 120 car.)</span></label>
           <textarea id="bio" class="form-input" rows="3" placeholder="Ex: Marcheur du bocage, amoureux des chemins creux et des citrouilles…" maxlength="120" style="resize:vertical;min-height:80px" oninput="updateCharCount('bio','bio-count',120)"></textarea>
           <div class="char-count"><span id="bio-count">0</span>/120</div>
+        </div>
+
+        <!-- Checkboxes obligatoires -->
+        <div style="margin-top:8px">
+          <div class="check-group required">
+            <input type="checkbox" id="check-cgu" required>
+            <label for="check-cgu">J'accepte les <a href="cgu.html" target="_blank">CGU et les règles de la Zone</a>.</label>
+          </div>
+          <div class="check-group required">
+            <input type="checkbox" id="check-rgpd" required>
+            <label for="check-rgpd">J'ai lu la <a href="confidentialite.html" target="_blank">politique de confidentialité</a>.</label>
+          </div>
+          <div class="check-group">
+            <input type="checkbox" id="check-newsletter">
+            <label for="check-newsletter">J'accepte de recevoir les actualités de Zone85 par email. <span style="font-weight:400;color:var(--text-muted)">(facultatif)</span></label>
+          </div>
+          <div class="form-error" id="err-checks" style="margin-top:4px">Veuillez accepter les CGU et la politique de confidentialité pour continuer.</div>
         </div>
 
         <div class="step-actions">
@@ -494,6 +550,68 @@
 
   </div><!-- /insc-wrap -->
 </div><!-- /insc-page -->
+
+<!-- ============ FOOTER ============ -->
+<footer id="footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-col">
+        <div class="footer-brand-logo">ZONE<span>85</span></div>
+        <div class="footer-brand-tagline">L'Esprit Vendée</div>
+        <p class="footer-brand-desc">La Vendée qui joue, qui marche, qui enquête et qui se raconte.</p>
+        <div class="footer-clan-chips">
+          <span class="footer-clan-chip">Bocage</span>
+          <span class="footer-clan-chip">Littoral</span>
+          <span class="footer-clan-chip">Marais</span>
+        </div>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Le site</div>
+        <ul>
+          <li><a href="index.html">Accueil</a></li>
+          <li><a href="concept.html">Le Concept</a></li>
+          <li><a href="clans.html">Les Clans</a></li>
+          <li><a href="missions.html">Missions</a></li>
+          <li><a href="classement.html">Classement</a></li>
+          <li><a href="hall.html">Hall de la Zone</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Mon compte</div>
+        <ul>
+          <li><a href="inscription.html">Rejoindre</a></li>
+          <li><a href="profil.html">Connexion</a></li>
+          <li><a href="profil.html">Profil</a></li>
+        </ul>
+        <div style="margin-top:20px">
+          <div class="footer-col-title">Saison en cours</div>
+          <div style="font-size:.88rem;color:rgba(255,255,255,.65);font-weight:600">Camp d'Été Zone85</div>
+          <div style="font-size:.75rem;color:var(--primary);font-weight:700;margin-top:4px">Le Grand Défi de l'Été</div>
+        </div>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Légal</div>
+        <ul>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="mentions-legales.html">Mentions légales</a></li>
+          <li><a href="confidentialite.html">Confidentialité</a></li>
+          <li><a href="cookies.html">Cookies</a></li>
+          <li><a href="cgu.html">CGU / Règles de la Zone</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2025 Zone 85 — L'Esprit Vendée. Tous droits réservés.</div>
+      <div class="footer-legal">
+        <a href="mentions-legales.html">Mentions légales</a>
+        <a href="cgu.html">CGU</a>
+        <a href="confidentialite.html">Confidentialité</a>
+        <a href="cookies.html">Cookies</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </div>
+  </div>
+</footer>
 
 <script src="zone85.js"></script>
 <script>
@@ -625,10 +743,37 @@ function selectClan(val, el) {
 }
 
 /* ── ÉTAPE 5 — AVATAR + PSEUDO ── */
+function switchAvatarTab(tab, btn) {
+  document.querySelectorAll('.avatar-tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('avatar-panel-emoji').classList.toggle('active', tab === 'emoji');
+  document.getElementById('avatar-panel-upload').classList.toggle('active', tab === 'upload');
+  if (tab === 'emoji') formData.avatarType = 'emoji';
+  else formData.avatarType = 'upload';
+}
+
+function handlePhotoUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const preview = document.getElementById('upload-preview');
+    const img = document.getElementById('upload-preview-img');
+    img.src = e.target.result;
+    preview.style.display = 'block';
+    document.getElementById('upload-icon').style.display = 'none';
+    document.getElementById('upload-text').innerHTML = '<strong>' + file.name + '</strong><br>Photo chargée — tu peux en choisir une autre.';
+    formData.avatarType = 'upload';
+    formData.photoSrc = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
 function selectAvatar(el) {
   document.querySelectorAll('.avatar-btn').forEach(b => b.classList.remove('selected'));
   el.classList.add('selected');
   formData.avatar = el.dataset.emoji;
+  formData.avatarType = 'emoji';
 }
 
 function updateCharCount(inputId, countId, max) {
@@ -644,8 +789,20 @@ function validateStep5() {
     return;
   }
   setError('pseudo', 'err-pseudo', false);
+
+  const checkCgu  = document.getElementById('check-cgu').checked;
+  const checkRgpd = document.getElementById('check-rgpd').checked;
+  const errChecks = document.getElementById('err-checks');
+  if (!checkCgu || !checkRgpd) {
+    errChecks.classList.add('show');
+    errChecks.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  errChecks.classList.remove('show');
+
   formData.pseudo = pseudo;
   formData.bio    = document.getElementById('bio').value.trim();
+  formData.newsletter = document.getElementById('check-newsletter').checked;
   buildWelcome();
   goStep(6);
   setTimeout(spawnConfetti, 400);
