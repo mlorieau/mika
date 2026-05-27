@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hall de la Zone — Zone85</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="zone85.css">
+  <style>
+  /* HERO */
+  .hall-hero{background:linear-gradient(160deg,#0d1e2c 0%,#12314e 60%,#1a3a55 100%);padding:120px 0 72px;position:relative;overflow:hidden}
+  .hall-hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");pointer-events:none}
+  .hall-hero-inner{position:relative;z-index:1}
+  .hall-hero h1{font-size:clamp(2rem,5vw,3rem);font-weight:900;color:#fff;letter-spacing:-1px;line-height:1.1;margin-bottom:14px}
+  .hall-hero p{font-size:1.05rem;color:rgba(255,255,255,.6);max-width:520px;line-height:1.7}
+
+  /* À LA UNE */
+  #a-la-une{background:var(--beige);padding:80px 0}
+  .une-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:28px;align-items:start}
+  .une-featured{background:var(--white);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-md)}
+  .une-img{height:260px;background:linear-gradient(135deg,#12314e,#1d4f7a);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+  .une-img-placeholder{font-size:5rem;opacity:.25}
+  .une-img-tag{position:absolute;top:16px;left:16px;background:var(--primary);color:#fff;font-size:.68rem;font-weight:800;padding:4px 12px;border-radius:4px;letter-spacing:.08em;text-transform:uppercase}
+  .une-body{padding:28px}
+  .une-meta{font-size:.72rem;font-weight:700;color:var(--text-muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+  .une-title{font-size:1.2rem;font-weight:900;color:var(--text);letter-spacing:-.5px;margin-bottom:10px;line-height:1.3}
+  .une-desc{font-size:.88rem;color:var(--text-mid);line-height:1.65;margin-bottom:18px}
+  .une-author{display:flex;align-items:center;gap:10px}
+  .une-avatar{width:32px;height:32px;border-radius:8px;background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-size:.7rem;font-weight:900}
+  .une-author-info{font-size:.8rem;color:var(--text-mid)}
+  .une-author-info strong{color:var(--text);font-weight:700}
+  .une-sidebar{display:flex;flex-direction:column;gap:16px}
+  .une-side-card{background:var(--white);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm);display:grid;grid-template-columns:100px 1fr;gap:0}
+  .une-side-img{background:linear-gradient(135deg,#1e3d2b,#2d8a49);display:flex;align-items:center;justify-content:center;font-size:2.2rem;min-height:90px}
+  .une-side-body{padding:14px 16px}
+  .une-side-tag{font-size:.62rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px}
+  .une-side-title{font-size:.88rem;font-weight:800;color:var(--text);line-height:1.3;margin-bottom:4px}
+  .une-side-meta{font-size:.75rem;color:var(--text-muted)}
+
+  /* GALERIE */
+  #galerie{background:var(--beige-light);padding:80px 0}
+  .galerie-tabs-wrap{margin-bottom:32px}
+  .galerie-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .gal-card{border-radius:var(--radius-lg);overflow:hidden;background:var(--white);box-shadow:var(--shadow-sm);cursor:pointer;transition:all .25s;position:relative;aspect-ratio:1}
+  .gal-card:hover{transform:scale(1.03);box-shadow:var(--shadow-md);z-index:1}
+  .gal-card:first-child{grid-column:span 2;grid-row:span 2;aspect-ratio:auto}
+  .gal-img{width:100%;height:100%;object-fit:cover;display:flex;align-items:center;justify-content:center;font-size:3rem;background:linear-gradient(135deg,#12314e 0%,#1d4f7a 100%)}
+  .gal-img.bocage-bg{background:linear-gradient(135deg,#0d2018,#1e5c30)}
+  .gal-img.marais-bg{background:linear-gradient(135deg,#2b1a0a,#8a6020)}
+  .gal-img.littoral-bg{background:linear-gradient(135deg,#0a1a2e,#12314e)}
+  .gal-img.beige-bg{background:linear-gradient(135deg,var(--beige-dark),var(--beige))}
+  .gal-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.6) 0%,transparent 50%);opacity:0;transition:opacity .25s}
+  .gal-card:hover .gal-overlay{opacity:1}
+  .gal-info{position:absolute;bottom:12px;left:12px;right:12px;opacity:0;transform:translateY(6px);transition:all .25s}
+  .gal-card:hover .gal-info{opacity:1;transform:translateY(0)}
+  .gal-author{font-size:.72rem;font-weight:700;color:#fff}
+  .gal-caption{font-size:.65rem;color:rgba(255,255,255,.7)}
+  .gal-clan-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px}
+  .gal-clan-dot.bocage{background:#2d8a49}
+  .gal-clan-dot.littoral{background:#1d4f7a}
+  .gal-clan-dot.marais{background:#c9962a}
+
+  /* KTC ARCHIVES */
+  #ktc{background:var(--beige);padding:80px 0}
+  .ktc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .ktc-card{background:var(--white);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm);transition:all .25s}
+  .ktc-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-md)}
+  .ktc-card-img{height:140px;display:flex;align-items:center;justify-content:center;font-size:3.5rem}
+  .ktc-img-bocage{background:linear-gradient(135deg,#0d2018,#1e3d2b)}
+  .ktc-img-littoral{background:linear-gradient(135deg,#0a1a2e,#163756)}
+  .ktc-img-marais{background:linear-gradient(135deg,#2b1a0a,#4a2e15)}
+  .ktc-card-body{padding:18px 20px}
+  .ktc-type{font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px}
+  .ktc-title{font-size:.95rem;font-weight:800;color:var(--text);margin-bottom:6px;line-height:1.3}
+  .ktc-desc{font-size:.8rem;color:var(--text-mid);line-height:1.55;margin-bottom:12px}
+  .ktc-footer{display:flex;justify-content:space-between;align-items:center;font-size:.72rem;color:var(--text-muted)}
+  .ktc-author{font-weight:700;color:var(--text)}
+  .ktc-xp{font-weight:800;color:var(--primary)}
+
+  /* RANDO ARCHIVES */
+  #randos{background:var(--beige-light);padding:80px 0}
+  .rando-list{display:flex;flex-direction:column;gap:16px}
+  .rando-card{background:var(--white);border-radius:var(--radius-lg);padding:0;overflow:hidden;box-shadow:var(--shadow-sm);display:grid;grid-template-columns:200px 1fr auto;transition:all .25s}
+  .rando-card:hover{transform:translateX(4px);box-shadow:var(--shadow-md)}
+  .rando-map{background:linear-gradient(135deg,#1e3d2b,#2d8a49);display:flex;align-items:center;justify-content:center;font-size:3rem;min-height:110px}
+  .rando-map.marais{background:linear-gradient(135deg,#2b1a0a,#8a6020)}
+  .rando-map.littoral{background:linear-gradient(135deg,#0a1a2e,#12314e)}
+  .rando-body{padding:22px 24px}
+  .rando-title{font-size:1rem;font-weight:800;color:var(--text);margin-bottom:6px}
+  .rando-meta-row{display:flex;gap:16px;flex-wrap:wrap;font-size:.78rem;color:var(--text-muted);margin-bottom:8px}
+  .rando-meta-row span{display:flex;align-items:center;gap:4px}
+  .rando-desc{font-size:.82rem;color:var(--text-mid);line-height:1.55}
+  .rando-side{padding:22px 24px;display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;gap:12px;border-left:1px solid var(--beige-dark)}
+  .rando-xp{font-size:1.2rem;font-weight:900;color:var(--primary)}
+  .rando-xp small{font-size:.65rem;font-weight:600;color:var(--text-muted);display:block}
+  .rando-clan-chip{font-size:.7rem;font-weight:700;padding:4px 12px;border-radius:20px}
+
+  /* TROPHÉES SAISONS */
+  #trophees-hall{background:var(--navy-dark);padding:80px 0}
+  #trophees-hall .overline-label{color:rgba(234,86,73,.8)}
+  #trophees-hall .section-header h2{color:#fff}
+  #trophees-hall .section-header .section-sub{color:rgba(255,255,255,.5)}
+  .hall-trophees-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+
+  @media(max-width:1024px){
+    .une-grid{grid-template-columns:1fr}
+    .galerie-grid{grid-template-columns:repeat(3,1fr)}
+    .ktc-grid{grid-template-columns:repeat(2,1fr)}
+    .rando-card{grid-template-columns:160px 1fr}
+    .rando-side{display:none}
+    .hall-trophees-grid{grid-template-columns:repeat(2,1fr)}
+  }
+  @media(max-width:768px){
+    .galerie-grid{grid-template-columns:repeat(2,1fr)}
+    .gal-card:first-child{grid-column:span 2;grid-row:span 1}
+    .ktc-grid{grid-template-columns:1fr}
+    .rando-card{grid-template-columns:120px 1fr}
+    .hall-trophees-grid{grid-template-columns:1fr}
+    .une-side-card{grid-template-columns:80px 1fr}
+  }
+  </style>
+</head>
+<body>
+
+<!-- ===================== NAV ===================== -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <div class="nav-left">
+      <a href="index.html">Accueil</a>
+      <a href="concept.html">Le Concept</a>
+      <a href="clans.html">Les Clans</a>
+      <a href="missions.html">Missions</a>
+      <a href="classement.html">Classement</a>
+      <a href="hall.html" class="active">Hall de la Zone</a>
+    </div>
+    <a href="index.html" class="nav-logo">ZONE<span>85</span></a>
+    <div class="nav-right">
+      <div class="nav-avatar" title="Mon profil" onclick="location.href='profil.html'">SM</div>
+      <a href="inscription.html" class="nav-btn">Rejoindre</a>
+      <div class="hamburger" id="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html">Accueil</a>
+  <a href="concept.html">Le Concept</a>
+  <a href="clans.html">Les Clans</a>
+  <a href="missions.html">Missions</a>
+  <a href="classement.html">Classement</a>
+  <a href="hall.html" class="active">Hall de la Zone</a>
+  <a href="inscription.html" style="color:var(--primary);font-weight:800;border-bottom:none">Rejoindre la Zone →</a>
+</div>
+
+<!-- ===================== HERO ===================== -->
+<section class="hall-hero">
+  <div class="container hall-hero-inner">
+    <p class="overline-label">Mémoire de la Zone</p>
+    <h1>Hall de la Zone</h1>
+    <p>Les contributions, les découvertes, les exploits. Tout ce que la communauté a construit, ici pour toujours.</p>
+  </div>
+</section>
+
+<!-- ===================== À LA UNE ===================== -->
+<section id="a-la-une">
+  <div class="container">
+    <div class="section-header reveal">
+      <p class="overline-label">Mise en avant · Cette semaine</p>
+      <h2>À la une</h2>
+    </div>
+
+    <div class="une-grid reveal">
+      <!-- Article principal -->
+      <div class="une-featured">
+        <div class="une-img">
+          <span class="une-img-placeholder">🌊</span>
+          <span class="une-img-tag">🥐 Kéto Kolé Tché</span>
+        </div>
+        <div class="une-body">
+          <div class="une-meta">KTC · Littoral · 18 juin 2025</div>
+          <h3 class="une-title">La boulangerie Gauthier à Noirmoutier : le kouign-amann du bout du monde</h3>
+          <p class="une-desc">DuneRider85 a repéré une boulangerie artisanale hors du commun au cœur de l'île. Kouign-amann croustillant, brioche vendéenne d'exception et une vue sur les marais salants à tomber. Une adresse que la Zone devait connaître.</p>
+          <div class="une-author">
+            <div class="une-avatar">DR</div>
+            <div class="une-author-info">
+              Par <strong>DuneRider85</strong> · ⚓ Clan Littoral · +50 XP gagnés
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar articles -->
+      <div class="une-sidebar">
+        <div class="une-side-card">
+          <div class="une-side-img bocage-bg">🌳</div>
+          <div class="une-side-body">
+            <div class="une-side-tag">📸 Photo</div>
+            <div class="une-side-title">Héronnière dans le bocage de Chantonnay</div>
+            <div class="une-side-meta">Forêt_Runner · 🌳 Bocage · +40 XP</div>
+          </div>
+        </div>
+        <div class="une-side-card">
+          <div class="une-side-img" style="background:linear-gradient(135deg,#2b1a0a,#8a6020)">🌿</div>
+          <div class="une-side-body">
+            <div class="une-side-tag">🔍 Enquête</div>
+            <div class="une-side-title">Le lavoir du Gué-de-Velluire retrouvé</div>
+            <div class="une-side-meta">BrumeDuMarais · 🌿 Marais · +80 XP</div>
+          </div>
+        </div>
+        <div class="une-side-card">
+          <div class="une-side-img littoral-bg">🥾</div>
+          <div class="une-side-body">
+            <div class="une-side-tag">🥾 Rando</div>
+            <div class="une-side-title">Traversée des marais de Challans en kayak</div>
+            <div class="une-side-meta">HeronnièreOuest · 🌿 Marais · +120 XP</div>
+          </div>
+        </div>
+        <div class="une-side-card">
+          <div class="une-side-img" style="background:linear-gradient(135deg,#3a2a0a,#c9962a)">🧠</div>
+          <div class="une-side-body">
+            <div class="une-side-tag">🧠 Quiz</div>
+            <div class="une-side-title">Quiz Bocage : 8/8 pour VigneronneLB</div>
+            <div class="une-side-meta">VigneronneLB · 🌳 Bocage · +35 XP</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== GALERIE ===================== -->
+<section id="galerie">
+  <div class="container">
+    <div class="section-header reveal">
+      <p class="overline-label">Les meilleures photos de la Zone</p>
+      <h2>Galerie des contributions</h2>
+    </div>
+
+    <div class="galerie-tabs-wrap reveal">
+      <div class="filter-tabs" id="galerie-filters">
+        <button class="filter-tab active" onclick="filterMissions(this,'all')">Toutes</button>
+        <button class="filter-tab" onclick="filterMissions(this,'photo')">📸 Photos</button>
+        <button class="filter-tab" onclick="filterMissions(this,'rando')">🥾 Randos</button>
+        <button class="filter-tab" onclick="filterMissions(this,'ktc')">🥐 KTC</button>
+      </div>
+    </div>
+
+    <div class="galerie-grid reveal">
+      <!-- Grande image featured -->
+      <div class="gal-card" data-type="photo" style="aspect-ratio:auto;min-height:280px">
+        <div class="gal-img littoral-bg" style="height:100%;min-height:280px;align-items:center">🌊</div>
+        <div class="gal-overlay"></div>
+        <div class="gal-info">
+          <div class="gal-author"><span class="gal-clan-dot littoral"></span>DuneRider85</div>
+          <div class="gal-caption">Coucher de soleil sur les dunes de La Barre-de-Monts</div>
+        </div>
+      </div>
+
+      <div class="gal-card" data-type="photo">
+        <div class="gal-img bocage-bg">🌿</div>
+        <div class="gal-overlay"></div>
+        <div class="gal-info">
+          <div class="gal-author"><span class="gal-clan-dot bocage"></span>Forêt_Runner</div>
+          <div class="gal-caption">Chemin creux au printemps</div>
+        </div>
+      </div>
+
+      <div class="gal-card" data-type="rando">
+        <div class="gal-img" style="background:linear-gradient(135deg,#2b1a0a,#4a2e15)">🥾</div>
+        <div class="gal-overlay"></div>
+        <div class="gal-info">
+          <div class="gal-author"><span class="gal-clan-dot marais"></span>HeronnièreOuest</div>
+          <div class="gal-caption">Sentier des roselières</div>
+        </div>
+      </div>
+
+      <div class="gal-card" data-type="photo">
+        <div class="gal-img littoral-bg">🏄</div>
+        <div class="gal-overlay"></div>
+        <div class="gal-info">
+          <div class="gal-author"><span class="gal-clan-dot littoral"></span>VendéeWave</div>
+          <div class="gal-caption">Surf à la Sauzaie</div>
+        </div>
+      </div>
+
+      <div class="gal-card" data-type="ktc">
+        <div class="gal-img" style="background:linear-gradient(135deg,#3a2a0a,#c9962a)">🥐</div>
+        <div class="gal-overlay"></div>
+        <div class="gal-info">
+          <div class="gal-author"><span class="gal-clan-dot littoral"></span>Cap_Pineau</div>
+          <div class="gal-caption">Préfou maison chez Mamie Léa</div>
+        </div>
+      </div>
+
+      <div class="gal-card" data-type="photo">
+        <div class="gal-img bocage-bg">🦎</div>
+        <div class="gal-overlay"></div>
+        <div class="gal-info">
+          <div class="gal-author"><span class="gal-clan-dot bocage"></span>SentierCreux44</div>
+          <div class="gal-caption">Lézard vert dans le bocage</div>
+        </div>
+      </div>
+
+      <div class="gal-card" data-type="photo">
+        <div class="gal-img marais-bg">🦢</div>
+        <div class="gal-overlay"></div>
+        <div class="gal-info">
+          <div class="gal-author"><span class="gal-clan-dot marais"></span>BrumeDuMarais</div>
+          <div class="gal-caption">Cygne sur le marais de Monts</div>
+        </div>
+      </div>
+
+      <div class="gal-card" data-type="rando">
+        <div class="gal-img littoral-bg">⛵</div>
+        <div class="gal-overlay"></div>
+        <div class="gal-info">
+          <div class="gal-author"><span class="gal-clan-dot littoral"></span>Île_Noirmoutier</div>
+          <div class="gal-caption">Vue depuis le passage du Gois</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== KTC ARCHIVES ===================== -->
+<section id="ktc">
+  <div class="container">
+    <div class="section-header reveal">
+      <p class="overline-label">Les bons plans de la communauté</p>
+      <h2>Archives Kéto Kolé Tché</h2>
+      <p class="section-sub">Chaque KTC est une recommandation locale validée par la Zone. Restaurants, artisans, spots secrets, adresses de caractère.</p>
+    </div>
+
+    <div class="ktc-grid">
+      <div class="ktc-card reveal">
+        <div class="ktc-card-img ktc-img-littoral">🍦</div>
+        <div class="ktc-card-body">
+          <div class="ktc-type">Restaurant · Côte</div>
+          <div class="ktc-title">La Guinguette du Bord d'Eau — Les Sables</div>
+          <p class="ktc-desc">Plateaux de fruits de mer en terrasse, vue sur l'océan, ambiance familiale. Réservez à l'avance l'été.</p>
+          <div class="ktc-footer">
+            <span class="ktc-author">Cap_Pineau</span>
+            <span>⚓ Littoral</span>
+            <span class="ktc-xp">+50 XP</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ktc-card reveal" style="transition-delay:.07s">
+        <div class="ktc-card-img ktc-img-bocage">🧀</div>
+        <div class="ktc-card-body">
+          <div class="ktc-type">Producteur · Bocage</div>
+          <div class="ktc-title">Ferme des Charmes — Fromagerie artisanale</div>
+          <p class="ktc-desc">Chèvres en plein air, fromages frais à la louche et visite de la ferme le samedi matin. Un trésor local.</p>
+          <div class="ktc-footer">
+            <span class="ktc-author">VigneronneLB</span>
+            <span>🌳 Bocage</span>
+            <span class="ktc-xp">+65 XP</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ktc-card reveal" style="transition-delay:.14s">
+        <div class="ktc-card-img ktc-img-marais">🚣</div>
+        <div class="ktc-card-body">
+          <div class="ktc-type">Activité · Marais</div>
+          <div class="ktc-title">Location de barques — Coulon sans foule</div>
+          <p class="ktc-desc">L'embarcadère du bout du chemin, inconnu des touristes. 8€/h, nature sauvage garantie. Demandez Pierrot.</p>
+          <div class="ktc-footer">
+            <span class="ktc-author">BrumeDuMarais</span>
+            <span>🌿 Marais</span>
+            <span class="ktc-xp">+55 XP</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ktc-card reveal" style="transition-delay:.05s">
+        <div class="ktc-card-img ktc-img-bocage">🍞</div>
+        <div class="ktc-card-body">
+          <div class="ktc-type">Artisan · Bocage</div>
+          <div class="ktc-title">Boulangerie Moreau — Préfou au beurre d'herbes</div>
+          <p class="ktc-desc">La seule boulangerie du bocage qui fait encore le préfou au levain. Ouvert du mardi au dimanche, 7h–13h.</p>
+          <div class="ktc-footer">
+            <span class="ktc-author">Forêt_Runner</span>
+            <span>🌳 Bocage</span>
+            <span class="ktc-xp">+45 XP</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ktc-card reveal" style="transition-delay:.1s">
+        <div class="ktc-card-img ktc-img-littoral">🌅</div>
+        <div class="ktc-card-body">
+          <div class="ktc-type">Spot · Côte</div>
+          <div class="ktc-title">Dune du Puits d'Enfer — Vue panoramique</div>
+          <p class="ktc-desc">La plus haute dune du littoral vendéen, sans les foules de l'île de Ré. Coucher de soleil exceptionnel.</p>
+          <div class="ktc-footer">
+            <span class="ktc-author">DuneRider85</span>
+            <span>⚓ Littoral</span>
+            <span class="ktc-xp">+60 XP</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ktc-card reveal" style="transition-delay:.15s">
+        <div class="ktc-card-img ktc-img-marais">🌿</div>
+        <div class="ktc-card-body">
+          <div class="ktc-type">Nature · Marais</div>
+          <div class="ktc-title">Mare aux grenouilles — Maillezais</div>
+          <p class="ktc-desc">Un spot discret près de l'abbaye. En mai–juin, des milliers de grenouilles. Observer sans déranger.</p>
+          <div class="ktc-footer">
+            <span class="ktc-author">RoncesMouillées</span>
+            <span>🌿 Marais</span>
+            <span class="ktc-xp">+50 XP</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== RANDO ARCHIVES ===================== -->
+<section id="randos">
+  <div class="container">
+    <div class="section-header reveal">
+      <p class="overline-label">Itinéraires validés par la communauté</p>
+      <h2>Archives randonnées</h2>
+      <p class="section-sub">Chaque rando ici a été réalisée, documentée et partagée par un membre de la Zone.</p>
+    </div>
+
+    <div class="rando-list">
+      <div class="rando-card reveal">
+        <div class="rando-map">🌳</div>
+        <div class="rando-body">
+          <div class="rando-title">Le Sentier des Menhirs — La Garnache → Challans</div>
+          <div class="rando-meta-row">
+            <span>📍 Bocage</span>
+            <span>📏 14 km</span>
+            <span>⏱ 4h30</span>
+            <span>🔺 Dénivelé +180m</span>
+          </div>
+          <p class="rando-desc">Une boucle qui traverse 3 communes du bocage, longeant dolmens et menhirs. Balisage blanc-rouge. Prévoir eau et casse-croûte.</p>
+        </div>
+        <div class="rando-side">
+          <div class="rando-xp">+120 XP<small>à gagner</small></div>
+          <span class="rando-clan-chip bocage-chip-sm">🌳 Bocage</span>
+          <a href="inscription.html" class="btn btn-ghost btn-sm">Valider cette rando</a>
+        </div>
+      </div>
+
+      <div class="rando-card reveal" style="transition-delay:.07s">
+        <div class="rando-map littoral">⚓</div>
+        <div class="rando-body">
+          <div class="rando-title">Tour de l'Île de Noirmoutier à vélo</div>
+          <div class="rando-meta-row">
+            <span>📍 Littoral</span>
+            <span>📏 48 km</span>
+            <span>⏱ 5h</span>
+            <span>🚲 Vélo requis</span>
+          </div>
+          <p class="rando-desc">Le tour complet de l'île par les pistes cyclables côtières. Passe par le Bois de la Chaise, les marais salants et le passage du Gois.</p>
+        </div>
+        <div class="rando-side">
+          <div class="rando-xp">+150 XP<small>à gagner</small></div>
+          <span class="rando-clan-chip littoral-chip-sm">⚓ Littoral</span>
+          <a href="inscription.html" class="btn btn-ghost btn-sm">Valider cette rando</a>
+        </div>
+      </div>
+
+      <div class="rando-card reveal" style="transition-delay:.14s">
+        <div class="rando-map marais">🌿</div>
+        <div class="rando-body">
+          <div class="rando-title">La Venise Verte — Coulon en barque et à pied</div>
+          <div class="rando-meta-row">
+            <span>📍 Marais</span>
+            <span>📏 8 km + barque</span>
+            <span>⏱ 3h</span>
+            <span>🚣 Barque + pédestre</span>
+          </div>
+          <p class="rando-desc">Combiné unique : 1h de barque sur les canaux du marais poitevin puis 8 km de sentier à travers les prairies humides. Apporter jumelles.</p>
+        </div>
+        <div class="rando-side">
+          <div class="rando-xp">+130 XP<small>à gagner</small></div>
+          <span class="rando-clan-chip marais-chip-sm">🌿 Marais</span>
+          <a href="inscription.html" class="btn btn-ghost btn-sm">Valider cette rando</a>
+        </div>
+      </div>
+
+      <div class="rando-card reveal" style="transition-delay:.07s">
+        <div class="rando-map">🌊</div>
+        <div class="rando-body">
+          <div class="rando-title">GR de Pays — Côte de Lumière, étape Les Sables</div>
+          <div class="rando-meta-row">
+            <span>📍 Littoral</span>
+            <span>📏 22 km</span>
+            <span>⏱ 6h</span>
+            <span>🔺 Dénivelé +90m</span>
+          </div>
+          <p class="rando-desc">Longe l'océan de Saint-Hilaire-de-Riez aux Sables-d'Olonne. Plages sauvages, falaises ocre, coins de pêche locaux.</p>
+        </div>
+        <div class="rando-side">
+          <div class="rando-xp">+140 XP<small>à gagner</small></div>
+          <span class="rando-clan-chip littoral-chip-sm">⚓ Littoral</span>
+          <a href="inscription.html" class="btn btn-ghost btn-sm">Valider cette rando</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TROPHÉES & SAISONS ===================== -->
+<section id="trophees-hall">
+  <div class="container">
+    <div class="section-header reveal">
+      <p class="overline-label">Histoire de la Zone · Saisons passées</p>
+      <h2>Trophées & saisons</h2>
+      <p class="section-sub">Les victoires de clan sont permanentes. Elles entrent dans l'histoire de la Zone pour toujours.</p>
+    </div>
+
+    <div class="hall-trophees-grid">
+      <div class="trophy-card reveal">
+        <div class="trophy-header marais">
+          <span class="trophy-season">Automne 2024 · Saison 1</span>
+          <span class="trophy-winner-badge">🏆 Vainqueur</span>
+        </div>
+        <div class="trophy-body">
+          <div class="trophy-clan"><span class="marais-chip-sm">🌿 Clan Marais</span></div>
+          <p class="trophy-desc">Victoire à l'arraché lors du Défi Automne. Les Passeurs du Marais ont signé la première page de l'histoire de la Zone.</p>
+          <div class="trophy-scores">
+            <div class="tsc-row"><span class="tsc-clan">🌿 Marais</span><span class="tsc-pts gold">14 320 pts</span></div>
+            <div class="tsc-row"><span class="tsc-clan">⚓ Littoral</span><span class="tsc-pts">13 110 pts</span></div>
+            <div class="tsc-row"><span class="tsc-clan">🌳 Bocage</span><span class="tsc-pts">12 040 pts</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="trophy-card reveal" style="transition-delay:.08s">
+        <div class="trophy-header bocage">
+          <span class="trophy-season">Hiver 2024–2025 · Saison 2</span>
+          <span class="trophy-winner-badge">🏆 Vainqueur</span>
+        </div>
+        <div class="trophy-body">
+          <div class="trophy-clan"><span class="bocage-chip-sm">🌳 Clan Bocage</span></div>
+          <p class="trophy-desc">Domination totale de l'hiver. Les Gardiens ont multiplié les randos et KTC pour décrocher leur premier trophée.</p>
+          <div class="trophy-scores">
+            <div class="tsc-row"><span class="tsc-clan">🌳 Bocage</span><span class="tsc-pts gold">15 880 pts</span></div>
+            <div class="tsc-row"><span class="tsc-clan">🌿 Marais</span><span class="tsc-pts">14 500 pts</span></div>
+            <div class="tsc-row"><span class="tsc-clan">⚓ Littoral</span><span class="tsc-pts">12 760 pts</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="trophy-card reveal" style="transition-delay:.16s">
+        <div class="trophy-header littoral">
+          <span class="trophy-season">Printemps 2025 · Saison 3</span>
+          <span class="trophy-winner-badge">🏆 Vainqueur</span>
+        </div>
+        <div class="trophy-body">
+          <div class="trophy-clan"><span class="littoral-chip-sm">⚓ Clan Littoral</span></div>
+          <p class="trophy-desc">Le Littoral a explosé au printemps avec une vague photo et quiz. Une victoire nette qui leur ouvre le chemin du doublé.</p>
+          <div class="trophy-scores">
+            <div class="tsc-row"><span class="tsc-clan">⚓ Littoral</span><span class="tsc-pts gold">16 240 pts</span></div>
+            <div class="tsc-row"><span class="tsc-clan">🌿 Marais</span><span class="tsc-pts">13 890 pts</span></div>
+            <div class="tsc-row"><span class="tsc-clan">🌳 Bocage</span><span class="tsc-pts">13 200 pts</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:40px">
+      <a href="clans.html" class="btn btn-outline" style="color:rgba(255,255,255,.7);border-color:rgba(255,255,255,.2)">Voir la bibliothèque complète →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CTA ===================== -->
+<section class="cta-bloc reveal" style="max-width:1200px;margin:0 auto 72px;border-radius:var(--radius-lg)">
+  <div class="cta-inner">
+    <div>
+      <h2>Ta contribution mérite d'être ici</h2>
+      <p>Rejoins la Zone, participe aux missions, entre dans la légende.</p>
+    </div>
+    <div class="cta-actions">
+      <a href="inscription.html" class="btn btn-white">Créer mon compte →</a>
+      <a href="missions.html" class="btn btn-outline-white">Voir les missions</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="footer-logo">ZONE<span>85</span></span>
+      <p>Explorez. Contribuez. Bâtissez votre légende en Vendée.</p>
+    </div>
+    <div class="footer-nav">
+      <a href="index.html">Accueil</a>
+      <a href="concept.html">Le Concept</a>
+      <a href="clans.html">Les Clans</a>
+      <a href="missions.html">Missions</a>
+      <a href="classement.html">Classement</a>
+      <a href="hall.html">Hall de la Zone</a>
+      <a href="profil.html">Mon profil</a>
+      <a href="inscription.html">Inscription</a>
+    </div>
+    <div class="footer-copy">
+      <p>© 2025 Zone85</p>
+    </div>
+  </div>
+</footer>
+
+<script src="zone85.js"></script>
+</body>
+</html>

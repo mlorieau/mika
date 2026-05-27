@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Missions — Zone85</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="zone85.css">
+  <style>
+  /* MISSIONS HERO */
+  .missions-hero{background:linear-gradient(160deg,#0d1e2c 0%,#12314e 60%,#1a3a55 100%);padding:120px 0 72px;position:relative;overflow:hidden}
+  .missions-hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");pointer-events:none}
+  .missions-hero-inner{position:relative;z-index:1}
+  .missions-hero .overline-label{color:rgba(234,86,73,.85);margin-bottom:12px}
+  .missions-hero h1{font-size:clamp(2rem,5vw,3rem);font-weight:900;color:#fff;letter-spacing:-1px;line-height:1.1;margin-bottom:14px}
+  .missions-hero p{font-size:1.05rem;color:rgba(255,255,255,.6);max-width:520px;line-height:1.7;margin-bottom:0}
+
+  /* GRANDE MISSION DE SAISON */
+  #grande-mission{background:var(--beige);padding:72px 0}
+  .gm-card{background:linear-gradient(135deg,#0c1e2e,#163756);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-lg)}
+  .gm-inner{display:grid;grid-template-columns:1fr 360px;gap:0}
+  .gm-content{padding:48px 48px 48px 48px}
+  .gm-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(234,86,73,.2);border:1px solid rgba(234,86,73,.35);color:#f07066;font-size:.72rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:5px 14px;border-radius:4px;margin-bottom:20px}
+  .gm-tag::before{content:'';width:6px;height:6px;background:var(--primary);border-radius:50%;animation:blink 1.5s infinite}
+  .gm-title{font-size:clamp(1.6rem,3vw,2.2rem);font-weight:900;color:#fff;letter-spacing:-.5px;margin-bottom:14px;line-height:1.1}
+  .gm-desc{font-size:.92rem;color:rgba(255,255,255,.6);line-height:1.75;margin-bottom:28px;max-width:480px}
+  .gm-xp-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(201,150,42,.15);border:1px solid rgba(201,150,42,.3);color:#e0b84a;padding:8px 18px;border-radius:var(--radius-sm);font-size:.88rem;font-weight:800;margin-bottom:28px}
+  .gm-progress{margin-bottom:28px}
+  .gm-progress-label{display:flex;justify-content:space-between;font-size:.78rem;font-weight:700;color:rgba(255,255,255,.5);margin-bottom:8px}
+  .gm-progress-bar{background:rgba(255,255,255,.1);border-radius:6px;height:10px;overflow:hidden}
+  .gm-progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),#f07066);border-radius:6px;width:0;transition:width 1.4s cubic-bezier(.22,1,.36,1)}
+  .gm-ctas{display:flex;gap:12px;flex-wrap:wrap}
+  .gm-side{background:rgba(0,0,0,.25);padding:48px 32px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;border-left:1px solid rgba(255,255,255,.06)}
+  .gm-countdown-title{font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4);text-align:center;margin-bottom:4px}
+  .gm-clans{width:100%}
+  .gm-clan-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .gm-clan-row:last-child{margin-bottom:0}
+  .gm-clan-lbl{font-size:.72rem;font-weight:700;color:rgba(255,255,255,.55);width:60px;flex-shrink:0}
+  .gm-clan-bar{flex:1;background:rgba(255,255,255,.08);border-radius:4px;height:8px;overflow:hidden}
+  .gm-clan-fill{height:100%;border-radius:4px;width:0;transition:width 1.4s cubic-bezier(.22,1,.36,1)}
+  .gm-clan-pts{font-size:.72rem;font-weight:800;color:rgba(255,255,255,.65);width:48px;text-align:right;flex-shrink:0}
+
+  /* QUICK ACTIONS */
+  #quick-actions{background:var(--beige-light);padding:72px 0;border-bottom:1px solid var(--beige-dark)}
+  .quick-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-top:40px}
+  .quick-card{background:var(--white);border-radius:var(--radius-lg);padding:24px 16px;text-align:center;box-shadow:var(--shadow-sm);cursor:pointer;transition:all .25s;border:2px solid transparent;text-decoration:none;display:block;color:inherit}
+  .quick-card:hover{border-color:var(--primary);transform:translateY(-4px);box-shadow:var(--shadow-md)}
+  .quick-icon{font-size:2rem;margin-bottom:10px;display:block}
+  .quick-type{font-size:.75rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--text);margin-bottom:4px}
+  .quick-xp{font-size:.78rem;font-weight:700;color:var(--primary)}
+
+  /* MISSION LIST */
+  #mission-list{background:var(--beige);padding:72px 0}
+  .mission-list-header{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:32px;flex-wrap:wrap}
+  .missions-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .mission-card{background:var(--white);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm);transition:all .25s;cursor:pointer}
+  .mission-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-md)}
+  .mission-card-header{padding:20px 20px 14px;border-bottom:1px solid var(--beige-dark)}
+  .mission-type-tag{display:inline-block;font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:3px 10px;border-radius:4px;margin-bottom:10px}
+  .tag-photo{background:rgba(99,102,241,.12);color:#4f46e5}
+  .tag-quiz{background:rgba(234,86,73,.1);color:var(--primary)}
+  .tag-rando{background:rgba(30,92,48,.12);color:#1e5c30}
+  .tag-ktc{background:rgba(201,150,42,.15);color:#8a6020}
+  .tag-meteo{background:rgba(14,165,233,.12);color:#0369a1}
+  .tag-enquete{background:rgba(168,85,247,.1);color:#7c3aed}
+  .tag-saison{background:rgba(234,86,73,.15);color:var(--primary);border:1px solid rgba(234,86,73,.2)}
+  .tag-rapide{background:rgba(234,86,73,.08);color:var(--text-mid)}
+  .mission-title{font-size:.95rem;font-weight:800;color:var(--text);margin-bottom:6px;line-height:1.3}
+  .mission-desc{font-size:.8rem;color:var(--text-mid);line-height:1.55}
+  .mission-card-footer{padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
+  .mission-xp{font-size:.82rem;font-weight:800;color:var(--primary)}
+  .mission-difficulty{font-size:.72rem;color:var(--text-muted);font-weight:600}
+  .mission-cta-link{font-size:.78rem;font-weight:700;color:var(--navy-dark);text-decoration:underline}
+  .mission-card.featured{border:2px solid var(--primary)}
+  .mission-card.featured .mission-card-header{background:rgba(234,86,73,.04)}
+
+  @media(max-width:1024px){
+    .gm-inner{grid-template-columns:1fr}
+    .gm-side{border-left:none;border-top:1px solid rgba(255,255,255,.06);padding:32px}
+    .quick-grid{grid-template-columns:repeat(3,1fr)}
+    .missions-grid{grid-template-columns:repeat(2,1fr)}
+  }
+  @media(max-width:768px){
+    .quick-grid{grid-template-columns:repeat(2,1fr)}
+    .missions-grid{grid-template-columns:1fr}
+    .gm-content{padding:32px 24px}
+    .mission-list-header{flex-direction:column}
+  }
+  </style>
+</head>
+<body>
+
+<!-- ===================== NAV ===================== -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <div class="nav-left">
+      <a href="index.html">Accueil</a>
+      <a href="concept.html">Le Concept</a>
+      <a href="clans.html">Les Clans</a>
+      <a href="missions.html" class="active">Missions</a>
+      <a href="classement.html">Classement</a>
+      <a href="hall.html">Hall de la Zone</a>
+    </div>
+    <a href="index.html" class="nav-logo">ZONE<span>85</span></a>
+    <div class="nav-right">
+      <div class="nav-avatar" title="Mon profil" onclick="location.href='profil.html'">SM</div>
+      <a href="inscription.html" class="nav-btn">Rejoindre</a>
+      <div class="hamburger" id="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html">Accueil</a>
+  <a href="concept.html">Le Concept</a>
+  <a href="clans.html">Les Clans</a>
+  <a href="missions.html" class="active">Missions</a>
+  <a href="classement.html">Classement</a>
+  <a href="hall.html">Hall de la Zone</a>
+  <a href="inscription.html" style="color:var(--primary);font-weight:800;border-bottom:none">Rejoindre la Zone →</a>
+</div>
+
+<!-- ===================== HERO ===================== -->
+<section class="missions-hero">
+  <div class="container missions-hero-inner">
+    <p class="overline-label">Camp d'Été Zone85 · juin–août 2025</p>
+    <h1>Les Missions</h1>
+    <p>Chaque contribution compte. Gagne des XP pour toi, des points pour ton clan. Explore la Vendée à ta façon.</p>
+  </div>
+</section>
+
+<!-- ===================== GRANDE MISSION DE SAISON ===================== -->
+<section id="grande-mission">
+  <div class="container">
+    <div class="section-header reveal">
+      <p class="overline-label">Mission collective · Saison en cours</p>
+      <h2>Le Grand Défi de l'Été</h2>
+      <p class="section-sub">Une seule grande mission unit tous les membres de la Zone pour la saison. Le clan le plus engagé remporte le trophée.</p>
+    </div>
+
+    <div class="gm-card reveal">
+      <div class="gm-inner">
+        <div class="gm-content">
+          <div class="gm-tag">Mission de saison · Camp d'Été</div>
+          <h2 class="gm-title">Le Grand Défi de l'Été</h2>
+          <p class="gm-desc">Pendant tout l'été, chaque action que tu réalises — photo, quiz, météo, rando, KTC — contribue au score de ton clan. La Vendée se découvre, se partage, se raconte. À toi de jouer.</p>
+          <div class="gm-xp-badge">
+            ⚡ +15 à +150 XP par action · Points clan en prime
+          </div>
+          <div class="gm-progress">
+            <div class="gm-progress-label">
+              <span>Progression collective</span>
+              <span>34 740 / 50 000 contributions</span>
+            </div>
+            <div class="gm-progress-bar">
+              <div class="gm-progress-fill" data-prog="69"></div>
+            </div>
+          </div>
+          <div class="gm-ctas">
+            <a href="inscription.html" class="btn btn-primary">Participer maintenant →</a>
+            <a href="#mission-list" class="btn btn-outline">Voir toutes les missions</a>
+          </div>
+        </div>
+
+        <div class="gm-side">
+          <div>
+            <div class="gm-countdown-title">Fin de la saison</div>
+            <div class="countdown-inline">
+              <div class="cd-unit">
+                <span class="countdown-days cd-val">—</span>
+                <span class="cd-lbl">j</span>
+              </div>
+              <div class="cd-sep">:</div>
+              <div class="cd-unit">
+                <span class="countdown-hours cd-val">—</span>
+                <span class="cd-lbl">h</span>
+              </div>
+              <div class="cd-sep">:</div>
+              <div class="cd-unit">
+                <span class="countdown-mins cd-val">—</span>
+                <span class="cd-lbl">min</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="gm-clans" style="width:100%">
+            <div class="gm-clan-row">
+              <span class="gm-clan-lbl">⚓ Littoral</span>
+              <div class="gm-clan-bar"><div class="gm-clan-fill race-fill-littoral" data-width="94"></div></div>
+              <span class="gm-clan-pts">12 840</span>
+            </div>
+            <div class="gm-clan-row">
+              <span class="gm-clan-lbl">🌿 Marais</span>
+              <div class="gm-clan-bar"><div class="gm-clan-fill race-fill-marais" data-width="85"></div></div>
+              <span class="gm-clan-pts">11 560</span>
+            </div>
+            <div class="gm-clan-row">
+              <span class="gm-clan-lbl">🌳 Bocage</span>
+              <div class="gm-clan-bar"><div class="gm-clan-fill race-fill-bocage" data-width="75"></div></div>
+              <span class="gm-clan-pts">10 210</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== QUICK ACTIONS ===================== -->
+<section id="quick-actions">
+  <div class="container">
+    <div class="section-header reveal">
+      <p class="overline-label">Rapide · 5 minutes max</p>
+      <h2>Actions du quotidien</h2>
+      <p class="section-sub">Six façons de participer, chaque jour. Toutes comptent pour toi et pour ton clan.</p>
+    </div>
+    <div class="quick-grid">
+      <a href="#mission-list" onclick="filterMissions(document.querySelector('[data-filter=photo]'),'photo')" class="quick-card reveal">
+        <span class="quick-icon">📸</span>
+        <div class="quick-type">Photo</div>
+        <div class="quick-xp">+20 à +60 XP</div>
+      </a>
+      <a href="#mission-list" onclick="filterMissions(document.querySelector('[data-filter=quiz]'),'quiz')" class="quick-card reveal" style="transition-delay:.05s">
+        <span class="quick-icon">🧠</span>
+        <div class="quick-type">Quiz</div>
+        <div class="quick-xp">+15 à +40 XP</div>
+      </a>
+      <a href="#mission-list" onclick="filterMissions(document.querySelector('[data-filter=meteo]'),'meteo')" class="quick-card reveal" style="transition-delay:.1s">
+        <span class="quick-icon">🌤️</span>
+        <div class="quick-type">Météo</div>
+        <div class="quick-xp">+15 XP / jour</div>
+      </a>
+      <a href="#mission-list" onclick="filterMissions(document.querySelector('[data-filter=rando]'),'rando')" class="quick-card reveal" style="transition-delay:.15s">
+        <span class="quick-icon">🥾</span>
+        <div class="quick-type">Rando</div>
+        <div class="quick-xp">+50 à +150 XP</div>
+      </a>
+      <a href="#mission-list" onclick="filterMissions(document.querySelector('[data-filter=ktc]'),'ktc')" class="quick-card reveal" style="transition-delay:.2s">
+        <span class="quick-icon">🥐</span>
+        <div class="quick-type">Kéto Kolé Tché</div>
+        <div class="quick-xp">+30 à +80 XP</div>
+      </a>
+      <a href="#mission-list" onclick="filterMissions(document.querySelector('[data-filter=enquete]'),'enquete')" class="quick-card reveal" style="transition-delay:.25s">
+        <span class="quick-icon">🔍</span>
+        <div class="quick-type">Enquête</div>
+        <div class="quick-xp">+40 à +100 XP</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== LISTE DES MISSIONS ===================== -->
+<section id="mission-list">
+  <div class="container">
+    <div class="mission-list-header reveal">
+      <div>
+        <p class="overline-label">Toutes les missions disponibles</p>
+        <h2 style="font-size:clamp(1.4rem,2.5vw,1.8rem);font-weight:900;letter-spacing:-.5px;color:var(--text)">Choisissez votre mission</h2>
+      </div>
+      <div class="filter-tabs" id="mission-filters">
+        <button class="filter-tab active" data-filter="all" onclick="filterMissions(this,'all')">Toutes</button>
+        <button class="filter-tab" data-filter="saison" onclick="filterMissions(this,'saison')">🏆 Saison</button>
+        <button class="filter-tab" data-filter="photo" onclick="filterMissions(this,'photo')">📸 Photo</button>
+        <button class="filter-tab" data-filter="quiz" onclick="filterMissions(this,'quiz')">🧠 Quiz</button>
+        <button class="filter-tab" data-filter="rando" onclick="filterMissions(this,'rando')">🥾 Rando</button>
+        <button class="filter-tab" data-filter="ktc" onclick="filterMissions(this,'ktc')">🥐 KTC</button>
+        <button class="filter-tab" data-filter="meteo" onclick="filterMissions(this,'meteo')">🌤️ Météo</button>
+        <button class="filter-tab" data-filter="enquete" onclick="filterMissions(this,'enquete')">🔍 Enquête</button>
+        <button class="filter-tab" data-filter="rapide" onclick="filterMissions(this,'rapide')">⚡ Rapide</button>
+      </div>
+    </div>
+
+    <div class="missions-grid">
+
+      <!-- MISSION SAISON (featured) -->
+      <div class="mission-card featured reveal" data-type="saison">
+        <div class="mission-card-header">
+          <span class="mission-type-tag tag-saison">🏆 Mission de saison</span>
+          <div class="mission-title">Le Grand Défi de l'Été</div>
+          <p class="mission-desc">Toutes les contributions de la saison comptent. Chaque action rapproche ton clan de la victoire.</p>
+        </div>
+        <div class="mission-card-footer">
+          <span class="mission-xp">+15–150 XP</span>
+          <span class="mission-difficulty">Toute la saison</span>
+          <a href="inscription.html" class="mission-cta-link">Participer</a>
+        </div>
+      </div>
+
+      <!-- MISSIONS PHOTO -->
+      <div class="mission-card reveal" data-type="photo">
+        <div class="mission-card-header">
+          <span class="mission-type-tag tag-photo">📸 Photo</span>
+          <div class="mission-title">La Vendée en couleurs d'été</div>
+          <p class="mission-desc">Capture un paysage vendéen caractéristique de l'été — dunes, bocage, marais, fête locale.</p>
+        </div>
+        <div class="mission-card-footer">
+          <span class="mission-xp">+40 XP</span>
+          <span class="mission-difficulty">Facile</span>
+          <a href="inscription.html" class="mission-cta-link">Participer</a>
+        </div>
+      </div>
+
+      <div class="mission-card reveal" data-type="photo" style="transition-delay:.05s">
+        <div class="mission-card-header">
+          <span class="mission-type-tag tag-photo">📸 Photo</span>
+          <div class="mission-title">Animaux sauvages du bocage</div>
+          <p class="mission-desc">Photographiez une espèce animale sauvage en milieu naturel vendéen. Fournissez lieu et date.</p>
+        </div>
+        <div class="mission-card-footer">
+          <span class="mission-xp">+60 XP</span>
+          <span class="mission-difficulty">Intermédiaire</span>
+          <a href="inscription.html" class="mission-cta-link">Participer</a>
+        </div>
+      </div>
+
+      <!-- MISSIONS QUIZ -->
+      <div class="mission-card reveal" data-type="quiz" style="transition-delay:.1s">
+        <div class="mission-card-header">
+          <span class="mission-type-tag tag-quiz">🧠 Quiz</span>
+          <div class="mission-title">Histoire de la Vendée militaire</div>
+          <p class="mission-desc">5 questions sur les guerres de Vendée, de 1793 à nos jours. Score minimum 3/5 pour valider.</p>
+        </div>
+        <div class="mission-card-footer">
+          <span class="mission-xp">+30 XP</span>
+          <span class="mission-difficulty">Intermédiaire</span>
+          <a href="inscription.html" class="mission-cta-link">Participer</a>
+        </div>
+      </div>
+
+      <div class="mission-card reveal" data-type="quiz" style="transition-delay:.05s">
+        <div class="mission-card-header">
+          <span class="mission-type-tag tag-quiz">🧠 Quiz</span>
+          <div class="mission-title">Saveurs vendéennes</div>
+          <p class="mission-desc">Brioche, préfou, mojhette — connais-tu vraiment la gastronomie locale ? 8 questions pour le savoir.</p>
+        </div>
+        <div class="mission-card-footer">
+          <span class="mission-xp">+25 XP</span>
+          <span class="mission-difficulty">Facile</span>
+          <a href="inscription.html" class="mission-cta-link">Participer</a>
+        </div>
+      </div>
+
+      <!-- MISSIONS RANDO -->
+      <div class="mission-card reveal" data-type="rando">
+        <div class="mission-card-header">
+          <span class="mission-type-tag tag-rando">🥾 Rando</span>
+          <div class="mission-title">Le Sentier du Marais Poitevin</div>
+          <p class="mission-desc">Parcours le sentier balisé du marais poitevin et partage 3 photos avec géolocalisation. Boucle de 8 km.</p>
+        </div>
+        <div class="mission-card-footer">
+          <span class="mission-xp">+120 XP</span>
+          <span class="mission-difficulty">Sportif · 3h</span>
+          <a href="inscription.html" class="mission-cta-link">Participer</a>
+        </div>
+      </div>
+
+      <div class="mission-card reveal" data-type="rando" style="transition-delay:.05s">
+        <div class="mission-card-header">
+          <span class="mission-type-tag tag-rando">🥾 Rando</span>
+          <div class="mission-title">Dunes sauvages de la côte</div>
+          <p class="mission-desc">Explorer les dunes de la Parée-Préneau à Noirmoutier. Identifier 2 plantes caractéristiques des dunes.</p>
+        </div>
+        <div class="mission-card-footer">
+          <span class="mission-xp">+90 XP</span>
+          <span class="mission-difficulty">Modéré · 2h</span>
+          <a href="inscription.html" class="mission-cta-link">Participer</a>
+        </div>
+      </div>
+
+      <!-- MISSIONS KTC -->
+      <div class="mission-card reveal" data-type="ktc">
+        <div class="mission-card-header">
+          <span class="mission-type-tag tag-ktc">🥐 Kéto Kolé Tché</span>
+          <div class="mission-title">Le meilleur spot estival</div>
+          <p class="mission-desc">Recommande un endroit secret, une adresse locale ou une activité méconnue à faire cet été en Vendée.</p>
+        </div>
+        <div class="mission-card-footer">
+          <span class="mission-xp">+50 XP</span>
+          <span class="mission-difficulty">Facile</span>
+          <a href="inscription.html" class="mission-cta-link">Participer</a>
+        </div>
+      </div>
+
+      <div class="mission-card reveal" data-type="ktc" style="transition-delay:.05s">
+        <div class="mission-card-header">
+          <span class="mission-type-tag tag-ktc">🥐 Kéto Kolé Tché</span>
+          <div class="mission-title">Producteur local du bocage</div>
+          <p class="mission-desc">Présente un producteur local, une ferme ou un artisan de ton territoire. Photo + description courte.</p>
+        </div>
+        <div class="mission-card-footer">
+          <span class="mission-xp">+65 XP</span>
+          <span class="mission-difficulty">Facile</span>
+          <a href="inscription.html" class="mission-cta-link">Participer</a>
+        </div>
+      </div>
+
+      <!-- MISSIONS MÉTÉO -->
+      <div class="mission-card reveal" data-type="meteo">
+        <div class="mission-card-header">
+          <span class="mission-type-tag tag-meteo">🌤️ Météo</span>
+          <div class="mission-title">Relevé météo quotidien</div>
+          <p class="mission-desc">Envoie chaque matin la météo de ton secteur (température, ciel, vent). 7 jours consécutifs = bonus XP.</p>
+        </div>
+        <div class="mission-card-footer">
+          <span class="mission-xp">+15 XP / jour</span>
+          <span class="mission-difficulty">Quotidien · 2 min</span>
+          <a href="inscription.html" class="mission-cta-link">Participer</a>
+        </div>
+      </div>
+
+      <!-- MISSIONS ENQUÊTE -->
+      <div class="mission-card reveal" data-type="enquete">
+        <div class="mission-card-header">
+          <span class="mission-type-tag tag-enquete">🔍 Enquête</span>
+          <div class="mission-title">Patrimoine oublié de mon village</div>
+          <p class="mission-desc">Identifie un élément du patrimoine local peu connu (lavoir, calvaire, ancien moulin…) et documente-le.</p>
+        </div>
+        <div class="mission-card-footer">
+          <span class="mission-xp">+80 XP</span>
+          <span class="mission-difficulty">Intermédiaire</span>
+          <a href="inscription.html" class="mission-cta-link">Participer</a>
+        </div>
+      </div>
+
+      <!-- MISSION RAPIDE -->
+      <div class="mission-card reveal" data-type="rapide">
+        <div class="mission-card-header">
+          <span class="mission-type-tag tag-rapide">⚡ Rapide</span>
+          <div class="mission-title">Sondage : ta sortie de l'été</div>
+          <p class="mission-desc">Vote pour ta sortie incontournable de l'été en Vendée. 1 clic, résultats en direct.</p>
+        </div>
+        <div class="mission-card-footer">
+          <span class="mission-xp">+10 XP</span>
+          <span class="mission-difficulty">Immédiat · 30 sec</span>
+          <a href="inscription.html" class="mission-cta-link">Participer</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CTA ===================== -->
+<section class="cta-bloc reveal" style="margin:72px 24px;max-width:1200px;margin-left:auto;margin-right:auto;border-radius:var(--radius-lg)">
+  <div class="cta-inner">
+    <div>
+      <h2>Prêt à gagner ton premier XP ?</h2>
+      <p>Crée ton compte en 2 minutes et rejoins le clan qui te ressemble.</p>
+    </div>
+    <div class="cta-actions">
+      <a href="inscription.html" class="btn btn-white">Rejoindre la Zone →</a>
+      <a href="classement.html" class="btn btn-outline-white">Voir le classement</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="footer-logo">ZONE<span>85</span></span>
+      <p>Explorez. Contribuez. Bâtissez votre légende en Vendée.</p>
+    </div>
+    <div class="footer-nav">
+      <a href="index.html">Accueil</a>
+      <a href="concept.html">Le Concept</a>
+      <a href="clans.html">Les Clans</a>
+      <a href="missions.html">Missions</a>
+      <a href="classement.html">Classement</a>
+      <a href="hall.html">Hall de la Zone</a>
+      <a href="profil.html">Mon profil</a>
+      <a href="inscription.html">Inscription</a>
+    </div>
+    <div class="footer-copy">
+      <p>© 2025 Zone85</p>
+    </div>
+  </div>
+</footer>
+
+<script src="zone85.js"></script>
+</body>
+</html>

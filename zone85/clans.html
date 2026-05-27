@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Les Clans — Zone85</title>
+  <link rel="stylesheet" href="zone85.css">
+</head>
+<body>
+
+<!-- ===================== NAV ===================== -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <div class="nav-left">
+      <a href="index.html">Accueil</a>
+      <a href="concept.html">Le Concept</a>
+      <a href="clans.html" class="active">Les Clans</a>
+      <a href="missions.html">Missions</a>
+      <a href="classement.html">Classement</a>
+      <a href="hall.html">Hall de la Zone</a>
+    </div>
+    <a href="index.html" class="nav-logo">ZONE<span>85</span></a>
+    <div class="nav-right">
+      <div class="nav-avatar" title="Mon profil" onclick="location.href='profil.html'">SM</div>
+      <a href="inscription.html" class="nav-btn">Rejoindre</a>
+      <div class="hamburger" id="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html">Accueil</a>
+  <a href="concept.html">Le Concept</a>
+  <a href="clans.html" class="active">Les Clans</a>
+  <a href="missions.html">Missions</a>
+  <a href="classement.html">Classement</a>
+  <a href="hall.html">Hall de la Zone</a>
+  <a href="inscription.html" style="color:var(--primary);font-weight:800;border-bottom:none">Rejoindre la Zone →</a>
+</div>
+
+<!-- ===================== HERO PODIUM ===================== -->
+<section class="clans-hero">
+  <div class="clans-hero-inner">
+    <div class="clans-hero-text">
+      <p class="overline-label">Saison en cours · Camp d'Été Zone85</p>
+      <h1>La Bataille des Clans</h1>
+      <p class="hero-sub">Trois clans. Un seul vainqueur de saison.<br>Le clan gagne la saison. Le joueur construit sa légende.</p>
+      <a href="missions.html" class="btn btn-primary btn-lg">Participer à la mission</a>
+    </div>
+
+    <div class="podium-wrap">
+      <!-- PODIUM 2 - Marais (2e) -->
+      <div class="podium-col" id="p2">
+        <div class="pod-clan-label marais-label">Marais</div>
+        <div class="pod-masc">
+          <img src="./img/masc-marais.png" alt="Mascotte Marais">
+        </div>
+        <div class="pod-bar p2-bar">
+          <span class="pod-rank">2</span>
+        </div>
+        <div class="pod-score">11 560 <small>pts</small></div>
+      </div>
+
+      <!-- PODIUM 1 - Littoral (1er) -->
+      <div class="podium-col" id="p1">
+        <div class="pod-crown">👑</div>
+        <div class="pod-clan-label littoral-label">Littoral</div>
+        <div class="pod-masc">
+          <img src="./img/masc-littoral.png" alt="Mascotte Littoral">
+        </div>
+        <div class="pod-bar p1-bar">
+          <span class="pod-rank">1</span>
+        </div>
+        <div class="pod-score">12 840 <small>pts</small></div>
+      </div>
+
+      <!-- PODIUM 3 - Bocage (3e) -->
+      <div class="podium-col" id="p3">
+        <div class="pod-clan-label bocage-label">Bocage</div>
+        <div class="pod-masc">
+          <img src="./img/masc-bocage.png" alt="Mascotte Bocage">
+        </div>
+        <div class="pod-bar p3-bar">
+          <span class="pod-rank">3</span>
+        </div>
+        <div class="pod-score">10 210 <small>pts</small></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== COURSE EN DIRECT ===================== -->
+<section class="course-section reveal">
+  <div class="container">
+    <div class="section-header">
+      <p class="overline-label">Score de saison · mis à jour en continu</p>
+      <h2>Course en direct</h2>
+    </div>
+
+    <div class="race-track">
+      <!-- Littoral -->
+      <div class="race-row">
+        <div class="race-meta">
+          <span class="race-clan-name littoral-text">⚓ Littoral</span>
+          <span class="race-pts">12 840 pts</span>
+        </div>
+        <div class="race-bar-bg">
+          <div class="race-fill race-fill-littoral" data-width="94"></div>
+        </div>
+        <span class="race-rank gold-badge">🥇</span>
+      </div>
+
+      <!-- Marais -->
+      <div class="race-row">
+        <div class="race-meta">
+          <span class="race-clan-name marais-text">🌿 Marais</span>
+          <span class="race-pts">11 560 pts</span>
+        </div>
+        <div class="race-bar-bg">
+          <div class="race-fill race-fill-marais" data-width="85"></div>
+        </div>
+        <span class="race-rank silver-badge">🥈</span>
+      </div>
+
+      <!-- Bocage -->
+      <div class="race-row">
+        <div class="race-meta">
+          <span class="race-clan-name bocage-text">🌳 Bocage</span>
+          <span class="race-pts">10 210 pts</span>
+        </div>
+        <div class="race-bar-bg">
+          <div class="race-fill race-fill-bocage" data-width="75"></div>
+        </div>
+        <span class="race-rank bronze-badge">🥉</span>
+      </div>
+    </div>
+
+    <!-- Countdown -->
+    <div class="course-footer">
+      <p class="course-mission-label">Mission collective · <strong>Le Grand Défi de l'Été</strong></p>
+      <div class="countdown-inline">
+        <div class="cd-unit">
+          <span class="countdown-days cd-val">—</span>
+          <span class="cd-lbl">jours</span>
+        </div>
+        <div class="cd-sep">:</div>
+        <div class="cd-unit">
+          <span class="countdown-hours cd-val">—</span>
+          <span class="cd-lbl">heures</span>
+        </div>
+        <div class="cd-sep">:</div>
+        <div class="cd-unit">
+          <span class="countdown-mins cd-val">—</span>
+          <span class="cd-lbl">min</span>
+        </div>
+      </div>
+      <p class="course-end-label">Fin de saison : 31 août</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FICHE CLAN — BOCAGE ===================== -->
+<section class="clan-sheet clan-sheet-bocage reveal" id="clan-bocage">
+  <div class="container">
+    <div class="clan-sheet-inner">
+      <div class="clan-sheet-info">
+        <div class="clan-chip bocage-chip">🌳 Clan Bocage</div>
+        <h2 class="clan-sheet-title">Les Gardiens du Bocage</h2>
+        <p class="clan-sheet-desc">Ancrés dans les forêts et bocages vendéens, les aventuriers du Bocage tracent leur chemin entre chemins creux et haies centenaires. Discrets, déterminés, ils avancent à leur rythme et ne lâchent jamais.</p>
+        <div class="clan-stats-row">
+          <div class="clan-stat-box">
+            <span class="clan-stat-val">10 210</span>
+            <span class="clan-stat-lbl">Pts saison</span>
+          </div>
+          <div class="clan-stat-box">
+            <span class="clan-stat-val">412</span>
+            <span class="clan-stat-lbl">Membres</span>
+          </div>
+          <div class="clan-stat-box">
+            <span class="clan-stat-val">3</span>
+            <span class="clan-stat-lbl">Trophées</span>
+          </div>
+        </div>
+        <div class="clan-top-members">
+          <p class="top-members-title">Top membres · Saison en cours</p>
+          <ol class="top-members-list">
+            <li>
+              <span class="tm-rank">1</span>
+              <span class="tm-name">Forêt_Runner</span>
+              <span class="tm-xp">2 340 XP</span>
+            </li>
+            <li>
+              <span class="tm-rank">2</span>
+              <span class="tm-name">VigneronneLB</span>
+              <span class="tm-xp">1 890 XP</span>
+            </li>
+            <li>
+              <span class="tm-rank">3</span>
+              <span class="tm-name">SentierCreux44</span>
+              <span class="tm-xp">1 750 XP</span>
+            </li>
+          </ol>
+        </div>
+        <a href="inscription.html" class="btn btn-primary">Rejoindre le Bocage</a>
+      </div>
+      <div class="clan-masc-wrap">
+        <img src="./img/masc-bocage-full.png" alt="Mascotte Bocage" class="clan-masc-img">
+        <div class="clan-quote bocage-quote">"On tient. On avance. On gagne."</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FICHE CLAN — LITTORAL ===================== -->
+<section class="clan-sheet clan-sheet-littoral reveal" id="clan-littoral">
+  <div class="container">
+    <div class="clan-sheet-inner reverse">
+      <div class="clan-masc-wrap">
+        <img src="./img/masc-littoral-full.png" alt="Mascotte Littoral" class="clan-masc-img">
+        <div class="clan-quote littoral-quote">"Le vent souffle, on garde le cap."</div>
+      </div>
+      <div class="clan-sheet-info">
+        <div class="clan-chip littoral-chip">⚓ Clan Littoral</div>
+        <h2 class="clan-sheet-title">Les Sentinelles du Littoral</h2>
+        <p class="clan-sheet-desc">Entre dunes sauvages et ports animés, le Clan Littoral incarne l'esprit ouvert de la côte vendéenne. Audacieux, curieux, toujours en mouvement — ils sont là où ça bouge, et ils mènent la danse.</p>
+        <div class="clan-stats-row">
+          <div class="clan-stat-box">
+            <span class="clan-stat-val">12 840</span>
+            <span class="clan-stat-lbl">Pts saison</span>
+          </div>
+          <div class="clan-stat-box">
+            <span class="clan-stat-val">448</span>
+            <span class="clan-stat-lbl">Membres</span>
+          </div>
+          <div class="clan-stat-box">
+            <span class="clan-stat-val">2</span>
+            <span class="clan-stat-lbl">Trophées</span>
+          </div>
+        </div>
+        <div class="clan-top-members">
+          <p class="top-members-title">Top membres · Saison en cours</p>
+          <ol class="top-members-list">
+            <li>
+              <span class="tm-rank">1</span>
+              <span class="tm-name">DuneRider85</span>
+              <span class="tm-xp">2 610 XP</span>
+            </li>
+            <li>
+              <span class="tm-rank">2</span>
+              <span class="tm-name">VendéeWave</span>
+              <span class="tm-xp">2 180 XP</span>
+            </li>
+            <li>
+              <span class="tm-rank">3</span>
+              <span class="tm-name">Cap_Pineau</span>
+              <span class="tm-xp">1 990 XP</span>
+            </li>
+          </ol>
+        </div>
+        <a href="inscription.html" class="btn btn-primary">Rejoindre le Littoral</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FICHE CLAN — MARAIS ===================== -->
+<section class="clan-sheet clan-sheet-marais reveal" id="clan-marais">
+  <div class="container">
+    <div class="clan-sheet-inner">
+      <div class="clan-sheet-info">
+        <div class="clan-chip marais-chip">🌿 Clan Marais</div>
+        <h2 class="clan-sheet-title">Les Passeurs du Marais</h2>
+        <p class="clan-sheet-desc">Dans les brumes du marais poitevin et des prairies humides, les aventuriers du Marais cultivent la patience et la profondeur. Ils lisent le territoire comme nul autre, et connaissent chaque chemin caché.</p>
+        <div class="clan-stats-row">
+          <div class="clan-stat-box">
+            <span class="clan-stat-val">11 560</span>
+            <span class="clan-stat-lbl">Pts saison</span>
+          </div>
+          <div class="clan-stat-box">
+            <span class="clan-stat-val">380</span>
+            <span class="clan-stat-lbl">Membres</span>
+          </div>
+          <div class="clan-stat-box">
+            <span class="clan-stat-val">4</span>
+            <span class="clan-stat-lbl">Trophées</span>
+          </div>
+        </div>
+        <div class="clan-top-members">
+          <p class="top-members-title">Top membres · Saison en cours</p>
+          <ol class="top-members-list">
+            <li>
+              <span class="tm-rank">1</span>
+              <span class="tm-name">BrumeDuMarais</span>
+              <span class="tm-xp">2 490 XP</span>
+            </li>
+            <li>
+              <span class="tm-rank">2</span>
+              <span class="tm-name">HeronnièreOuest</span>
+              <span class="tm-xp">2 020 XP</span>
+            </li>
+            <li>
+              <span class="tm-rank">3</span>
+              <span class="tm-name">Tourbe_Libre</span>
+              <span class="tm-xp">1 810 XP</span>
+            </li>
+          </ol>
+        </div>
+        <a href="inscription.html" class="btn btn-primary">Rejoindre le Marais</a>
+      </div>
+      <div class="clan-masc-wrap">
+        <img src="./img/masc-marais-full.png" alt="Mascotte Marais" class="clan-masc-img">
+        <div class="clan-quote marais-quote">"L'eau trouve toujours son chemin."</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== BIBLIOTHÈQUE DES TROPHÉES ===================== -->
+<section class="trophees-section reveal">
+  <div class="container">
+    <div class="section-header">
+      <p class="overline-label">Palmarès des saisons passées</p>
+      <h2>Bibliothèque des trophées</h2>
+      <p class="section-sub">Chaque saison couronnée entre dans l'histoire. Ces victoires sont définitives.</p>
+    </div>
+
+    <div class="trophy-grid">
+      <!-- Saison 1 -->
+      <div class="trophy-card reveal">
+        <div class="trophy-header marais">
+          <span class="trophy-season">Automne 2024 · Saison 1</span>
+          <span class="trophy-winner-badge">🏆 Vainqueur</span>
+        </div>
+        <div class="trophy-body">
+          <div class="trophy-clan marais-chip-sm">🌿 Clan Marais</div>
+          <p class="trophy-desc">Les Passeurs du Marais ont dominé le Défi Automne en accumulant le plus grand nombre de contributions météo et découvertes de sites naturels.</p>
+          <div class="trophy-scores">
+            <div class="tsc-row"><span class="tsc-clan">🌿 Marais</span><span class="tsc-pts gold">14 320 pts</span></div>
+            <div class="tsc-row"><span class="tsc-clan">⚓ Littoral</span><span class="tsc-pts">13 110 pts</span></div>
+            <div class="tsc-row"><span class="tsc-clan">🌳 Bocage</span><span class="tsc-pts">12 040 pts</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Saison 2 -->
+      <div class="trophy-card reveal">
+        <div class="trophy-header bocage">
+          <span class="trophy-season">Hiver 2024–2025 · Saison 2</span>
+          <span class="trophy-winner-badge">🏆 Vainqueur</span>
+        </div>
+        <div class="trophy-body">
+          <div class="trophy-clan bocage-chip-sm">🌳 Clan Bocage</div>
+          <p class="trophy-desc">Les Gardiens du Bocage ont triomphé durant la saison hivernale grâce à une mobilisation exceptionnelle sur les randonnées et les Kéto Kolé Tché.</p>
+          <div class="trophy-scores">
+            <div class="tsc-row"><span class="tsc-clan">🌳 Bocage</span><span class="tsc-pts gold">15 880 pts</span></div>
+            <div class="tsc-row"><span class="tsc-clan">🌿 Marais</span><span class="tsc-pts">14 500 pts</span></div>
+            <div class="tsc-row"><span class="tsc-clan">⚓ Littoral</span><span class="tsc-pts">12 760 pts</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Saison 3 -->
+      <div class="trophy-card reveal">
+        <div class="trophy-header littoral">
+          <span class="trophy-season">Printemps 2025 · Saison 3</span>
+          <span class="trophy-winner-badge">🏆 Vainqueur</span>
+        </div>
+        <div class="trophy-body">
+          <div class="trophy-clan littoral-chip-sm">⚓ Clan Littoral</div>
+          <p class="trophy-desc">Le Clan Littoral a explosé au printemps avec une vague de photos et de quiz sur le patrimoine côtier. Une victoire écrasante qui leur a valu la première place du podium.</p>
+          <div class="trophy-scores">
+            <div class="tsc-row"><span class="tsc-clan">⚓ Littoral</span><span class="tsc-pts gold">16 240 pts</span></div>
+            <div class="tsc-row"><span class="tsc-clan">🌿 Marais</span><span class="tsc-pts">13 890 pts</span></div>
+            <div class="tsc-row"><span class="tsc-clan">🌳 Bocage</span><span class="tsc-pts">13 200 pts</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CTA ===================== -->
+<section class="cta-bloc reveal">
+  <div class="cta-inner">
+    <div>
+      <h2>Choisissez votre camp</h2>
+      <p>Bocage, Littoral ou Marais — quel territoire vous ressemble ?</p>
+    </div>
+    <div class="cta-actions">
+      <a href="inscription.html" class="btn btn-white">Choisir mon clan</a>
+      <a href="classement.html" class="btn btn-outline-white">Voir le classement</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="footer-logo">ZONE<span>85</span></span>
+      <p>Explorez. Contribuez. Bâtissez votre légende en Vendée.</p>
+    </div>
+    <div class="footer-nav">
+      <a href="index.html">Accueil</a>
+      <a href="concept.html">Concept</a>
+      <a href="clans.html">Clans</a>
+      <a href="missions.html">Missions</a>
+      <a href="classement.html">Classement</a>
+      <a href="hall.html">Hall of Fame</a>
+      <a href="profil.html">Mon profil</a>
+      <a href="inscription.html">Inscription</a>
+    </div>
+    <div class="footer-copy">
+      <p>© 2025 Zone85 · Média communautaire vendéen</p>
+    </div>
+  </div>
+</footer>
+
+<script src="zone85.js"></script>
+</body>
+</html>
