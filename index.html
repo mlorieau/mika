@@ -1,258 +1,981 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ZONE85 — La Vendée, autrement</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mika — Communauté Vendée</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --beige-100: #FAF6EF;
+      --beige-200: #F0E6D3;
+      --beige-300: #DDD0BC;
+      --coral-400: #E07A5F;
+      --coral-300: #F5A98A;
+      --coral-500: #C45E44;
+      --blue-400: #3B8AB5;
+      --blue-300: #7AB8D4;
+      --blue-500: #255F82;
+      --text: #2A2520;
+      --text-muted: #6B5E54;
+      --radius: 14px;
+      --radius-sm: 8px;
+      --shadow: 0 2px 12px rgba(42,37,32,.08);
+      --shadow-md: 0 4px 24px rgba(42,37,32,.12);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--beige-100);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(250,246,239,.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--beige-300);
+      transition: box-shadow .3s;
+    }
+    nav.scrolled { box-shadow: var(--shadow-md); }
+
+    .nav-inner {
+      max-width: 1180px; margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex; align-items: center; gap: 32px;
+    }
+
+    .nav-logo {
+      font-size: 1.5rem; font-weight: 800; letter-spacing: -.5px;
+      color: var(--text); text-decoration: none; flex-shrink: 0;
+    }
+    .nav-logo .ka { color: var(--coral-400); }
+
+    .nav-links {
+      display: flex; gap: 24px; list-style: none;
+      flex: 1;
+    }
+    .nav-links a {
+      font-size: .9rem; font-weight: 500; color: var(--text-muted);
+      text-decoration: none; transition: color .2s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+
+    .nav-actions { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
+
+    .btn-profil {
+      padding: 7px 18px; border-radius: 999px;
+      background: var(--blue-400); color: #fff;
+      font-size: .85rem; font-weight: 600; text-decoration: none;
+      transition: background .2s;
+    }
+    .btn-profil:hover { background: var(--blue-500); }
+
+    .btn-rejoindre {
+      padding: 7px 18px; border-radius: 999px;
+      background: var(--coral-400); color: #fff;
+      font-size: .85rem; font-weight: 600; text-decoration: none;
+      transition: background .2s;
+    }
+    .btn-rejoindre:hover { background: var(--coral-500); }
+
+    .hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      background: none; border: none; cursor: pointer; padding: 4px;
+    }
+    .hamburger span {
+      display: block; width: 22px; height: 2px;
+      background: var(--text); border-radius: 2px;
+      transition: transform .3s, opacity .3s;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .mobile-menu {
+      display: none; position: fixed; top: 64px; left: 0; right: 0;
+      background: var(--beige-100); border-bottom: 1px solid var(--beige-300);
+      padding: 20px 24px 24px; z-index: 99;
+      flex-direction: column; gap: 16px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      font-size: 1rem; font-weight: 500; color: var(--text);
+      text-decoration: none; padding: 4px 0;
+    }
+    .mobile-menu .mobile-actions { display: flex; gap: 10px; margin-top: 8px; }
+
+    /* HERO */
+    .hero {
+      padding: 140px 24px 100px;
+      max-width: 1180px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;
+    }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--beige-200); border: 1px solid var(--beige-300);
+      border-radius: 999px; padding: 6px 14px;
+      font-size: .8rem; font-weight: 600; color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+    .hero-badge .dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--coral-400);
+    }
+
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.4rem);
+      font-weight: 800; line-height: 1.15; letter-spacing: -.03em;
+      color: var(--text); margin-bottom: 20px;
+    }
+    .hero h1 .accent { color: var(--coral-400); }
+
+    .hero-lead {
+      font-size: 1.1rem; color: var(--text-muted);
+      max-width: 480px; margin-bottom: 32px; line-height: 1.7;
+    }
+
+    .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 48px; }
+
+    .btn-primary {
+      padding: 13px 28px; border-radius: 999px;
+      background: var(--coral-400); color: #fff;
+      font-size: 1rem; font-weight: 700; text-decoration: none;
+      transition: background .2s, transform .15s;
+    }
+    .btn-primary:hover { background: var(--coral-500); transform: translateY(-1px); }
+
+    .btn-secondary {
+      padding: 13px 28px; border-radius: 999px;
+      background: transparent; color: var(--text);
+      font-size: 1rem; font-weight: 600; text-decoration: none;
+      border: 2px solid var(--beige-300); transition: border-color .2s, background .2s;
+    }
+    .btn-secondary:hover { border-color: var(--text); background: var(--beige-200); }
+
+    .hero-stats {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+    }
+    .stat-card {
+      background: #fff; border: 1px solid var(--beige-300);
+      border-radius: var(--radius-sm); padding: 16px;
+      box-shadow: var(--shadow);
+    }
+    .stat-card .num {
+      font-size: 1.5rem; font-weight: 800; color: var(--text); display: block;
+    }
+    .stat-card .label {
+      font-size: .75rem; color: var(--text-muted); font-weight: 500;
+    }
+
+    /* Hero visual */
+    .hero-visual {
+      position: relative; display: flex; justify-content: center; align-items: center;
+    }
+
+    .hero-map-placeholder {
+      width: 340px; height: 340px; border-radius: 50%;
+      background: var(--beige-200); border: 2px dashed var(--beige-300);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 5rem; position: relative;
+    }
+
+    .float-chip {
+      position: absolute; background: #fff;
+      border: 1px solid var(--beige-300); border-radius: var(--radius-sm);
+      padding: 10px 16px; box-shadow: var(--shadow-md);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .float-chip-1 {
+      top: 30px; left: -20px;
+      animation: floatY 3s ease-in-out infinite;
+    }
+    .float-chip-2 {
+      bottom: 50px; right: -20px;
+      animation: floatY 3s ease-in-out infinite;
+      animation-delay: 1.5s;
+    }
+    @keyframes floatY {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .chip-icon { font-size: 1.4rem; }
+    .chip-label { font-size: .8rem; font-weight: 700; line-height: 1.2; }
+    .chip-sub { font-size: .7rem; color: var(--text-muted); }
+
+    /* SECTIONS COMMON */
+    section { padding: 80px 24px; }
+    .section-inner { max-width: 1180px; margin: 0 auto; }
+
+    .section-label {
+      display: inline-block; font-size: .75rem; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: var(--coral-400); margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+      font-weight: 800; letter-spacing: -.02em; color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .section-sub {
+      font-size: 1rem; color: var(--text-muted); margin-bottom: 48px;
+      max-width: 560px;
+    }
+
+    .section-header-row {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      flex-wrap: wrap; gap: 16px; margin-bottom: 40px;
+    }
+
+    .link-more {
+      font-size: .9rem; font-weight: 600; color: var(--coral-400);
+      text-decoration: none; display: flex; align-items: center; gap: 4px;
+      white-space: nowrap;
+    }
+    .link-more:hover { color: var(--coral-500); }
+
+    /* TRIBUS */
+    #tribus { background: var(--beige-200); }
+
+    .tribu-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+    }
+
+    .tribu-card {
+      border-radius: var(--radius); padding: 32px 28px;
+      border: 1.5px solid transparent;
+      box-shadow: var(--shadow);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .tribu-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+
+    .tribu-card.littoral {
+      background: linear-gradient(145deg, #EDF6FB 0%, #d0eaf7 100%);
+      border-color: #b0d8ef;
+    }
+    .tribu-card.bocage {
+      background: linear-gradient(145deg, #EEF7ED 0%, #cce8c8 100%);
+      border-color: #a9d6a4;
+    }
+    .tribu-card.marais {
+      background: linear-gradient(145deg, #FDF6E8 0%, #f5e0a5 100%);
+      border-color: #e8ca7a;
+    }
+
+    .tribu-icon { font-size: 2.4rem; margin-bottom: 16px; display: block; }
+    .tribu-name { font-size: 1.3rem; font-weight: 800; margin-bottom: 8px; color: var(--text); }
+    .tribu-desc { font-size: .9rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6; }
+    .tribu-meta { display: flex; justify-content: space-between; align-items: center; }
+    .tribu-members { font-size: .8rem; font-weight: 600; color: var(--text-muted); }
+    .tribu-link {
+      font-size: .85rem; font-weight: 700; text-decoration: none;
+      color: var(--blue-500); display: flex; align-items: center; gap: 4px;
+    }
+    .tribu-link:hover { color: var(--blue-400); }
+
+    /* JEUX */
+    .jeux-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start;
+    }
+
+    .game-cards { display: flex; flex-direction: column; gap: 14px; }
+
+    .game-card {
+      background: #fff; border: 1px solid var(--beige-300);
+      border-radius: var(--radius); padding: 18px 20px;
+      display: flex; align-items: center; gap: 16px;
+      box-shadow: var(--shadow); transition: transform .2s, box-shadow .2s;
+    }
+    .game-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+    .game-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; flex-shrink: 0;
+    }
+    .game-icon.quiz { background: #FEF0EB; }
+    .game-icon.objet { background: #EBF5FB; }
+    .game-icon.defi { background: #EDFAF0; }
+
+    .game-info { flex: 1; }
+    .game-name { font-size: 1rem; font-weight: 700; color: var(--text); }
+    .game-xp {
+      font-size: .78rem; font-weight: 600;
+      background: var(--beige-200); border-radius: 999px;
+      padding: 2px 10px; display: inline-block; margin-top: 4px; color: var(--text-muted);
+    }
+
+    .btn-play {
+      padding: 8px 18px; border-radius: 999px;
+      background: var(--coral-400); color: #fff;
+      font-size: .82rem; font-weight: 700; text-decoration: none; border: none; cursor: pointer;
+      transition: background .2s; font-family: inherit;
+    }
+    .btn-play:hover { background: var(--coral-500); }
+
+    /* Mini quiz */
+    .mini-quiz {
+      background: #fff; border: 1px solid var(--beige-300);
+      border-radius: var(--radius); padding: 28px;
+      box-shadow: var(--shadow);
+    }
+    .quiz-label {
+      font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--coral-400); margin-bottom: 12px;
+    }
+    .quiz-question {
+      font-size: 1.05rem; font-weight: 700; color: var(--text); margin-bottom: 20px;
+      line-height: 1.4;
+    }
+    .quiz-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+
+    .quiz-opt {
+      padding: 12px 16px; border-radius: var(--radius-sm);
+      border: 1.5px solid var(--beige-300); background: var(--beige-100);
+      font-size: .9rem; cursor: pointer; text-align: left; width: 100%;
+      font-family: inherit; color: var(--text); transition: border-color .2s, background .2s;
+    }
+    .quiz-opt:hover:not(:disabled) { border-color: var(--blue-300); background: #EBF5FB; }
+    .quiz-opt.correct { border-color: #4CAF50; background: #EDFAF0; color: #2E7D32; font-weight: 600; }
+    .quiz-opt.wrong { border-color: var(--coral-400); background: #FEF0EB; color: var(--coral-500); }
+
+    .quiz-feedback {
+      display: none; padding: 12px 16px; border-radius: var(--radius-sm);
+      font-size: .9rem; font-weight: 600;
+    }
+    .quiz-feedback.show { display: block; }
+    .quiz-feedback.correct { background: #EDFAF0; color: #2E7D32; }
+    .quiz-feedback.wrong { background: #FEF0EB; color: var(--coral-500); }
+
+    .quiz-footer {
+      display: flex; justify-content: space-between; align-items: center; margin-top: 16px;
+    }
+    .xp-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--beige-200); border-radius: 999px; padding: 5px 12px;
+      font-size: .8rem; font-weight: 700; color: var(--text);
+    }
+    .xp-badge .star { color: var(--coral-400); }
+
+    .btn-reset {
+      display: none; padding: 6px 14px; border: none;
+      background: var(--beige-200); border-radius: 999px;
+      font-size: .8rem; font-weight: 600; cursor: pointer; color: var(--text);
+      font-family: inherit; transition: background .2s;
+    }
+    .btn-reset:hover { background: var(--beige-300); }
+
+    .jeux-cta { margin-top: 24px; }
+
+    /* MISSIONS */
+    #missions { background: var(--beige-200); }
+
+    .featured-mission {
+      background: #fff; border: 1px solid var(--beige-300);
+      border-radius: var(--radius); padding: 36px;
+      box-shadow: var(--shadow); margin-bottom: 24px;
+      display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: center;
+    }
+
+    .mission-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      border-radius: 999px; padding: 4px 12px;
+      font-size: .75rem; font-weight: 700;
+    }
+    .mission-tag.active { background: #EDFAF0; color: #2E7D32; }
+    .mission-tag.upcoming { background: var(--beige-200); color: var(--text-muted); }
+
+    .featured-mission h3 {
+      font-size: 1.5rem; font-weight: 800; margin: 12px 0 8px;
+      color: var(--text); line-height: 1.3;
+    }
+    .featured-desc {
+      font-size: .95rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.7;
+    }
+
+    .mission-meta {
+      display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;
+    }
+    .meta-pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: var(--beige-100); border: 1px solid var(--beige-300);
+      border-radius: 999px; padding: 4px 12px;
+      font-size: .78rem; font-weight: 600; color: var(--text-muted);
+    }
+
+    .progress-label {
+      display: flex; justify-content: space-between;
+      font-size: .78rem; font-weight: 600; color: var(--text-muted); margin-bottom: 6px;
+    }
+    .progress-bar {
+      height: 8px; background: var(--beige-200); border-radius: 999px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%; background: var(--coral-400); border-radius: 999px;
+      width: 0; transition: width 1.2s ease;
+    }
+
+    .featured-aside { text-align: center; }
+    .xp-big {
+      font-size: 2.8rem; font-weight: 800; color: var(--coral-400);
+      line-height: 1;
+    }
+    .xp-big-unit { font-size: 1rem; font-weight: 600; color: var(--text-muted); margin-top: 4px; }
+
+    .mission-cta-btn {
+      display: inline-block; padding: 13px 28px; border-radius: 999px;
+      background: var(--coral-400); color: #fff;
+      font-size: .95rem; font-weight: 700; text-decoration: none;
+      transition: background .2s; margin-top: 20px;
+    }
+    .mission-cta-btn:hover { background: var(--coral-500); }
+
+    .mission-cards-row {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+    }
+
+    .mission-mini {
+      background: #fff; border: 1px solid var(--beige-300);
+      border-radius: var(--radius); padding: 22px;
+      box-shadow: var(--shadow); transition: transform .2s, box-shadow .2s;
+    }
+    .mission-mini:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+
+    .mission-mini h4 {
+      font-size: 1rem; font-weight: 700; color: var(--text); margin: 10px 0 6px;
+    }
+    .mission-mini-desc {
+      font-size: .82rem; color: var(--text-muted); margin-bottom: 14px; line-height: 1.5;
+    }
+    .mini-footer { display: flex; justify-content: space-between; align-items: center; }
+
+    /* CTA */
+    .cta-section { padding: 80px 24px; }
+    .cta-card {
+      max-width: 900px; margin: 0 auto;
+      background: var(--coral-400); border-radius: 20px;
+      padding: 60px 48px; text-align: center;
+      box-shadow: 0 8px 40px rgba(224,122,95,.3);
+    }
+    .cta-card h2 {
+      font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800;
+      color: #fff; margin-bottom: 14px; letter-spacing: -.02em;
+    }
+    .cta-lead { font-size: 1.05rem; color: rgba(255,255,255,.85); margin-bottom: 32px; }
+
+    .cta-tribe-chips {
+      display: flex; justify-content: center; gap: 12px;
+      flex-wrap: wrap; margin-bottom: 32px;
+    }
+    .tribe-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.2); border: 1.5px solid rgba(255,255,255,.4);
+      border-radius: 999px; padding: 7px 16px;
+      font-size: .85rem; font-weight: 600; color: #fff;
+    }
+
+    .btn-cta-white {
+      display: inline-block; padding: 14px 36px; border-radius: 999px;
+      background: #fff; color: var(--coral-400);
+      font-size: 1rem; font-weight: 700; text-decoration: none;
+      transition: background .2s, transform .15s;
+    }
+    .btn-cta-white:hover { background: var(--beige-100); transform: translateY(-2px); }
+
+    /* FOOTER */
+    footer {
+      background: var(--text); color: rgba(255,255,255,.7);
+      padding: 60px 24px 32px;
+    }
+    .footer-inner { max-width: 1180px; margin: 0 auto; }
+    .footer-top {
+      display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 40px;
+      margin-bottom: 48px;
+    }
+    .footer-logo {
+      font-size: 1.5rem; font-weight: 800; color: #fff; margin-bottom: 12px;
+      display: block; text-decoration: none;
+    }
+    .footer-logo .ka { color: var(--coral-400); }
+    .footer-tagline { font-size: .88rem; line-height: 1.6; }
+
+    .footer-col h4 {
+      font-size: .82rem; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: rgba(255,255,255,.4); margin-bottom: 16px;
+    }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-col ul a {
+      font-size: .88rem; color: rgba(255,255,255,.6);
+      text-decoration: none; transition: color .2s;
+    }
+    .footer-col ul a:hover { color: #fff; }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,.1);
+      padding-top: 24px;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 12px;
+      font-size: .82rem;
+    }
+
+    /* REVEAL */
+    .reveal {
+      opacity: 0; transform: translateY(24px);
+      transition: opacity .6s ease, transform .6s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: .1s; }
+    .reveal-delay-2 { transition-delay: .2s; }
+    .reveal-delay-3 { transition-delay: .3s; }
+
+    /* RESPONSIVE */
+    @media (max-width: 960px) {
+      .hero { grid-template-columns: 1fr; padding: 110px 24px 60px; gap: 40px; }
+      .hero-visual { display: none; }
+      .hero-stats { grid-template-columns: repeat(2, 1fr); }
+      .tribu-grid { grid-template-columns: 1fr; gap: 16px; }
+      .jeux-grid { grid-template-columns: 1fr; }
+      .featured-mission { grid-template-columns: 1fr; }
+      .featured-aside { text-align: left; display: flex; align-items: center; gap: 24px; }
+      .mission-cards-row { grid-template-columns: 1fr 1fr; gap: 14px; }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .nav-actions .btn-profil { display: none; }
+      .hamburger { display: flex; }
+      .hero-stats { grid-template-columns: repeat(2, 1fr); }
+      .mission-cards-row { grid-template-columns: 1fr; }
+      .footer-top { grid-template-columns: 1fr; }
+      .cta-card { padding: 40px 24px; }
+    }
+  </style>
 </head>
 <body>
 
-  <!-- ============================================================
-       ÉCRAN D'INTRO — Disparaît après 2,4s
-       ============================================================ -->
-  <div id="intro">
-    <div class="intro-content">
-      <div class="intro-logo">
-        <span class="logo-zone">ZONE</span><span class="logo-85">85</span>
-      </div>
-      <p class="intro-tagline">La Vendée, autrement.</p>
-      <div class="intro-line"></div>
-    </div>
-  </div>
-
-  <!-- ============================================================
-       APP PRINCIPALE
-       ============================================================ -->
-  <div id="app" class="hidden">
-
-    <!-- Fond de particules flottantes -->
-    <canvas id="particles-canvas"></canvas>
-
-    <!-- Lueur ambiante centrale (CSS) -->
-    <div id="ambient-glow"></div>
-
-    <!-- ── HEADER ── -->
-    <header id="main-header">
-      <div class="header-logo">
-        <span class="logo-zone">ZONE</span><span class="logo-85">85</span>
-      </div>
-      <nav class="header-nav">
-        <button class="nav-btn" data-section="invisibles">Les Invisibles</button>
-        <button class="nav-btn" data-section="patois">Chez nous…</button>
-        <button class="nav-btn" data-section="meteo">Météo 85</button>
-        <button class="nav-btn" data-section="balades">Balades</button>
-        <button class="nav-btn" data-section="memoire">Mémoire</button>
-        <button class="nav-btn" data-section="ovni">OVNI 85</button>
-      </nav>
-      <button class="header-menu-toggle" id="menu-toggle" aria-label="Menu">
+<!-- NAV -->
+<nav id="mainNav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">mi<span class="ka">ka</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="active">Accueil</a></li>
+      <li><a href="tribu.html">Tribus</a></li>
+      <li><a href="#">Jeux</a></li>
+      <li><a href="#">Missions</a></li>
+      <li><a href="#">Badges</a></li>
+      <li><a href="#">Classement</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="profil.html" class="btn-profil">Mon profil</a>
+      <a href="inscription.html" class="btn-rejoindre">Rejoindre</a>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
         <span></span><span></span><span></span>
       </button>
-    </header>
+    </div>
+  </div>
+</nav>
 
-    <!-- ── HERO : CARTE + TEXTES FLOTTANTS ── -->
-    <main id="hero">
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html">Accueil</a>
+  <a href="tribu.html">Tribus</a>
+  <a href="#">Jeux</a>
+  <a href="#">Missions</a>
+  <a href="#">Badges</a>
+  <a href="#">Classement</a>
+  <div class="mobile-actions">
+    <a href="profil.html" class="btn-profil">Mon profil</a>
+    <a href="inscription.html" class="btn-rejoindre">Rejoindre</a>
+  </div>
+</div>
 
-      <!-- Texte flottant haut -->
-      <p class="ambient-text" id="text-top">
-        Ici, on ne visite pas la Vendée.<br>
-        <em>On la fouille.</em>
-      </p>
-
-      <!-- Carte centrale Vendée -->
-      <div id="map-container">
-
-        <!-- Fragments décoratifs de quartz -->
-        <div class="quartz-fragment f1"></div>
-        <div class="quartz-fragment f2"></div>
-        <div class="quartz-fragment f3"></div>
-        <div class="quartz-fragment f4"></div>
-
-        <!-- SVG : contour animé de la Vendée -->
-        <svg id="vendee-map" viewBox="0 0 270 295" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <!-- Filtre lueur carte -->
-            <filter id="glow-soft" x="-30%" y="-30%" width="160%" height="160%">
-              <feGaussianBlur stdDeviation="2.5" result="blur"/>
-              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-            <!-- Filtre lueur forte (point mobile) -->
-            <filter id="glow-strong" x="-100%" y="-100%" width="300%" height="300%">
-              <feGaussianBlur stdDeviation="5" result="blur"/>
-              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-            <!-- Remplissage gradient -->
-            <radialGradient id="fill-grad" cx="48%" cy="50%" r="52%">
-              <stop offset="0%"   stop-color="#1e3a4a" stop-opacity="0.55"/>
-              <stop offset="100%" stop-color="#080d18" stop-opacity="0.1"/>
-            </radialGradient>
-          </defs>
-
-          <!-- Zone remplie — apparaît après le tracé -->
-          <path id="vendee-fill" d="
-            M 140,14
-            C 162,9  186,16 208,30
-            L 232,50
-            C 248,66 256,86 256,108
-            L 254,136
-            C 256,158 250,178 242,196
-            L 230,218
-            C 220,234 206,246 190,254
-            L 168,264
-            C 150,272 130,273 111,267
-            L 88,255
-            C 66,242 50,220 42,196
-            L 32,168
-            C 24,146 24,122 30,100
-            L 42,75
-            C 54,50 76,28 104,16
-            L 122,12
-            Z
-          " fill="url(#fill-grad)" opacity="0"/>
-
-          <!-- Contour principal — animé par JS -->
-          <path id="vendee-path" d="
-            M 140,14
-            C 162,9  186,16 208,30
-            L 232,50
-            C 248,66 256,86 256,108
-            L 254,136
-            C 256,158 250,178 242,196
-            L 230,218
-            C 220,234 206,246 190,254
-            L 168,264
-            C 150,272 130,273 111,267
-            L 88,255
-            C 66,242 50,220 42,196
-            L 32,168
-            C 24,146 24,122 30,100
-            L 42,75
-            C 54,50 76,28 104,16
-            L 122,12
-            Z
-          " fill="none" stroke="#4a9eba" stroke-width="1.5"
-             stroke-linecap="round" stroke-linejoin="round"
-             filter="url(#glow-soft)"/>
-
-          <!-- Point lumineux qui trace le contour -->
-          <circle id="trace-glow" r="10" cx="140" cy="14"
-                  fill="none" stroke="rgba(184,220,236,0.5)" stroke-width="1"
-                  filter="url(#glow-strong)" opacity="0"/>
-          <circle id="trace-dot" r="3" cx="140" cy="14"
-                  fill="#ffffff" filter="url(#glow-strong)" opacity="0"/>
-        </svg>
-
-        <!-- ── HOTSPOTS ── -->
-        <!-- Les Invisibles — centre-est -->
-        <div class="hotspot" data-section="invisibles"
-             style="left:58%;top:46%">
-          <div class="hs-ring"></div>
-          <div class="hs-core"></div>
-          <div class="hs-label">Les Invisibles</div>
-          <div class="hs-tooltip">
-            <strong>Les Invisibles</strong>
-            <p>Un carnet retrouvé. Une société secrète. Une enquête qui commence.</p>
-          </div>
-        </div>
-
-        <!-- Chez nous — bocage est -->
-        <div class="hotspot" data-section="patois"
-             style="left:72%;top:32%">
-          <div class="hs-ring"></div>
-          <div class="hs-core hs-gold"></div>
-          <div class="hs-label">Chez nous…</div>
-          <div class="hs-tooltip">
-            <strong>Chez nous, on ne dit pas…</strong>
-            <p>Le patois, la fierté, les mots du coin. Et le fou rire.</p>
-          </div>
-        </div>
-
-        <!-- Météo — nord -->
-        <div class="hotspot" data-section="meteo"
-             style="left:38%;top:18%">
-          <div class="hs-ring"></div>
-          <div class="hs-core hs-sky"></div>
-          <div class="hs-label">Météo 85</div>
-          <div class="hs-tooltip">
-            <strong>Météo Zone85</strong>
-            <p>O va peuter ? Mi-figue mi-mogette ? On vous dit tout.</p>
-          </div>
-        </div>
-
-        <!-- Balades — côte ouest -->
-        <div class="hotspot" data-section="balades"
-             style="left:16%;top:50%">
-          <div class="hs-ring"></div>
-          <div class="hs-core hs-green"></div>
-          <div class="hs-label">Balades</div>
-          <div class="hs-tooltip">
-            <strong>Balades & coins à voir</strong>
-            <p>Marais, bocage, littoral… La Vendée à pied, les yeux ouverts.</p>
-          </div>
-        </div>
-
-        <!-- Mémoire — sud-est -->
-        <div class="hotspot" data-section="memoire"
-             style="left:62%;top:74%">
-          <div class="hs-ring"></div>
-          <div class="hs-core hs-amber"></div>
-          <div class="hs-label">Mémoire</div>
-          <div class="hs-tooltip">
-            <strong>Mémoire vendéenne</strong>
-            <p>Des histoires de familles, des lieux, des archives vivantes.</p>
-          </div>
-        </div>
-
-        <!-- OVNI — marais sud-ouest -->
-        <div class="hotspot" data-section="ovni"
-             style="left:28%;top:68%">
-          <div class="hs-ring"></div>
-          <div class="hs-core hs-purple"></div>
-          <div class="hs-label">OVNI 85</div>
-          <div class="hs-tooltip">
-            <strong>OVNI Zone85</strong>
-            <p>Des objets. Des mystères. Des zonautes qui répondent.</p>
-          </div>
-        </div>
-
-      </div><!-- /#map-container -->
-
-      <!-- Texte flottant bas -->
-      <div class="ambient-text" id="text-bottom">
-        <p>Des lieux, des histoires, des expressions, des indices…</p>
-        <p class="sub">et parfois, un vieux carnet qui n'aurait jamais dû refaire surface.</p>
+<!-- HERO -->
+<section style="padding:0;background:var(--beige-100)">
+  <div class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        Communauté Vendée &middot; Saison 2026
       </div>
-
-      <!-- Indicateur de navigation -->
-      <div id="explore-hint">
-        <span>Explorer la zone</span>
-        <div class="hint-line"></div>
+      <h1>L'aventure <span class="accent">collective</span><br>commence ici.</h1>
+      <p class="hero-lead">Rejoignez des centaines d'aventuriers du Vendée. Explorez, créez des liens, relevez des défis et découvrez votre territoire autrement.</p>
+      <div class="hero-ctas">
+        <a href="inscription.html" class="btn-primary">Rejoindre l'aventure</a>
+        <a href="tribu.html" class="btn-secondary">Découvrir les tribus →</a>
       </div>
-
-    </main><!-- /#hero -->
-
-    <!-- ── PANNEAU LATÉRAL DE CONTENU ── -->
-    <div id="panel-backdrop"></div>
-    <aside id="content-panel">
-      <button id="panel-close" aria-label="Fermer">✕</button>
-      <div id="panel-inner"></div>
-    </aside>
-
-    <!-- ── NAVIGATION MOBILE (overlay) ── -->
-    <div id="mobile-nav">
-      <button id="mobile-nav-close">✕</button>
-      <nav>
-        <button class="nav-btn" data-section="invisibles">Les Invisibles</button>
-        <button class="nav-btn" data-section="patois">Chez nous, on ne dit pas…</button>
-        <button class="nav-btn" data-section="meteo">Météo Zone85</button>
-        <button class="nav-btn" data-section="balades">Balades & coins</button>
-        <button class="nav-btn" data-section="memoire">Mémoire vendéenne</button>
-        <button class="nav-btn" data-section="ovni">OVNI Zone85</button>
-      </nav>
+      <div class="hero-stats">
+        <div class="stat-card">
+          <span class="num">1 240</span>
+          <span class="label">Aventuriers</span>
+        </div>
+        <div class="stat-card">
+          <span class="num">3</span>
+          <span class="label">Tribus actives</span>
+        </div>
+        <div class="stat-card">
+          <span class="num">87</span>
+          <span class="label">Missions</span>
+        </div>
+        <div class="stat-card">
+          <span class="num">14k</span>
+          <span class="label">XP collectifs</span>
+        </div>
+      </div>
     </div>
 
-  </div><!-- /#app -->
+    <div class="hero-visual">
+      <div class="hero-map-placeholder">
+        🗺️
+        <div class="float-chip float-chip-1">
+          <span class="chip-icon">⚓</span>
+          <div>
+            <div class="chip-label">Tribu Littoral</div>
+            <div class="chip-sub">412 membres</div>
+          </div>
+        </div>
+        <div class="float-chip float-chip-2">
+          <span class="chip-icon">⭐</span>
+          <div>
+            <div class="chip-label">Niveau 7</div>
+            <div class="chip-sub">Explorateur</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-  <script src="script.js"></script>
+<!-- TRIBUS -->
+<section id="tribus">
+  <div class="section-inner">
+    <div class="section-header-row">
+      <div>
+        <span class="section-label">Les Tribus</span>
+        <h2 class="section-title">Choisissez votre camp</h2>
+        <p class="section-sub" style="margin-bottom:0">Trois territoires, trois identités. Chaque tribu a son caractère, ses missions et sa communauté.</p>
+      </div>
+      <a href="tribu.html" class="link-more">Toutes les tribus →</a>
+    </div>
+    <div class="tribu-grid">
+      <div class="tribu-card littoral reveal">
+        <span class="tribu-icon">⚓</span>
+        <div class="tribu-name">Tribu Littoral</div>
+        <p class="tribu-desc">Gardiens des côtes et des îles. Vous aimez l'horizon marin, les plages sauvages et l'air iodé. Explorez le bord de l'Atlantique.</p>
+        <div class="tribu-meta">
+          <span class="tribu-members">👥 412 membres</span>
+          <a href="tribu.html" class="tribu-link">Rejoindre →</a>
+        </div>
+      </div>
+      <div class="tribu-card bocage reveal reveal-delay-1">
+        <span class="tribu-icon">🌿</span>
+        <div class="tribu-name">Tribu Bocage</div>
+        <p class="tribu-desc">Âmes des collines et forêts. Vous trouvez la magie dans les chemins creux, les villages cachés et les paysages verdoyants.</p>
+        <div class="tribu-meta">
+          <span class="tribu-members">👥 387 membres</span>
+          <a href="tribu.html" class="tribu-link">Rejoindre →</a>
+        </div>
+      </div>
+      <div class="tribu-card marais reveal reveal-delay-2">
+        <span class="tribu-icon">🦆</span>
+        <div class="tribu-name">Tribu Marais</div>
+        <p class="tribu-desc">Explorateurs des zones humides et du silence. Vous connaissez les secrets des marécages, des oiseaux migrateurs et des canaux.</p>
+        <div class="tribu-meta">
+          <span class="tribu-members">👥 441 membres</span>
+          <a href="tribu.html" class="tribu-link">Rejoindre →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- JEUX -->
+<section id="jeux" style="background:var(--beige-100)">
+  <div class="section-inner">
+    <div class="section-header-row">
+      <div>
+        <span class="section-label">Univers des Jeux</span>
+        <h2 class="section-title">Jouez, découvrez, gagnez</h2>
+        <p class="section-sub" style="margin-bottom:0">Des défis quotidiens pour explorer le Vendée autrement et accumuler des XP.</p>
+      </div>
+    </div>
+    <div class="jeux-grid">
+      <!-- Game list -->
+      <div>
+        <div class="game-cards">
+          <div class="game-card reveal">
+            <div class="game-icon quiz">🧠</div>
+            <div class="game-info">
+              <div class="game-name">Quiz du Jour</div>
+              <span class="game-xp">+30 XP</span>
+            </div>
+            <button class="btn-play">Jouer</button>
+          </div>
+          <div class="game-card reveal reveal-delay-1">
+            <div class="game-icon objet">🔍</div>
+            <div class="game-info">
+              <div class="game-name">Objet Mystère</div>
+              <span class="game-xp">+50 XP</span>
+            </div>
+            <button class="btn-play">Jouer</button>
+          </div>
+          <div class="game-card reveal reveal-delay-2">
+            <div class="game-icon defi">⚡</div>
+            <div class="game-info">
+              <div class="game-name">Défi du Jour</div>
+              <span class="game-xp">+75 XP</span>
+            </div>
+            <button class="btn-play">Jouer</button>
+          </div>
+        </div>
+        <div class="jeux-cta">
+          <a href="#" class="btn-secondary" style="display:inline-block;margin-top:24px">Voir tous les jeux →</a>
+        </div>
+      </div>
+
+      <!-- Interactive mini quiz -->
+      <div class="mini-quiz reveal reveal-delay-1">
+        <div class="quiz-label">✨ Aperçu Quiz · Question du moment</div>
+        <div class="quiz-question">Quelle est la plus grande île de Vendée, reliée au continent par un pont depuis 1971&nbsp;?</div>
+        <div class="quiz-options" id="quizOpts">
+          <button class="quiz-opt" data-answer="wrong">Île de Ré</button>
+          <button class="quiz-opt" data-answer="wrong">Île d'Aix</button>
+          <button class="quiz-opt" data-answer="correct">Île de Noirmoutier</button>
+          <button class="quiz-opt" data-answer="wrong">Île d'Yeu</button>
+        </div>
+        <div class="quiz-feedback" id="quizFeedback"></div>
+        <div class="quiz-footer">
+          <div class="xp-badge"><span class="star">★</span>&nbsp;+30 XP si correct</div>
+          <button class="btn-reset" id="quizReset">Réessayer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MISSIONS -->
+<section id="missions">
+  <div class="section-inner">
+    <div class="section-header-row">
+      <div>
+        <span class="section-label">Missions</span>
+        <h2 class="section-title">Mission du Moment</h2>
+        <p class="section-sub" style="margin-bottom:0">Des aventures collectives pour explorer le territoire et créer du lien.</p>
+      </div>
+      <a href="#" class="link-more">Toutes les missions →</a>
+    </div>
+
+    <div class="featured-mission reveal">
+      <div>
+        <span class="mission-tag active">● En cours</span>
+        <h3>La Grande Traversée des Marais</h3>
+        <p class="featured-desc">Embarquez pour une exploration collective des marais breton-vendéens. Photographiez, observez et partagez vos découvertes de ce territoire unique. Mission collaborative ouverte à tous.</p>
+        <div class="mission-meta">
+          <span class="meta-pill">🦆 Tribu Marais</span>
+          <span class="meta-pill">📸 Photo + Exploration</span>
+          <span class="meta-pill">⏱ 14 jours restants</span>
+          <span class="meta-pill">👥 128 participants</span>
+        </div>
+        <div class="progress-label">
+          <span>Progression collective</span>
+          <span>67 / 100 étapes</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="missionProgress"></div>
+        </div>
+      </div>
+      <div class="featured-aside">
+        <div>
+          <div class="xp-big">150</div>
+          <div class="xp-big-unit">XP à gagner</div>
+          <a href="#" class="mission-cta-btn">Participer</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mission-cards-row">
+      <div class="mission-mini reveal">
+        <span class="mission-tag active" style="font-size:.72rem">● Actif</span>
+        <h4>Quiz Patrimoine Vendée</h4>
+        <p class="mission-mini-desc">Testez vos connaissances sur l'histoire et le patrimoine vendéen en 10 questions.</p>
+        <div class="mini-footer">
+          <span class="xp-badge"><span class="star">★</span>&nbsp;30 XP</span>
+          <a href="#" class="tribu-link">Jouer →</a>
+        </div>
+      </div>
+      <div class="mission-mini reveal reveal-delay-1">
+        <span class="mission-tag upcoming" style="font-size:.72rem">○ À venir</span>
+        <h4>Chasse aux Traditions</h4>
+        <p class="mission-mini-desc">Retrouvez et documentez les savoir-faire artisanaux typiques du bocage vendéen.</p>
+        <div class="mini-footer">
+          <span class="xp-badge"><span class="star">★</span>&nbsp;80 XP</span>
+          <a href="#" class="tribu-link">Voir →</a>
+        </div>
+      </div>
+      <div class="mission-mini reveal reveal-delay-2">
+        <span class="mission-tag active" style="font-size:.72rem">● Actif</span>
+        <h4>Les Géants de la Forêt</h4>
+        <p class="mission-mini-desc">Identifiez les arbres remarquables du Vendée grâce à notre guide botanique collaboratif.</p>
+        <div class="mini-footer">
+          <span class="xp-badge"><span class="star">★</span>&nbsp;50 XP</span>
+          <a href="#" class="tribu-link">Jouer →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" style="background:var(--beige-100)">
+  <div class="cta-card reveal">
+    <h2>Prêt à rejoindre l'aventure&nbsp;?</h2>
+    <p class="cta-lead">1&nbsp;240 aventuriers vous attendent déjà. Choisissez votre tribu, commencez vos missions, et forgez votre légende dans le Vendée.</p>
+    <div class="cta-tribe-chips">
+      <span class="tribe-chip">⚓ Littoral</span>
+      <span class="tribe-chip">🌿 Bocage</span>
+      <span class="tribe-chip">🦆 Marais</span>
+    </div>
+    <a href="inscription.html" class="btn-cta-white">Rejoindre gratuitement</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <a href="index.html" class="footer-logo">mi<span class="ka">ka</span></a>
+        <p class="footer-tagline">La communauté d'aventuriers du Vendée. Explorez, créez des liens, et découvrez votre territoire autrement.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Communauté</h4>
+        <ul>
+          <li><a href="tribu.html">Les Tribus</a></li>
+          <li><a href="#">Classement</a></li>
+          <li><a href="#">Badges</a></li>
+          <li><a href="#">Aventuriers</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Jeux &amp; Missions</h4>
+        <ul>
+          <li><a href="#">Quiz du Jour</a></li>
+          <li><a href="#">Objet Mystère</a></li>
+          <li><a href="#">Défi du Jour</a></li>
+          <li><a href="#">Toutes les missions</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Info</h4>
+        <ul>
+          <li><a href="#">À propos</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">Mentions légales</a></li>
+          <li><a href="#">CGU</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 Mika &mdash; Communauté Vendée. Tous droits réservés.</span>
+      <span>Fait avec &#10084;&#65039; en Vendée</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Nav scroll
+const nav = document.getElementById('mainNav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 20);
+});
+
+// Hamburger
+const hamburger = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobileMenu');
+hamburger.addEventListener('click', () => {
+  hamburger.classList.toggle('open');
+  mobileMenu.classList.toggle('open');
+});
+mobileMenu.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => {
+    hamburger.classList.remove('open');
+    mobileMenu.classList.remove('open');
+  });
+});
+
+// Intersection observer for reveal + progress bar
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    e.target.classList.add('visible');
+    // Animate mission progress bar when it enters view
+    const bar = e.target.querySelector ? e.target.querySelector('#missionProgress') : null;
+    observer.unobserve(e.target);
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Progress bar trigger
+const progressObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      document.getElementById('missionProgress').style.width = '67%';
+      progressObserver.disconnect();
+    }
+  });
+}, { threshold: 0.3 });
+const featuredMission = document.querySelector('.featured-mission');
+if (featuredMission) progressObserver.observe(featuredMission);
+
+// Mini quiz
+const quizOpts = document.querySelectorAll('.quiz-opt');
+const quizFeedback = document.getElementById('quizFeedback');
+const quizReset = document.getElementById('quizReset');
+let quizAnswered = false;
+
+quizOpts.forEach(opt => {
+  opt.addEventListener('click', () => {
+    if (quizAnswered) return;
+    quizAnswered = true;
+    const isCorrect = opt.dataset.answer === 'correct';
+    opt.classList.add(isCorrect ? 'correct' : 'wrong');
+    quizOpts.forEach(o => {
+      if (o.dataset.answer === 'correct') o.classList.add('correct');
+      o.disabled = true;
+    });
+    quizFeedback.textContent = isCorrect
+      ? '🎉 Bonne réponse ! +30 XP gagnés.'
+      : '❌ Pas tout à fait ! La bonne réponse est l\'Île de Noirmoutier.';
+    quizFeedback.className = 'quiz-feedback show ' + (isCorrect ? 'correct' : 'wrong');
+    quizReset.style.display = 'inline-block';
+  });
+});
+
+quizReset.addEventListener('click', () => {
+  quizAnswered = false;
+  quizOpts.forEach(o => { o.classList.remove('correct', 'wrong'); o.disabled = false; });
+  quizFeedback.className = 'quiz-feedback';
+  quizReset.style.display = 'none';
+});
+
+// Smooth scroll for # links
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const id = a.getAttribute('href').slice(1);
+    if (!id) return;
+    const target = document.getElementById(id);
+    if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+  });
+});
+</script>
 </body>
 </html>

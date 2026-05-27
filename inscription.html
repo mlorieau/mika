@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inscription — Mika</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --beige-100: #FAF6EF;
+      --beige-200: #F0E6D3;
+      --beige-300: #DDD0BC;
+      --coral-400: #E07A5F;
+      --coral-300: #F5A98A;
+      --coral-500: #C45E44;
+      --blue-400: #3B8AB5;
+      --blue-300: #7AB8D4;
+      --blue-500: #255F82;
+      --text: #2A2520;
+      --text-muted: #6B5E54;
+      --green: #4CAF50;
+      --green-bg: #EDFAF0;
+      --radius: 14px;
+      --radius-sm: 8px;
+      --shadow: 0 2px 12px rgba(42,37,32,.08);
+      --shadow-md: 0 4px 24px rgba(42,37,32,.12);
+      --shadow-lg: 0 8px 48px rgba(42,37,32,.14);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--beige-100);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(250,246,239,.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--beige-300);
+      box-shadow: var(--shadow);
+    }
+    .nav-inner {
+      max-width: 1180px; margin: 0 auto;
+      padding: 0 24px; height: 64px;
+      display: flex; align-items: center; gap: 32px;
+    }
+    .nav-logo {
+      font-size: 1.5rem; font-weight: 800; letter-spacing: -.5px;
+      color: var(--text); text-decoration: none; flex-shrink: 0;
+    }
+    .nav-logo .ka { color: var(--coral-400); }
+    .nav-links {
+      display: flex; gap: 24px; list-style: none; flex: 1;
+    }
+    .nav-links a {
+      font-size: .9rem; font-weight: 500; color: var(--text-muted);
+      text-decoration: none; transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-actions { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
+    .btn-profil {
+      padding: 7px 18px; border-radius: 999px;
+      background: var(--blue-400); color: #fff;
+      font-size: .85rem; font-weight: 600; text-decoration: none; transition: background .2s;
+    }
+    .btn-profil:hover { background: var(--blue-500); }
+    .btn-rejoindre {
+      padding: 7px 18px; border-radius: 999px;
+      background: var(--coral-400); color: #fff;
+      font-size: .85rem; font-weight: 600; text-decoration: none; transition: background .2s;
+    }
+    .btn-rejoindre:hover { background: var(--coral-500); }
+    .hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      background: none; border: none; cursor: pointer; padding: 4px;
+    }
+    .hamburger span {
+      display: block; width: 22px; height: 2px;
+      background: var(--text); border-radius: 2px;
+      transition: transform .3s, opacity .3s;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .mobile-menu {
+      display: none; position: fixed; top: 64px; left: 0; right: 0;
+      background: var(--beige-100); border-bottom: 1px solid var(--beige-300);
+      padding: 20px 24px 24px; z-index: 99;
+      flex-direction: column; gap: 16px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      font-size: 1rem; font-weight: 500; color: var(--text); text-decoration: none; padding: 4px 0;
+    }
+    .mobile-menu .mobile-actions { display: flex; gap: 10px; margin-top: 8px; }
+
+    /* PAGE LAYOUT */
+    .page-wrap {
+      min-height: 100vh;
+      padding: 96px 24px 60px;
+      display: flex; flex-direction: column; align-items: center;
+    }
+
+    .page-header {
+      text-align: center; margin-bottom: 36px;
+    }
+    .page-header h1 {
+      font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 800;
+      letter-spacing: -.02em; color: var(--text); margin-bottom: 8px;
+    }
+    .page-header p { font-size: 1rem; color: var(--text-muted); }
+
+    /* PROGRESS INDICATOR */
+    .step-indicator {
+      display: flex; align-items: center; gap: 0;
+      margin-bottom: 40px; width: 100%; max-width: 560px;
+    }
+
+    .step-dot {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      flex: 1;
+      position: relative;
+    }
+
+    .step-dot::before {
+      content: ''; position: absolute; top: 18px; left: calc(50% + 18px);
+      right: calc(-50% + 18px); height: 2px;
+      background: var(--beige-300);
+      transition: background .4s;
+    }
+    .step-dot:last-child::before { display: none; }
+    .step-dot.done::before { background: var(--coral-400); }
+
+    .step-circle {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .85rem; font-weight: 700;
+      border: 2px solid var(--beige-300);
+      background: #fff; color: var(--text-muted);
+      transition: all .3s; position: relative; z-index: 1;
+    }
+    .step-dot.active .step-circle {
+      border-color: var(--coral-400); background: var(--coral-400); color: #fff;
+    }
+    .step-dot.done .step-circle {
+      border-color: var(--coral-400); background: var(--coral-400); color: #fff;
+    }
+    .step-dot.done .step-circle::after { content: '✓'; font-size: .9rem; }
+    .step-dot.done .step-circle .step-num { display: none; }
+
+    .step-label {
+      font-size: .72rem; font-weight: 600; color: var(--text-muted);
+      text-align: center; white-space: nowrap;
+      transition: color .3s;
+    }
+    .step-dot.active .step-label,
+    .step-dot.done .step-label { color: var(--coral-400); }
+
+    /* CARD */
+    .form-card {
+      background: #fff; border: 1px solid var(--beige-300);
+      border-radius: 20px; padding: 44px 48px;
+      box-shadow: var(--shadow-lg);
+      width: 100%; max-width: 560px;
+      position: relative; overflow: hidden;
+    }
+
+    /* STEPS */
+    .step {
+      display: none;
+      animation: stepIn .35s ease forwards;
+    }
+    .step.active { display: block; }
+    .step.slide-out {
+      animation: stepOut .25s ease forwards;
+    }
+
+    @keyframes stepIn {
+      from { opacity: 0; transform: translateX(32px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes stepOut {
+      from { opacity: 1; transform: translateX(0); }
+      to   { opacity: 0; transform: translateX(-32px); }
+    }
+    @keyframes stepInBack {
+      from { opacity: 0; transform: translateX(-32px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    .step.slide-in-back { animation: stepInBack .35s ease forwards; }
+
+    .step-title {
+      font-size: 1.3rem; font-weight: 800; color: var(--text);
+      margin-bottom: 6px; letter-spacing: -.01em;
+    }
+    .step-subtitle {
+      font-size: .9rem; color: var(--text-muted); margin-bottom: 28px; line-height: 1.5;
+    }
+
+    /* FORM FIELDS */
+    .field-group { display: flex; flex-direction: column; gap: 16px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    .field {
+      display: flex; flex-direction: column; gap: 5px;
+    }
+    .field label {
+      font-size: .82rem; font-weight: 700; color: var(--text);
+    }
+    .field input, .field textarea {
+      padding: 11px 14px; border-radius: var(--radius-sm);
+      border: 1.5px solid var(--beige-300); background: var(--beige-100);
+      font-size: .95rem; font-family: inherit; color: var(--text);
+      transition: border-color .2s, background .2s;
+      outline: none;
+    }
+    .field input:focus, .field textarea:focus {
+      border-color: var(--blue-400); background: #fff;
+    }
+    .field input.error, .field textarea.error {
+      border-color: var(--coral-400); background: #FEF0EB;
+    }
+    .field input.valid {
+      border-color: var(--green); background: var(--green-bg);
+    }
+    .field-error {
+      font-size: .78rem; color: var(--coral-500); font-weight: 600;
+      display: none;
+    }
+    .field-error.show { display: block; }
+
+    .field textarea { resize: vertical; min-height: 80px; }
+
+    /* TRIBU CARDS */
+    .tribu-pick-grid {
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .tribu-pick {
+      border: 2px solid var(--beige-300); border-radius: var(--radius);
+      padding: 18px 20px; cursor: pointer;
+      display: flex; align-items: center; gap: 16px;
+      background: var(--beige-100);
+      transition: border-color .2s, background .2s, box-shadow .2s;
+      user-select: none;
+    }
+    .tribu-pick:hover { border-color: var(--beige-300); background: #fff; box-shadow: var(--shadow); }
+
+    .tribu-pick.selected-littoral { border-color: #3B8AB5; background: #EDF6FB; }
+    .tribu-pick.selected-bocage  { border-color: #4CAF50; background: #EDFAF0; }
+    .tribu-pick.selected-marais  { border-color: #E6B800; background: #FDF6E8; }
+
+    .tribu-pick-icon { font-size: 2rem; flex-shrink: 0; }
+    .tribu-pick-body { flex: 1; }
+    .tribu-pick-name { font-size: 1rem; font-weight: 800; color: var(--text); }
+    .tribu-pick-desc { font-size: .82rem; color: var(--text-muted); line-height: 1.4; margin-top: 2px; }
+    .tribu-pick-count { font-size: .75rem; font-weight: 600; color: var(--text-muted); margin-top: 4px; }
+    .tribu-pick-check {
+      width: 24px; height: 24px; border-radius: 50%;
+      border: 2px solid var(--beige-300); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .85rem; transition: all .2s;
+    }
+    .tribu-pick.selected-littoral .tribu-pick-check,
+    .tribu-pick.selected-bocage  .tribu-pick-check,
+    .tribu-pick.selected-marais  .tribu-pick-check {
+      background: var(--coral-400); border-color: var(--coral-400); color: #fff;
+    }
+
+    /* AVATAR PICKER */
+    .username-field { margin-bottom: 20px; }
+
+    .avatar-label {
+      font-size: .82rem; font-weight: 700; color: var(--text); margin-bottom: 10px;
+    }
+    .avatar-grid {
+      display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px;
+      margin-bottom: 20px;
+    }
+    .avatar-btn {
+      aspect-ratio: 1; border-radius: 12px;
+      border: 2px solid var(--beige-300); background: var(--beige-100);
+      font-size: 1.5rem; cursor: pointer; transition: all .2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .avatar-btn:hover { border-color: var(--blue-300); background: #EBF5FB; transform: scale(1.05); }
+    .avatar-btn.selected { border-color: var(--coral-400); background: #FEF0EB; transform: scale(1.08); }
+
+    /* MISSION PICK */
+    .mission-pick-grid { display: flex; flex-direction: column; gap: 12px; }
+    .mission-pick {
+      border: 2px solid var(--beige-300); border-radius: var(--radius);
+      padding: 18px 20px; cursor: pointer;
+      background: var(--beige-100); transition: all .2s;
+    }
+    .mission-pick:hover { border-color: var(--beige-300); background: #fff; box-shadow: var(--shadow); }
+    .mission-pick.selected { border-color: var(--coral-400); background: #FEF0EB; }
+
+    .mission-pick-header {
+      display: flex; justify-content: space-between; align-items: flex-start;
+    }
+    .mission-pick-icon { font-size: 1.6rem; margin-bottom: 8px; display: block; }
+    .mission-pick-name { font-size: .95rem; font-weight: 800; color: var(--text); }
+    .mission-pick-desc { font-size: .82rem; color: var(--text-muted); margin-top: 4px; line-height: 1.4; }
+    .mission-pick-badges {
+      display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;
+    }
+    .mission-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--beige-200); border-radius: 999px;
+      padding: 3px 10px; font-size: .72rem; font-weight: 600; color: var(--text-muted);
+    }
+    .mission-pick.selected .mission-badge { background: rgba(224,122,95,.12); }
+
+    /* NAV BUTTONS */
+    .step-nav {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 32px; gap: 12px;
+    }
+    .btn-back {
+      padding: 11px 22px; border-radius: 999px;
+      background: transparent; color: var(--text-muted);
+      border: 1.5px solid var(--beige-300);
+      font-size: .9rem; font-weight: 600; cursor: pointer;
+      font-family: inherit; transition: all .2s;
+    }
+    .btn-back:hover { border-color: var(--text-muted); color: var(--text); }
+    .btn-next {
+      flex: 1; padding: 13px 28px; border-radius: 999px;
+      background: var(--coral-400); color: #fff;
+      font-size: 1rem; font-weight: 700; cursor: pointer;
+      border: none; font-family: inherit;
+      transition: background .2s, transform .15s;
+    }
+    .btn-next:hover { background: var(--coral-500); transform: translateY(-1px); }
+
+    .step-count {
+      font-size: .78rem; color: var(--text-muted); font-weight: 600;
+    }
+
+    /* STEP 5 — WELCOME */
+    .welcome-screen { text-align: center; }
+
+    .confetti-container {
+      position: relative; overflow: hidden;
+      padding: 24px 0 8px; margin-bottom: 16px;
+    }
+    .confetti-emoji {
+      position: absolute; font-size: 1.2rem;
+      animation: confettiFall linear infinite;
+      pointer-events: none;
+    }
+    @keyframes confettiFall {
+      0%   { transform: translateY(-30px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(180px) rotate(360deg); opacity: 0; }
+    }
+
+    .welcome-avatar {
+      width: 90px; height: 90px; border-radius: 50%;
+      background: var(--beige-200); border: 3px solid var(--beige-300);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3rem; margin: 0 auto 16px;
+    }
+
+    .welcome-name {
+      font-size: 1.5rem; font-weight: 800; color: var(--text); margin-bottom: 4px;
+    }
+
+    .welcome-chips {
+      display: flex; justify-content: center; gap: 10px;
+      flex-wrap: wrap; margin: 16px 0 24px;
+    }
+
+    .welcome-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      border-radius: 999px; padding: 6px 14px;
+      font-size: .82rem; font-weight: 700;
+    }
+    .welcome-chip.tribu {
+      background: var(--beige-200); color: var(--text);
+    }
+    .welcome-chip.level {
+      background: #EBF5FB; color: var(--blue-500);
+    }
+    .welcome-chip.xp {
+      background: #FEF0EB; color: var(--coral-500);
+    }
+
+    .welcome-mission {
+      background: var(--beige-100); border: 1px solid var(--beige-300);
+      border-radius: var(--radius); padding: 16px 20px;
+      text-align: left; margin: 20px 0 28px;
+    }
+    .welcome-mission-label {
+      font-size: .72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .08em; color: var(--text-muted); margin-bottom: 8px;
+    }
+    .welcome-mission-name {
+      font-size: .95rem; font-weight: 700; color: var(--text);
+    }
+
+    .btn-start {
+      display: inline-block; padding: 14px 36px; border-radius: 999px;
+      background: var(--coral-400); color: #fff;
+      font-size: 1rem; font-weight: 700; text-decoration: none;
+      transition: background .2s, transform .15s;
+    }
+    .btn-start:hover { background: var(--coral-500); transform: translateY(-2px); }
+
+    /* Error banner */
+    .step-error {
+      background: #FEF0EB; border: 1px solid var(--coral-300);
+      border-radius: var(--radius-sm); padding: 10px 14px;
+      font-size: .85rem; color: var(--coral-500); font-weight: 600;
+      margin-bottom: 20px; display: none;
+    }
+    .step-error.show { display: block; }
+
+    /* RESPONSIVE */
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .nav-actions .btn-profil { display: none; }
+      .hamburger { display: flex; }
+      .form-card { padding: 32px 24px; }
+      .field-row { grid-template-columns: 1fr; }
+      .avatar-grid { grid-template-columns: repeat(6, 1fr); }
+      .step-label { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">mi<span class="ka">ka</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Accueil</a></li>
+      <li><a href="tribu.html">Tribus</a></li>
+      <li><a href="#">Jeux</a></li>
+      <li><a href="#">Missions</a></li>
+      <li><a href="#">Badges</a></li>
+      <li><a href="#">Classement</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="profil.html" class="btn-profil">Mon profil</a>
+      <a href="inscription.html" class="btn-rejoindre">Rejoindre</a>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html">Accueil</a>
+  <a href="tribu.html">Tribus</a>
+  <a href="#">Jeux</a>
+  <a href="#">Missions</a>
+  <a href="#">Badges</a>
+  <a href="#">Classement</a>
+  <div class="mobile-actions">
+    <a href="profil.html" class="btn-profil">Mon profil</a>
+    <a href="inscription.html" class="btn-rejoindre">Rejoindre</a>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="page-wrap">
+  <div class="page-header">
+    <h1>Rejoindre l'aventure</h1>
+    <p>Créez votre compte en quelques étapes et commencez à explorer.</p>
+  </div>
+
+  <!-- Step indicator -->
+  <div class="step-indicator" id="stepIndicator">
+    <div class="step-dot active" data-step="1">
+      <div class="step-circle"><span class="step-num">1</span></div>
+      <span class="step-label">Infos</span>
+    </div>
+    <div class="step-dot" data-step="2">
+      <div class="step-circle"><span class="step-num">2</span></div>
+      <span class="step-label">Tribu</span>
+    </div>
+    <div class="step-dot" data-step="3">
+      <div class="step-circle"><span class="step-num">3</span></div>
+      <span class="step-label">Identité</span>
+    </div>
+    <div class="step-dot" data-step="4">
+      <div class="step-circle"><span class="step-num">4</span></div>
+      <span class="step-label">Mission</span>
+    </div>
+    <div class="step-dot" data-step="5">
+      <div class="step-circle"><span class="step-num">5</span></div>
+      <span class="step-label">Bienvenue</span>
+    </div>
+  </div>
+
+  <!-- Form card -->
+  <div class="form-card">
+
+    <!-- STEP 1: Informations -->
+    <div class="step active" id="step1">
+      <h2 class="step-title">Vos informations</h2>
+      <p class="step-subtitle">Créez votre compte pour rejoindre la communauté Mika.</p>
+      <div id="step1Error" class="step-error"></div>
+      <div class="field-group">
+        <div class="field-row">
+          <div class="field">
+            <label for="prenom">Prénom</label>
+            <input type="text" id="prenom" placeholder="Lucie" autocomplete="given-name" />
+            <span class="field-error" id="errPrenom">Le prénom est requis.</span>
+          </div>
+          <div class="field">
+            <label for="nom">Nom</label>
+            <input type="text" id="nom" placeholder="Martin" autocomplete="family-name" />
+            <span class="field-error" id="errNom">Le nom est requis.</span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="email">Adresse email</label>
+          <input type="email" id="email" placeholder="lucie@exemple.fr" autocomplete="email" />
+          <span class="field-error" id="errEmail">Email invalide.</span>
+        </div>
+        <div class="field">
+          <label for="password">Mot de passe</label>
+          <input type="password" id="password" placeholder="8 caractères minimum" autocomplete="new-password" />
+          <span class="field-error" id="errPassword">Au moins 8 caractères.</span>
+        </div>
+        <div class="field">
+          <label for="confirm">Confirmer le mot de passe</label>
+          <input type="password" id="confirm" placeholder="Répétez votre mot de passe" autocomplete="new-password" />
+          <span class="field-error" id="errConfirm">Les mots de passe ne correspondent pas.</span>
+        </div>
+      </div>
+      <div class="step-nav">
+        <span class="step-count">Étape 1 / 5</span>
+        <button class="btn-next" onclick="goNext(1)">Continuer →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Tribu -->
+    <div class="step" id="step2">
+      <h2 class="step-title">Votre Tribu</h2>
+      <p class="step-subtitle">Choisissez le territoire qui vous ressemble. Vous pourrez le changer plus tard.</p>
+      <div id="step2Error" class="step-error"></div>
+      <div class="tribu-pick-grid">
+        <div class="tribu-pick" id="pick-littoral" onclick="selectTribu('littoral')">
+          <span class="tribu-pick-icon">⚓</span>
+          <div class="tribu-pick-body">
+            <div class="tribu-pick-name">Tribu Littoral</div>
+            <div class="tribu-pick-desc">Côtes, plages, air iodé &mdash; l'Atlantique comme terrain de jeu.</div>
+            <div class="tribu-pick-count">👥 412 membres</div>
+          </div>
+          <div class="tribu-pick-check" id="check-littoral"></div>
+        </div>
+        <div class="tribu-pick" id="pick-bocage" onclick="selectTribu('bocage')">
+          <span class="tribu-pick-icon">🌿</span>
+          <div class="tribu-pick-body">
+            <div class="tribu-pick-name">Tribu Bocage</div>
+            <div class="tribu-pick-desc">Forêts, collines, chemins creux &mdash; la nature intérieure du Vendée.</div>
+            <div class="tribu-pick-count">👥 387 membres</div>
+          </div>
+          <div class="tribu-pick-check" id="check-bocage"></div>
+        </div>
+        <div class="tribu-pick" id="pick-marais" onclick="selectTribu('marais')">
+          <span class="tribu-pick-icon">🦆</span>
+          <div class="tribu-pick-body">
+            <div class="tribu-pick-name">Tribu Marais</div>
+            <div class="tribu-pick-desc">Zones humides, oiseaux migrateurs &mdash; les secrets des marécages.</div>
+            <div class="tribu-pick-count">👥 441 membres</div>
+          </div>
+          <div class="tribu-pick-check" id="check-marais"></div>
+        </div>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goBack(2)">← Retour</button>
+        <span class="step-count">Étape 2 / 5</span>
+        <button class="btn-next" onclick="goNext(2)">Continuer →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Identité -->
+    <div class="step" id="step3">
+      <h2 class="step-title">Votre Identité</h2>
+      <p class="step-subtitle">Choisissez votre nom d'aventurier et votre avatar. C'est votre signature dans la communauté.</p>
+      <div id="step3Error" class="step-error"></div>
+      <div class="username-field field">
+        <label for="username">Nom d'aventurier</label>
+        <input type="text" id="username" placeholder="ex. LucieExplore" maxlength="24" />
+        <span class="field-error" id="errUsername">Le nom d'aventurier est requis (3 caractères min.).</span>
+      </div>
+
+      <div>
+        <div class="avatar-label">Choisissez votre avatar</div>
+        <div class="avatar-grid" id="avatarGrid">
+          <button class="avatar-btn" data-emoji="🧭" onclick="selectAvatar(this)">🧭</button>
+          <button class="avatar-btn" data-emoji="🌊" onclick="selectAvatar(this)">🌊</button>
+          <button class="avatar-btn" data-emoji="🌿" onclick="selectAvatar(this)">🌿</button>
+          <button class="avatar-btn" data-emoji="🦆" onclick="selectAvatar(this)">🦆</button>
+          <button class="avatar-btn" data-emoji="🏕️" onclick="selectAvatar(this)">🏕️</button>
+          <button class="avatar-btn" data-emoji="🔍" onclick="selectAvatar(this)">🔍</button>
+          <button class="avatar-btn" data-emoji="📸" onclick="selectAvatar(this)">📸</button>
+          <button class="avatar-btn" data-emoji="🎓" onclick="selectAvatar(this)">🎓</button>
+          <button class="avatar-btn" data-emoji="⚓" onclick="selectAvatar(this)">⚓</button>
+          <button class="avatar-btn" data-emoji="🌟" onclick="selectAvatar(this)">🌟</button>
+          <button class="avatar-btn" data-emoji="🦅" onclick="selectAvatar(this)">🦅</button>
+          <button class="avatar-btn" data-emoji="🪸" onclick="selectAvatar(this)">🪸</button>
+        </div>
+        <span class="field-error" id="errAvatar" style="display:none;margin-top:-12px;margin-bottom:12px">Choisissez un avatar.</span>
+      </div>
+
+      <div class="field">
+        <label for="bio">Bio courte <span style="font-weight:400;color:var(--text-muted)">(optionnel)</span></label>
+        <textarea id="bio" placeholder="Quelques mots sur vous, votre rapport au Vendée..."></textarea>
+      </div>
+
+      <div class="step-nav">
+        <button class="btn-back" onclick="goBack(3)">← Retour</button>
+        <span class="step-count">Étape 3 / 5</span>
+        <button class="btn-next" onclick="goNext(3)">Continuer →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Première mission -->
+    <div class="step" id="step4">
+      <h2 class="step-title">Première Mission</h2>
+      <p class="step-subtitle">Choisissez par quoi commencer. Cette mission vous attend dès votre arrivée.</p>
+      <div id="step4Error" class="step-error"></div>
+      <div class="mission-pick-grid">
+        <div class="mission-pick" id="mpick-quiz" onclick="selectMission('quiz', this)">
+          <span class="mission-pick-icon">🧠</span>
+          <div class="mission-pick-header">
+            <div class="mission-pick-name">Quiz Patrimoine Vendée</div>
+          </div>
+          <div class="mission-pick-desc">Testez vos connaissances sur l'histoire et les paysages du Vendée en 10 questions.</div>
+          <div class="mission-pick-badges">
+            <span class="mission-badge">⭐ +30 XP</span>
+            <span class="mission-badge">🟢 Facile</span>
+            <span class="mission-badge">⏱ 5 min</span>
+          </div>
+        </div>
+        <div class="mission-pick" id="mpick-photo" onclick="selectMission('photo', this)">
+          <span class="mission-pick-icon">📸</span>
+          <div class="mission-pick-header">
+            <div class="mission-pick-name">Défi Photo : Mon Vendée</div>
+          </div>
+          <div class="mission-pick-desc">Photographiez un paysage, un lieu ou un détail qui représente le Vendée pour vous. Partagez-le avec la communauté.</div>
+          <div class="mission-pick-badges">
+            <span class="mission-badge">⭐ +50 XP</span>
+            <span class="mission-badge">🟡 Moyen</span>
+            <span class="mission-badge">⏱ 1 heure</span>
+          </div>
+        </div>
+        <div class="mission-pick" id="mpick-walk" onclick="selectMission('walk', this)">
+          <span class="mission-pick-icon">🥾</span>
+          <div class="mission-pick-header">
+            <div class="mission-pick-name">Balade Découverte</div>
+          </div>
+          <div class="mission-pick-desc">Partez explorer un sentier, un marché ou un quartier de votre ville vendéenne. Notez 3 découvertes.</div>
+          <div class="mission-pick-badges">
+            <span class="mission-badge">⭐ +75 XP</span>
+            <span class="mission-badge">🟠 Aventure</span>
+            <span class="mission-badge">⏱ 2 heures</span>
+          </div>
+        </div>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goBack(4)">← Retour</button>
+        <span class="step-count">Étape 4 / 5</span>
+        <button class="btn-next" onclick="goNext(4)">Créer mon compte →</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: Bienvenue -->
+    <div class="step" id="step5">
+      <div class="welcome-screen">
+        <div class="confetti-container" id="confettiContainer">
+          <div id="welcomeAvatar" class="welcome-avatar">🧭</div>
+        </div>
+
+        <div id="welcomeName" class="welcome-name">Bienvenue !</div>
+        <p style="font-size:.9rem;color:var(--text-muted);margin-top:4px">Votre aventure commence maintenant.</p>
+
+        <div class="welcome-chips">
+          <span class="welcome-chip tribu" id="welcomeTribu">🦆 Tribu Marais</span>
+          <span class="welcome-chip level">⚡ Niveau 1 &middot; Néophyte</span>
+          <span class="welcome-chip xp">★ 50 XP de bienvenue</span>
+        </div>
+
+        <div class="welcome-mission">
+          <div class="welcome-mission-label">🚀 Première mission choisie</div>
+          <div class="welcome-mission-name" id="welcomeMission">Quiz Patrimoine Vendée</div>
+        </div>
+
+        <a href="profil.html" class="btn-start">Commencer l'aventure →</a>
+
+        <p style="margin-top:20px;font-size:.78rem;color:var(--text-muted)">
+          Un email de confirmation a été envoyé à <strong id="welcomeEmail">votre adresse</strong>.
+        </p>
+      </div>
+    </div>
+
+  </div><!-- /form-card -->
+</main>
+
+<script>
+// ─── State ───────────────────────────────────────────────
+const formData = {
+  prenom: '', nom: '', email: '', password: '',
+  tribu: null,
+  username: '', avatar: null, bio: '',
+  mission: null
+};
+
+const missionNames = {
+  quiz:  'Quiz Patrimoine Vendée',
+  photo: 'Défi Photo : Mon Vendée',
+  walk:  'Balade Découverte'
+};
+
+const tribuIcons = { littoral: '⚓', bocage: '🌿', marais: '🦆' };
+const tribuLabels = { littoral: 'Tribu Littoral', bocage: 'Tribu Bocage', marais: 'Tribu Marais' };
+
+let currentStep = 1;
+let isAnimating = false;
+
+// ─── Step transition ──────────────────────────────────────
+function showStep(from, to, direction = 'forward') {
+  if (isAnimating) return;
+  isAnimating = true;
+
+  const fromEl = document.getElementById('step' + from);
+  const toEl   = document.getElementById('step' + to);
+
+  fromEl.classList.remove('active');
+  toEl.classList.add('active');
+  toEl.classList.add(direction === 'forward' ? '' : 'slide-in-back');
+
+  updateIndicator(to);
+  currentStep = to;
+
+  setTimeout(() => {
+    toEl.classList.remove('slide-in-back');
+    isAnimating = false;
+  }, 350);
+}
+
+function updateIndicator(active) {
+  document.querySelectorAll('.step-dot').forEach(dot => {
+    const n = parseInt(dot.dataset.step);
+    dot.classList.remove('active', 'done');
+    if (n === active) dot.classList.add('active');
+    else if (n < active) dot.classList.add('done');
+  });
+}
+
+// ─── Navigation ───────────────────────────────────────────
+function goNext(step) {
+  if (!validateStep(step)) return;
+  if (step === 4) {
+    buildWelcome();
+  }
+  showStep(step, step + 1, 'forward');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goBack(step) {
+  showStep(step, step - 1, 'back');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ─── Validation ───────────────────────────────────────────
+function setError(id, show) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('show', show);
+}
+function setFieldError(inputId, errId, show) {
+  const input = document.getElementById(inputId);
+  const err   = document.getElementById(errId);
+  if (input) input.classList.toggle('error', show);
+  if (err)   err.classList.toggle('show', show);
+}
+function clearFieldError(inputId, errId) {
+  setFieldError(inputId, errId, false);
+}
+
+function validateStep(step) {
+  let valid = true;
+
+  if (step === 1) {
+    const prenom   = document.getElementById('prenom').value.trim();
+    const nom      = document.getElementById('nom').value.trim();
+    const email    = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const confirm  = document.getElementById('confirm').value;
+
+    setFieldError('prenom', 'errPrenom', !prenom);
+    setFieldError('nom', 'errNom', !nom);
+
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    setFieldError('email', 'errEmail', !emailOk);
+
+    const passOk = password.length >= 8;
+    setFieldError('password', 'errPassword', !passOk);
+
+    const matchOk = password === confirm && confirm.length > 0;
+    setFieldError('confirm', 'errConfirm', !matchOk);
+
+    if (prenom && nom && emailOk && passOk && matchOk) {
+      formData.prenom = prenom; formData.nom = nom;
+      formData.email = email; formData.password = password;
+    } else {
+      valid = false;
+    }
+  }
+
+  if (step === 2) {
+    const errEl = document.getElementById('step2Error');
+    if (!formData.tribu) {
+      errEl.textContent = 'Veuillez choisir une tribu pour continuer.';
+      errEl.classList.add('show');
+      valid = false;
+    } else {
+      errEl.classList.remove('show');
+    }
+  }
+
+  if (step === 3) {
+    const username = document.getElementById('username').value.trim();
+    const usernameOk = username.length >= 3;
+    setFieldError('username', 'errUsername', !usernameOk);
+
+    const avatarErr = document.getElementById('errAvatar');
+    if (!formData.avatar) {
+      avatarErr.style.display = 'block';
+      valid = false;
+    } else {
+      avatarErr.style.display = 'none';
+    }
+
+    if (usernameOk) { formData.username = username; }
+    else { valid = false; }
+
+    formData.bio = document.getElementById('bio').value.trim();
+  }
+
+  if (step === 4) {
+    const errEl = document.getElementById('step4Error');
+    if (!formData.mission) {
+      errEl.textContent = 'Veuillez choisir une mission de départ pour continuer.';
+      errEl.classList.add('show');
+      valid = false;
+    } else {
+      errEl.classList.remove('show');
+    }
+  }
+
+  return valid;
+}
+
+// ─── Tribu selection ──────────────────────────────────────
+function selectTribu(name) {
+  ['littoral', 'bocage', 'marais'].forEach(t => {
+    const el = document.getElementById('pick-' + t);
+    el.className = 'tribu-pick';
+    document.getElementById('check-' + t).textContent = '';
+  });
+  formData.tribu = name;
+  document.getElementById('pick-' + name).classList.add('selected-' + name);
+  document.getElementById('check-' + name).textContent = '✓';
+  document.getElementById('step2Error').classList.remove('show');
+}
+
+// ─── Avatar selection ─────────────────────────────────────
+function selectAvatar(btn) {
+  document.querySelectorAll('.avatar-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  formData.avatar = btn.dataset.emoji;
+  document.getElementById('errAvatar').style.display = 'none';
+}
+
+// ─── Mission selection ────────────────────────────────────
+function selectMission(name, el) {
+  document.querySelectorAll('.mission-pick').forEach(m => m.classList.remove('selected'));
+  el.classList.add('selected');
+  formData.mission = name;
+  document.getElementById('step4Error').classList.remove('show');
+}
+
+// ─── Build welcome screen ─────────────────────────────────
+function buildWelcome() {
+  const avatar = formData.avatar || '🧭';
+  const name   = formData.username || formData.prenom || 'Aventurier';
+  const tribu  = formData.tribu || 'marais';
+  const mission = missionNames[formData.mission] || 'Quiz Patrimoine Vendée';
+
+  document.getElementById('welcomeAvatar').textContent = avatar;
+  document.getElementById('welcomeName').textContent = 'Bienvenue, ' + name + ' !';
+  document.getElementById('welcomeTribu').textContent = tribuIcons[tribu] + ' ' + tribuLabels[tribu];
+  document.getElementById('welcomeMission').textContent = mission;
+  document.getElementById('welcomeEmail').textContent = formData.email || 'votre adresse';
+
+  spawnConfetti();
+}
+
+// ─── Confetti ─────────────────────────────────────────────
+function spawnConfetti() {
+  const container = document.getElementById('confettiContainer');
+  const pieces = ['🎉','⭐','✨','🌟','🎊','💫','🪄'];
+  for (let i = 0; i < 14; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-emoji';
+    el.textContent = pieces[Math.floor(Math.random() * pieces.length)];
+    el.style.left = Math.random() * 100 + '%';
+    el.style.top = '-20px';
+    el.style.animationDuration = (1.2 + Math.random() * 1.6) + 's';
+    el.style.animationDelay = (Math.random() * 1.5) + 's';
+    el.style.fontSize = (0.9 + Math.random() * 0.8) + 'rem';
+    container.appendChild(el);
+  }
+}
+
+// ─── Live validation feedback ─────────────────────────────
+['prenom','nom','email','password','confirm','username'].forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('input', () => {
+    // Remove error styling while typing
+    el.classList.remove('error');
+    const errMap = {
+      prenom: 'errPrenom', nom: 'errNom', email: 'errEmail',
+      password: 'errPassword', confirm: 'errConfirm', username: 'errUsername'
+    };
+    const errEl = document.getElementById(errMap[id]);
+    if (errEl) errEl.classList.remove('show');
+  });
+});
+
+// ─── Hamburger ────────────────────────────────────────────
+const hamburger = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobileMenu');
+hamburger.addEventListener('click', () => {
+  hamburger.classList.toggle('open');
+  mobileMenu.classList.toggle('open');
+});
+mobileMenu.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => {
+    hamburger.classList.remove('open');
+    mobileMenu.classList.remove('open');
+  });
+});
+</script>
+</body>
+</html>
