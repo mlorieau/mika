@@ -1,0 +1,3446 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mika — L'aventure collective en Vendée</title>
+<style>
+/* ============================================================
+   DESIGN SYSTEM
+   ============================================================ */
+:root {
+  --beige-pale:   #FAF6EF;
+  --beige:        #F0E6D3;
+  --beige-dark:   #DDD0BC;
+  --coral-light:  #F5A98A;
+  --coral:        #E07A5F;
+  --coral-dark:   #C45E44;
+  --blue-light:   #7AB8D4;
+  --blue:         #3B8AB5;
+  --blue-dark:    #255F82;
+  --green-soft:   #7DB49A;
+  --amber:        #D4A843;
+  --text:         #2A2520;
+  --text-mid:     #5C5248;
+  --text-soft:    #9A8E84;
+  --white:        #FFFFFF;
+  --card-shadow:  0 2px 12px rgba(42,37,32,.07);
+  --radius-sm:    8px;
+  --radius-md:    14px;
+  --radius-lg:    22px;
+  --radius-xl:    32px;
+  --font:         'Segoe UI', system-ui, -apple-system, sans-serif;
+  --transition:   .22s ease;
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font);
+  background: var(--beige-pale);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+button { font-family: var(--font); cursor: pointer; border: none; background: none; }
+ul { list-style: none; }
+
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
+.t-hero    { font-size: clamp(2.2rem, 6vw, 4.2rem); font-weight: 800; line-height: 1.1; letter-spacing: -.03em; }
+.t-h1      { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; line-height: 1.15; letter-spacing: -.02em; }
+.t-h2      { font-size: clamp(1.4rem, 3vw, 2rem);   font-weight: 700; line-height: 1.2; }
+.t-h3      { font-size: 1.15rem; font-weight: 700; }
+.t-body    { font-size: 1rem; }
+.t-small   { font-size: .875rem; }
+.t-xs      { font-size: .75rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.t-coral   { color: var(--coral); }
+.t-blue    { color: var(--blue); }
+.t-soft    { color: var(--text-soft); }
+.t-mid     { color: var(--text-mid); }
+.t-center  { text-align: center; }
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+.section   { padding: 80px 0; }
+.section-sm{ padding: 56px 0; }
+.grid-2    { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.grid-3    { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.grid-4    { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.flex      { display: flex; }
+.flex-col  { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-8     { gap: 8px; }
+.gap-12    { gap: 12px; }
+.gap-16    { gap: 16px; }
+.gap-24    { gap: 24px; }
+.mb-8      { margin-bottom: 8px; }
+.mb-12     { margin-bottom: 12px; }
+.mb-16     { margin-bottom: 16px; }
+.mb-24     { margin-bottom: 24px; }
+.mb-32     { margin-bottom: 32px; }
+.mb-48     { margin-bottom: 48px; }
+.mt-8      { margin-top: 8px; }
+.mt-16     { margin-top: 16px; }
+.mt-24     { margin-top: 24px; }
+
+/* ============================================================
+   COMPONENTS — BUTTONS
+   ============================================================ */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 26px; border-radius: var(--radius-xl);
+  font-size: .95rem; font-weight: 700;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.btn:hover { transform: translateY(-2px); }
+.btn-coral {
+  background: var(--coral); color: var(--white);
+  box-shadow: 0 4px 16px rgba(224,122,95,.28);
+}
+.btn-coral:hover { background: var(--coral-dark); box-shadow: 0 6px 20px rgba(224,122,95,.38); }
+.btn-blue {
+  background: var(--blue); color: var(--white);
+  box-shadow: 0 4px 16px rgba(59,138,181,.28);
+}
+.btn-blue:hover { background: var(--blue-dark); }
+.btn-outline {
+  background: transparent; color: var(--text);
+  border: 2px solid var(--beige-dark);
+}
+.btn-outline:hover { border-color: var(--coral); color: var(--coral); }
+.btn-white {
+  background: var(--white); color: var(--coral);
+  box-shadow: 0 4px 16px rgba(0,0,0,.1);
+}
+.btn-white:hover { transform: translateY(-2px); }
+.btn-sm { padding: 8px 18px; font-size: .85rem; }
+.btn-lg { padding: 16px 36px; font-size: 1.05rem; }
+
+/* ============================================================
+   COMPONENTS — CARDS
+   ============================================================ */
+.card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--card-shadow);
+}
+.card-beige {
+  background: var(--beige);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+}
+
+/* ============================================================
+   COMPONENTS — PILL TAGS
+   ============================================================ */
+.pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 12px; border-radius: 99px;
+  font-size: .78rem; font-weight: 700; letter-spacing: .04em;
+}
+.pill-coral  { background: rgba(224,122,95,.12); color: var(--coral-dark); }
+.pill-blue   { background: rgba(59,138,181,.12); color: var(--blue-dark); }
+.pill-green  { background: rgba(125,180,154,.15); color: #3D7A62; }
+.pill-amber  { background: rgba(212,168,67,.15); color: #9A7020; }
+.pill-beige  { background: var(--beige-dark); color: var(--text-mid); }
+
+/* ============================================================
+   COMPONENTS — PROGRESS BAR
+   ============================================================ */
+.progress-track {
+  height: 8px; background: var(--beige-dark);
+  border-radius: 99px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; border-radius: 99px;
+  background: linear-gradient(90deg, var(--coral-light), var(--coral));
+  transition: width 1.2s cubic-bezier(.4,0,.2,1);
+  width: 0;
+}
+.progress-fill.blue {
+  background: linear-gradient(90deg, var(--blue-light), var(--blue));
+}
+.progress-fill.green {
+  background: linear-gradient(90deg, #A8D5C2, var(--green-soft));
+}
+
+/* ============================================================
+   COMPONENTS — SECTION HEADER
+   ============================================================ */
+.section-header { margin-bottom: 48px; }
+.section-header .eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  color: var(--coral); font-size: .8rem; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.section-header .eyebrow::before {
+  content: ''; display: block;
+  width: 24px; height: 2px; background: var(--coral);
+  border-radius: 2px;
+}
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(250,246,239,.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(224,214,200,.5);
+  transition: box-shadow var(--transition);
+}
+.nav.scrolled { box-shadow: 0 2px 20px rgba(42,37,32,.08); }
+.nav-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  height: 68px; padding: 0 24px; max-width: 1200px; margin: 0 auto;
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+}
+.nav-logo-mark {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--coral); display: flex; align-items: center; justify-content: center;
+}
+.nav-logo-mark svg { width: 20px; height: 20px; }
+.nav-logo-text { font-size: 1.3rem; font-weight: 800; letter-spacing: -.03em; }
+.nav-logo-text span { color: var(--coral); }
+.nav-links {
+  display: flex; align-items: center; gap: 4px;
+}
+.nav-link {
+  padding: 7px 14px; border-radius: var(--radius-sm);
+  font-size: .9rem; font-weight: 600; color: var(--text-mid);
+  transition: color var(--transition), background var(--transition);
+}
+.nav-link:hover, .nav-link.active {
+  color: var(--coral); background: rgba(224,122,95,.08);
+}
+.nav-cta { margin-left: 8px; }
+.nav-hamburger {
+  display: none; flex-direction: column; gap: 5px;
+  width: 36px; height: 36px; align-items: center; justify-content: center;
+  border-radius: var(--radius-sm); cursor: pointer;
+  transition: background var(--transition);
+}
+.nav-hamburger:hover { background: var(--beige); }
+.nav-hamburger span {
+  display: block; width: 22px; height: 2px;
+  background: var(--text); border-radius: 2px;
+  transition: transform var(--transition), opacity var(--transition);
+}
+.mobile-menu {
+  display: none; position: fixed; top: 68px; left: 0; right: 0; bottom: 0;
+  background: var(--beige-pale); z-index: 99;
+  padding: 24px; flex-direction: column; gap: 8px;
+  overflow-y: auto;
+}
+.mobile-menu.open { display: flex; }
+.mobile-menu .nav-link {
+  font-size: 1.1rem; padding: 14px 18px;
+  border-radius: var(--radius-md);
+}
+.mobile-menu .btn { width: 100%; justify-content: center; margin-top: 8px; }
+
+/* ============================================================
+   HERO
+   ============================================================ */
+#hero {
+  padding-top: 108px; padding-bottom: 80px;
+  background: var(--beige-pale);
+  position: relative; overflow: hidden;
+}
+.hero-bg-shape {
+  position: absolute; top: -80px; right: -120px;
+  width: 560px; height: 560px; border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, rgba(224,122,95,.10), transparent 70%);
+  pointer-events: none;
+}
+.hero-bg-shape2 {
+  position: absolute; bottom: -100px; left: -80px;
+  width: 400px; height: 400px; border-radius: 50%;
+  background: radial-gradient(circle at 60% 60%, rgba(59,138,181,.08), transparent 70%);
+  pointer-events: none;
+}
+.hero-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 48px; align-items: center;
+}
+.hero-text { position: relative; z-index: 2; }
+.hero-text .eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 14px; border-radius: 99px;
+  background: rgba(224,122,95,.1); color: var(--coral-dark);
+  font-size: .8rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.hero-title { margin-bottom: 20px; }
+.hero-title em { font-style: normal; color: var(--coral); }
+.hero-desc { font-size: 1.1rem; color: var(--text-mid); line-height: 1.7; margin-bottom: 32px; max-width: 480px; }
+.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 40px; }
+.hero-stats {
+  display: flex; gap: 28px;
+  padding-top: 28px; border-top: 1px solid var(--beige-dark);
+}
+.hero-stat-num {
+  font-size: 1.6rem; font-weight: 800; letter-spacing: -.03em;
+  color: var(--text); line-height: 1;
+}
+.hero-stat-label { font-size: .8rem; color: var(--text-soft); margin-top: 3px; }
+.hero-visual {
+  position: relative; z-index: 2;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+}
+.hero-card-float {
+  background: var(--white); border-radius: var(--radius-lg);
+  padding: 18px; box-shadow: var(--card-shadow);
+  animation: float 6s ease-in-out infinite;
+}
+.hero-card-float:nth-child(2) { animation-delay: -2s; margin-top: 28px; }
+.hero-card-float:nth-child(3) { animation-delay: -4s; grid-column: 1 / -1; }
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+.tribe-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 11px; border-radius: 99px;
+  font-size: .78rem; font-weight: 700;
+}
+.tribe-littoral { background: rgba(59,138,181,.12); color: var(--blue-dark); }
+.tribe-bocage   { background: rgba(125,180,154,.15); color: #3D7A62; }
+.tribe-marais   { background: rgba(212,168,67,.15);  color: #9A7020; }
+
+/* mini badge row */
+.badge-mini-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+.badge-mini {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+}
+.badge-mini.locked {
+  background: var(--beige-dark); filter: grayscale(1); opacity: .5;
+}
+.badge-mini.unlocked { background: var(--beige); }
+
+/* ============================================================
+   TRIBES
+   ============================================================ */
+#tribus { background: var(--white); }
+.tribe-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.tribe-card {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+  transition: transform var(--transition), box-shadow var(--transition);
+  cursor: pointer;
+}
+.tribe-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(42,37,32,.12);
+}
+.tribe-card-header {
+  padding: 32px 24px 24px;
+  position: relative;
+}
+.tribe-littoral-card .tribe-card-header { background: linear-gradient(135deg, #E8F4F9, #C8E4F0); }
+.tribe-bocage-card   .tribe-card-header { background: linear-gradient(135deg, #EAF3EE, #C6DDD4); }
+.tribe-marais-card   .tribe-card-header { background: linear-gradient(135deg, #F5F0E0, #E8D9A8); }
+.tribe-icon-wrap {
+  width: 56px; height: 56px; border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 16px; font-size: 1.6rem;
+}
+.tribe-littoral-card .tribe-icon-wrap { background: rgba(59,138,181,.18); }
+.tribe-bocage-card   .tribe-icon-wrap { background: rgba(125,180,154,.25); }
+.tribe-marais-card   .tribe-icon-wrap { background: rgba(212,168,67,.25); }
+.tribe-card-body { background: var(--white); padding: 20px 24px 24px; }
+.tribe-members-row {
+  display: flex; align-items: center; gap: 8px; margin-top: 14px;
+}
+.member-avatars { display: flex; }
+.member-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 2px solid var(--white);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .7rem; font-weight: 700; color: var(--white);
+  margin-left: -8px;
+}
+.member-avatar:first-child { margin-left: 0; }
+.av-1 { background: var(--coral); }
+.av-2 { background: var(--blue); }
+.av-3 { background: var(--green-soft); }
+.av-4 { background: var(--amber); }
+.av-5 { background: #9B7FBF; }
+.tribe-score {
+  display: flex; align-items: center; gap: 4px;
+  margin-top: 12px; font-size: .85rem; font-weight: 600; color: var(--text-mid);
+}
+
+/* ============================================================
+   PROFILE / GAMIFICATION
+   ============================================================ */
+#profil { background: var(--beige-pale); }
+.profile-grid { display: grid; grid-template-columns: 340px 1fr; gap: 28px; }
+.profile-card {
+  background: var(--white); border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow); padding: 28px;
+}
+.profile-avatar-ring {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--coral-light), var(--coral));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem; margin-bottom: 14px;
+  box-shadow: 0 4px 14px rgba(224,122,95,.28);
+}
+.level-badge-wrap { position: relative; display: inline-block; }
+.level-badge {
+  position: absolute; bottom: -4px; right: -4px;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--amber); border: 2px solid var(--white);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .65rem; font-weight: 900; color: var(--white);
+}
+.xp-section { margin: 20px 0; }
+.xp-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.xp-num { font-size: .85rem; font-weight: 700; color: var(--text-mid); }
+.missions-mini-list { margin-top: 18px; }
+.mission-mini-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 0; border-bottom: 1px solid var(--beige);
+}
+.mission-mini-item:last-child { border-bottom: none; }
+.mission-status-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.dot-todo     { background: var(--beige-dark); }
+.dot-active   { background: var(--coral); }
+.dot-done     { background: var(--green-soft); }
+.profile-right-grid { display: flex; flex-direction: column; gap: 22px; }
+.stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.stat-box {
+  background: var(--white); border-radius: var(--radius-md);
+  padding: 18px 16px; box-shadow: var(--card-shadow); text-align: center;
+}
+.stat-box-num {
+  font-size: 1.8rem; font-weight: 800; letter-spacing: -.03em;
+  color: var(--text); line-height: 1;
+}
+.stat-box-label { font-size: .78rem; color: var(--text-soft); margin-top: 4px; }
+.recent-activity-list { display: flex; flex-direction: column; gap: 10px; }
+.activity-item {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--white); border-radius: var(--radius-md);
+  padding: 12px 16px; box-shadow: var(--card-shadow);
+}
+.activity-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; flex-shrink: 0;
+}
+.activity-coral  { background: rgba(224,122,95,.1); }
+.activity-blue   { background: rgba(59,138,181,.1); }
+.activity-green  { background: rgba(125,180,154,.15); }
+.activity-amber  { background: rgba(212,168,67,.15); }
+.activity-xp {
+  margin-left: auto; font-size: .85rem; font-weight: 700; color: var(--amber);
+  white-space: nowrap;
+}
+
+/* ============================================================
+   MISSIONS
+   ============================================================ */
+#missions { background: var(--white); }
+.missions-tabs {
+  display: flex; gap: 8px; margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+.missions-tab {
+  padding: 8px 20px; border-radius: 99px;
+  font-size: .9rem; font-weight: 700;
+  background: var(--beige); color: var(--text-mid);
+  transition: background var(--transition), color var(--transition);
+  cursor: pointer;
+}
+.missions-tab.active { background: var(--coral); color: var(--white); }
+.missions-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.mission-card {
+  background: var(--white); border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow);
+  overflow: hidden; transition: transform var(--transition);
+}
+.mission-card:hover { transform: translateY(-3px); }
+.mission-card-top {
+  padding: 20px 20px 16px; position: relative;
+}
+.mission-card-top.status-done     { background: rgba(125,180,154,.08); }
+.mission-card-top.status-active   { background: rgba(224,122,95,.07); }
+.mission-card-top.status-todo     { background: var(--beige-pale); }
+.mission-type-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; margin-bottom: 12px;
+  background: var(--beige);
+}
+.mission-card-bottom { padding: 16px 20px; }
+.mission-card-bottom .progress-track { margin-top: 8px; margin-bottom: 8px; }
+.mission-xp {
+  font-size: .8rem; font-weight: 700; color: var(--amber);
+  display: flex; align-items: center; gap: 4px;
+}
+.mission-status-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 12px;
+}
+.status-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 99px;
+  font-size: .75rem; font-weight: 700;
+}
+.chip-done   { background: rgba(125,180,154,.2); color: #3D7A62; }
+.chip-active { background: rgba(224,122,95,.15); color: var(--coral-dark); }
+.chip-todo   { background: var(--beige-dark); color: var(--text-soft); }
+
+/* ============================================================
+   BADGES
+   ============================================================ */
+#badges { background: var(--beige-pale); }
+.badges-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 18px;
+}
+.badge-card {
+  background: var(--white); border-radius: var(--radius-lg);
+  padding: 24px 16px; text-align: center;
+  box-shadow: var(--card-shadow);
+  transition: transform var(--transition);
+  position: relative; overflow: hidden;
+}
+.badge-card:hover { transform: translateY(-4px); }
+.badge-card.locked {
+  opacity: .55; filter: saturate(.3);
+}
+.badge-card.locked::after {
+  content: '🔒'; position: absolute; top: 10px; right: 10px;
+  font-size: .85rem;
+}
+.badge-icon-wrap {
+  width: 72px; height: 72px; border-radius: 50%;
+  margin: 0 auto 14px; display: flex; align-items: center; justify-content: center;
+  font-size: 2rem;
+  position: relative;
+}
+.badge-icon-wrap::before {
+  content: ''; position: absolute; inset: -4px;
+  border-radius: 50%; z-index: -1;
+}
+.badge-coral  .badge-icon-wrap { background: rgba(224,122,95,.1); }
+.badge-coral  .badge-icon-wrap::before { background: rgba(224,122,95,.08); }
+.badge-blue   .badge-icon-wrap { background: rgba(59,138,181,.1); }
+.badge-blue   .badge-icon-wrap::before { background: rgba(59,138,181,.08); }
+.badge-green  .badge-icon-wrap { background: rgba(125,180,154,.15); }
+.badge-green  .badge-icon-wrap::before { background: rgba(125,180,154,.1); }
+.badge-amber  .badge-icon-wrap { background: rgba(212,168,67,.15); }
+.badge-amber  .badge-icon-wrap::before { background: rgba(212,168,67,.1); }
+.badge-purple .badge-icon-wrap { background: rgba(155,127,191,.15); }
+.badge-purple .badge-icon-wrap::before { background: rgba(155,127,191,.1); }
+.badge-name   { font-size: .9rem; font-weight: 700; margin-bottom: 4px; }
+.badge-desc   { font-size: .75rem; color: var(--text-soft); }
+.badge-xp     { font-size: .75rem; font-weight: 700; color: var(--amber); margin-top: 8px; }
+
+/* ============================================================
+   TERRITORY MAP
+   ============================================================ */
+#carte { background: var(--white); }
+.map-container {
+  background: linear-gradient(145deg, #EDF4F8, #E4EFF5);
+  border-radius: var(--radius-xl); padding: 40px;
+  position: relative; overflow: hidden;
+  min-height: 420px;
+}
+.map-svg-wrap {
+  position: relative; max-width: 700px; margin: 0 auto;
+}
+.map-svg-wrap svg { width: 100%; height: auto; }
+.map-label {
+  position: absolute; background: var(--white);
+  border-radius: var(--radius-sm); padding: 6px 12px;
+  font-size: .8rem; font-weight: 700; color: var(--text);
+  box-shadow: var(--card-shadow); white-space: nowrap;
+  pointer-events: none;
+}
+/* animated pulse rings */
+@keyframes pulse-ring {
+  0%   { transform: scale(1); opacity: .6; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+.map-pulse {
+  animation: pulse-ring 2s ease-out infinite;
+}
+
+/* ============================================================
+   LEADERBOARD
+   ============================================================ */
+#classement { background: var(--beige-pale); }
+.leaderboard-list { display: flex; flex-direction: column; gap: 10px; max-width: 680px; margin: 0 auto; }
+.lb-item {
+  display: flex; align-items: center; gap: 16px;
+  background: var(--white); border-radius: var(--radius-md);
+  padding: 14px 18px; box-shadow: var(--card-shadow);
+  transition: transform var(--transition);
+}
+.lb-item:hover { transform: translateX(4px); }
+.lb-item.me { border: 2px solid var(--coral); }
+.lb-rank {
+  width: 28px; text-align: center;
+  font-size: 1rem; font-weight: 800; color: var(--text-soft);
+  flex-shrink: 0;
+}
+.lb-rank.gold   { color: #C9962A; }
+.lb-rank.silver { color: #8A9EB0; }
+.lb-rank.bronze { color: #A07850; }
+.lb-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; flex-shrink: 0;
+}
+.lb-info { flex: 1; min-width: 0; }
+.lb-name { font-weight: 700; font-size: .95rem; }
+.lb-tribe { font-size: .78rem; color: var(--text-soft); }
+.lb-score {
+  font-size: 1.1rem; font-weight: 800; color: var(--text);
+  white-space: nowrap;
+}
+.lb-score span { font-size: .75rem; font-weight: 600; color: var(--text-soft); }
+
+/* ============================================================
+   JOIN CTA
+   ============================================================ */
+#rejoindre {
+  background: var(--coral);
+  position: relative; overflow: hidden;
+}
+.join-bg {
+  position: absolute; top: -100px; right: -100px;
+  width: 400px; height: 400px; border-radius: 50%;
+  background: rgba(255,255,255,.06); pointer-events: none;
+}
+.join-bg2 {
+  position: absolute; bottom: -80px; left: -60px;
+  width: 300px; height: 300px; border-radius: 50%;
+  background: rgba(0,0,0,.05); pointer-events: none;
+}
+.join-inner { position: relative; z-index: 2; text-align: center; color: var(--white); }
+.join-inner h2 { color: var(--white); font-size: clamp(1.6rem, 4vw, 2.4rem); margin-bottom: 14px; }
+.join-inner p  { opacity: .88; font-size: 1.05rem; margin-bottom: 36px; max-width: 540px; margin-left: auto; margin-right: auto; }
+.join-actions  { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.join-tribe-chips { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 32px; }
+.join-tribe-chip {
+  padding: 7px 16px; border-radius: 99px;
+  background: rgba(255,255,255,.15); color: var(--white);
+  font-size: .85rem; font-weight: 700; border: 1px solid rgba(255,255,255,.25);
+  cursor: pointer; transition: background var(--transition);
+}
+.join-tribe-chip:hover { background: rgba(255,255,255,.25); }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer {
+  background: var(--text); color: rgba(255,255,255,.55);
+  padding: 48px 0 32px;
+}
+.footer-inner {
+  display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 40px;
+}
+.footer-brand .nav-logo-text { color: var(--white); margin-bottom: 8px; }
+.footer-brand .nav-logo-text span { color: var(--coral-light); }
+.footer-tagline { font-size: .88rem; opacity: .65; line-height: 1.5; }
+.footer-col-title { font-size: .8rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.85); margin-bottom: 14px; }
+.footer-links li { margin-bottom: 8px; }
+.footer-links a { font-size: .88rem; transition: color var(--transition); }
+.footer-links a:hover { color: var(--coral-light); }
+.footer-bottom {
+  margin-top: 40px; padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: .8rem;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 1024px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .footer-inner { grid-template-columns: 1fr 1fr; gap: 28px; }
+  .profile-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  .section  { padding: 56px 0; }
+  .section-sm { padding: 40px 0; }
+  .nav-links, .nav-cta { display: none; }
+  .nav-hamburger { display: flex; }
+  .hero-grid { grid-template-columns: 1fr; gap: 32px; }
+  .hero-visual { display: none; }
+  .hero-stats { gap: 20px; }
+  .tribe-cards { grid-template-columns: 1fr; }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .missions-grid { grid-template-columns: 1fr; }
+  .stats-row { grid-template-columns: repeat(3, 1fr); }
+  .footer-inner { grid-template-columns: 1fr; gap: 24px; }
+  .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+  .mb-48 { margin-bottom: 32px; }
+  .map-container { padding: 24px; }
+}
+@media (max-width: 480px) {
+  .hero-actions { flex-direction: column; }
+  .hero-actions .btn { width: 100%; justify-content: center; }
+  .stats-row { grid-template-columns: 1fr 1fr; }
+  .badges-grid { grid-template-columns: repeat(2, 1fr); }
+  .btn-lg { padding: 14px 28px; }
+  .missions-tabs { gap: 6px; }
+  .missions-tab { font-size: .82rem; padding: 7px 14px; }
+}
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-in { animation: fade-up .6s ease both; }
+.delay-1 { animation-delay: .1s; }
+.delay-2 { animation-delay: .2s; }
+.delay-3 { animation-delay: .3s; }
+.delay-4 { animation-delay: .4s; }
+
+/* Intersection Observer targets */
+.reveal { opacity: 0; transform: translateY(20px); transition: opacity .6s ease, transform .6s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ============================================================
+   BLUE ACCENT SYSTEM
+   ============================================================ */
+.eyebrow-blue {
+  color: var(--blue) !important;
+}
+.eyebrow-blue::before {
+  background: var(--blue) !important;
+}
+.nav-link-profile {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 5px 5px 12px; border-radius: 99px;
+  font-size: .88rem; font-weight: 700; color: var(--blue-dark);
+  background: rgba(59,138,181,.09);
+  border: 1.5px solid rgba(59,138,181,.2);
+  cursor: pointer;
+  transition: all var(--transition);
+  margin-left: 4px;
+}
+.nav-link-profile:hover {
+  background: rgba(59,138,181,.16);
+  border-color: var(--blue);
+  transform: translateY(-1px);
+}
+.nav-profile-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--blue-light), var(--blue));
+  display: flex; align-items: center; justify-content: center;
+  font-size: .85rem;
+}
+/* ============================================================
+   JEUX — GAMES UNIVERSE
+   ============================================================ */
+#jeux { background: var(--white); }
+.games-intro-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+  margin-bottom: 56px;
+}
+.game-type-card {
+  border-radius: var(--radius-lg); overflow: hidden;
+  box-shadow: var(--card-shadow);
+  transition: transform var(--transition), box-shadow var(--transition);
+  cursor: pointer; background: var(--white);
+}
+.game-type-card:hover { transform: translateY(-4px); box-shadow: 0 10px 32px rgba(42,37,32,.13); }
+.game-type-card-top {
+  padding: 24px 20px 18px; text-align: center;
+}
+.game-type-card.g-quiz    .game-type-card-top { background: linear-gradient(135deg, #E8F2F8, #CDE2EF); }
+.game-type-card.g-mystery .game-type-card-top { background: linear-gradient(135deg, #EEE8F5, #DDD0EE); }
+.game-type-card.g-defi    .game-type-card-top { background: linear-gradient(135deg, #FDF0E8, #F5D9C5); }
+.game-type-card.g-chasse  .game-type-card-top { background: linear-gradient(135deg, #E8F5EF, #C8E5D8); }
+.game-type-card.g-memory  .game-type-card-top { background: linear-gradient(135deg, #FEF5E4, #F8DFA8); }
+.game-type-card.g-duel    .game-type-card-top { background: linear-gradient(135deg, #FDEAEA, #F5C4C4); }
+.game-type-icon {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: rgba(255,255,255,.6); display: flex;
+  align-items: center; justify-content: center;
+  font-size: 1.6rem; margin: 0 auto 12px;
+}
+.game-type-card-body { padding: 14px 18px 18px; }
+.game-xp-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: rgba(212,168,67,.12); color: #9A7020;
+  border-radius: 99px; padding: 3px 9px;
+  font-size: .72rem; font-weight: 700; margin-top: 6px;
+}
+.game-difficulty {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: .72rem; color: var(--text-soft);
+}
+/* Featured quiz widget */
+.quiz-featured {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 28px;
+  align-items: start; margin-top: 0;
+}
+.quiz-widget {
+  background: var(--white); border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow); overflow: hidden;
+}
+.quiz-header {
+  background: linear-gradient(135deg, var(--blue-dark), var(--blue));
+  padding: 20px 24px; color: var(--white);
+}
+.quiz-progress-strip {
+  display: flex; gap: 4px; margin-top: 12px;
+}
+.quiz-progress-pip {
+  flex: 1; height: 4px; border-radius: 2px; background: rgba(255,255,255,.25);
+  transition: background .3s;
+}
+.quiz-progress-pip.done { background: var(--white); }
+.quiz-progress-pip.active { background: rgba(255,255,255,.7); }
+.quiz-body { padding: 24px; }
+.quiz-question-text {
+  font-size: 1rem; font-weight: 700; color: var(--text);
+  line-height: 1.5; margin-bottom: 20px;
+}
+.quiz-options { display: flex; flex-direction: column; gap: 10px; }
+.quiz-option {
+  padding: 12px 16px; border-radius: var(--radius-md);
+  background: var(--beige-pale); border: 2px solid var(--beige-dark);
+  font-size: .9rem; font-weight: 600; color: var(--text);
+  cursor: pointer; text-align: left;
+  transition: border-color var(--transition), background var(--transition), transform .15s;
+}
+.quiz-option:hover:not(:disabled) {
+  border-color: var(--blue); background: rgba(59,138,181,.06);
+  transform: translateX(3px);
+}
+.quiz-option.correct { border-color: var(--green-soft); background: rgba(125,180,154,.12); color: #2A6048; }
+.quiz-option.wrong   { border-color: var(--coral); background: rgba(224,122,95,.08); color: var(--coral-dark); }
+.quiz-option:disabled { cursor: not-allowed; }
+.quiz-feedback {
+  margin-top: 14px; padding: 10px 14px; border-radius: var(--radius-md);
+  font-size: .85rem; font-weight: 600; display: none;
+}
+.quiz-feedback.show { display: block; }
+.quiz-feedback.ok  { background: rgba(125,180,154,.15); color: #2A6048; }
+.quiz-feedback.ko  { background: rgba(224,122,95,.1);  color: var(--coral-dark); }
+.quiz-footer { padding: 0 24px 24px; display: flex; align-items: center; justify-content: space-between; }
+.quiz-result {
+  display: none; padding: 28px 24px; text-align: center;
+}
+.quiz-result.show { display: block; }
+.quiz-score-circle {
+  width: 96px; height: 96px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; flex-direction: column;
+  margin: 0 auto 16px;
+  font-size: 1.6rem; font-weight: 900; line-height: 1;
+  box-shadow: 0 4px 20px rgba(59,138,181,.2);
+}
+/* Mystery object widget */
+.mystery-widget {
+  background: var(--white); border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow); overflow: hidden;
+}
+.mystery-header {
+  background: linear-gradient(135deg, #3A2D5C, #6B4FA0);
+  padding: 20px 24px; color: var(--white);
+}
+.mystery-image-zone {
+  padding: 20px 24px 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.mystery-object-display {
+  width: 100%; height: 160px; border-radius: var(--radius-md);
+  background: var(--beige); display: flex; align-items: center;
+  justify-content: center; font-size: 4rem;
+  position: relative; overflow: hidden;
+  transition: filter .6s ease;
+}
+.mystery-blur-3 { filter: blur(18px); }
+.mystery-blur-2 { filter: blur(10px); }
+.mystery-blur-1 { filter: blur(4px); }
+.mystery-blur-0 { filter: blur(0); }
+.mystery-clues { padding: 16px 24px; }
+.mystery-clue-item {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 9px 0; border-bottom: 1px solid var(--beige);
+  font-size: .85rem;
+}
+.mystery-clue-item:last-child { border-bottom: none; }
+.mystery-clue-num {
+  width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+  background: var(--beige-dark); display: flex; align-items: center;
+  justify-content: center; font-size: .7rem; font-weight: 700;
+}
+.mystery-clue-num.revealed { background: var(--blue); color: var(--white); }
+.mystery-clue-text { color: var(--text-soft); }
+.mystery-clue-text.revealed { color: var(--text); font-weight: 600; }
+.mystery-guess-row {
+  padding: 0 24px 20px; display: flex; gap: 8px;
+}
+.mystery-input {
+  flex: 1; padding: 10px 14px; border-radius: var(--radius-md);
+  border: 2px solid var(--beige-dark); background: var(--beige-pale);
+  font-size: .9rem; font-family: var(--font); color: var(--text);
+  transition: border-color var(--transition);
+}
+.mystery-input:focus { outline: none; border-color: var(--blue); background: var(--white); }
+.mystery-input.success { border-color: var(--green-soft); background: rgba(125,180,154,.08); }
+/* Défi du jour */
+.defi-card {
+  background: linear-gradient(135deg, var(--coral-light), var(--coral));
+  border-radius: var(--radius-lg); padding: 24px;
+  color: var(--white); box-shadow: 0 6px 24px rgba(224,122,95,.3);
+}
+.defi-countdown {
+  display: flex; gap: 8px; margin-top: 16px;
+}
+.countdown-unit {
+  background: rgba(255,255,255,.2); border-radius: var(--radius-sm);
+  padding: 8px 12px; text-align: center; min-width: 50px;
+}
+.countdown-num { font-size: 1.3rem; font-weight: 900; line-height: 1; }
+.countdown-lbl { font-size: .65rem; opacity: .75; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+/* Daily streak */
+.streak-card {
+  background: linear-gradient(135deg, #2E1A5C, #4A2D8A);
+  border-radius: var(--radius-lg); padding: 22px;
+  color: var(--white); box-shadow: 0 4px 20px rgba(46,26,92,.25);
+}
+.streak-flames { display: flex; gap: 4px; margin-top: 14px; flex-wrap: wrap; }
+.streak-day {
+  width: 28px; height: 28px; border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .8rem; background: rgba(255,255,255,.1);
+}
+.streak-day.on { background: var(--amber); }
+.streak-day.today { background: var(--coral); box-shadow: 0 0 0 2px rgba(255,255,255,.4); }
+/* ============================================================
+   POINTS & ACTIONS UNIVERSE
+   ============================================================ */
+#points-actions { background: var(--beige-pale); }
+.points-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;
+  margin-bottom: 40px;
+}
+.points-category {
+  background: var(--white); border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow); overflow: hidden;
+}
+.points-cat-header {
+  padding: 16px 20px; display: flex; align-items: center; gap: 10px;
+  border-bottom: 1px solid var(--beige);
+}
+.points-cat-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+  flex-shrink: 0;
+}
+.points-actions-list { padding: 8px 0; }
+.points-action-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 9px 20px;
+  transition: background var(--transition);
+}
+.points-action-item:hover { background: var(--beige-pale); }
+.pa-icon { font-size: 1.1rem; flex-shrink: 0; }
+.pa-label { flex: 1; font-size: .85rem; font-weight: 600; color: var(--text-mid); }
+.pa-xp {
+  font-size: .8rem; font-weight: 800;
+  color: var(--amber); white-space: nowrap;
+  background: rgba(212,168,67,.1); padding: 2px 8px; border-radius: 99px;
+}
+.pa-badge { font-size: .72rem; color: var(--text-soft); white-space: nowrap; }
+/* Live XP counter banner */
+.xp-counter-banner {
+  background: linear-gradient(135deg, var(--blue-dark), var(--blue));
+  border-radius: var(--radius-lg); padding: 28px 32px;
+  color: var(--white); margin-bottom: 28px;
+  display: flex; align-items: center; gap: 32px; flex-wrap: wrap;
+}
+.xp-counter-num {
+  font-size: 3rem; font-weight: 900; letter-spacing: -.04em;
+  line-height: 1; transition: color .3s;
+}
+.xp-counter-sub { font-size: .85rem; opacity: .7; margin-top: 2px; }
+.xp-actions-demo {
+  display: flex; flex-wrap: wrap; gap: 8px; flex: 1; justify-content: flex-end;
+}
+.xp-action-btn {
+  padding: 8px 14px; border-radius: 99px;
+  background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25);
+  color: var(--white); font-size: .82rem; font-weight: 700;
+  cursor: pointer; transition: background var(--transition), transform .15s;
+  display: flex; align-items: center; gap: 5px;
+}
+.xp-action-btn:hover { background: rgba(255,255,255,.28); transform: scale(1.04); }
+.xp-action-btn:active { transform: scale(.97); }
+/* Toast XP notification */
+.xp-toast-container {
+  position: fixed; bottom: 28px; right: 28px; z-index: 300;
+  display: flex; flex-direction: column-reverse; gap: 10px;
+  pointer-events: none;
+}
+.xp-toast {
+  background: var(--text); color: var(--white);
+  padding: 12px 18px; border-radius: var(--radius-md);
+  box-shadow: 0 6px 24px rgba(42,37,32,.22);
+  display: flex; align-items: center; gap: 10px;
+  font-size: .88rem; font-weight: 600;
+  animation: toast-in .35s cubic-bezier(.4,0,.2,1) both;
+  max-width: 280px;
+}
+.xp-toast-amount {
+  font-size: 1rem; font-weight: 900; color: var(--amber); white-space: nowrap;
+}
+.xp-toast-badge {
+  display: inline-block; background: var(--blue); color: var(--white);
+  font-size: .7rem; font-weight: 700; padding: 2px 7px; border-radius: 99px; margin-left: 4px;
+}
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(20px) scale(.95); }
+  to   { opacity: 1; transform: translateX(0) scale(1); }
+}
+@keyframes toast-out {
+  from { opacity: 1; transform: translateX(0); max-height: 80px; margin-top: 0; }
+  to   { opacity: 0; transform: translateX(20px); max-height: 0; margin-top: -10px; }
+}
+.xp-toast.removing {
+  animation: toast-out .3s ease both;
+}
+/* Badge unlock celebration */
+.badge-unlock-toast {
+  background: linear-gradient(135deg, var(--blue-dark), var(--blue));
+  border-left: 4px solid var(--amber);
+}
+/* ============================================================
+   RESPONSIVE additions for new sections
+   ============================================================ */
+@media (max-width: 768px) {
+  .games-intro-grid { grid-template-columns: repeat(2, 1fr); }
+  .quiz-featured { grid-template-columns: 1fr; }
+  .points-grid { grid-template-columns: 1fr; }
+  .xp-counter-banner { flex-direction: column; align-items: flex-start; }
+  .xp-actions-demo { justify-content: flex-start; }
+}
+@media (max-width: 480px) {
+  .games-intro-grid { grid-template-columns: 1fr; }
+  .xp-toast-container { right: 16px; bottom: 16px; }
+}
+/* Blue decorative lines on some cards */
+.blue-accent-top { border-top: 3px solid var(--blue); }
+.coral-accent-top { border-top: 3px solid var(--coral); }
+/* Blue stat highlight */
+.stat-blue .stat-box-num { color: var(--blue); }
+/* Hero stat blue */
+.hero-stat-blue .hero-stat-num { color: var(--blue); }
+
+/* ============================================================
+   PROFILE MODAL
+   ============================================================ */
+.profile-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(42,37,32,.45);
+  backdrop-filter: blur(6px);
+  display: flex; align-items: flex-end;
+  opacity: 0; pointer-events: none;
+  transition: opacity .3s ease;
+}
+.profile-overlay.open {
+  opacity: 1; pointer-events: all;
+}
+.profile-modal {
+  background: var(--beige-pale);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  width: 100%; max-width: 780px;
+  margin: 0 auto;
+  max-height: 92vh;
+  overflow-y: auto;
+  transform: translateY(100%);
+  transition: transform .4s cubic-bezier(.4,0,.2,1);
+  box-shadow: 0 -8px 40px rgba(42,37,32,.18);
+}
+.profile-overlay.open .profile-modal {
+  transform: translateY(0);
+}
+/* desktop: centered modal */
+@media (min-width: 769px) {
+  .profile-overlay {
+    align-items: center;
+    padding: 24px;
+  }
+  .profile-modal {
+    border-radius: var(--radius-xl);
+    transform: translateY(24px) scale(.97);
+    max-height: 88vh;
+  }
+  .profile-overlay.open .profile-modal {
+    transform: translateY(0) scale(1);
+  }
+}
+.modal-close {
+  position: absolute; top: 16px; right: 16px;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(255,255,255,.25);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; cursor: pointer; z-index: 10;
+  transition: background var(--transition);
+}
+.modal-close:hover { background: rgba(255,255,255,.4); }
+
+/* Profile modal header */
+.pm-header {
+  background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue) 60%, var(--blue-light) 100%);
+  padding: 36px 28px 28px;
+  position: relative;
+  overflow: hidden;
+}
+.pm-header::before {
+  content: '';
+  position: absolute; top: -60px; right: -60px;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: rgba(255,255,255,.07);
+}
+.pm-header::after {
+  content: '';
+  position: absolute; bottom: -40px; left: -30px;
+  width: 150px; height: 150px; border-radius: 50%;
+  background: rgba(255,255,255,.05);
+}
+.pm-avatar-ring {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: rgba(255,255,255,.2);
+  border: 3px solid rgba(255,255,255,.5);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.2rem; margin-bottom: 14px;
+  position: relative; z-index: 1;
+}
+.pm-level-badge {
+  position: absolute; bottom: -2px; right: -2px;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--amber); border: 2px solid var(--white);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .7rem; font-weight: 900; color: var(--white);
+}
+.pm-name { color: var(--white); font-size: 1.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 6px; position: relative; z-index: 1; }
+.pm-title {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.3);
+  padding: 4px 12px; border-radius: 99px;
+  color: rgba(255,255,255,.9); font-size: .82rem; font-weight: 700;
+  margin-bottom: 12px; position: relative; z-index: 1;
+}
+.pm-tribe {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,.12);
+  padding: 3px 10px; border-radius: 99px;
+  color: rgba(255,255,255,.8); font-size: .78rem; font-weight: 600;
+  position: relative; z-index: 1;
+}
+.pm-xp-section { margin-top: 20px; position: relative; z-index: 1; }
+.pm-xp-label { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.pm-xp-label span { font-size: .78rem; color: rgba(255,255,255,.7); font-weight: 600; }
+.pm-xp-label strong { font-size: .82rem; color: rgba(255,255,255,.95); }
+.pm-progress-track { height: 7px; background: rgba(255,255,255,.2); border-radius: 99px; overflow: hidden; }
+.pm-progress-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, rgba(255,255,255,.7), var(--white)); width: 0; transition: width 1.2s cubic-bezier(.4,0,.2,1); }
+
+/* Profile modal stats strip */
+.pm-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  background: var(--white);
+  border-bottom: 1px solid var(--beige);
+}
+.pm-stat {
+  padding: 18px 12px; text-align: center;
+  border-right: 1px solid var(--beige);
+}
+.pm-stat:last-child { border-right: none; }
+.pm-stat-num { font-size: 1.4rem; font-weight: 800; line-height: 1; }
+.pm-stat-lbl { font-size: .72rem; color: var(--text-soft); margin-top: 4px; font-weight: 600; }
+.pm-stat-coral .pm-stat-num { color: var(--coral); }
+.pm-stat-blue  .pm-stat-num { color: var(--blue); }
+.pm-stat-green .pm-stat-num { color: var(--green-soft); }
+.pm-stat-amber .pm-stat-num { color: var(--amber); }
+
+/* Profile modal tabs */
+.pm-tabs {
+  display: flex; gap: 0;
+  background: var(--white);
+  border-bottom: 2px solid var(--beige);
+  padding: 0 24px;
+}
+.pm-tab {
+  padding: 14px 18px; font-size: .9rem; font-weight: 700; color: var(--text-soft);
+  border-bottom: 2px solid transparent; margin-bottom: -2px;
+  cursor: pointer; transition: color var(--transition), border-color var(--transition);
+  white-space: nowrap;
+}
+.pm-tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+.pm-tab:hover:not(.active) { color: var(--text); }
+
+/* Profile modal body */
+.pm-body { padding: 28px; }
+.pm-tab-content { display: none; }
+.pm-tab-content.active { display: block; }
+
+/* Progression tab */
+.pm-level-road {
+  display: flex; flex-direction: column; gap: 0;
+  position: relative;
+}
+.pm-level-road::before {
+  content: ''; position: absolute; left: 22px; top: 0; bottom: 0;
+  width: 2px; background: var(--beige-dark);
+}
+.pm-level-item {
+  display: flex; gap: 16px; align-items: flex-start;
+  padding: 14px 0; position: relative;
+}
+.pm-level-dot {
+  width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; position: relative; z-index: 1;
+  border: 2px solid transparent;
+}
+.pm-level-dot.done    { background: var(--green-soft); border-color: var(--green-soft); }
+.pm-level-dot.current { background: var(--blue); border-color: var(--blue); box-shadow: 0 0 0 4px rgba(59,138,181,.2); }
+.pm-level-dot.locked  { background: var(--beige-dark); opacity: .5; }
+.pm-level-info { flex: 1; padding-top: 4px; }
+.pm-level-name { font-weight: 700; font-size: .95rem; }
+.pm-level-range { font-size: .75rem; color: var(--text-soft); margin-bottom: 6px; }
+.pm-level-bar-wrap { margin-top: 4px; }
+
+/* Missions tab */
+.pm-missions-list { display: flex; flex-direction: column; gap: 10px; }
+.pm-mission-item {
+  display: flex; gap: 12px; align-items: center;
+  background: var(--white); border-radius: var(--radius-md);
+  padding: 12px 14px; box-shadow: var(--card-shadow);
+}
+.pm-mission-icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: var(--beige); display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; flex-shrink: 0;
+}
+.pm-mission-meta { flex: 1; min-width: 0; }
+.pm-mission-name { font-weight: 700; font-size: .88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pm-mission-sub  { font-size: .75rem; color: var(--text-soft); }
+
+/* Badges tab */
+.pm-badges-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 14px;
+}
+.pm-badge {
+  background: var(--white); border-radius: var(--radius-md);
+  padding: 18px 12px; text-align: center; box-shadow: var(--card-shadow);
+}
+.pm-badge-icon { font-size: 1.8rem; margin-bottom: 8px; }
+.pm-badge-name { font-size: .8rem; font-weight: 700; }
+.pm-badge-xp   { font-size: .72rem; color: var(--amber); margin-top: 4px; font-weight: 600; }
+.pm-badge.locked { opacity: .4; filter: saturate(.2); }
+
+/* Activity tab */
+.pm-activity-list { display: flex; flex-direction: column; gap: 8px; }
+.pm-activity-item {
+  display: flex; gap: 12px; align-items: center;
+  padding: 10px 14px; background: var(--white);
+  border-radius: var(--radius-md); box-shadow: var(--card-shadow);
+}
+.pm-activity-dot {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+.pm-activity-xp { margin-left: auto; font-size: .82rem; font-weight: 700; color: var(--amber); white-space: nowrap; }
+
+@media (max-width: 480px) {
+  .pm-stats { grid-template-columns: repeat(2, 1fr); }
+  .pm-stats .pm-stat:nth-child(2) { border-right: none; }
+  .pm-tabs { padding: 0 12px; gap: 0; overflow-x: auto; }
+  .pm-tab { padding: 12px 12px; font-size: .82rem; }
+  .pm-body { padding: 20px 16px; }
+  .pm-header { padding: 28px 20px 22px; }
+  .pm-badges-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     NAVIGATION
+     ============================================================ -->
+<nav class="nav" id="mainNav">
+  <div class="nav-inner">
+    <a href="#hero" class="nav-logo">
+      <div class="nav-logo-mark">
+        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10 2L13 7H17L13.5 10.5L15 16L10 13L5 16L6.5 10.5L3 7H7L10 2Z" fill="white"/>
+        </svg>
+      </div>
+      <span class="nav-logo-text">mi<span>ka</span></span>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="#hero"           class="nav-link active">Accueil</a></li>
+      <li><a href="#tribus"         class="nav-link">Tribus</a></li>
+      <li><a href="#jeux"           class="nav-link">Jeux</a></li>
+      <li><a href="#missions"       class="nav-link">Missions</a></li>
+      <li><a href="#badges"         class="nav-link">Badges</a></li>
+      <li><a href="#points-actions" class="nav-link">Points</a></li>
+      <li><a href="#classement"     class="nav-link">Classement</a></li>
+    </ul>
+
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="nav-link-profile" id="openProfile" aria-label="Mon profil">
+        Mon profil
+        <div class="nav-profile-avatar">🧭</div>
+      </button>
+      <a href="#rejoindre" class="btn btn-coral btn-sm nav-cta">Rejoindre</a>
+    </div>
+
+    <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#hero"           class="nav-link" onclick="closeMobile()">Accueil</a>
+  <a href="#tribus"         class="nav-link" onclick="closeMobile()">Tribus</a>
+  <a href="#jeux"           class="nav-link" onclick="closeMobile()">🎮 Jeux</a>
+  <a href="#missions"       class="nav-link" onclick="closeMobile()">Missions</a>
+  <a href="#badges"         class="nav-link" onclick="closeMobile()">Badges</a>
+  <a href="#points-actions" class="nav-link" onclick="closeMobile()">⭐ Points</a>
+  <a href="#classement"     class="nav-link" onclick="closeMobile()">Classement</a>
+  <button class="btn btn-blue" id="openProfileMobile" style="width:100%;justify-content:center" onclick="closeMobile()">🧭 Mon profil</button>
+  <a href="#rejoindre"  class="btn btn-coral" onclick="closeMobile()">Rejoindre l'aventure</a>
+</div>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<section id="hero">
+  <div class="hero-bg-shape"></div>
+  <div class="hero-bg-shape2"></div>
+  <div class="container">
+    <div class="hero-grid">
+
+      <div class="hero-text">
+        <div class="eyebrow animate-in">🌿 Vendée · Communauté locale</div>
+        <h1 class="t-hero hero-title animate-in delay-1">
+          L'aventure<br>collective<br><em>commence ici.</em>
+        </h1>
+        <p class="hero-desc animate-in delay-2">
+          Explorez votre territoire, relevez des défis, rejoignez une tribu et construisez ensemble la mémoire vivante de votre région.
+        </p>
+        <div class="hero-actions animate-in delay-3">
+          <a href="#rejoindre" class="btn btn-coral btn-lg">Rejoindre l'aventure</a>
+          <a href="#missions"  class="btn btn-outline btn-lg">Voir les missions</a>
+        </div>
+        <div class="hero-stats animate-in delay-4">
+          <div>
+            <div class="hero-stat-num t-coral">1 240</div>
+            <div class="hero-stat-label t-xs">aventuriers</div>
+          </div>
+          <div>
+            <div class="hero-stat-num t-blue">3</div>
+            <div class="hero-stat-label t-xs">tribus actives</div>
+          </div>
+          <div>
+            <div class="hero-stat-num t-coral">87</div>
+            <div class="hero-stat-label t-xs">missions créées</div>
+          </div>
+          <div>
+            <div class="hero-stat-num t-blue">14k</div>
+            <div class="hero-stat-label t-xs">points distribués</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- floating cards (desktop only) -->
+      <div class="hero-visual animate-in delay-2">
+        <div class="hero-card-float">
+          <div class="t-xs t-soft mb-8">Tribu active</div>
+          <div class="tribe-chip tribe-littoral mb-12">🌊 Littoral</div>
+          <div class="t-h3 mb-8">Sophie M.</div>
+          <div class="t-small t-soft">Niveau 7 · Grand Pisteur</div>
+          <button onclick="openProfileModal()" style="margin-top:12px;font-size:.78rem;font-weight:700;color:var(--blue);background:rgba(59,138,181,.09);border:1px solid rgba(59,138,181,.2);padding:5px 12px;border-radius:99px;cursor:pointer;">Voir mon profil →</button>
+          <div class="xp-section" style="margin-top:14px;margin-bottom:0">
+            <div class="xp-header">
+              <span class="t-xs t-soft">XP</span>
+              <span class="xp-num">3 400 / 4 000</span>
+            </div>
+            <div class="progress-track"><div class="progress-fill" style="width:85%"></div></div>
+          </div>
+        </div>
+
+        <div class="hero-card-float">
+          <div class="t-xs t-soft mb-12">Mission en cours</div>
+          <div class="t-h3 mb-8" style="font-size:.95rem">🔍 Chasse aux indices</div>
+          <div class="t-small t-soft mb-12">La Roche-sur-Yon · Étape 3/5</div>
+          <div class="progress-track"><div class="progress-fill" style="width:60%"></div></div>
+          <div class="flex items-center gap-8 mt-8">
+            <span class="status-chip chip-active">En cours</span>
+            <span class="mission-xp">+180 XP</span>
+          </div>
+        </div>
+
+        <div class="hero-card-float" style="padding:16px 18px">
+          <div class="flex items-center justify-between mb-12">
+            <div class="t-xs t-soft">Badges débloqués</div>
+            <div class="t-small t-coral" style="font-weight:700">6 / 12</div>
+          </div>
+          <div class="badge-mini-row">
+            <div class="badge-mini unlocked" title="Premier Pas">👣</div>
+            <div class="badge-mini unlocked" title="Explorateur">🧭</div>
+            <div class="badge-mini unlocked" title="Littoral">🌊</div>
+            <div class="badge-mini unlocked" title="Photo">📸</div>
+            <div class="badge-mini unlocked" title="Quiz">🎓</div>
+            <div class="badge-mini unlocked" title="Mémoire">📜</div>
+            <div class="badge-mini locked">🏆</div>
+            <div class="badge-mini locked">⚔️</div>
+            <div class="badge-mini locked">🌿</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     TRIBUS
+     ============================================================ -->
+<section id="tribus" class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="eyebrow">Les tribus</div>
+      <h2 class="t-h1 mb-16">Trois territoires,<br>une seule aventure.</h2>
+      <p class="t-body t-mid" style="max-width:520px">Chaque tribu incarne un territoire vendéen, ses paysages, ses histoires, son âme. Choisissez votre clan ou laissez-vous guider.</p>
+    </div>
+
+    <div class="tribe-cards">
+
+      <!-- Tribu du Littoral -->
+      <div class="tribe-card tribe-littoral-card reveal">
+        <div class="tribe-card-header">
+          <div class="tribe-icon-wrap">🌊</div>
+          <div class="tribe-chip tribe-littoral mb-8">Tribu du Littoral</div>
+          <h3 class="t-h2" style="font-size:1.3rem;margin-bottom:8px">Là où la terre<br>rencontre l'océan</h3>
+          <p class="t-small t-mid" style="line-height:1.6">Dunes, marais salants, îles et ports de pêche. Ceux du Littoral aiment l'horizon, les embruns et les histoires de mer.</p>
+        </div>
+        <div class="tribe-card-body">
+          <div class="tribe-members-row">
+            <div class="member-avatars">
+              <div class="member-avatar av-2">S</div>
+              <div class="member-avatar av-5">L</div>
+              <div class="member-avatar av-1">M</div>
+              <div class="member-avatar av-3">J</div>
+            </div>
+            <span class="t-small t-soft">+ 438 membres</span>
+          </div>
+          <div class="tribe-score">
+            <span>⭐</span> 12 840 points collectifs
+          </div>
+          <a href="#rejoindre" class="btn btn-blue btn-sm mt-16" style="display:inline-flex">Rejoindre →</a>
+        </div>
+      </div>
+
+      <!-- Tribu du Bocage -->
+      <div class="tribe-card tribe-bocage-card reveal delay-1">
+        <div class="tribe-card-header">
+          <div class="tribe-icon-wrap">🌿</div>
+          <div class="tribe-chip tribe-bocage mb-8">Tribu du Bocage</div>
+          <h3 class="t-h2" style="font-size:1.3rem;margin-bottom:8px">Haies, forêts<br>et chemins creux</h3>
+          <p class="t-small t-mid" style="line-height:1.6">Bocage vendéen, villages de granit, traditions rurales vivaces. La tribu du Bocage creuse la mémoire des campagnes.</p>
+        </div>
+        <div class="tribe-card-body">
+          <div class="tribe-members-row">
+            <div class="member-avatars">
+              <div class="member-avatar av-3">P</div>
+              <div class="member-avatar av-4">A</div>
+              <div class="member-avatar av-1">C</div>
+              <div class="member-avatar av-2">R</div>
+            </div>
+            <span class="t-small t-soft">+ 392 membres</span>
+          </div>
+          <div class="tribe-score">
+            <span>⭐</span> 10 210 points collectifs
+          </div>
+          <a href="#rejoindre" class="btn btn-sm mt-16" style="display:inline-flex;background:var(--green-soft);color:white;border-radius:99px;padding:8px 18px;font-weight:700;">Rejoindre →</a>
+        </div>
+      </div>
+
+      <!-- Tribu du Marais -->
+      <div class="tribe-card tribe-marais-card reveal delay-2">
+        <div class="tribe-card-header">
+          <div class="tribe-icon-wrap">🦆</div>
+          <div class="tribe-chip tribe-marais mb-8">Tribu du Marais</div>
+          <h3 class="t-h2" style="font-size:1.3rem;margin-bottom:8px">Canaux, roseaux<br>et ciel immense</h3>
+          <p class="t-small t-mid" style="line-height:1.6">Le Marais poitevin, les îles flottantes, les passages secrets. La tribu du Marais veille sur les eaux tranquilles et les savoirs cachés.</p>
+        </div>
+        <div class="tribe-card-body">
+          <div class="tribe-members-row">
+            <div class="member-avatars">
+              <div class="member-avatar av-4">N</div>
+              <div class="member-avatar av-1">E</div>
+              <div class="member-avatar av-5">V</div>
+              <div class="member-avatar av-3">T</div>
+            </div>
+            <span class="t-small t-soft">+ 410 membres</span>
+          </div>
+          <div class="tribe-score">
+            <span>⭐</span> 11 560 points collectifs
+          </div>
+          <a href="#rejoindre" class="btn btn-sm mt-16" style="display:inline-flex;background:var(--amber);color:white;border-radius:99px;padding:8px 18px;font-weight:700;">Rejoindre →</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PROFIL / GAMIFICATION
+     ============================================================ -->
+<section id="profil" class="section">
+  <div class="container">
+    <div class="section-header reveal t-center">
+      <div class="eyebrow" style="justify-content:center">Votre profil</div>
+      <h2 class="t-h1 mb-16">Progressez, explorez,<br>montez en légende.</h2>
+    </div>
+
+    <div class="profile-grid reveal">
+
+      <!-- Left: profile card -->
+      <div class="profile-card">
+        <div class="flex items-center gap-16 mb-20">
+          <div class="level-badge-wrap">
+            <div class="profile-avatar-ring">🧭</div>
+            <div class="level-badge">7</div>
+          </div>
+          <div>
+            <div class="t-h3" style="font-size:1.1rem">Sophie Martin</div>
+            <div class="tribe-chip tribe-littoral" style="margin-top:5px;font-size:.75rem">🌊 Tribu du Littoral</div>
+          </div>
+        </div>
+
+        <div class="pill pill-amber mb-16" style="display:inline-flex">🏅 Grand Pisteur</div>
+
+        <div class="xp-section">
+          <div class="xp-header">
+            <span class="t-xs t-soft">Niveau 7 → 8</span>
+            <span class="xp-num">3 400 / 4 000 XP</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" data-width="85"></div>
+          </div>
+          <div class="t-xs t-soft mt-8">600 XP avant le prochain niveau</div>
+        </div>
+
+        <div class="missions-mini-list">
+          <div class="t-xs t-soft mb-8">Missions en cours</div>
+          <div class="mission-mini-item">
+            <div class="mission-status-dot dot-active"></div>
+            <div style="flex:1">
+              <div class="t-small" style="font-weight:600">Chasse aux indices — Étape 3/5</div>
+              <div class="t-xs t-soft">+180 XP à la clé</div>
+            </div>
+            <div class="mission-xp">60%</div>
+          </div>
+          <div class="mission-mini-item">
+            <div class="mission-status-dot dot-active"></div>
+            <div style="flex:1">
+              <div class="t-small" style="font-weight:600">Défi Photo : La marée basse</div>
+              <div class="t-xs t-soft">+120 XP à la clé</div>
+            </div>
+            <div class="mission-xp">40%</div>
+          </div>
+          <div class="mission-mini-item">
+            <div class="mission-status-dot dot-todo"></div>
+            <div style="flex:1">
+              <div class="t-small" style="font-weight:600">Quiz : Légendes du Littoral</div>
+              <div class="t-xs t-soft">+90 XP à la clé</div>
+            </div>
+            <div class="pill pill-beige" style="font-size:.7rem">À faire</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: stats + activity -->
+      <div class="profile-right-grid">
+
+        <div class="stats-row">
+          <div class="stat-box coral-accent-top">
+            <div class="stat-box-num t-coral">3 400</div>
+            <div class="stat-box-label">Points XP</div>
+          </div>
+          <div class="stat-box blue-accent-top">
+            <div class="stat-box-num t-blue">6</div>
+            <div class="stat-box-label">Badges obtenus</div>
+          </div>
+          <div class="stat-box" style="border-top:3px solid var(--green-soft)">
+            <div class="stat-box-num" style="color:var(--green-soft)">14</div>
+            <div class="stat-box-label">Missions terminées</div>
+          </div>
+        </div>
+
+        <!-- Progression niveaux -->
+        <div class="card">
+          <div class="t-h3 mb-16">Niveaux de progression</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div>
+              <div class="flex items-center justify-between mb-8">
+                <span class="t-small" style="font-weight:600">👣 Néophyte</span>
+                <span class="t-xs t-soft">Niv. 1-2 · Terminé</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill green" data-width="100"></div></div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-8">
+                <span class="t-small" style="font-weight:600">🧭 Explorateur</span>
+                <span class="t-xs t-soft">Niv. 3-5 · Terminé</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill green" data-width="100"></div></div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-8">
+                <span class="t-small" style="font-weight:600">🏅 Grand Pisteur</span>
+                <span class="t-xs t-soft">Niv. 6-8 · En cours</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" data-width="60"></div></div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-8">
+                <span class="t-small" style="font-weight:600;opacity:.45">🌟 Mémoire Vivante</span>
+                <span class="t-xs t-soft" style="opacity:.4">Niv. 9-11 · Verrouillé</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" data-width="0"></div></div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-8">
+                <span class="t-small" style="font-weight:600;opacity:.3">⚔️ Gardien Légendaire</span>
+                <span class="t-xs t-soft" style="opacity:.3">Niv. 12 · Verrouillé</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" data-width="0"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activité récente -->
+        <div>
+          <div class="t-h3 mb-12">Activité récente</div>
+          <div class="recent-activity-list">
+            <div class="activity-item">
+              <div class="activity-icon activity-green">✅</div>
+              <div>
+                <div class="t-small" style="font-weight:600">Mission validée</div>
+                <div class="t-xs t-soft">Quiz Bocage — il y a 2h</div>
+              </div>
+              <div class="activity-xp">+90 XP</div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon activity-amber">🏅</div>
+              <div>
+                <div class="t-small" style="font-weight:600">Badge débloqué</div>
+                <div class="t-xs t-soft">Explorateur du Littoral — hier</div>
+              </div>
+              <div class="activity-xp">+150 XP</div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon activity-coral">📸</div>
+              <div>
+                <div class="t-small" style="font-weight:600">Photo soumise</div>
+                <div class="t-xs t-soft">Défi coucher de soleil — il y a 3j</div>
+              </div>
+              <div class="activity-xp">+60 XP</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     MISSIONS
+     ============================================================ -->
+<section id="missions" class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="eyebrow">Missions</div>
+      <h2 class="t-h1 mb-16">87 aventures<br>vous attendent.</h2>
+      <p class="t-body t-mid" style="max-width:500px">De la découverte douce à la chasse intense — chaque mission rapproche la communauté de son territoire.</p>
+    </div>
+
+    <div class="missions-tabs reveal">
+      <button class="missions-tab active" data-filter="all">Toutes</button>
+      <button class="missions-tab" data-filter="decouverte">🗺️ Découverte</button>
+      <button class="missions-tab" data-filter="photo">📸 Photo</button>
+      <button class="missions-tab" data-filter="quiz">🎓 Quiz</button>
+      <button class="missions-tab" data-filter="chasse">🔍 Chasse</button>
+      <button class="missions-tab" data-filter="communaute">🤝 Communauté</button>
+    </div>
+
+    <div class="missions-grid" id="missionsGrid">
+
+      <div class="mission-card reveal" data-category="chasse">
+        <div class="mission-card-top status-active">
+          <div class="mission-type-icon">🔍</div>
+          <div class="pill pill-coral mb-8">Chasse aux indices</div>
+          <h3 class="t-h3" style="font-size:1rem;margin-bottom:6px">Les secrets du vieux port</h3>
+          <p class="t-small t-soft">5 indices cachés dans Les Sables-d'Olonne. Partez sur les traces des marins du XIXe.</p>
+        </div>
+        <div class="mission-card-bottom">
+          <div class="flex items-center justify-between">
+            <span class="tribe-chip tribe-littoral" style="font-size:.72rem">🌊 Littoral</span>
+            <span class="mission-xp">⭐ +180 XP</span>
+          </div>
+          <div class="progress-track mt-8 mb-8">
+            <div class="progress-fill" data-width="60"></div>
+          </div>
+          <div class="mission-status-row">
+            <span class="status-chip chip-active">● En cours (3/5)</span>
+            <a href="#" class="btn btn-coral btn-sm" style="padding:6px 14px;font-size:.8rem">Continuer</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="mission-card reveal delay-1" data-category="photo">
+        <div class="mission-card-top status-todo">
+          <div class="mission-type-icon">📸</div>
+          <div class="pill pill-beige mb-8">Défi Photo</div>
+          <h3 class="t-h3" style="font-size:1rem;margin-bottom:6px">La marée basse en 5 clichés</h3>
+          <p class="t-small t-soft">Capturez la vie révélée à marée basse. Coquillages, poulpes et reflets d'or.</p>
+        </div>
+        <div class="mission-card-bottom">
+          <div class="flex items-center justify-between">
+            <span class="tribe-chip tribe-littoral" style="font-size:.72rem">🌊 Littoral</span>
+            <span class="mission-xp">⭐ +120 XP</span>
+          </div>
+          <div class="mission-status-row" style="margin-top:14px">
+            <span class="status-chip chip-todo">○ À faire</span>
+            <a href="#rejoindre" class="btn btn-outline btn-sm" style="padding:6px 14px;font-size:.8rem">Démarrer</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="mission-card reveal delay-2" data-category="quiz">
+        <div class="mission-card-top status-done">
+          <div class="mission-type-icon">🎓</div>
+          <div class="pill pill-green mb-8">Quiz Local</div>
+          <h3 class="t-h3" style="font-size:1rem;margin-bottom:6px">Légendes du Bocage</h3>
+          <p class="t-small t-soft">10 questions sur les contes et légendes rurales de Vendée. Testez vos connaissances !</p>
+        </div>
+        <div class="mission-card-bottom">
+          <div class="flex items-center justify-between">
+            <span class="tribe-chip tribe-bocage" style="font-size:.72rem">🌿 Bocage</span>
+            <span class="mission-xp">⭐ +90 XP</span>
+          </div>
+          <div class="mission-status-row" style="margin-top:14px">
+            <span class="status-chip chip-done">✓ Validée · 8/10</span>
+            <span class="t-xs t-soft">Score : 80%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mission-card reveal" data-category="decouverte">
+        <div class="mission-card-top status-todo">
+          <div class="mission-type-icon">🗺️</div>
+          <div class="pill pill-beige mb-8">Découverte</div>
+          <h3 class="t-h3" style="font-size:1rem;margin-bottom:6px">Itinéraire des moulins</h3>
+          <p class="t-small t-soft">Partez à pied sur les 7 moulins historiques de la plaine bocagère. Un circuit de 12 km.</p>
+        </div>
+        <div class="mission-card-bottom">
+          <div class="flex items-center justify-between">
+            <span class="tribe-chip tribe-bocage" style="font-size:.72rem">🌿 Bocage</span>
+            <span class="mission-xp">⭐ +200 XP</span>
+          </div>
+          <div class="mission-status-row" style="margin-top:14px">
+            <span class="status-chip chip-todo">○ À faire</span>
+            <a href="#rejoindre" class="btn btn-outline btn-sm" style="padding:6px 14px;font-size:.8rem">Démarrer</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="mission-card reveal delay-1" data-category="chasse">
+        <div class="mission-card-top status-todo">
+          <div class="mission-type-icon">🔍</div>
+          <div class="pill pill-amber mb-8">Chasse aux indices</div>
+          <h3 class="t-h3" style="font-size:1rem;margin-bottom:6px">Les yeux du Marais</h3>
+          <p class="t-small t-soft">Huit panneaux cachés le long des canaux du Marais Breton. Chaque planche révèle un mot.</p>
+        </div>
+        <div class="mission-card-bottom">
+          <div class="flex items-center justify-between">
+            <span class="tribe-chip tribe-marais" style="font-size:.72rem">🦆 Marais</span>
+            <span class="mission-xp">⭐ +240 XP</span>
+          </div>
+          <div class="mission-status-row" style="margin-top:14px">
+            <span class="status-chip chip-todo">○ À faire</span>
+            <a href="#rejoindre" class="btn btn-outline btn-sm" style="padding:6px 14px;font-size:.8rem">Démarrer</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="mission-card reveal delay-2" data-category="communaute">
+        <div class="mission-card-top status-active">
+          <div class="mission-type-icon">🤝</div>
+          <div class="pill pill-blue mb-8">Communauté</div>
+          <h3 class="t-h3" style="font-size:1rem;margin-bottom:6px">Collecte de témoignages</h3>
+          <p class="t-small t-soft">Recueillez 3 témoignages d'anciens habitants. Enregistrement audio ou texte accepté.</p>
+        </div>
+        <div class="mission-card-bottom">
+          <div class="flex items-center justify-between">
+            <span class="pill pill-blue" style="font-size:.7rem">Toutes tribus</span>
+            <span class="mission-xp">⭐ +160 XP</span>
+          </div>
+          <div class="progress-track mt-8 mb-8">
+            <div class="progress-fill blue" data-width="33"></div>
+          </div>
+          <div class="mission-status-row">
+            <span class="status-chip chip-active">● En cours (1/3)</span>
+            <a href="#" class="btn btn-blue btn-sm" style="padding:6px 14px;font-size:.8rem">Continuer</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     BADGES
+     ============================================================ -->
+<section id="badges" class="section">
+  <div class="container">
+    <div class="section-header reveal t-center">
+      <div class="eyebrow" style="justify-content:center">Badges & Honneurs</div>
+      <h2 class="t-h1 mb-16">Chaque geste mérite<br>une distinction.</h2>
+      <p class="t-body t-mid" style="max-width:500px;margin:0 auto">Les badges Mika ne se collectent pas — ils se méritent. Ils racontent votre aventure.</p>
+    </div>
+
+    <div class="badges-grid reveal">
+
+      <div class="badge-card badge-coral">
+        <div class="badge-icon-wrap">👣</div>
+        <div class="badge-name">Premier Pas</div>
+        <div class="badge-desc">Vous avez rejoint l'aventure</div>
+        <div class="badge-xp">+50 XP · Obtenu</div>
+      </div>
+
+      <div class="badge-card badge-blue">
+        <div class="badge-icon-wrap">🧭</div>
+        <div class="badge-name">Explorateur du Littoral</div>
+        <div class="badge-desc">5 missions côtières validées</div>
+        <div class="badge-xp">+150 XP · Obtenu</div>
+      </div>
+
+      <div class="badge-card badge-green">
+        <div class="badge-icon-wrap">🌿</div>
+        <div class="badge-name">Gardien du Bocage</div>
+        <div class="badge-desc">Protecteur des savoirs ruraux</div>
+        <div class="badge-xp">+200 XP · Obtenu</div>
+      </div>
+
+      <div class="badge-card badge-amber">
+        <div class="badge-icon-wrap">🦆</div>
+        <div class="badge-name">Œil du Marais</div>
+        <div class="badge-desc">3 missions marais réalisées</div>
+        <div class="badge-xp">+180 XP · Obtenu</div>
+      </div>
+
+      <div class="badge-card badge-purple">
+        <div class="badge-icon-wrap">📜</div>
+        <div class="badge-name">Mémoire Vivante</div>
+        <div class="badge-desc">10 témoignages collectés</div>
+        <div class="badge-xp">+300 XP · Obtenu</div>
+      </div>
+
+      <div class="badge-card badge-coral">
+        <div class="badge-icon-wrap">📸</div>
+        <div class="badge-name">Œil Vif</div>
+        <div class="badge-desc">15 photos de mission soumises</div>
+        <div class="badge-xp">+120 XP · Obtenu</div>
+      </div>
+
+      <div class="badge-card badge-amber locked">
+        <div class="badge-icon-wrap">🏆</div>
+        <div class="badge-name">Grand Pisteur</div>
+        <div class="badge-desc">Niveau 8 + 20 missions</div>
+        <div class="badge-xp">+400 XP · Verrouillé</div>
+      </div>
+
+      <div class="badge-card badge-blue locked">
+        <div class="badge-icon-wrap">⚓</div>
+        <div class="badge-name">Amiral</div>
+        <div class="badge-desc">Capitaine d'une tribu active</div>
+        <div class="badge-xp">+500 XP · Verrouillé</div>
+      </div>
+
+      <div class="badge-card badge-green locked">
+        <div class="badge-icon-wrap">🌱</div>
+        <div class="badge-name">Semeur</div>
+        <div class="badge-desc">5 nouveaux membres parrainés</div>
+        <div class="badge-xp">+250 XP · Verrouillé</div>
+      </div>
+
+      <div class="badge-card badge-purple locked">
+        <div class="badge-icon-wrap">⚔️</div>
+        <div class="badge-name">Champion de Tribu</div>
+        <div class="badge-desc">1er du classement mensuel</div>
+        <div class="badge-xp">+600 XP · Verrouillé</div>
+      </div>
+
+      <div class="badge-card badge-coral locked">
+        <div class="badge-icon-wrap">🌟</div>
+        <div class="badge-name">Légende Locale</div>
+        <div class="badge-desc">Niveau 12 atteint</div>
+        <div class="badge-xp">+1000 XP · Verrouillé</div>
+      </div>
+
+      <div class="badge-card badge-amber locked">
+        <div class="badge-icon-wrap">🗝️</div>
+        <div class="badge-name">Passeur de Secrets</div>
+        <div class="badge-desc">50 indices découverts</div>
+        <div class="badge-xp">+350 XP · Verrouillé</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     TERRITOIRE / CARTE
+     ============================================================ -->
+<section id="carte" class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="eyebrow eyebrow-blue">Territoire</div>
+      <h2 class="t-h1 mb-16">La Vendée comme<br>terrain de jeu infini.</h2>
+      <p class="t-body t-mid" style="max-width:500px">Chaque point lumineux est une mission, un lieu, une histoire à découvrir. Le territoire s'enrichit chaque semaine.</p>
+    </div>
+
+    <div class="map-container reveal">
+      <!-- SVG stylized Vendée-inspired territory map -->
+      <div class="map-svg-wrap">
+        <svg viewBox="0 0 700 480" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Carte du territoire Vendée">
+
+          <!-- Water background hint -->
+          <ellipse cx="60" cy="240" rx="80" ry="180" fill="#C8E4F0" opacity=".4"/>
+
+          <!-- Territory shapes (stylized) -->
+          <!-- Bocage (high inland) -->
+          <path d="M200 60 L420 40 L480 140 L440 220 L360 200 L280 230 L200 200 L160 130 Z"
+                fill="#C6DDD4" opacity=".6" stroke="#7DB49A" stroke-width="1.5"/>
+          <!-- Littoral (coastal) -->
+          <path d="M80 180 L200 200 L280 230 L260 360 L200 420 L120 400 L60 340 L40 260 Z"
+                fill="#C8E4F0" opacity=".65" stroke="#7AB8D4" stroke-width="1.5"/>
+          <!-- Marais (south-east) -->
+          <path d="M280 230 L440 220 L500 300 L480 400 L380 440 L260 420 L200 360 L260 300 Z"
+                fill="#E8D9A8" opacity=".55" stroke="#C8A84C" stroke-width="1.5"/>
+          <!-- Plain center -->
+          <path d="M200 200 L360 200 L440 220 L280 230 Z"
+                fill="#E8EFE0" opacity=".5"/>
+
+          <!-- Zone labels -->
+          <text x="290" y="130" font-family="system-ui,sans-serif" font-size="13" font-weight="700" fill="#3D7A62" opacity=".8">Bocage</text>
+          <text x="100" y="295" font-family="system-ui,sans-serif" font-size="13" font-weight="700" fill="#255F82" opacity=".8">Littoral</text>
+          <text x="350" y="340" font-family="system-ui,sans-serif" font-size="13" font-weight="700" fill="#9A7020" opacity=".8">Marais</text>
+
+          <!-- Ocean wave suggestion -->
+          <path d="M40 200 Q60 190 80 200 Q100 210 120 200" stroke="#7AB8D4" stroke-width="2" fill="none" opacity=".4"/>
+          <path d="M35 220 Q55 210 75 220 Q95 230 115 220" stroke="#7AB8D4" stroke-width="2" fill="none" opacity=".3"/>
+
+          <!-- Mission points — active (coral) -->
+          <!-- Point 1: Les Sables -->
+          <g>
+            <circle cx="110" cy="300" r="14" fill="rgba(224,122,95,.15)" class="map-pulse"/>
+            <circle cx="110" cy="300" r="7"  fill="var(--coral)" opacity=".9"/>
+            <circle cx="110" cy="300" r="3"  fill="white"/>
+          </g>
+          <!-- Point 2: Noirmoutier zone -->
+          <g>
+            <circle cx="70" cy="190" r="12" fill="rgba(224,122,95,.12)" class="map-pulse" style="animation-delay:.8s"/>
+            <circle cx="70" cy="190" r="6"  fill="var(--coral)" opacity=".85"/>
+            <circle cx="70" cy="190" r="2.5" fill="white"/>
+          </g>
+          <!-- Point 3: Bocage center -->
+          <g>
+            <circle cx="310" cy="130" r="12" fill="rgba(125,180,154,.18)" class="map-pulse" style="animation-delay:1.2s"/>
+            <circle cx="310" cy="130" r="6"  fill="var(--green-soft)" opacity=".9"/>
+            <circle cx="310" cy="130" r="2.5" fill="white"/>
+          </g>
+          <!-- Point 4: Marais -->
+          <g>
+            <circle cx="380" cy="360" r="13" fill="rgba(212,168,67,.18)" class="map-pulse" style="animation-delay:1.8s"/>
+            <circle cx="380" cy="360" r="7"  fill="var(--amber)" opacity=".9"/>
+            <circle cx="380" cy="360" r="3"  fill="white"/>
+          </g>
+          <!-- Point 5: La Roche-sur-Yon -->
+          <g>
+            <circle cx="260" cy="270" r="10" fill="rgba(59,138,181,.15)" class="map-pulse" style="animation-delay:.5s"/>
+            <circle cx="260" cy="270" r="5"  fill="var(--blue)" opacity=".9"/>
+            <circle cx="260" cy="270" r="2"  fill="white"/>
+          </g>
+          <!-- Point 6: South littoral -->
+          <g>
+            <circle cx="150" cy="390" r="9" fill="rgba(224,122,95,.1)" class="map-pulse" style="animation-delay:2.2s"/>
+            <circle cx="150" cy="390" r="5" fill="var(--coral-light)" opacity=".8"/>
+          </g>
+          <!-- Point 7: East Bocage -->
+          <g>
+            <circle cx="430" cy="100" r="9" fill="rgba(125,180,154,.15)" class="map-pulse" style="animation-delay:1s"/>
+            <circle cx="430" cy="100" r="5" fill="var(--green-soft)" opacity=".8"/>
+          </g>
+          <!-- Point 8: Marais canaux -->
+          <g>
+            <circle cx="450" cy="310" r="8" fill="rgba(212,168,67,.15)" class="map-pulse" style="animation-delay:1.6s"/>
+            <circle cx="450" cy="310" r="4.5" fill="var(--amber)" opacity=".75"/>
+          </g>
+
+          <!-- Paths / routes between points -->
+          <path d="M110 300 Q185 285 260 270" stroke="#E07A5F" stroke-width="1.5" stroke-dasharray="5 4" opacity=".4"/>
+          <path d="M260 270 Q285 200 310 130" stroke="#7DB49A" stroke-width="1.5" stroke-dasharray="5 4" opacity=".4"/>
+          <path d="M260 270 Q320 315 380 360" stroke="#D4A843" stroke-width="1.5" stroke-dasharray="5 4" opacity=".4"/>
+          <path d="M110 300 Q115 250 70 190"  stroke="#3B8AB5" stroke-width="1.5" stroke-dasharray="5 4" opacity=".35"/>
+
+          <!-- Compass hint -->
+          <g transform="translate(620,60)">
+            <circle cx="0" cy="0" r="26" fill="white" opacity=".7"/>
+            <text x="0" y="-13" text-anchor="middle" font-size="9" fill="#5C5248" font-weight="700">N</text>
+            <text x="0" y="17" text-anchor="middle" font-size="9" fill="#5C5248" font-weight="700">S</text>
+            <text x="-16" y="4" text-anchor="middle" font-size="9" fill="#5C5248" font-weight="700">O</text>
+            <text x="16" y="4" text-anchor="middle" font-size="9" fill="#5C5248" font-weight="700">E</text>
+            <path d="M0,-18 L3,-6 L0,0 L-3,-6 Z" fill="#E07A5F"/>
+            <path d="M0,18 L3,6 L0,0 L-3,6 Z" fill="#9A8E84"/>
+          </g>
+
+        </svg>
+
+        <!-- Floating info labels -->
+        <div class="map-label" style="top:28%;left:8%;border-left:3px solid var(--coral)">
+          📍 Les Sables-d'Olonne<br><span style="font-weight:400;color:#9A8E84;font-size:.72rem">3 missions actives</span>
+        </div>
+        <div class="map-label" style="top:60%;right:10%;border-left:3px solid var(--amber)">
+          📍 Marais Poitevin<br><span style="font-weight:400;color:#9A8E84;font-size:.72rem">5 missions actives</span>
+        </div>
+        <div class="map-label" style="top:14%;left:38%;border-left:3px solid var(--green-soft)">
+          📍 La Roche-sur-Yon<br><span style="font-weight:400;color:#9A8E84;font-size:.72rem">Siège des tribus</span>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center;margin-top:24px">
+        <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:600;color:var(--text-mid)">
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--coral)"></div> Mission Littoral
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:600;color:var(--text-mid)">
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--green-soft)"></div> Mission Bocage
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:600;color:var(--text-mid)">
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--amber)"></div> Mission Marais
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:600;color:var(--text-mid)">
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--blue)"></div> Toutes tribus
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CLASSEMENT
+     ============================================================ -->
+<section id="classement" class="section-sm section">
+  <div class="container">
+    <div class="section-header reveal t-center">
+      <div class="eyebrow eyebrow-blue" style="justify-content:center">Classement</div>
+      <h2 class="t-h1 mb-16">Tableau d'honneur</h2>
+      <p class="t-body t-mid" style="max-width:460px;margin:0 auto">La compétition est douce ici — chaque point est une histoire partagée.</p>
+    </div>
+
+    <!-- Tribe scores -->
+    <div class="grid-3 reveal mb-32" style="max-width:680px;margin-left:auto;margin-right:auto;margin-bottom:32px">
+      <div class="card" style="text-align:center;border-top:4px solid var(--blue)">
+        <div style="font-size:1.5rem;margin-bottom:4px">🌊</div>
+        <div class="t-h3" style="font-size:.95rem">Tribu du Littoral</div>
+        <div style="font-size:1.4rem;font-weight:800;color:var(--blue);margin:8px 0">12 840</div>
+        <div class="t-xs t-soft">points collectifs</div>
+        <div class="progress-track mt-8"><div class="progress-fill blue" data-width="82"></div></div>
+      </div>
+      <div class="card" style="text-align:center;border-top:4px solid var(--amber)">
+        <div style="font-size:1.5rem;margin-bottom:4px">🦆</div>
+        <div class="t-h3" style="font-size:.95rem">Tribu du Marais</div>
+        <div style="font-size:1.4rem;font-weight:800;color:var(--amber);margin:8px 0">11 560</div>
+        <div class="t-xs t-soft">points collectifs</div>
+        <div class="progress-track mt-8"><div class="progress-fill" style="background:linear-gradient(90deg,#E8CB7A,var(--amber))" data-width="74"></div></div>
+      </div>
+      <div class="card" style="text-align:center;border-top:4px solid var(--green-soft)">
+        <div style="font-size:1.5rem;margin-bottom:4px">🌿</div>
+        <div class="t-h3" style="font-size:.95rem">Tribu du Bocage</div>
+        <div style="font-size:1.4rem;font-weight:800;color:var(--green-soft);margin:8px 0">10 210</div>
+        <div class="t-xs t-soft">points collectifs</div>
+        <div class="progress-track mt-8"><div class="progress-fill green" data-width="65"></div></div>
+      </div>
+    </div>
+
+    <!-- Individual leaderboard -->
+    <div class="leaderboard-list reveal">
+
+      <div class="lb-item">
+        <div class="lb-rank gold">🥇</div>
+        <div class="lb-avatar" style="background:rgba(224,122,95,.12);font-size:1.2rem">🧭</div>
+        <div class="lb-info">
+          <div class="lb-name">Thomas D.</div>
+          <div class="lb-tribe"><span class="tribe-chip tribe-littoral" style="font-size:.7rem;padding:2px 8px">🌊 Littoral</span></div>
+        </div>
+        <div class="lb-score">5 820 <span>pts</span></div>
+      </div>
+
+      <div class="lb-item">
+        <div class="lb-rank silver">🥈</div>
+        <div class="lb-avatar" style="background:rgba(212,168,67,.12);font-size:1.2rem">🦅</div>
+        <div class="lb-info">
+          <div class="lb-name">Marie-Ange L.</div>
+          <div class="lb-tribe"><span class="tribe-chip tribe-marais" style="font-size:.7rem;padding:2px 8px">🦆 Marais</span></div>
+        </div>
+        <div class="lb-score">5 210 <span>pts</span></div>
+      </div>
+
+      <div class="lb-item">
+        <div class="lb-rank bronze">🥉</div>
+        <div class="lb-avatar" style="background:rgba(125,180,154,.15);font-size:1.2rem">🌿</div>
+        <div class="lb-info">
+          <div class="lb-name">Pierre V.</div>
+          <div class="lb-tribe"><span class="tribe-chip tribe-bocage" style="font-size:.7rem;padding:2px 8px">🌿 Bocage</span></div>
+        </div>
+        <div class="lb-score">4 970 <span>pts</span></div>
+      </div>
+
+      <div class="lb-item">
+        <div class="lb-rank">4</div>
+        <div class="lb-avatar" style="background:rgba(59,138,181,.1);font-size:1.2rem">⚓</div>
+        <div class="lb-info">
+          <div class="lb-name">Lucie B.</div>
+          <div class="lb-tribe"><span class="tribe-chip tribe-littoral" style="font-size:.7rem;padding:2px 8px">🌊 Littoral</span></div>
+        </div>
+        <div class="lb-score">4 680 <span>pts</span></div>
+      </div>
+
+      <div class="lb-item">
+        <div class="lb-rank">5</div>
+        <div class="lb-avatar" style="background:rgba(155,127,191,.12);font-size:1.2rem">📜</div>
+        <div class="lb-info">
+          <div class="lb-name">Jean-Michel F.</div>
+          <div class="lb-tribe"><span class="tribe-chip tribe-bocage" style="font-size:.7rem;padding:2px 8px">🌿 Bocage</span></div>
+        </div>
+        <div class="lb-score">4 120 <span>pts</span></div>
+      </div>
+
+      <!-- Current user highlighted -->
+      <div class="lb-item me">
+        <div class="lb-rank" style="color:var(--coral);font-weight:900">9</div>
+        <div class="lb-avatar" style="background:rgba(224,122,95,.12);font-size:1.2rem">🧭</div>
+        <div class="lb-info">
+          <div class="lb-name">Sophie M. <span style="font-size:.75rem;color:var(--coral);font-weight:600">(vous)</span></div>
+          <div class="lb-tribe"><span class="tribe-chip tribe-littoral" style="font-size:.7rem;padding:2px 8px">🌊 Littoral</span></div>
+        </div>
+        <div class="lb-score" style="color:var(--coral)">3 400 <span>pts</span></div>
+        <button onclick="openProfileModal()" class="btn btn-blue btn-sm" style="padding:6px 14px;font-size:.78rem;white-space:nowrap">Mon profil →</button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     UNIVERS DES JEUX
+     ============================================================ -->
+<section id="jeux" class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="eyebrow">Univers des Jeux</div>
+      <h2 class="t-h1 mb-16">Jouez. Découvrez.<br>Progressez ensemble.</h2>
+      <p class="t-body t-mid" style="max-width:520px">Chaque partie est une exploration. Chaque bonne réponse est un pas de plus vers votre légende locale.</p>
+    </div>
+
+    <!-- Game type cards -->
+    <div class="games-intro-grid mb-48">
+
+      <div class="game-type-card g-quiz reveal" onclick="scrollToQuiz()">
+        <div class="game-type-card-top">
+          <div class="game-type-icon">🎓</div>
+          <div class="t-h3" style="font-size:1rem">Quiz Vendée</div>
+        </div>
+        <div class="game-type-card-body">
+          <p class="t-small t-soft mb-8">Histoire, nature, traditions, personnages célèbres. 5 questions, 3 niveaux de difficulté.</p>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span class="game-xp-tag">⭐ +15 à +60 XP</span>
+            <span class="game-difficulty">⚡⚡☆ Moyen</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="game-type-card g-mystery reveal delay-1" onclick="scrollToMystery()">
+        <div class="game-type-card-top">
+          <div class="game-type-icon">🔮</div>
+          <div class="t-h3" style="font-size:1rem">Objet Mystère</div>
+        </div>
+        <div class="game-type-card-body">
+          <p class="t-small t-soft mb-8">Un objet local révélé indice par indice. Plus vite vous trouvez, plus vous gagnez.</p>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span class="game-xp-tag">⭐ +10 à +40 XP</span>
+            <span class="game-difficulty">⚡⚡⚡ Difficile</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="game-type-card g-defi reveal delay-2">
+        <div class="game-type-card-top">
+          <div class="game-type-icon">🔥</div>
+          <div class="t-h3" style="font-size:1rem">Défi du Jour</div>
+        </div>
+        <div class="game-type-card-body">
+          <p class="t-small t-soft mb-8">Un défi unique chaque matin. Photo, action, rencontre, observation sur le terrain.</p>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span class="game-xp-tag">⭐ +50 XP bonus</span>
+            <span class="game-difficulty">📅 Quotidien</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="game-type-card g-chasse reveal">
+        <div class="game-type-card-top">
+          <div class="game-type-icon">🗺️</div>
+          <div class="t-h3" style="font-size:1rem">Chasse Numérique</div>
+        </div>
+        <div class="game-type-card-body">
+          <p class="t-small t-soft mb-8">QR codes cachés sur le territoire. Scannez, résolvez, progressez. Multi-joueurs possible.</p>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span class="game-xp-tag">⭐ +80 à +200 XP</span>
+            <span class="game-difficulty">⚡☆☆ Facile</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="game-type-card g-memory reveal delay-1">
+        <div class="game-type-card-top">
+          <div class="game-type-icon">🃏</div>
+          <div class="t-h3" style="font-size:1rem">Memory du Territoire</div>
+        </div>
+        <div class="game-type-card-body">
+          <p class="t-small t-soft mb-8">Retrouvez les paires d'images du patrimoine vendéen. Entraîne la mémoire locale.</p>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span class="game-xp-tag">⭐ +20 à +45 XP</span>
+            <span class="game-difficulty">⚡☆☆ Facile</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="game-type-card g-duel reveal delay-2">
+        <div class="game-type-card-top">
+          <div class="game-type-icon">⚔️</div>
+          <div class="t-h3" style="font-size:1rem">Duel de Tribus</div>
+        </div>
+        <div class="game-type-card-body">
+          <p class="t-small t-soft mb-8">Affrontez une tribu adverse sur 10 questions. La tribu gagnante remporte des XP collectifs.</p>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span class="game-xp-tag">⭐ +100 XP tribu</span>
+            <span class="game-difficulty">🔥 Compétitif</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Featured: Quiz interactif + Objet Mystère -->
+    <div class="quiz-featured">
+
+      <!-- QUIZ INTERACTIF FONCTIONNEL -->
+      <div id="quizAnchor">
+        <div class="t-xs t-soft mb-12" style="letter-spacing:.08em;text-transform:uppercase">🎓 Quiz en direct</div>
+        <div class="quiz-widget reveal">
+          <div class="quiz-header">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+              <span style="font-size:.8rem;font-weight:700;opacity:.75">Quiz · Niveau Explorateur</span>
+              <span class="game-xp-tag" style="background:rgba(255,255,255,.2);color:rgba(255,255,255,.9)">⭐ +40 XP</span>
+            </div>
+            <div style="font-size:1rem;font-weight:800" id="quizTitleDisplay">Connaissez-vous votre Vendée ?</div>
+            <div class="quiz-progress-strip" id="quizProgressStrip">
+              <div class="quiz-progress-pip"></div>
+              <div class="quiz-progress-pip"></div>
+              <div class="quiz-progress-pip"></div>
+              <div class="quiz-progress-pip"></div>
+              <div class="quiz-progress-pip"></div>
+            </div>
+          </div>
+
+          <!-- Question display -->
+          <div id="quizPlay">
+            <div class="quiz-body">
+              <div class="quiz-question-text" id="quizQuestionText">Chargement…</div>
+              <div class="quiz-options" id="quizOptions"></div>
+              <div class="quiz-feedback" id="quizFeedback"></div>
+            </div>
+            <div class="quiz-footer">
+              <span style="font-size:.8rem;color:var(--text-soft)" id="quizCounter">Question 1 / 5</span>
+              <button class="btn btn-blue btn-sm" id="quizNext" style="display:none">Suivant →</button>
+            </div>
+          </div>
+
+          <!-- Result display -->
+          <div class="quiz-result" id="quizResult">
+            <div class="quiz-score-circle" id="quizScoreCircle">
+              <div id="quizScoreNum" style="font-size:2rem">-</div>
+              <div style="font-size:.7rem;font-weight:700;opacity:.7">/5</div>
+            </div>
+            <div class="t-h3 mb-8" id="quizResultTitle">Résultat</div>
+            <p class="t-small t-soft mb-16" id="quizResultDesc"></p>
+            <div id="quizXpEarned" style="font-size:1.1rem;font-weight:800;color:var(--amber);margin-bottom:16px"></div>
+            <button class="btn btn-blue" onclick="resetQuiz()">Rejouer ↺</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- COLONNE DROITE: Objet Mystère + Défi + Streak -->
+      <div style="display:flex;flex-direction:column;gap:20px">
+
+        <!-- OBJET MYSTÈRE -->
+        <div id="mysteryAnchor">
+          <div class="t-xs t-soft mb-12" style="letter-spacing:.08em;text-transform:uppercase">🔮 Objet Mystère du Jour</div>
+          <div class="mystery-widget reveal">
+            <div class="mystery-header">
+              <div style="font-size:.78rem;font-weight:700;opacity:.7;margin-bottom:3px">Objet du patrimoine vendéen</div>
+              <div style="font-size:1rem;font-weight:800">Qui suis-je ?</div>
+            </div>
+            <div class="mystery-image-zone">
+              <div class="mystery-object-display mystery-blur-3" id="mysteryImg">🪣</div>
+            </div>
+            <div class="mystery-clues">
+              <div class="mystery-clue-item">
+                <div class="mystery-clue-num revealed" id="clueNum1">1</div>
+                <div class="mystery-clue-text revealed" id="clueText1">Je suis fabriqué artisanalement en Vendée depuis des siècles.</div>
+              </div>
+              <div class="mystery-clue-item">
+                <div class="mystery-clue-num" id="clueNum2">2</div>
+                <div class="mystery-clue-text" id="clueText2" style="filter:blur(4px)">On m'utilise pour transporter un liquide précieux extrait de la terre.</div>
+              </div>
+              <div class="mystery-clue-item">
+                <div class="mystery-clue-num" id="clueNum3">3</div>
+                <div class="mystery-clue-text" id="clueText3" style="filter:blur(4px)">Je suis en bois, tressé, imperméabilisé à la résine de pin.</div>
+              </div>
+            </div>
+            <div id="mysteryRevealBtn" style="padding:0 24px 14px">
+              <button class="btn btn-outline btn-sm" onclick="revealNextClue()" style="width:100%;justify-content:center">
+                Révéler l'indice suivant (-10 XP potentiels)
+              </button>
+            </div>
+            <div class="mystery-guess-row">
+              <input class="mystery-input" id="mysteryInput" type="text" placeholder="Votre réponse…" autocomplete="off">
+              <button class="btn btn-coral btn-sm" onclick="checkMystery()">Valider</button>
+            </div>
+            <div id="mysteryFeedback" style="padding:0 24px 16px;font-size:.85rem;font-weight:600;display:none"></div>
+          </div>
+        </div>
+
+        <!-- DÉFI DU JOUR -->
+        <div class="defi-card reveal">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+            <div style="font-size:.78rem;font-weight:700;opacity:.8;letter-spacing:.06em;text-transform:uppercase">🔥 Défi du jour</div>
+            <span style="background:rgba(255,255,255,.2);border-radius:99px;padding:2px 8px;font-size:.72rem;font-weight:700">Expire dans</span>
+          </div>
+          <div style="font-size:1.05rem;font-weight:800;margin-bottom:4px">Photographiez un moulin vendéen</div>
+          <p style="font-size:.82rem;opacity:.82;line-height:1.5;margin-bottom:14px">Capturez un moulin à vent ou à eau de votre territoire et partagez-le avec la communauté.</p>
+          <div class="defi-countdown" id="defiCountdown">
+            <div class="countdown-unit"><div class="countdown-num" id="cdH">08</div><div class="countdown-lbl">h</div></div>
+            <div class="countdown-unit"><div class="countdown-num" id="cdM">23</div><div class="countdown-lbl">min</div></div>
+            <div class="countdown-unit"><div class="countdown-num" id="cdS">41</div><div class="countdown-lbl">sec</div></div>
+          </div>
+          <button class="btn btn-white btn-sm mt-16" onclick="showToast('📸','Défi du Jour accepté !','+50 XP bonus à la clé','coral')">Relever le défi →</button>
+        </div>
+
+        <!-- STREAK -->
+        <div class="streak-card reveal">
+          <div style="font-size:.78rem;font-weight:700;opacity:.7;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px">🔥 Série quotidienne</div>
+          <div style="font-size:1.2rem;font-weight:900;margin-bottom:2px">5 jours consécutifs !</div>
+          <div style="font-size:.82rem;opacity:.7">Continuez demain pour décrocher le badge <strong style="opacity:1">Fidèle</strong></div>
+          <div class="streak-flames">
+            <div class="streak-day on">L</div>
+            <div class="streak-day on">M</div>
+            <div class="streak-day on">M</div>
+            <div class="streak-day on">J</div>
+            <div class="streak-day on">V</div>
+            <div class="streak-day today">S</div>
+            <div class="streak-day">D</div>
+          </div>
+          <div style="margin-top:12px;font-size:.78rem;opacity:.65">+5 XP/jour · Bonus ×2 à 7 jours · Badge à 30 jours</div>
+        </div>
+
+      </div>
+    </div><!-- /.quiz-featured -->
+  </div>
+</section>
+
+<!-- ============================================================
+     UNIVERS DES POINTS
+     ============================================================ -->
+<section id="points-actions" class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="eyebrow eyebrow-blue">Univers des Points</div>
+      <h2 class="t-h1 mb-16">Chaque geste compte.<br>Chaque action récompense.</h2>
+      <p class="t-body t-mid" style="max-width:520px">Naviguer, jouer, partager, explorer — tout rapporte des XP et fait progresser vers les badges les plus rares.</p>
+    </div>
+
+    <!-- Live XP counter demo -->
+    <div class="xp-counter-banner reveal mb-32">
+      <div>
+        <div style="font-size:.8rem;font-weight:700;opacity:.65;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px">Votre total actuel (démo)</div>
+        <div class="xp-counter-num" id="liveXpNum">3 400</div>
+        <div class="xp-counter-sub">points d'aventure · Niveau 7</div>
+      </div>
+      <div style="flex:1">
+        <div style="font-size:.82rem;font-weight:700;opacity:.7;margin-bottom:10px">Essayez — cliquez pour gagner des XP :</div>
+        <div class="xp-actions-demo">
+          <button class="xp-action-btn" onclick="earnXP(5,  '☀️ Connexion du jour',   null)">☀️ Se connecter <strong>+5</strong></button>
+          <button class="xp-action-btn" onclick="earnXP(10, '👍 Vote photo',           null)">👍 Voter <strong>+10</strong></button>
+          <button class="xp-action-btn" onclick="earnXP(20, '📣 Partage réseau',       null)">📣 Partager <strong>+20</strong></button>
+          <button class="xp-action-btn" onclick="earnXP(30, '📸 Photo soumise',        'Œil Vif')">📸 Photo <strong>+30</strong></button>
+          <button class="xp-action-btn" onclick="earnXP(50, '✏️ Mission proposée',     'Créateur')">✏️ Proposer <strong>+50</strong></button>
+          <button class="xp-action-btn" onclick="earnXP(100,'🤝 Ami invité',           'Semeur')">🤝 Inviter <strong>+100</strong></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions grid by category -->
+    <div class="points-grid reveal">
+
+      <!-- Quotidien -->
+      <div class="points-category">
+        <div class="points-cat-header">
+          <div class="points-cat-icon" style="background:rgba(224,122,95,.1)">☀️</div>
+          <div>
+            <div class="t-h3" style="font-size:.95rem">Quotidien</div>
+            <div class="t-xs t-soft">Actions de présence</div>
+          </div>
+        </div>
+        <div class="points-actions-list">
+          <div class="points-action-item">
+            <div class="pa-icon">🔑</div>
+            <div class="pa-label">Connexion du jour</div>
+            <div class="pa-xp">+5 XP</div>
+          </div>
+          <div class="points-action-item">
+            <div class="pa-icon">🔥</div>
+            <div class="pa-label">Série 7 jours consécutifs</div>
+            <div class="pa-xp">+50 XP</div>
+          </div>
+          <div class="points-action-item">
+            <div class="pa-icon">⭐</div>
+            <div class="pa-label">Streak 30 jours</div>
+            <div class="pa-xp">+200 XP</div>
+          </div>
+          <div class="points-action-item">
+            <div class="pa-icon">📋</div>
+            <div class="pa-label">Compléter son profil</div>
+            <div class="pa-xp">+50 XP</div>
+          </div>
+          <div class="points-action-item">
+            <div class="pa-icon">🏕️</div>
+            <div class="pa-label">Rejoindre une tribu</div>
+            <div class="pa-xp">+30 XP</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Jeux -->
+      <div class="points-category">
+        <div class="points-cat-header">
+          <div class="points-cat-icon" style="background:rgba(59,138,181,.1)">🎮</div>
+          <div>
+            <div class="t-h3" style="font-size:.95rem">Jeux & Quiz</div>
+            <div class="t-xs t-soft">Actions ludiques</div>
+          </div>
+        </div>
+        <div class="points-actions-list">
+          <div class="points-action-item">
+            <div class="pa-icon">🎓</div>
+            <div class="pa-label">Participer à un quiz</div>
+            <div class="pa-xp">+15 XP</div>
+          </div>
+          <div class="points-action-item">
+            <div class="pa-icon">🏆</div>
+            <div class="pa-label">Quiz score parfait (5/5)</div>
+            <div class="pa-xp">+40 XP</div>
+          </div>
+          <div class="points-action-item">
+            <div class="pa-icon">🔮</div>
+            <div class="pa-label">Objet mystère trouvé</div>
+            <div class="pa-xp">+25 XP</div>
+          </div>
+          <div class="points-action-item">
+            <div class="pa-icon">🔥</div>
+            <div class="pa-label">Défi du jour relevé</div>
+            <div class="pa-xp">+50 XP</div>
+          </div>
+          <div class="points-action-item">
+            <div class="pa-icon">⚔️</div>
+            <div class="pa-label">Duel de tribus gagné</div>
+            <div class="pa-xp">+80 XP</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Missions -->
+      <div class="points-category">
+        <div class="points-cat-header">
+          <div class="points-cat-icon" style="background:rgba(125,180,154,.15)">🗺️</div>
+          <div>
+            <div class="t-h3" style="font-size:.95rem">Missions & Terrain</div>
+            <div class="t-xs t-soft">Actions d'exploration</div>
+          </div>
+        </div>
+        <div class="points-actions-list">
+          <div class="points-action-item">
+            <div class="pa-icon">▶️</div>
+            <div class="pa-label">Démarrer une mission</div>
+            <div class="pa-xp">+10 XP</div>
+          </div>
+          <div class="points-action-item">
+            <div class="pa-icon">✅</div>
+            <div class="pa-label">Mission validée</div>
+            <div class="pa-xp">+60–240 XP</div>
+          </div>
+          <div class="points-action-item">
+            <div class="pa-icon">📸</div>
+            <div class="pa-label">Photo de mission soumise</div>
+            <div class="pa-xp">+30 XP</div>
+          </div>
+          <div class="points-action-item">
+            <div class="pa-icon">🔍</div>
+            <div class="pa-label">Indice découvert</div>
+            <div class="pa-xp">+15 XP</div>
+          </div>
+          <div class="points-action-item">
+            <div class="pa-icon">✏️</div>
+            <div class="pa-label">Mission proposée et validée</div>
+            <div class="pa-xp">+50 XP</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Social -->
+      <div class="points-category">
+        <div class="points-cat-header">
+          <div class="points-cat-icon" style="background:rgba(212,168,67,.15)">🤝</div>
+          <div>
+            <div class="t-h3" style="font-size:.95rem">Social & Communauté</div>
+            <div class="t-xs t-soft">Actions collectives</div>
+          </div>
+        </div>
+        <div class="points-actions-list">
+          <div class="points-action-item">
+            <div class="pa-icon">💬</div>
+            <div class="pa-label">Commentaire publié</div>
+            <div class="pa-xp">+10 XP</div>
+          </div>
+          <div class="points-action-item">
+            <div class="pa-icon">👍</div>
+            <div class="pa-label">Voter pour une photo</div>
+            <div class="pa-xp">+5 XP</div>
+          </div>
+          <div class="points-action-item">
+            <div class="pa-icon">📣</div>
+            <div class="pa-label">Partager sur les réseaux</div>
+            <div class="pa-xp">+20 XP</div>
+          </div>
+          <div class="points-action-item">
+            <div class="pa-icon">🤝</div>
+            <div class="pa-label">Parrainer un membre</div>
+            <div class="pa-xp">+100 XP</div>
+          </div>
+          <div class="points-action-item">
+            <div class="pa-icon">🎙️</div>
+            <div class="pa-label">Témoignage recueilli</div>
+            <div class="pa-xp">+40 XP</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Badges liés aux actions -->
+    <div class="card reveal" style="padding:28px 32px">
+      <div class="flex items-center justify-between mb-20" style="flex-wrap:wrap;gap:12px">
+        <div>
+          <div class="t-h3 mb-4">Badges débloqués par actions</div>
+          <div class="t-small t-soft">Ces badges récompensent votre engagement quotidien sur la plateforme.</div>
+        </div>
+        <a href="#badges" class="btn btn-outline btn-sm">Voir tous les badges</a>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px">
+
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--beige-pale);border-radius:var(--radius-md)">
+          <div style="font-size:1.5rem;width:42px;text-align:center">☀️</div>
+          <div>
+            <div style="font-weight:700;font-size:.88rem">Fidèle</div>
+            <div style="font-size:.75rem;color:var(--text-soft)">7 jours consécutifs</div>
+            <div style="font-size:.72rem;color:var(--amber);font-weight:700">+75 XP</div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--beige-pale);border-radius:var(--radius-md)">
+          <div style="font-size:1.5rem;width:42px;text-align:center">🎓</div>
+          <div>
+            <div style="font-weight:700;font-size:.88rem">Érudit Local</div>
+            <div style="font-size:.75rem;color:var(--text-soft)">10 quiz complétés</div>
+            <div style="font-size:.72rem;color:var(--amber);font-weight:700">+120 XP</div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--beige-pale);border-radius:var(--radius-md)">
+          <div style="font-size:1.5rem;width:42px;text-align:center">🔮</div>
+          <div>
+            <div style="font-weight:700;font-size:.88rem">Détective</div>
+            <div style="font-size:.75rem;color:var(--text-soft)">5 objets mystères trouvés</div>
+            <div style="font-size:.72rem;color:var(--amber);font-weight:700">+100 XP</div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--beige-pale);border-radius:var(--radius-md)">
+          <div style="font-size:1.5rem;width:42px;text-align:center">🌱</div>
+          <div>
+            <div style="font-weight:700;font-size:.88rem">Semeur</div>
+            <div style="font-size:.75rem;color:var(--text-soft)">5 membres parrainés</div>
+            <div style="font-size:.72rem;color:var(--amber);font-weight:700">+250 XP</div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--beige-pale);border-radius:var(--radius-md)">
+          <div style="font-size:1.5rem;width:42px;text-align:center">📣</div>
+          <div>
+            <div style="font-weight:700;font-size:.88rem">Ambassadeur</div>
+            <div style="font-size:.75rem;color:var(--text-soft)">20 partages réseau</div>
+            <div style="font-size:.72rem;color:var(--amber);font-weight:700">+150 XP</div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(59,138,181,.06);border-radius:var(--radius-md);border:1.5px solid rgba(59,138,181,.2)">
+          <div style="font-size:1.5rem;width:42px;text-align:center">🔥</div>
+          <div>
+            <div style="font-weight:700;font-size:.88rem;color:var(--blue)">Inextinguible</div>
+            <div style="font-size:.75rem;color:var(--text-soft)">Streak 30 jours · Rare</div>
+            <div style="font-size:.72rem;color:var(--amber);font-weight:700">+500 XP</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     REJOINDRE
+     ============================================================ -->
+<section id="rejoindre" class="section">
+  <div class="container">
+    <div class="card" style="background:var(--coral);border-radius:var(--radius-xl);padding:clamp(36px,6vw,72px);position:relative;overflow:hidden">
+      <div class="join-bg"></div>
+      <div class="join-bg2"></div>
+      <div class="join-inner">
+        <div class="pill" style="background:rgba(255,255,255,.18);color:white;margin-bottom:20px;justify-content:center;display:inline-flex">
+          🌟 L'aventure collective commence maintenant
+        </div>
+        <h2 style="color:white;font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;margin-bottom:14px">
+          Rejoignez votre tribu.<br>Écrivez l'histoire du territoire.
+        </h2>
+        <p style="color:rgba(255,255,255,.85);font-size:1.05rem;margin-bottom:36px;max-width:500px;margin-left:auto;margin-right:auto;line-height:1.7">
+          1 240 aventuriers explorent déjà la Vendée avec vous. Choisissez votre tribu, démarrez votre première mission, et commencez à accumuler des points d'aventure.
+        </p>
+        <div class="join-actions">
+          <a href="#" class="btn btn-white btn-lg">Créer mon compte gratuit</a>
+          <a href="#tribus" class="btn btn-lg" style="background:rgba(255,255,255,.15);color:white;border:1px solid rgba(255,255,255,.3)">Choisir ma tribu →</a>
+        </div>
+        <div class="join-tribe-chips">
+          <div class="join-tribe-chip">🌊 Tribu du Littoral</div>
+          <div class="join-tribe-chip">🌿 Tribu du Bocage</div>
+          <div class="join-tribe-chip">🦆 Tribu du Marais</div>
+        </div>
+        <p style="margin-top:20px;color:rgba(255,255,255,.55);font-size:.82rem">
+          Gratuit · Sans engagement · Communauté locale vendéenne
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="nav-logo-text" style="font-size:1.4rem;margin-bottom:10px">mi<span>ka</span></div>
+        <p class="footer-tagline">L'aventure collective en Vendée.<br>Explorez, partagez, progressez ensemble.</p>
+      </div>
+      <div>
+        <div class="footer-col-title">Explorer</div>
+        <ul class="footer-links">
+          <li><a href="#tribus">Les Tribus</a></li>
+          <li><a href="#missions">Les Missions</a></li>
+          <li><a href="#badges">Les Badges</a></li>
+          <li><a href="#carte">Le Territoire</a></li>
+          <li><a href="#classement">Classement</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Communauté</div>
+        <ul class="footer-links">
+          <li><a href="#">Forum des tribus</a></li>
+          <li><a href="#">Proposer une mission</a></li>
+          <li><a href="#">Événements locaux</a></li>
+          <li><a href="#">Blog</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">À propos</div>
+        <ul class="footer-links">
+          <li><a href="#">Concept</a></li>
+          <li><a href="#">Équipe</a></li>
+          <li><a href="#">Nous contacter</a></li>
+          <li><a href="#">Mentions légales</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Mika — Communauté Vendée. Tous droits réservés.</span>
+      <span>Fait avec ❤️ en Vendée</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============================================================
+     PROFILE MODAL
+     ============================================================ -->
+<div class="profile-overlay" id="profileOverlay">
+  <div class="profile-modal" id="profileModal">
+
+    <!-- Header -->
+    <div class="pm-header">
+      <button class="modal-close" id="closeProfile" aria-label="Fermer">✕</button>
+      <div style="position:relative;display:inline-block">
+        <div class="pm-avatar-ring">🧭</div>
+        <div class="pm-level-badge">7</div>
+      </div>
+      <div class="pm-name">Sophie Martin</div>
+      <div class="pm-title">🏅 Grand Pisteur</div><br>
+      <div class="pm-tribe">🌊 Tribu du Littoral · Membre depuis mars 2025</div>
+      <div class="pm-xp-section">
+        <div class="pm-xp-label">
+          <span>Niveau 7 → 8</span>
+          <strong>3 400 / 4 000 XP</strong>
+        </div>
+        <div class="pm-progress-track">
+          <div class="pm-progress-fill" id="pmXpBar" style="width:0"></div>
+        </div>
+        <div style="font-size:.75rem;color:rgba(255,255,255,.6);margin-top:6px">600 XP avant le niveau suivant</div>
+      </div>
+    </div>
+
+    <!-- Stats strip -->
+    <div class="pm-stats">
+      <div class="pm-stat pm-stat-coral">
+        <div class="pm-stat-num">3 400</div>
+        <div class="pm-stat-lbl">Points XP</div>
+      </div>
+      <div class="pm-stat pm-stat-blue">
+        <div class="pm-stat-num">6</div>
+        <div class="pm-stat-lbl">Badges</div>
+      </div>
+      <div class="pm-stat pm-stat-green">
+        <div class="pm-stat-num">14</div>
+        <div class="pm-stat-lbl">Missions</div>
+      </div>
+      <div class="pm-stat pm-stat-amber">
+        <div class="pm-stat-num">#9</div>
+        <div class="pm-stat-lbl">Classement</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="pm-tabs">
+      <button class="pm-tab active" data-tab="progression">Progression</button>
+      <button class="pm-tab" data-tab="missions">Missions</button>
+      <button class="pm-tab" data-tab="badges">Badges</button>
+      <button class="pm-tab" data-tab="activite">Activité</button>
+    </div>
+
+    <!-- Tab body -->
+    <div class="pm-body">
+
+      <!-- Progression -->
+      <div class="pm-tab-content active" id="tab-progression">
+        <div class="pm-level-road">
+
+          <div class="pm-level-item">
+            <div class="pm-level-dot done">👣</div>
+            <div class="pm-level-info">
+              <div class="pm-level-name">Néophyte</div>
+              <div class="pm-level-range">Niveaux 1–2 · Complété</div>
+              <div class="pm-level-bar-wrap">
+                <div class="progress-track" style="height:5px"><div class="progress-fill green" style="width:100%"></div></div>
+              </div>
+            </div>
+            <div style="font-size:.8rem;font-weight:700;color:var(--green-soft);white-space:nowrap">✓ Terminé</div>
+          </div>
+
+          <div class="pm-level-item">
+            <div class="pm-level-dot done">🧭</div>
+            <div class="pm-level-info">
+              <div class="pm-level-name">Explorateur</div>
+              <div class="pm-level-range">Niveaux 3–5 · Complété</div>
+              <div class="pm-level-bar-wrap">
+                <div class="progress-track" style="height:5px"><div class="progress-fill green" style="width:100%"></div></div>
+              </div>
+            </div>
+            <div style="font-size:.8rem;font-weight:700;color:var(--green-soft);white-space:nowrap">✓ Terminé</div>
+          </div>
+
+          <div class="pm-level-item">
+            <div class="pm-level-dot current">🏅</div>
+            <div class="pm-level-info">
+              <div class="pm-level-name" style="color:var(--blue)">Grand Pisteur</div>
+              <div class="pm-level-range">Niveaux 6–8 · <strong style="color:var(--blue)">En cours (Niv. 7)</strong></div>
+              <div class="pm-level-bar-wrap">
+                <div class="progress-track" style="height:5px"><div class="progress-fill blue" style="width:60%"></div></div>
+              </div>
+              <div style="font-size:.72rem;color:var(--text-soft);margin-top:4px">Débloquez encore 3 missions chasse pour passer au niveau 8</div>
+            </div>
+            <div style="font-size:.8rem;font-weight:700;color:var(--blue);white-space:nowrap">60%</div>
+          </div>
+
+          <div class="pm-level-item" style="opacity:.45">
+            <div class="pm-level-dot locked">🌟</div>
+            <div class="pm-level-info">
+              <div class="pm-level-name">Mémoire Vivante</div>
+              <div class="pm-level-range">Niveaux 9–11 · Verrouillé</div>
+              <div class="pm-level-bar-wrap">
+                <div class="progress-track" style="height:5px"><div class="progress-fill" style="width:0%"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pm-level-item" style="opacity:.28">
+            <div class="pm-level-dot locked">⚔️</div>
+            <div class="pm-level-info">
+              <div class="pm-level-name">Gardien Légendaire</div>
+              <div class="pm-level-range">Niveau 12 · Verrouillé</div>
+              <div class="pm-level-bar-wrap">
+                <div class="progress-track" style="height:5px"><div class="progress-fill" style="width:0%"></div></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Compétences de tribu -->
+        <div style="margin-top:28px">
+          <div class="t-h3 mb-16" style="font-size:.95rem">Compétences Littoral</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+                <span style="font-size:.82rem;font-weight:600">🌊 Maître des côtes</span>
+                <span style="font-size:.78rem;color:var(--text-soft)">72%</span>
+              </div>
+              <div class="progress-track" style="height:6px"><div class="progress-fill blue" style="width:72%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+                <span style="font-size:.82rem;font-weight:600">📸 Photographe du territoire</span>
+                <span style="font-size:.78rem;color:var(--text-soft)">55%</span>
+              </div>
+              <div class="progress-track" style="height:6px"><div class="progress-fill" style="width:55%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+                <span style="font-size:.82rem;font-weight:600">📜 Collecteur de mémoires</span>
+                <span style="font-size:.78rem;color:var(--text-soft)">40%</span>
+              </div>
+              <div class="progress-track" style="height:6px"><div class="progress-fill blue" style="width:40%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Missions -->
+      <div class="pm-tab-content" id="tab-missions">
+        <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+          <span class="pill pill-green">✓ 14 validées</span>
+          <span class="pill pill-coral">● 2 en cours</span>
+          <span class="pill pill-beige">○ 12 disponibles</span>
+        </div>
+        <div class="pm-missions-list">
+          <div class="pm-mission-item">
+            <div class="pm-mission-icon" style="background:rgba(125,180,154,.15)">✅</div>
+            <div class="pm-mission-meta">
+              <div class="pm-mission-name">Quiz : Légendes du Bocage</div>
+              <div class="pm-mission-sub">Quiz local · 🌿 Bocage · Score 8/10</div>
+            </div>
+            <span class="pill pill-green" style="font-size:.7rem;white-space:nowrap">+90 XP</span>
+          </div>
+          <div class="pm-mission-item">
+            <div class="pm-mission-icon" style="background:rgba(59,138,181,.1)">🔍</div>
+            <div class="pm-mission-meta">
+              <div class="pm-mission-name">Chasse aux indices — vieux port</div>
+              <div class="pm-mission-sub">En cours · 🌊 Littoral · Étape 3/5</div>
+            </div>
+            <span class="status-chip chip-active" style="font-size:.7rem;white-space:nowrap">En cours</span>
+          </div>
+          <div class="pm-mission-item">
+            <div class="pm-mission-icon" style="background:rgba(224,122,95,.1)">📸</div>
+            <div class="pm-mission-meta">
+              <div class="pm-mission-name">Défi photo : coucher de soleil</div>
+              <div class="pm-mission-sub">Validée · 🌊 Littoral · 5 clichés</div>
+            </div>
+            <span class="pill pill-green" style="font-size:.7rem;white-space:nowrap">+60 XP</span>
+          </div>
+          <div class="pm-mission-item">
+            <div class="pm-mission-icon" style="background:rgba(212,168,67,.12)">🤝</div>
+            <div class="pm-mission-meta">
+              <div class="pm-mission-name">Collecte de témoignages</div>
+              <div class="pm-mission-sub">En cours · Toutes tribus · 1/3</div>
+            </div>
+            <span class="status-chip chip-active" style="font-size:.7rem;white-space:nowrap">En cours</span>
+          </div>
+          <div class="pm-mission-item">
+            <div class="pm-mission-icon" style="background:rgba(125,180,154,.15)">🗺️</div>
+            <div class="pm-mission-meta">
+              <div class="pm-mission-name">Itinéraire des moulins</div>
+              <div class="pm-mission-sub">Validée · 🌿 Bocage · 12 km</div>
+            </div>
+            <span class="pill pill-green" style="font-size:.7rem;white-space:nowrap">+200 XP</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Badges -->
+      <div class="pm-tab-content" id="tab-badges">
+        <div class="mb-16">
+          <span class="t-xs t-soft">6 obtenus · 6 à débloquer</span>
+        </div>
+        <div class="pm-badges-grid">
+          <div class="pm-badge">
+            <div class="pm-badge-icon">👣</div>
+            <div class="pm-badge-name">Premier Pas</div>
+            <div class="pm-badge-xp">+50 XP</div>
+          </div>
+          <div class="pm-badge">
+            <div class="pm-badge-icon">🧭</div>
+            <div class="pm-badge-name">Explorateur</div>
+            <div class="pm-badge-xp">+150 XP</div>
+          </div>
+          <div class="pm-badge">
+            <div class="pm-badge-icon">🌿</div>
+            <div class="pm-badge-name">Gardien Bocage</div>
+            <div class="pm-badge-xp">+200 XP</div>
+          </div>
+          <div class="pm-badge">
+            <div class="pm-badge-icon">🦆</div>
+            <div class="pm-badge-name">Œil du Marais</div>
+            <div class="pm-badge-xp">+180 XP</div>
+          </div>
+          <div class="pm-badge">
+            <div class="pm-badge-icon">📜</div>
+            <div class="pm-badge-name">Mémoire Vivante</div>
+            <div class="pm-badge-xp">+300 XP</div>
+          </div>
+          <div class="pm-badge">
+            <div class="pm-badge-icon">📸</div>
+            <div class="pm-badge-name">Œil Vif</div>
+            <div class="pm-badge-xp">+120 XP</div>
+          </div>
+          <div class="pm-badge locked">
+            <div class="pm-badge-icon">🏆</div>
+            <div class="pm-badge-name">Grand Pisteur</div>
+            <div class="pm-badge-xp">+400 XP</div>
+          </div>
+          <div class="pm-badge locked">
+            <div class="pm-badge-icon">⚓</div>
+            <div class="pm-badge-name">Amiral</div>
+            <div class="pm-badge-xp">+500 XP</div>
+          </div>
+          <div class="pm-badge locked">
+            <div class="pm-badge-icon">🌟</div>
+            <div class="pm-badge-name">Légende</div>
+            <div class="pm-badge-xp">+1000 XP</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activité -->
+      <div class="pm-tab-content" id="tab-activite">
+        <div class="pm-activity-list">
+          <div class="pm-activity-item">
+            <div class="pm-activity-dot" style="background:rgba(125,180,154,.15)">✅</div>
+            <div>
+              <div style="font-weight:700;font-size:.88rem">Mission validée — Quiz Bocage</div>
+              <div style="font-size:.75rem;color:var(--text-soft)">Aujourd'hui · 14h32</div>
+            </div>
+            <div class="pm-activity-xp">+90 XP</div>
+          </div>
+          <div class="pm-activity-item">
+            <div class="pm-activity-dot" style="background:rgba(212,168,67,.15)">🏅</div>
+            <div>
+              <div style="font-weight:700;font-size:.88rem">Badge débloqué — Explorateur du Littoral</div>
+              <div style="font-size:.75rem;color:var(--text-soft)">Hier · 09h15</div>
+            </div>
+            <div class="pm-activity-xp">+150 XP</div>
+          </div>
+          <div class="pm-activity-item">
+            <div class="pm-activity-dot" style="background:rgba(59,138,181,.1)">🔍</div>
+            <div>
+              <div style="font-weight:700;font-size:.88rem">Chasse démarrée — vieux port</div>
+              <div style="font-size:.75rem;color:var(--text-soft)">Il y a 2 jours</div>
+            </div>
+            <div class="pm-activity-xp">—</div>
+          </div>
+          <div class="pm-activity-item">
+            <div class="pm-activity-dot" style="background:rgba(224,122,95,.1)">📸</div>
+            <div>
+              <div style="font-weight:700;font-size:.88rem">Photo soumise — coucher de soleil</div>
+              <div style="font-size:.75rem;color:var(--text-soft)">Il y a 3 jours</div>
+            </div>
+            <div class="pm-activity-xp">+60 XP</div>
+          </div>
+          <div class="pm-activity-item">
+            <div class="pm-activity-dot" style="background:rgba(155,127,191,.12)">🤝</div>
+            <div>
+              <div style="font-weight:700;font-size:.88rem">Tribu rejointe — Littoral</div>
+              <div style="font-size:.75rem;color:var(--text-soft)">Il y a 2 mois</div>
+            </div>
+            <div class="pm-activity-xp">+50 XP</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /.pm-body -->
+  </div><!-- /.profile-modal -->
+</div><!-- /.profile-overlay -->
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+/* ---- Navigation ---- */
+const nav = document.getElementById('mainNav');
+const hamburger = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobileMenu');
+
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 20);
+
+  // Active nav link highlighting
+  const sections = ['hero','tribus','jeux','missions','badges','points-actions','classement'];
+  let current = 'hero';
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.getBoundingClientRect().top <= 100) current = id;
+  });
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+  });
+});
+
+hamburger.addEventListener('click', () => {
+  mobileMenu.classList.toggle('open');
+  const bars = hamburger.querySelectorAll('span');
+  if (mobileMenu.classList.contains('open')) {
+    bars[0].style.transform = 'translateY(7px) rotate(45deg)';
+    bars[1].style.opacity = '0';
+    bars[2].style.transform = 'translateY(-7px) rotate(-45deg)';
+  } else {
+    bars.forEach(b => { b.style.transform = ''; b.style.opacity = ''; });
+  }
+});
+
+function closeMobile() {
+  mobileMenu.classList.remove('open');
+  hamburger.querySelectorAll('span').forEach(b => { b.style.transform = ''; b.style.opacity = ''; });
+}
+
+/* ---- Missions tabs filter ---- */
+document.querySelectorAll('.missions-tab').forEach(tab => {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.missions-tab').forEach(t => t.classList.remove('active'));
+    this.classList.add('active');
+
+    const filter = this.dataset.filter;
+    document.querySelectorAll('.mission-card').forEach(card => {
+      if (filter === 'all' || card.dataset.category === filter) {
+        card.style.display = '';
+        card.style.animation = 'fade-up .4s ease both';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  });
+});
+
+/* ---- Intersection Observer: reveal + progress bars ---- */
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+
+      // Animate progress bars inside the revealed element
+      entry.target.querySelectorAll('.progress-fill[data-width]').forEach(bar => {
+        const w = bar.getAttribute('data-width');
+        setTimeout(() => { bar.style.width = w + '%'; }, 200);
+      });
+
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+/* ---- Animate hero progress bars on load ---- */
+window.addEventListener('load', () => {
+  document.querySelectorAll('.hero-visual .progress-fill, #hero .progress-fill').forEach(bar => {
+    const w = bar.style.width || '0%';
+    bar.style.width = '0%';
+    setTimeout(() => { bar.style.width = w; }, 600);
+  });
+});
+
+/* ==============================================================
+   XP TOAST SYSTEM
+   ============================================================== */
+const toastContainer = document.createElement('div');
+toastContainer.className = 'xp-toast-container';
+document.body.appendChild(toastContainer);
+
+let liveXp = 3400;
+
+function showToast(icon, label, xpText, style) {
+  const t = document.createElement('div');
+  t.className = 'xp-toast' + (style === 'badge' ? ' badge-unlock-toast' : '');
+  t.innerHTML = `<span style="font-size:1.2rem">${icon}</span><div style="flex:1"><div style="font-size:.8rem;opacity:.75">${label}</div></div><div class="xp-toast-amount">${xpText}</div>`;
+  toastContainer.appendChild(t);
+  setTimeout(() => {
+    t.classList.add('removing');
+    t.addEventListener('animationend', () => t.remove());
+  }, 3200);
+}
+
+function earnXP(amount, label, badgeLabel) {
+  liveXp += amount;
+  const formatted = liveXp.toLocaleString('fr-FR');
+  const el = document.getElementById('liveXpNum');
+  if (el) {
+    el.textContent = formatted;
+    el.style.color = '#FFD166';
+    setTimeout(() => { el.style.color = ''; }, 600);
+  }
+  showToast('⭐', label, '+' + amount + ' XP', 'xp');
+  if (badgeLabel) {
+    setTimeout(() => {
+      showToast('🏅', 'Badge débloqué !', badgeLabel, 'badge');
+    }, 700);
+  }
+}
+
+/* ==============================================================
+   QUIZ LOGIC
+   ============================================================== */
+const quizData = [
+  {
+    q: "Quelle est la préfecture du département de la Vendée ?",
+    opts: ["Les Sables-d'Olonne", "Fontenay-le-Comte", "La Roche-sur-Yon", "Luçon"],
+    ans: 2,
+    exp: "La Roche-sur-Yon a été fondée par Napoléon 1er en 1804 et porte depuis le statut de préfecture vendéenne."
+  },
+  {
+    q: "Quel marais naturel partage son territoire entre la Vendée et les Deux-Sèvres ?",
+    opts: ["Marais de Brière", "Marais Vernier", "Marais Poitevin", "Marais de Monts"],
+    ans: 2,
+    exp: "Le Marais Poitevin, surnommé 'Venise verte', est le 2e plus grand marais de France."
+  },
+  {
+    q: "Quelle île vendéenne est reliée au continent par le Passage du Gois à marée basse ?",
+    opts: ["Île d'Yeu", "Île de Noirmoutier", "Île de Ré", "Île de Groix"],
+    ans: 1,
+    exp: "Le Passage du Gois est une chaussée submersible de 4,2 km accessible seulement à marée basse."
+  },
+  {
+    q: "Quel est le nom de la spécialité boulangère emblématique de Vendée ?",
+    opts: ["Le Préfou", "La galette charentaise", "Le far breton", "Le kougelhopf"],
+    ans: 0,
+    exp: "Le Préfou est une baguette de pain aillée et beurrée, apéritif incontournable des tables vendéennes."
+  },
+  {
+    q: "Dans quel département se situe le Puy du Fou, classé meilleur parc d'attractions du monde ?",
+    opts: ["Loire-Atlantique", "Maine-et-Loire", "Vendée", "Deux-Sèvres"],
+    ans: 2,
+    exp: "Le Puy du Fou est situé aux Epesses, en Vendée (85). Il a été classé meilleur parc du monde par Thea Awards."
+  }
+];
+
+let qIndex = 0, score = 0, answered = false;
+
+function renderQuestion() {
+  const q = quizData[qIndex];
+  document.getElementById('quizQuestionText').textContent = q.q;
+  document.getElementById('quizCounter').textContent = 'Question ' + (qIndex + 1) + ' / ' + quizData.length;
+  document.getElementById('quizNext').style.display = 'none';
+  const fb = document.getElementById('quizFeedback');
+  fb.className = 'quiz-feedback'; fb.textContent = '';
+  answered = false;
+
+  const pips = document.querySelectorAll('.quiz-progress-pip');
+  pips.forEach((p, i) => {
+    p.className = 'quiz-progress-pip';
+    if (i < qIndex) p.classList.add('done');
+    else if (i === qIndex) p.classList.add('active');
+  });
+
+  const container = document.getElementById('quizOptions');
+  container.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-option'; btn.textContent = opt;
+    btn.addEventListener('click', () => selectAnswer(i));
+    container.appendChild(btn);
+  });
+}
+
+function selectAnswer(idx) {
+  if (answered) return;
+  answered = true;
+  const q = quizData[qIndex];
+  const btns = document.querySelectorAll('.quiz-option');
+  btns.forEach(b => b.disabled = true);
+  btns[idx].classList.add(idx === q.ans ? 'correct' : 'wrong');
+  if (idx !== q.ans) btns[q.ans].classList.add('correct');
+  const fb = document.getElementById('quizFeedback');
+  if (idx === q.ans) {
+    score++;
+    fb.className = 'quiz-feedback show ok';
+    fb.textContent = '✓ Bonne réponse ! ' + q.exp;
+    earnXP(8, '🎓 Bonne réponse !', null);
+  } else {
+    fb.className = 'quiz-feedback show ko';
+    fb.textContent = '✗ Raté. ' + q.exp;
+  }
+  document.getElementById('quizNext').style.display = 'block';
+}
+
+document.getElementById('quizNext').addEventListener('click', () => {
+  qIndex++;
+  if (qIndex < quizData.length) {
+    renderQuestion();
+  } else {
+    showQuizResult();
+  }
+});
+
+function showQuizResult() {
+  document.getElementById('quizPlay').style.display = 'none';
+  const result = document.getElementById('quizResult');
+  result.classList.add('show');
+  const circle = document.getElementById('quizScoreCircle');
+  const xpEarned = score * 8;
+  document.getElementById('quizScoreNum').textContent = score;
+  let title, desc, bg;
+  if (score === 5) {
+    title = 'Parfait ! 🏆'; desc = 'Score parfait ! Vous êtes un vrai connaisseur de la Vendée.';
+    bg = 'linear-gradient(135deg, #3DB476, #28A065)';
+  } else if (score >= 3) {
+    title = 'Bien joué ! 👏'; desc = 'Belle connaissance du territoire. Continuez à explorer !';
+    bg = 'linear-gradient(135deg, var(--blue-light), var(--blue))';
+  } else {
+    title = 'À améliorer 💪'; desc = 'La Vendée a encore des secrets à vous révéler. Réessayez !';
+    bg = 'linear-gradient(135deg, var(--coral-light), var(--coral))';
+  }
+  circle.style.background = bg; circle.style.color = 'white';
+  document.getElementById('quizResultTitle').textContent = title;
+  document.getElementById('quizResultDesc').textContent = desc;
+  document.getElementById('quizXpEarned').textContent = '+' + xpEarned + ' XP gagnés';
+  earnXP(xpEarned, '🎓 Quiz terminé — ' + score + '/5', score === 5 ? 'Érudit Local' : null);
+  // animate pips all done
+  document.querySelectorAll('.quiz-progress-pip').forEach(p => { p.className = 'quiz-progress-pip done'; });
+}
+
+function resetQuiz() {
+  qIndex = 0; score = 0; answered = false;
+  document.getElementById('quizPlay').style.display = 'block';
+  document.getElementById('quizResult').classList.remove('show');
+  renderQuestion();
+}
+
+function scrollToQuiz() {
+  const el = document.getElementById('quizAnchor');
+  if (el) window.scrollTo({ top: el.offsetTop - 90, behavior: 'smooth' });
+}
+function scrollToMystery() {
+  const el = document.getElementById('mysteryAnchor');
+  if (el) window.scrollTo({ top: el.offsetTop - 90, behavior: 'smooth' });
+}
+
+// Init quiz on load
+renderQuestion();
+
+/* ==============================================================
+   MYSTERY OBJECT
+   ============================================================== */
+let mysteryClue = 1;
+const mysteryAnswer = ['gerle', 'gerle vendéenne', 'gerle de vendée'];
+
+function revealNextClue() {
+  mysteryClue++;
+  const img = document.getElementById('mysteryImg');
+  if (mysteryClue === 2) {
+    img.className = 'mystery-object-display mystery-blur-2';
+    document.getElementById('clueNum2').className = 'mystery-clue-num revealed';
+    document.getElementById('clueText2').className = 'mystery-clue-text revealed';
+    document.getElementById('clueText2').style.filter = '';
+    showToast('🔮', 'Indice 2 révélé', '-10 XP potentiels', null);
+  } else if (mysteryClue >= 3) {
+    img.className = 'mystery-object-display mystery-blur-1';
+    document.getElementById('clueNum3').className = 'mystery-clue-num revealed';
+    document.getElementById('clueText3').className = 'mystery-clue-text revealed';
+    document.getElementById('clueText3').style.filter = '';
+    document.getElementById('mysteryRevealBtn').style.display = 'none';
+    showToast('🔮', 'Indice 3 révélé', '-10 XP potentiels', null);
+  }
+}
+
+function checkMystery() {
+  const val = document.getElementById('mysteryInput').value.trim().toLowerCase();
+  const fb  = document.getElementById('mysteryFeedback');
+  fb.style.display = 'block';
+  if (mysteryAnswer.includes(val)) {
+    document.getElementById('mysteryImg').className = 'mystery-object-display mystery-blur-0';
+    document.getElementById('mysteryInput').className = 'mystery-input success';
+    fb.style.color = '#2A6048'; fb.style.background = 'rgba(125,180,154,.12)';
+    fb.style.padding = '8px 14px'; fb.style.borderRadius = '8px';
+    fb.textContent = '✓ Exact ! La gerle est un tonneau artisanal utilisé pour transporter le vin ou l\'eau-de-vie vendéenne. Bien joué !';
+    const xp = mysteryClue === 1 ? 40 : mysteryClue === 2 ? 30 : 20;
+    earnXP(xp, '🔮 Objet mystère trouvé !', 'Détective');
+    document.getElementById('mysteryRevealBtn').style.display = 'none';
+    document.querySelector('.mystery-guess-row button').disabled = true;
+  } else if (val.length < 2) {
+    fb.style.color = 'var(--text-soft)'; fb.textContent = 'Entrez au moins 2 caractères…';
+  } else {
+    fb.style.color = 'var(--coral-dark)'; fb.style.background = 'rgba(224,122,95,.08)';
+    fb.style.padding = '8px 14px'; fb.style.borderRadius = '8px';
+    fb.textContent = '✗ Pas tout à fait… Utilisez les indices pour affiner votre réponse.';
+  }
+}
+document.getElementById('mysteryInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') checkMystery();
+});
+
+/* ==============================================================
+   DÉFI COUNTDOWN
+   ============================================================== */
+(function() {
+  let secs = 8 * 3600 + 23 * 60 + 41;
+  const h = document.getElementById('cdH');
+  const m = document.getElementById('cdM');
+  const s = document.getElementById('cdS');
+  if (!h) return;
+  setInterval(() => {
+    if (secs <= 0) { secs = 86399; return; }
+    secs--;
+    const hh = Math.floor(secs / 3600);
+    const mm = Math.floor((secs % 3600) / 60);
+    const ss = secs % 60;
+    h.textContent = String(hh).padStart(2, '0');
+    m.textContent = String(mm).padStart(2, '0');
+    s.textContent = String(ss).padStart(2, '0');
+  }, 1000);
+})();
+
+/* ---- Profile modal ---- */
+function openProfileModal() {
+  const overlay = document.getElementById('profileOverlay');
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  // Animate XP bar
+  setTimeout(() => {
+    document.getElementById('pmXpBar').style.width = '85%';
+  }, 350);
+}
+function closeProfileModal() {
+  document.getElementById('profileOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  document.getElementById('pmXpBar').style.width = '0';
+}
+document.getElementById('openProfile').addEventListener('click', openProfileModal);
+document.getElementById('openProfileMobile').addEventListener('click', openProfileModal);
+document.getElementById('closeProfile').addEventListener('click', closeProfileModal);
+document.getElementById('profileOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeProfileModal();
+});
+// Profile tabs
+document.querySelectorAll('.pm-tab').forEach(tab => {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.pm-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.pm-tab-content').forEach(c => c.classList.remove('active'));
+    this.classList.add('active');
+    document.getElementById('tab-' + this.dataset.tab).classList.add('active');
+  });
+});
+// Close on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeProfileModal();
+});
+
+/* ---- Smooth scroll offset for fixed nav ---- */
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function(e) {
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      const offset = 80;
+      window.scrollTo({ top: target.offsetTop - offset, behavior: 'smooth' });
+    }
+  });
+});
+</script>
+
+</body>
+</html>

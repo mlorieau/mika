@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tribu du Littoral · Mika</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --beige-lightest: #FAF6EF;
+    --beige-light: #F0E6D3;
+    --beige-mid: #DDD0BC;
+    --coral: #E07A5F;
+    --coral-light: #F5A98A;
+    --coral-dark: #C45E44;
+    --blue: #3B8AB5;
+    --blue-light: #7AB8D4;
+    --blue-dark: #255F82;
+    --green: #7DB49A;
+    --amber: #D4A843;
+    --text: #2A2520;
+    --text-muted: #6B5E54;
+    --white: #FFFFFF;
+    --gold: #E8C547;
+    --gold-dark: #C9962A;
+    --silver: #C8D4DC;
+    --silver-dark: #9AAAB8;
+    --bronze: #D4A878;
+    --bronze-dark: #A07850;
+    --shadow-sm: 0 1px 3px rgba(42,37,32,.08);
+    --shadow-md: 0 4px 16px rgba(42,37,32,.10);
+    --shadow-lg: 0 8px 32px rgba(42,37,32,.14);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: var(--beige-lightest);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  /* ─── NAVBAR ─── */
+  .navbar {
+    background: var(--white);
+    border-bottom: 1px solid var(--beige-mid);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow-sm);
+  }
+  .nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+  .logo {
+    font-size: 1.6rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+    text-decoration: none;
+    color: var(--text);
+    flex-shrink: 0;
+  }
+  .logo span { color: var(--coral); }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    list-style: none;
+    flex: 1;
+  }
+  .nav-links a {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: .9rem;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: background .15s, color .15s;
+  }
+  .nav-links a:hover { background: var(--beige-light); color: var(--text); }
+  .nav-links a.active { color: var(--coral); font-weight: 600; background: rgba(224,122,95,.08); }
+  .nav-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .btn-profil {
+    background: var(--blue);
+    color: var(--white);
+    border: none;
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-size: .88rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .15s;
+  }
+  .btn-profil:hover { background: var(--blue-dark); }
+  .btn-rejoindre {
+    background: var(--coral);
+    color: var(--white);
+    border: none;
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-size: .88rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .15s;
+  }
+  .btn-rejoindre:hover { background: var(--coral-dark); }
+  .hamburger {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    flex-direction: column;
+    gap: 5px;
+    padding: 4px;
+    margin-left: auto;
+  }
+  .hamburger span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: var(--text);
+    border-radius: 2px;
+  }
+  .mobile-menu {
+    display: none;
+    background: var(--white);
+    border-bottom: 1px solid var(--beige-mid);
+    padding: 16px 24px;
+  }
+  .mobile-menu.open { display: block; }
+  .mobile-menu a {
+    display: block;
+    padding: 10px 0;
+    text-decoration: none;
+    color: var(--text-muted);
+    font-weight: 500;
+    border-bottom: 1px solid var(--beige-light);
+  }
+  .mobile-menu a:last-child { border-bottom: none; }
+
+  /* ─── HERO BANNER ─── */
+  .hero {
+    background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue) 50%, var(--blue-light) 100%);
+    color: var(--white);
+    padding: 64px 24px 56px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    right: -80px;
+    top: -80px;
+    width: 380px;
+    height: 380px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.06);
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    left: -40px;
+    bottom: -60px;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.04);
+  }
+  .hero-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-icon { font-size: 4rem; margin-bottom: 16px; display: block; }
+  .hero-title { font-size: 2.6rem; font-weight: 900; letter-spacing: -1px; margin-bottom: 8px; }
+  .hero-sub { font-size: 1.1rem; opacity: .82; margin-bottom: 28px; font-style: italic; }
+  .hero-meta { font-size: .82rem; opacity: .65; margin-bottom: 28px; }
+  .hero-stats {
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+  }
+  .hero-stat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,.14);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 12px;
+    padding: 10px 18px;
+  }
+  .hero-stat-icon { font-size: 1.2rem; }
+  .hero-stat-val { font-size: 1.1rem; font-weight: 800; }
+  .hero-stat-lbl { font-size: .75rem; opacity: .8; }
+
+  /* ─── CONTENT WRAPPER ─── */
+  .content-wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  .section { margin-bottom: 48px; }
+  .section-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-sub { font-size: .88rem; color: var(--text-muted); margin-bottom: 28px; }
+
+  /* ─── CARD ─── */
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    padding: 28px;
+  }
+
+  /* ─── PODIUM ─── */
+  .podium-stage {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 16px;
+    padding: 20px 0 0;
+    min-height: 340px;
+  }
+  .podium-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    max-width: 220px;
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity .5s, transform .5s;
+  }
+  .podium-col.visible { opacity: 1; transform: translateY(0); }
+  .podium-col:nth-child(1) { transition-delay: .2s; } /* 2nd place left */
+  .podium-col:nth-child(2) { transition-delay: 0s; }   /* 1st place center */
+  .podium-col:nth-child(3) { transition-delay: .4s; }  /* 3rd place right */
+
+  .podium-avatar-wrap { position: relative; margin-bottom: 10px; }
+  .podium-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    box-shadow: var(--shadow-md);
+    border: 3px solid var(--white);
+  }
+  .pa-gold { background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%); }
+  .pa-silver { background: linear-gradient(135deg, var(--silver) 0%, var(--silver-dark) 100%); }
+  .pa-bronze { background: linear-gradient(135deg, var(--bronze) 0%, var(--bronze-dark) 100%); }
+
+  .podium-1st .podium-avatar {
+    width: 96px;
+    height: 96px;
+    font-size: 2.6rem;
+    box-shadow: 0 0 0 4px var(--white), 0 0 0 8px rgba(232,197,71,.5), var(--shadow-lg);
+  }
+  .podium-medal {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    font-size: 1.4rem;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,.2));
+  }
+  .podium-name {
+    font-size: .9rem;
+    font-weight: 700;
+    color: var(--text);
+    text-align: center;
+    margin-bottom: 3px;
+  }
+  .podium-1st .podium-name { font-size: 1rem; }
+  .podium-personality {
+    font-size: .72rem;
+    color: var(--text-muted);
+    text-align: center;
+    font-style: italic;
+    margin-bottom: 6px;
+  }
+  .podium-chips {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .chip-level {
+    background: var(--blue);
+    color: var(--white);
+    font-size: .68rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+  .chip-xp {
+    background: rgba(212,168,67,.15);
+    color: var(--amber);
+    font-size: .68rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+  .chip-badges {
+    background: var(--beige-light);
+    color: var(--text-muted);
+    font-size: .68rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+  .podium-block {
+    width: 100%;
+    border-radius: 14px 14px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 8px;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: rgba(255,255,255,.7);
+    text-shadow: 0 2px 4px rgba(0,0,0,.15);
+    position: relative;
+  }
+  .pb-1st {
+    background: linear-gradient(160deg, var(--gold) 0%, var(--gold-dark) 100%);
+    height: 130px;
+    box-shadow: 0 -4px 20px rgba(232,197,71,.4);
+  }
+  .pb-2nd {
+    background: linear-gradient(160deg, var(--silver) 0%, var(--silver-dark) 100%);
+    height: 90px;
+  }
+  .pb-3rd {
+    background: linear-gradient(160deg, var(--bronze) 0%, var(--bronze-dark) 100%);
+    height: 65px;
+  }
+  .pb-rank { font-size: 1.2rem; font-weight: 900; opacity: .6; }
+
+  /* ─── LEADERBOARD BELOW PODIUM ─── */
+  .leaderboard-list { list-style: none; }
+  .lb-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border-radius: var(--radius-sm);
+    transition: background .15s;
+  }
+  .lb-item:hover { background: var(--beige-lightest); }
+  .lb-rank {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--beige-light);
+    color: var(--text-muted);
+    font-size: .8rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .lb-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--beige-mid);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+  .lb-name { font-size: .9rem; font-weight: 600; flex: 1; }
+  .lb-level { font-size: .72rem; color: var(--blue); font-weight: 700; background: rgba(59,138,181,.1); padding: 2px 8px; border-radius: 999px; }
+  .lb-xp { font-size: .88rem; font-weight: 700; color: var(--amber); min-width: 70px; text-align: right; }
+  .lb-divider {
+    height: 1px;
+    background: var(--beige-light);
+    margin: 4px 14px;
+  }
+
+  /* ─── CHART SECTION ─── */
+  .chart-wrap {
+    background: var(--beige-lightest);
+    border-radius: var(--radius-sm);
+    padding: 20px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .chart-title { font-size: .88rem; font-weight: 700; color: var(--text-muted); margin-bottom: 16px; text-transform: uppercase; letter-spacing: .05em; }
+  .svg-chart { width: 100%; height: 200px; display: block; overflow: visible; }
+
+  .chart-stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .chart-stat-box {
+    background: var(--white);
+    border: 1px solid var(--beige-mid);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    text-align: center;
+  }
+  .csb-label { font-size: .75rem; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; }
+  .csb-value { font-size: 1.3rem; font-weight: 800; color: var(--blue); }
+  .csb-unit { font-size: .72rem; color: var(--text-muted); font-weight: 500; }
+
+  .stacked-bar-title { font-size: .82rem; font-weight: 700; color: var(--text-muted); margin-bottom: 10px; }
+  .stacked-bar-wrap {
+    background: var(--beige-mid);
+    border-radius: 999px;
+    height: 20px;
+    overflow: hidden;
+    display: flex;
+    margin-bottom: 8px;
+  }
+  .sb-segment { height: 100%; transition: width 1s cubic-bezier(.4,0,.2,1) .5s; }
+  .sb-missions { background: var(--blue); }
+  .sb-jeux { background: var(--coral); }
+  .sb-social { background: var(--green); }
+  .stacked-legend {
+    display: flex;
+    gap: 16px;
+    font-size: .75rem;
+    color: var(--text-muted);
+  }
+  .sl-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+
+  /* ─── MEMBERS SECTION ─── */
+  .members-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .search-input {
+    flex: 1;
+    min-width: 160px;
+    background: var(--beige-lightest);
+    border: 1.5px solid var(--beige-mid);
+    border-radius: 10px;
+    padding: 9px 14px;
+    font-size: .9rem;
+    color: var(--text);
+    outline: none;
+    font-family: inherit;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .search-input:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(59,138,181,.12);
+  }
+  .filter-tabs {
+    display: flex;
+    gap: 6px;
+  }
+  .filter-tab {
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1.5px solid var(--beige-mid);
+    background: var(--white);
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: background .15s, border-color .15s, color .15s;
+    white-space: nowrap;
+  }
+  .filter-tab:hover { border-color: var(--blue-light); }
+  .filter-tab.active { background: var(--blue); border-color: var(--blue); color: var(--white); }
+
+  .members-table { width: 100%; border-collapse: collapse; }
+  .members-table thead tr {
+    border-bottom: 2px solid var(--beige-mid);
+  }
+  .members-table th {
+    text-align: left;
+    font-size: .74rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    padding: 10px 12px;
+  }
+  .members-table th:last-child, .members-table td:last-child { text-align: right; }
+  .members-table tbody tr {
+    border-bottom: 1px solid var(--beige-light);
+    transition: background .15s;
+  }
+  .members-table tbody tr:last-child { border-bottom: none; }
+  .members-table tbody tr:hover { background: var(--beige-lightest); }
+  .members-table td {
+    padding: 12px 12px;
+    font-size: .88rem;
+    vertical-align: middle;
+  }
+  .m-rank-num {
+    width: 28px;
+    height: 28px;
+    background: var(--beige-light);
+    color: var(--text-muted);
+    font-size: .78rem;
+    font-weight: 700;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .m-avatar-cell { display: flex; align-items: center; gap: 10px; }
+  .m-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--beige-mid);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+  .m-name { font-weight: 700; color: var(--text); }
+  .m-level { font-size: .72rem; color: var(--blue); font-weight: 700; background: rgba(59,138,181,.1); padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+  .m-xp { font-weight: 700; color: var(--amber); }
+  .m-missions { color: var(--text-muted); }
+  .m-badges { color: var(--text-muted); }
+
+  /* ─── MISSIONS SECTION ─── */
+  .missions-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .mission-card {
+    background: var(--beige-lightest);
+    border: 1px solid var(--beige-mid);
+    border-radius: 14px;
+    padding: 20px;
+    transition: transform .15s, box-shadow .15s;
+  }
+  .mission-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .mc-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .mc-icon {
+    width: 44px;
+    height: 44px;
+    background: var(--white);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    box-shadow: var(--shadow-sm);
+  }
+  .mc-status {
+    font-size: .72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+  }
+  .mcs-active { background: rgba(125,180,154,.2); color: var(--green); }
+  .mcs-urgent { background: rgba(224,122,95,.15); color: var(--coral); }
+  .mcs-new { background: rgba(59,138,181,.12); color: var(--blue); }
+  .mc-name { font-size: .95rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .mc-xp { font-size: .78rem; color: var(--coral); font-weight: 700; margin-bottom: 12px; }
+  .mc-prog-label { display: flex; justify-content: space-between; font-size: .74rem; color: var(--text-muted); margin-bottom: 5px; }
+  .prog-bar-bg { background: var(--beige-mid); border-radius: 999px; height: 6px; overflow: hidden; }
+  .prog-bar-fill { height: 100%; background: linear-gradient(90deg, var(--blue) 0%, var(--blue-light) 100%); border-radius: 999px; }
+
+  .cta-missions {
+    text-align: right;
+  }
+  .link-cta {
+    color: var(--blue);
+    font-size: .9rem;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: gap .15s;
+  }
+  .link-cta:hover { gap: 8px; }
+
+  /* ─── JOIN CARD ─── */
+  .join-card {
+    background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue) 40%, var(--coral) 100%);
+    border-radius: var(--radius);
+    padding: 40px 36px;
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    overflow: hidden;
+  }
+  .join-card::before {
+    content: '';
+    position: absolute;
+    right: -40px;
+    top: -40px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.07);
+  }
+  .join-card-icon { font-size: 3rem; margin-bottom: 12px; }
+  .join-card-body { flex: 1; position: relative; }
+  .join-card h2 { font-size: 1.5rem; font-weight: 900; margin-bottom: 8px; }
+  .join-card p { font-size: .9rem; opacity: .88; margin-bottom: 14px; }
+  .join-card-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,.18);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: .82rem;
+    font-weight: 700;
+  }
+  .btn-join-big {
+    background: var(--white);
+    color: var(--coral-dark);
+    border: none;
+    border-radius: 14px;
+    padding: 16px 32px;
+    font-size: 1rem;
+    font-weight: 800;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform .15s, box-shadow .15s;
+    flex-shrink: 0;
+    white-space: nowrap;
+    position: relative;
+    box-shadow: 0 4px 16px rgba(0,0,0,.12);
+  }
+  .btn-join-big:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.18); }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    .nav-links, .nav-actions .btn-rejoindre { display: none; }
+    .hamburger { display: flex; }
+    .hero-title { font-size: 1.8rem; }
+    .missions-grid { grid-template-columns: 1fr; }
+    .chart-stats-row { grid-template-columns: 1fr 1fr; }
+    .podium-stage { min-height: 280px; }
+    .podium-avatar { width: 64px; height: 64px; font-size: 1.7rem; }
+    .podium-1st .podium-avatar { width: 80px; height: 80px; font-size: 2rem; }
+    .join-card { flex-direction: column; text-align: center; }
+  }
+  @media (max-width: 640px) {
+    .hero-stats { gap: 10px; }
+    .hero-stat { padding: 8px 12px; }
+    .chart-stats-row { grid-template-columns: 1fr; }
+    .members-table th:nth-child(4), .members-table td:nth-child(4),
+    .members-table th:nth-child(5), .members-table td:nth-child(5) { display: none; }
+    .podium-stage { gap: 8px; }
+    .podium-block { border-radius: 10px 10px 0 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── NAVBAR ─── -->
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="logo">mi<span>ka</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Accueil</a></li>
+      <li><a href="tribu.html" class="active">Tribus</a></li>
+      <li><a href="#">Jeux</a></li>
+      <li><a href="#">Missions</a></li>
+      <li><a href="#">Badges</a></li>
+      <li><a href="#">Classement</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="profil.html" class="btn-profil">Mon profil</a>
+      <a href="inscription.html" class="btn-rejoindre">Rejoindre</a>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html">Accueil</a>
+  <a href="tribu.html" style="color:var(--coral);font-weight:700;">Tribus</a>
+  <a href="#">Jeux</a>
+  <a href="#">Missions</a>
+  <a href="#">Badges</a>
+  <a href="#">Classement</a>
+  <a href="profil.html" style="color:var(--blue);font-weight:700;">Mon profil</a>
+  <a href="inscription.html" style="color:var(--coral);font-weight:700;">Rejoindre</a>
+</div>
+
+<!-- ─── HERO BANNER ─── -->
+<div class="hero">
+  <div class="hero-inner">
+    <span class="hero-icon">🌊</span>
+    <h1 class="hero-title">Tribu du Littoral</h1>
+    <p class="hero-sub">Là où la terre rencontre l'océan</p>
+    <p class="hero-meta">Fondée le 12 mars 2023 · Vendée, France</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="hero-stat-icon">👥</span>
+        <div>
+          <div class="hero-stat-val">438</div>
+          <div class="hero-stat-lbl">membres</div>
+        </div>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-icon">⚡</span>
+        <div>
+          <div class="hero-stat-val">12 840</div>
+          <div class="hero-stat-lbl">XP collectifs</div>
+        </div>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-icon">🎯</span>
+        <div>
+          <div class="hero-stat-val">23</div>
+          <div class="hero-stat-lbl">missions</div>
+        </div>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-icon">🏆</span>
+        <div>
+          <div class="hero-stat-val">Rang #1</div>
+          <div class="hero-stat-lbl">classement</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── CONTENT ─── -->
+<div class="content-wrap">
+
+  <!-- ─── PODIUM DES MASCOTTES ─── -->
+  <section class="section">
+    <h2 class="section-title">🏆 Podium des Mascottes</h2>
+    <p class="section-sub">Les membres les plus actifs de la Tribu du Littoral ce mois-ci</p>
+
+    <div class="card">
+      <!-- Podium -->
+      <div class="podium-stage" id="podiumStage">
+
+        <!-- 2nd place — left -->
+        <div class="podium-col" id="p2">
+          <div class="podium-avatar-wrap">
+            <div class="podium-avatar pa-silver">🐬</div>
+            <span class="podium-medal">🥈</span>
+          </div>
+          <div class="podium-name">Marie-Ange L.</div>
+          <div class="podium-personality">La Dauphine Cartographe</div>
+          <div class="podium-chips">
+            <span class="chip-level">Niv. 9</span>
+            <span class="chip-xp">2 140 XP</span>
+            <span class="chip-badges">🏅 11</span>
+          </div>
+          <div class="podium-block pb-2nd">
+            <span class="pb-rank">2</span>
+          </div>
+        </div>
+
+        <!-- 1st place — center -->
+        <div class="podium-col podium-1st" id="p1">
+          <div class="podium-avatar-wrap">
+            <div class="podium-avatar pa-gold">🦭</div>
+            <span class="podium-medal">🥇</span>
+          </div>
+          <div class="podium-name">Thomas D.</div>
+          <div class="podium-personality">Le Phoque Navigateur</div>
+          <div class="podium-chips">
+            <span class="chip-level">Niv. 12</span>
+            <span class="chip-xp">3 890 XP</span>
+            <span class="chip-badges">🏅 18</span>
+          </div>
+          <div class="podium-block pb-1st">
+            <span class="pb-rank">1</span>
+          </div>
+        </div>
+
+        <!-- 3rd place — right -->
+        <div class="podium-col" id="p3">
+          <div class="podium-avatar-wrap">
+            <div class="podium-avatar pa-bronze">🦀</div>
+            <span class="podium-medal">🥉</span>
+          </div>
+          <div class="podium-name">Lucas B.</div>
+          <div class="podium-personality">Le Crabe Explorateur</div>
+          <div class="podium-chips">
+            <span class="chip-level">Niv. 7</span>
+            <span class="chip-xp">1 760 XP</span>
+            <span class="chip-badges">🏅 8</span>
+          </div>
+          <div class="podium-block pb-3rd">
+            <span class="pb-rank">3</span>
+          </div>
+        </div>
+
+      </div><!-- /podium-stage -->
+
+      <!-- Ranks 4–10 -->
+      <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--beige-light);">
+        <div style="font-size:.78rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;padding-left:14px;">Suite du classement</div>
+        <ul class="leaderboard-list">
+          <li class="lb-item">
+            <div class="lb-rank">4</div>
+            <div class="lb-avatar">🦦</div>
+            <span class="lb-name">Isabelle M.</span>
+            <span class="lb-level">Niv. 8</span>
+            <span class="lb-xp">1 540 XP</span>
+          </li>
+          <div class="lb-divider"></div>
+          <li class="lb-item">
+            <div class="lb-rank">5</div>
+            <div class="lb-avatar">🐚</div>
+            <span class="lb-name">Romain T.</span>
+            <span class="lb-level">Niv. 6</span>
+            <span class="lb-xp">1 320 XP</span>
+          </li>
+          <div class="lb-divider"></div>
+          <li class="lb-item">
+            <div class="lb-rank">6</div>
+            <div class="lb-avatar">🦈</div>
+            <span class="lb-name">Céline P.</span>
+            <span class="lb-level">Niv. 7</span>
+            <span class="lb-xp">1 180 XP</span>
+          </li>
+          <div class="lb-divider"></div>
+          <li class="lb-item">
+            <div class="lb-rank">7</div>
+            <div class="lb-avatar">🌊</div>
+            <span class="lb-name">Antoine R.</span>
+            <span class="lb-level">Niv. 5</span>
+            <span class="lb-xp">990 XP</span>
+          </li>
+          <div class="lb-divider"></div>
+          <li class="lb-item">
+            <div class="lb-rank">8</div>
+            <div class="lb-avatar">🪸</div>
+            <span class="lb-name">Lucie V.</span>
+            <span class="lb-level">Niv. 6</span>
+            <span class="lb-xp">870 XP</span>
+          </li>
+          <div class="lb-divider"></div>
+          <li class="lb-item">
+            <div class="lb-rank">9</div>
+            <div class="lb-avatar">🦭</div>
+            <span class="lb-name">Kevin A.</span>
+            <span class="lb-level">Niv. 4</span>
+            <span class="lb-xp">740 XP</span>
+          </li>
+          <div class="lb-divider"></div>
+          <li class="lb-item">
+            <div class="lb-rank">10</div>
+            <div class="lb-avatar">🐦</div>
+            <span class="lb-name">Margot F.</span>
+            <span class="lb-level">Niv. 5</span>
+            <span class="lb-xp">620 XP</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── HISTORIQUE DES POINTS ─── -->
+  <section class="section">
+    <h2 class="section-title">📊 Historique des Points</h2>
+    <p class="section-sub">Évolution de l'XP collectif de la tribu sur les 8 dernières semaines</p>
+
+    <div class="card">
+      <div class="chart-wrap">
+        <div class="chart-title">XP par semaine</div>
+        <!-- SVG Bar Chart — data: [420, 680, 510, 890, 1100, 780, 950, 1240] -->
+        <svg class="svg-chart" id="barChart" viewBox="0 0 640 200" preserveAspectRatio="xMidYMid meet">
+          <!-- Y-axis labels -->
+          <text x="30" y="195" font-size="11" fill="#6B5E54" text-anchor="end">0</text>
+          <text x="30" y="155" font-size="11" fill="#6B5E54" text-anchor="end">300</text>
+          <text x="30" y="115" font-size="11" fill="#6B5E54" text-anchor="end">600</text>
+          <text x="30" y="75" font-size="11" fill="#6B5E54" text-anchor="end">900</text>
+          <text x="30" y="35" font-size="11" fill="#6B5E54" text-anchor="end">1200</text>
+          <!-- Gridlines -->
+          <line x1="38" y1="190" x2="630" y2="190" stroke="#DDD0BC" stroke-width="1"/>
+          <line x1="38" y1="150" x2="630" y2="150" stroke="#DDD0BC" stroke-width="0.5" stroke-dasharray="4,4"/>
+          <line x1="38" y1="110" x2="630" y2="110" stroke="#DDD0BC" stroke-width="0.5" stroke-dasharray="4,4"/>
+          <line x1="38" y1="70" x2="630" y2="70" stroke="#DDD0BC" stroke-width="0.5" stroke-dasharray="4,4"/>
+          <line x1="38" y1="30" x2="630" y2="30" stroke="#DDD0BC" stroke-width="0.5" stroke-dasharray="4,4"/>
+
+          <!-- Bars: max=1300, chartH=160, base y=190 -->
+          <!-- W1: 420 → h = 420/1300*160 ≈ 51.7 → y=190-52=138 -->
+          <rect class="chart-bar" data-h="51.7" x="48" y="190" width="52" height="0" rx="5" fill="#3B8AB5"/>
+          <text x="74" y="207" font-size="11" fill="#6B5E54" text-anchor="middle">S1</text>
+
+          <!-- W2: 680 → h = 83.7 → y=106 -->
+          <rect class="chart-bar" data-h="83.7" x="122" y="190" width="52" height="0" rx="5" fill="#3B8AB5"/>
+          <text x="148" y="207" font-size="11" fill="#6B5E54" text-anchor="middle">S2</text>
+
+          <!-- W3: 510 → h = 62.8 → y=127 -->
+          <rect class="chart-bar" data-h="62.8" x="196" y="190" width="52" height="0" rx="5" fill="#3B8AB5"/>
+          <text x="222" y="207" font-size="11" fill="#6B5E54" text-anchor="middle">S3</text>
+
+          <!-- W4: 890 → h = 109.5 → y=80 -->
+          <rect class="chart-bar" data-h="109.5" x="270" y="190" width="52" height="0" rx="5" fill="#3B8AB5"/>
+          <text x="296" y="207" font-size="11" fill="#6B5E54" text-anchor="middle">S4</text>
+
+          <!-- W5: 1100 → h = 135.4 → y=55 -->
+          <rect class="chart-bar" data-h="135.4" x="344" y="190" width="52" height="0" rx="5" fill="#3B8AB5"/>
+          <text x="370" y="207" font-size="11" fill="#6B5E54" text-anchor="middle">S5</text>
+
+          <!-- W6: 780 → h = 96 → y=94 -->
+          <rect class="chart-bar" data-h="96" x="418" y="190" width="52" height="0" rx="5" fill="#3B8AB5"/>
+          <text x="444" y="207" font-size="11" fill="#6B5E54" text-anchor="middle">S6</text>
+
+          <!-- W7: 950 → h = 116.9 → y=73 -->
+          <rect class="chart-bar" data-h="116.9" x="492" y="190" width="52" height="0" rx="5" fill="#3B8AB5"/>
+          <text x="518" y="207" font-size="11" fill="#6B5E54" text-anchor="middle">S7</text>
+
+          <!-- W8: 1240 → h = 152.6 → y=37 — CORAL accent (highest) -->
+          <rect class="chart-bar" data-h="152.6" x="566" y="190" width="52" height="0" rx="5" fill="#E07A5F"/>
+          <text x="592" y="207" font-size="11" fill="#E07A5F" font-weight="700" text-anchor="middle">S8</text>
+          <!-- Value label on top of W8 -->
+          <text class="chart-bar-label" x="592" y="30" font-size="11" fill="#E07A5F" font-weight="700" text-anchor="middle" opacity="0">1 240 XP</text>
+        </svg>
+      </div>
+
+      <div class="chart-stats-row">
+        <div class="chart-stat-box">
+          <div class="csb-label">Semaine en cours</div>
+          <div class="csb-value">1 240</div>
+          <div class="csb-unit">XP</div>
+        </div>
+        <div class="chart-stat-box">
+          <div class="csb-label">Moyenne</div>
+          <div class="csb-value">821</div>
+          <div class="csb-unit">XP / semaine</div>
+        </div>
+        <div class="chart-stat-box">
+          <div class="csb-label">Record</div>
+          <div class="csb-value">1 240</div>
+          <div class="csb-unit">XP (S8)</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="stacked-bar-title">Répartition par activité cette semaine</div>
+        <div class="stacked-bar-wrap">
+          <div class="sb-segment sb-missions" id="sbMissions" style="width:0%"></div>
+          <div class="sb-segment sb-jeux" id="sbJeux" style="width:0%"></div>
+          <div class="sb-segment sb-social" id="sbSocial" style="width:0%"></div>
+        </div>
+        <div class="stacked-legend">
+          <span><span class="sl-dot" style="background:var(--blue)"></span>Missions (55%)</span>
+          <span><span class="sl-dot" style="background:var(--coral)"></span>Jeux (28%)</span>
+          <span><span class="sl-dot" style="background:var(--green)"></span>Social (17%)</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── MEMBRES ACTIFS ─── -->
+  <section class="section">
+    <h2 class="section-title">👥 Membres Actifs</h2>
+    <p class="section-sub">Classement des membres les plus impliqués dans la tribu</p>
+
+    <div class="card">
+      <div class="members-header">
+        <input class="search-input" type="text" id="memberSearch" placeholder="🔍  Rechercher un membre…">
+        <div class="filter-tabs">
+          <button class="filter-tab active" data-period="month">Ce mois</button>
+          <button class="filter-tab" data-period="total">Total</button>
+          <button class="filter-tab" data-period="week">Cette semaine</button>
+        </div>
+      </div>
+
+      <table class="members-table" id="membersTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th colspan="2">Membre</th>
+            <th>Niveau</th>
+            <th>XP</th>
+            <th>Missions</th>
+            <th>Badges</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-name="thomas d">
+            <td><div class="m-rank-num">1</div></td>
+            <td colspan="2">
+              <div class="m-avatar-cell">
+                <div class="m-avatar">🦭</div>
+                <span class="m-name">Thomas D.</span>
+              </div>
+            </td>
+            <td><span class="m-level">Niv. 12</span></td>
+            <td class="m-xp">3 890</td>
+            <td class="m-missions">41</td>
+            <td class="m-badges">18</td>
+          </tr>
+          <tr data-name="marie-ange l">
+            <td><div class="m-rank-num">2</div></td>
+            <td colspan="2">
+              <div class="m-avatar-cell">
+                <div class="m-avatar">🐬</div>
+                <span class="m-name">Marie-Ange L.</span>
+              </div>
+            </td>
+            <td><span class="m-level">Niv. 9</span></td>
+            <td class="m-xp">2 140</td>
+            <td class="m-missions">28</td>
+            <td class="m-badges">11</td>
+          </tr>
+          <tr data-name="lucas b">
+            <td><div class="m-rank-num">3</div></td>
+            <td colspan="2">
+              <div class="m-avatar-cell">
+                <div class="m-avatar">🦀</div>
+                <span class="m-name">Lucas B.</span>
+              </div>
+            </td>
+            <td><span class="m-level">Niv. 7</span></td>
+            <td class="m-xp">1 760</td>
+            <td class="m-missions">22</td>
+            <td class="m-badges">8</td>
+          </tr>
+          <tr data-name="isabelle m">
+            <td><div class="m-rank-num">4</div></td>
+            <td colspan="2">
+              <div class="m-avatar-cell">
+                <div class="m-avatar">🦦</div>
+                <span class="m-name">Isabelle M.</span>
+              </div>
+            </td>
+            <td><span class="m-level">Niv. 8</span></td>
+            <td class="m-xp">1 540</td>
+            <td class="m-missions">19</td>
+            <td class="m-badges">9</td>
+          </tr>
+          <tr data-name="sophie martin">
+            <td><div class="m-rank-num">5</div></td>
+            <td colspan="2">
+              <div class="m-avatar-cell">
+                <div class="m-avatar">🧭</div>
+                <span class="m-name">Sophie Martin</span>
+              </div>
+            </td>
+            <td><span class="m-level">Niv. 7</span></td>
+            <td class="m-xp">1 320</td>
+            <td class="m-missions">14</td>
+            <td class="m-badges">6</td>
+          </tr>
+          <tr data-name="céline p">
+            <td><div class="m-rank-num">6</div></td>
+            <td colspan="2">
+              <div class="m-avatar-cell">
+                <div class="m-avatar">🦈</div>
+                <span class="m-name">Céline P.</span>
+              </div>
+            </td>
+            <td><span class="m-level">Niv. 7</span></td>
+            <td class="m-xp">1 180</td>
+            <td class="m-missions">15</td>
+            <td class="m-badges">7</td>
+          </tr>
+          <tr data-name="antoine r">
+            <td><div class="m-rank-num">7</div></td>
+            <td colspan="2">
+              <div class="m-avatar-cell">
+                <div class="m-avatar">🌊</div>
+                <span class="m-name">Antoine R.</span>
+              </div>
+            </td>
+            <td><span class="m-level">Niv. 5</span></td>
+            <td class="m-xp">990</td>
+            <td class="m-missions">12</td>
+            <td class="m-badges">5</td>
+          </tr>
+          <tr data-name="lucie v">
+            <td><div class="m-rank-num">8</div></td>
+            <td colspan="2">
+              <div class="m-avatar-cell">
+                <div class="m-avatar">🪸</div>
+                <span class="m-name">Lucie V.</span>
+              </div>
+            </td>
+            <td><span class="m-level">Niv. 6</span></td>
+            <td class="m-xp">870</td>
+            <td class="m-missions">10</td>
+            <td class="m-badges">4</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ─── MISSIONS DE LA TRIBU ─── -->
+  <section class="section">
+    <h2 class="section-title">🎯 Missions de la Tribu</h2>
+    <p class="section-sub">Missions actives pour les membres de la Tribu du Littoral</p>
+
+    <div class="missions-grid">
+      <div class="mission-card">
+        <div class="mc-head">
+          <div class="mc-icon">📸</div>
+          <span class="mc-status mcs-active">En cours</span>
+        </div>
+        <div class="mc-name">Grande Traversée Photographique</div>
+        <div class="mc-xp">+350 XP collectifs</div>
+        <div class="mc-prog-label"><span>287 / 500 photos</span><span>57%</span></div>
+        <div class="prog-bar-bg"><div class="prog-bar-fill" style="width:57%"></div></div>
+      </div>
+      <div class="mission-card">
+        <div class="mc-head">
+          <div class="mc-icon">🌿</div>
+          <span class="mc-status mcs-urgent">⚡ Urgent</span>
+        </div>
+        <div class="mc-name">Inventaire de la flore côtière</div>
+        <div class="mc-xp">+280 XP collectifs</div>
+        <div class="mc-prog-label"><span>63 / 80 espèces</span><span>79%</span></div>
+        <div class="prog-bar-bg"><div class="prog-bar-fill" style="width:79%;background:linear-gradient(90deg,var(--coral) 0%,var(--coral-light) 100%)"></div></div>
+      </div>
+      <div class="mission-card">
+        <div class="mc-head">
+          <div class="mc-icon">🗺️</div>
+          <span class="mc-status mcs-new">Nouveau</span>
+        </div>
+        <div class="mc-name">Cartographie des sentiers perdus</div>
+        <div class="mc-xp">+500 XP collectifs</div>
+        <div class="mc-prog-label"><span>4 / 20 sentiers</span><span>20%</span></div>
+        <div class="prog-bar-bg"><div class="prog-bar-fill" style="width:20%;background:linear-gradient(90deg,var(--green) 0%,#A0CCB8 100%)"></div></div>
+      </div>
+    </div>
+    <div class="cta-missions">
+      <a href="#" class="link-cta">Voir toutes les missions →</a>
+    </div>
+  </section>
+
+  <!-- ─── REJOINDRE LA TRIBU ─── -->
+  <section class="section">
+    <div class="join-card">
+      <div class="join-card-body">
+        <div class="join-card-icon">🌊</div>
+        <h2>Rejoignez la Tribu du Littoral</h2>
+        <p>Explorez les côtes vendéennes, participez aux missions collectives et rejoignez une communauté passionnée de la nature et du patrimoine local.</p>
+        <div class="join-card-stat">👥 438 membres actifs</div>
+      </div>
+      <a href="inscription.html" class="btn-join-big">Rejoindre la tribu →</a>
+    </div>
+  </section>
+
+</div><!-- /content-wrap -->
+
+<script>
+  // ─── HAMBURGER ───
+  document.getElementById('hamburger').addEventListener('click', function() {
+    document.getElementById('mobileMenu').classList.toggle('open');
+  });
+
+  // ─── PODIUM ENTRANCE ANIMATION ───
+  var podiumObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        // Animate each column with slight stagger
+        var cols = entry.target.querySelectorAll('.podium-col');
+        cols.forEach(function(col) {
+          col.classList.add('visible');
+        });
+        podiumObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.2 });
+
+  var podiumEl = document.getElementById('podiumStage');
+  if (podiumEl) podiumObserver.observe(podiumEl);
+
+  // ─── SVG BAR CHART ANIMATION ───
+  var chartObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        animateChart();
+        chartObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.3 });
+
+  var chartEl = document.getElementById('barChart');
+  if (chartEl) chartObserver.observe(chartEl);
+
+  function animateChart() {
+    var bars = document.querySelectorAll('.chart-bar');
+    bars.forEach(function(bar, i) {
+      var targetH = parseFloat(bar.dataset.h);
+      setTimeout(function() {
+        bar.setAttribute('y', 190 - targetH);
+        bar.setAttribute('height', targetH);
+        bar.style.transition = 'y 0.6s cubic-bezier(.4,0,.2,1), height 0.6s cubic-bezier(.4,0,.2,1)';
+      }, i * 80);
+    });
+    // Show value label on last bar (highest)
+    setTimeout(function() {
+      var label = document.querySelector('.chart-bar-label');
+      if (label) {
+        label.style.transition = 'opacity 0.4s';
+        label.setAttribute('opacity', '1');
+      }
+    }, bars.length * 80 + 200);
+
+    // Animate stacked bar
+    setTimeout(function() {
+      document.getElementById('sbMissions').style.width = '55%';
+      document.getElementById('sbJeux').style.width = '28%';
+      document.getElementById('sbSocial').style.width = '17%';
+    }, 400);
+  }
+
+  // ─── MEMBER SEARCH ───
+  document.getElementById('memberSearch').addEventListener('input', function() {
+    var query = this.value.toLowerCase().trim();
+    var rows = document.querySelectorAll('#membersTable tbody tr');
+    rows.forEach(function(row) {
+      var name = row.dataset.name || '';
+      row.style.display = name.includes(query) ? '' : 'none';
+    });
+  });
+
+  // ─── MEMBER FILTER TABS ───
+  // XP data per period: [month, total, week]
+  var memberData = {
+    'thomas d':    { month: '3 890', total: '18 240', week: '680' },
+    'marie-ange l':{ month: '2 140', total: '9 870',  week: '420' },
+    'lucas b':     { month: '1 760', total: '6 540',  week: '310' },
+    'isabelle m':  { month: '1 540', total: '7 120',  week: '280' },
+    'sophie martin':{ month: '1 320', total: '3 400', week: '340' },
+    'céline p':    { month: '1 180', total: '5 680',  week: '260' },
+    'antoine r':   { month: '990',   total: '2 870',  week: '190' },
+    'lucie v':     { month: '870',   total: '2 340',  week: '150' }
+  };
+
+  document.querySelectorAll('.filter-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.filter-tab').forEach(function(t) { t.classList.remove('active'); });
+      this.classList.add('active');
+      var period = this.dataset.period;
+      var rows = document.querySelectorAll('#membersTable tbody tr');
+      rows.forEach(function(row) {
+        var name = row.dataset.name;
+        var data = memberData[name];
+        if (data) {
+          row.querySelector('.m-xp').textContent = data[period];
+        }
+      });
+    });
+  });
+</script>
+</body>
+</html>

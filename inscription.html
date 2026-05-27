@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rejoindre la Zone 85</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#ea5649;--primary-dark:#c73d31;--primary-light:#f07066;
+  --navy-dark:#12314e;--navy-mid:#163756;--navy-pale:#243d52;--navy-deep:#0c1e2e;
+  --beige:#F5F1ED;--beige-light:#FAF7F4;--beige-dark:#EAE4DC;
+  --white:#fff;--text:#1a2530;--text-mid:#3d4f5c;--text-muted:#7a8a94;
+  --gold:#C9962A;--green:#2a9d5c;--green-bg:#edfaf0;
+  --radius-sm:5px;--radius:8px;--radius-lg:12px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.08);--shadow-md:0 4px 16px rgba(0,0,0,.12);--shadow-lg:0 8px 32px rgba(0,0,0,.18);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--beige);color:var(--text);min-height:100vh;line-height:1.6}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--beige-light);border-bottom:3px solid var(--primary);box-shadow:var(--shadow-sm)}
+.nav-inner{max-width:1100px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.nav-logo{font-size:1.3rem;font-weight:900;color:var(--navy-dark);text-decoration:none;letter-spacing:-.02em}
+.nav-logo span{color:var(--primary)}
+.nav-back{font-size:.82rem;font-weight:600;color:var(--text-muted);text-decoration:none;display:flex;align-items:center;gap:6px;transition:color .2s}
+.nav-back:hover{color:var(--primary)}
+.nav-step-label{font-size:.78rem;font-weight:700;color:var(--primary);letter-spacing:.06em;text-transform:uppercase}
+
+/* PROGRESS BAR */
+.progress-wrap{height:4px;background:var(--beige-dark);position:fixed;top:67px;left:0;right:0;z-index:99}
+.progress-fill{height:100%;background:var(--primary);transition:width .5s ease;border-radius:0 2px 2px 0}
+
+/* LAYOUT */
+.page-wrap{max-width:700px;margin:0 auto;padding:100px 24px 60px}
+
+/* STEP INDICATOR */
+.step-indicator{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:48px}
+.step-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;border:2px solid var(--beige-dark);background:white;color:var(--text-muted);transition:all .3s;flex-shrink:0}
+.step-dot.done{background:var(--primary);border-color:var(--primary);color:white}
+.step-dot.active{background:var(--navy-dark);border-color:var(--navy-dark);color:white;box-shadow:0 0 0 4px rgba(18,49,78,.15)}
+.step-line{height:2px;flex:1;background:var(--beige-dark);transition:background .3s;max-width:60px}
+.step-line.done{background:var(--primary)}
+
+/* STEP PANELS */
+.step{display:none;animation:fadeIn .35s ease}
+.step.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* HEADINGS */
+.step-eyebrow{font-size:.7rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--primary);margin-bottom:8px}
+.step-title{font-size:clamp(1.6rem,3.5vw,2.2rem);font-weight:900;color:var(--navy-dark);letter-spacing:-.02em;line-height:1.15;margin-bottom:10px}
+.step-sub{font-size:.95rem;color:var(--text-muted);margin-bottom:32px}
+
+/* FORMS */
+.form-grid{display:flex;flex-direction:column;gap:16px;margin-bottom:28px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.field label{display:block;font-size:.78rem;font-weight:700;color:var(--text-mid);margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase}
+.field input,.field textarea{width:100%;padding:12px 14px;border:2px solid var(--beige-dark);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:.95rem;color:var(--text);background:white;transition:border-color .2s,box-shadow .2s;outline:none}
+.field input:focus,.field textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(234,86,73,.1)}
+.field input.error{border-color:#e53e3e}
+.field-error{font-size:.75rem;color:#e53e3e;margin-top:4px;display:none}
+.field-error.show{display:block}
+.pw-wrap{position:relative}
+.pw-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:.9rem;padding:4px}
+.pw-strength{height:3px;background:var(--beige-dark);border-radius:2px;margin-top:6px;overflow:hidden}
+.pw-bar{height:100%;width:0;border-radius:2px;transition:width .3s,background .3s}
+
+/* IDENTITY (ADN) CARDS */
+.identity-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px}
+.identity-card{background:white;border:2px solid var(--beige-dark);border-radius:var(--radius-lg);padding:24px 16px;text-align:center;cursor:pointer;transition:all .25s;user-select:none}
+.identity-card:hover{border-color:var(--primary);transform:translateY(-3px);box-shadow:var(--shadow-md)}
+.identity-card.selected{border-color:var(--primary);background:rgba(234,86,73,.05);box-shadow:0 0 0 4px rgba(234,86,73,.15)}
+.identity-card .ic-icon{font-size:2.4rem;margin-bottom:10px;display:block}
+.identity-card .ic-label{font-size:.92rem;font-weight:800;color:var(--navy-dark);margin-bottom:4px}
+.identity-card .ic-sub{font-size:.78rem;color:var(--text-muted);line-height:1.4}
+.identity-card.selected .ic-label{color:var(--primary)}
+
+/* 7 LEÇONS — image grid */
+.lecons-img-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
+.lecon-img{width:100%;border-radius:var(--radius-lg);display:block;object-fit:cover}
+.lecon-img-full{grid-column:1 / -1}
+.lecon-img-last{grid-column:1 / -1;max-width:50%;justify-self:center}
+
+.lecon-accept{background:white;border-radius:var(--radius-lg);padding:20px 24px;display:flex;align-items:center;gap:16px;border:2px solid var(--beige-dark);cursor:pointer;transition:all .25s}
+.lecon-accept:hover{border-color:var(--primary)}
+.lecon-accept.checked{border-color:var(--primary);background:rgba(234,86,73,.04)}
+.lecon-accept input[type=checkbox]{width:22px;height:22px;accent-color:var(--primary);cursor:pointer;flex-shrink:0}
+.lecon-accept label{font-size:.9rem;font-weight:600;color:var(--text-mid);cursor:pointer;line-height:1.4}
+.lecon-accept.checked label{color:var(--primary);font-weight:700}
+
+/* CLAN SELECTION */
+.clan-grid{display:flex;flex-direction:column;gap:16px;margin-bottom:28px}
+.clan-option{background:white;border:2px solid var(--beige-dark);border-radius:var(--radius-lg);display:flex;align-items:center;gap:20px;padding:16px 20px;cursor:pointer;transition:all .25s;user-select:none}
+.clan-option:hover{border-color:var(--primary);transform:translateX(4px)}
+.clan-option.selected{border-color:var(--primary);box-shadow:0 0 0 4px rgba(234,86,73,.12)}
+.clan-option .co-mascot{width:80px;height:80px;object-fit:contain;flex-shrink:0;transition:transform .3s}
+.clan-option:hover .co-mascot,.clan-option.selected .co-mascot{transform:scale(1.08)}
+.clan-option .co-head{width:56px;height:56px;border-radius:var(--radius-sm);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.5rem}
+.co-head.bocage{background:linear-gradient(135deg,#1a3d18,#2d5a27)}
+.co-head.littoral{background:linear-gradient(135deg,#0d1e2c,#163756)}
+.co-head.marais{background:linear-gradient(135deg,#2e1f0d,#4a3520)}
+.clan-option .co-body{flex:1;min-width:0}
+.co-name{font-size:1rem;font-weight:800;color:var(--navy-dark);margin-bottom:2px}
+.co-mascot-name{font-size:.78rem;font-weight:700;color:var(--primary);margin-bottom:3px}
+.co-cry{font-size:.78rem;color:var(--text-muted);font-style:italic}
+.co-desc{font-size:.8rem;color:var(--text-mid);margin-top:4px;line-height:1.4}
+.clan-option .co-radio{width:22px;height:22px;border-radius:50%;border:2px solid var(--beige-dark);flex-shrink:0;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.clan-option.selected .co-radio{background:var(--primary);border-color:var(--primary);color:white;font-size:.8rem}
+
+/* AVATAR */
+.avatar-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:20px}
+.avatar-opt{width:100%;aspect-ratio:1;background:white;border:2px solid var(--beige-dark);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:1.5rem;cursor:pointer;transition:all .2s}
+.avatar-opt:hover{border-color:var(--primary);transform:scale(1.08)}
+.avatar-opt.selected{border-color:var(--primary);background:rgba(234,86,73,.08);box-shadow:0 0 0 3px rgba(234,86,73,.2)}
+
+/* WELCOME */
+.welcome-hero{background:linear-gradient(160deg,var(--navy-dark),var(--navy-deep));border-radius:var(--radius-lg);padding:40px 32px;text-align:center;position:relative;overflow:hidden;margin-bottom:24px}
+.welcome-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:rgba(234,86,73,.12)}
+.welcome-confetti{font-size:2.5rem;margin-bottom:12px;display:block}
+.welcome-title{font-size:2rem;font-weight:900;color:white;margin-bottom:8px}
+.welcome-sub{font-size:.95rem;color:rgba(255,255,255,.65);margin-bottom:0}
+.welcome-card{background:white;border-radius:var(--radius-lg);padding:24px;box-shadow:var(--shadow-md);margin-bottom:20px}
+.wc-row{display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid var(--beige-dark)}
+.wc-row:last-child{border-bottom:none}
+.wc-icon{font-size:1.2rem;width:36px;text-align:center}
+.wc-label{font-size:.78rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.wc-value{font-size:.95rem;font-weight:700;color:var(--text)}
+.wc-value.orange{color:var(--primary)}
+.wc-clan-mascot{width:40px;height:40px;object-fit:contain}
+
+/* BUTTONS */
+.btn-primary{background:var(--primary);color:white;border:none;padding:14px 32px;border-radius:var(--radius-sm);font-family:'Inter',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:8px;text-decoration:none}
+.btn-primary:hover{background:var(--primary-dark);transform:translateY(-1px);box-shadow:0 4px 16px rgba(234,86,73,.35)}
+.btn-primary:disabled{opacity:.5;cursor:default;transform:none;box-shadow:none}
+.btn-secondary{background:white;color:var(--text);border:2px solid var(--beige-dark);padding:12px 24px;border-radius:var(--radius-sm);font-family:'Inter',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-secondary:hover{border-color:var(--text-muted)}
+.btn-row{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-top:4px}
+.btn-full{width:100%;justify-content:center}
+
+/* IDENTITY BADGE */
+.adn-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(234,86,73,.1);border:1px solid rgba(234,86,73,.25);border-radius:100px;padding:5px 14px;font-size:.8rem;font-weight:700;color:var(--primary);margin-bottom:20px}
+
+@media(max-width:600px){
+  .form-row{grid-template-columns:1fr}
+  .identity-grid{grid-template-columns:1fr}
+  .avatar-grid{grid-template-columns:repeat(4,1fr)}
+  .clan-option .co-mascot{width:56px;height:56px}
+  .welcome-title{font-size:1.5rem}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-back">← Retour</a>
+    <a href="zone85_v5.html" class="nav-logo">ZONE<span>85</span></a>
+    <span class="nav-step-label" id="step-nav-label">Étape 1 / 6</span>
+  </div>
+</nav>
+<div class="progress-wrap"><div class="progress-fill" id="progress-fill" style="width:16.6%"></div></div>
+
+<div class="page-wrap">
+
+  <!-- STEP INDICATOR -->
+  <div class="step-indicator" id="step-indicator">
+    <div class="step-dot active" data-s="1">1</div>
+    <div class="step-line" data-l="1"></div>
+    <div class="step-dot" data-s="2">2</div>
+    <div class="step-line" data-l="2"></div>
+    <div class="step-dot" data-s="3">3</div>
+    <div class="step-line" data-l="3"></div>
+    <div class="step-dot" data-s="4">4</div>
+    <div class="step-line" data-l="4"></div>
+    <div class="step-dot" data-s="5">5</div>
+    <div class="step-line" data-l="5"></div>
+    <div class="step-dot" data-s="6">6</div>
+  </div>
+
+  <!-- ─── ÉTAPE 1 : INFOS ─── -->
+  <div class="step active" id="step-1">
+    <div class="step-eyebrow">Étape 1 — Tes infos</div>
+    <h1 class="step-title">Crée ton compte</h1>
+    <p class="step-sub">Le début de ton aventure en Zone 85 commence ici.</p>
+    <div class="form-grid">
+      <div class="form-row">
+        <div class="field">
+          <label for="f-prenom">Prénom</label>
+          <input type="text" id="f-prenom" placeholder="Gabin" autocomplete="given-name">
+          <div class="field-error" id="err-prenom">Ton prénom est requis</div>
+        </div>
+        <div class="field">
+          <label for="f-nom">Nom</label>
+          <input type="text" id="f-nom" placeholder="Dupuy" autocomplete="family-name">
+          <div class="field-error" id="err-nom">Ton nom est requis</div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="f-email">Adresse email</label>
+        <input type="email" id="f-email" placeholder="gabin@zone85.fr" autocomplete="email">
+        <div class="field-error" id="err-email">Email invalide</div>
+      </div>
+      <div class="field">
+        <label for="f-pw">Mot de passe</label>
+        <div class="pw-wrap">
+          <input type="password" id="f-pw" placeholder="8 caractères minimum" autocomplete="new-password">
+          <button class="pw-toggle" onclick="togglePw('f-pw')" tabindex="-1" type="button">👁</button>
+        </div>
+        <div class="pw-strength"><div class="pw-bar" id="pw-bar"></div></div>
+        <div class="field-error" id="err-pw">Mot de passe trop court (8 car. min.)</div>
+      </div>
+      <div class="field">
+        <label for="f-pw2">Confirmer le mot de passe</label>
+        <div class="pw-wrap">
+          <input type="password" id="f-pw2" placeholder="Répète ton mot de passe" autocomplete="new-password">
+          <button class="pw-toggle" onclick="togglePw('f-pw2')" tabindex="-1" type="button">👁</button>
+        </div>
+        <div class="field-error" id="err-pw2">Les mots de passe ne correspondent pas</div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <span style="font-size:.8rem;color:var(--text-muted)">Déjà un compte ? <a href="profil.html" style="color:var(--primary);font-weight:600">Connecte-toi</a></span>
+      <button class="btn-primary" onclick="validateStep1()">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- ─── ÉTAPE 2 : ADN VENDÉEN ─── -->
+  <div class="step" id="step-2">
+    <div class="step-eyebrow">Étape 2 — Ton ADN vendéen</div>
+    <h1 class="step-title">Tu es vendéen.ne…</h1>
+    <p class="step-sub">Ton lien avec la Vendée, c'est quoi ? Pas de mauvaise réponse — chacun a sa porte d'entrée dans la Zone.</p>
+    <div class="identity-grid">
+      <div class="identity-card" onclick="selectIdentity('souche', this)">
+        <span class="ic-icon">🌱</span>
+        <div class="ic-label">De souche</div>
+        <div class="ic-sub">Né.e en terre vendéenne. Le 85 coule dans tes veines depuis toujours.</div>
+      </div>
+      <div class="identity-card" onclick="selectIdentity('coeur', this)">
+        <span class="ic-icon">❤️</span>
+        <div class="ic-label">De cœur</div>
+        <div class="ic-sub">La Vendée t'a adopté.e. Tu l'as choisie et tu ne pars plus.</div>
+      </div>
+      <div class="identity-card" onclick="selectIdentity('adoption', this)">
+        <span class="ic-icon">🌍</span>
+        <div class="ic-label">D'adoption</div>
+        <div class="ic-sub">Tu découvres la Vendée et tu tombes déjà sous le charme. Bienvenue !</div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goStep(1)">← Retour</button>
+      <button class="btn-primary" id="btn-step2" onclick="validateStep2()" disabled>Continuer →</button>
+    </div>
+  </div>
+
+  <!-- ─── ÉTAPE 3 : 7 LEÇONS ─── -->
+  <div class="step" id="step-3">
+    <div class="step-eyebrow">Étape 3 — Le Code de la Zone</div>
+    <h1 class="step-title">Les 7 leçons de la ZONE</h1>
+    <p class="step-sub">Entrer en Zone85, tu pourras… mais d'abord, 7 vérités vendéennes tu accepteras.</p>
+
+    <div class="lecons-img-grid">
+      <img src="./img/intro.png" alt="Entrer en Zone85" class="lecon-img lecon-img-full">
+      <img src="./img/1.png" alt="Leçon n°1" class="lecon-img">
+      <img src="./img/2.png" alt="Leçon n°2" class="lecon-img">
+      <img src="./img/3.png" alt="Leçon n°3" class="lecon-img">
+      <img src="./img/4.png" alt="Leçon n°4" class="lecon-img">
+      <img src="./img/5.png" alt="Leçon n°5" class="lecon-img">
+      <img src="./img/6.png" alt="Leçon n°6" class="lecon-img">
+      <img src="./img/7.png" alt="Leçon n°7" class="lecon-img lecon-img-last">
+    </div>
+
+    <div class="lecon-accept" id="lecon-accept-wrap" onclick="toggleAccept()">
+      <input type="checkbox" id="lecon-check" onchange="toggleAccept()">
+      <label for="lecon-check">J'ai lu et j'accepte le Code de la Zone 85. Je jure sur la brioche pur beurre.</label>
+    </div>
+
+    <div class="btn-row" style="margin-top:20px">
+      <button class="btn-secondary" onclick="goStep(2)">← Retour</button>
+      <button class="btn-primary" id="btn-step3" onclick="validateStep3()" disabled>Continuer →</button>
+    </div>
+  </div>
+
+  <!-- ─── ÉTAPE 4 : CLAN ─── -->
+  <div class="step" id="step-4">
+    <div class="step-eyebrow">Étape 4 — Ton clan</div>
+    <h1 class="step-title">Choisis ton clan</h1>
+    <p class="step-sub">Trois clans, trois caractères, une seule question : laquelle de ces forces t'appelle ?</p>
+    <div class="clan-grid">
+      <div class="clan-option" onclick="selectClan('bocage', this)">
+        <img src="./img/mascotte-bocage.png" alt="Bran le Bocager" class="co-mascot">
+        <div class="co-body">
+          <div class="co-name">Clan du Bocage</div>
+          <div class="co-mascot-name">Bran le Bocager — Gardien des Haies</div>
+          <div class="co-cry">« Par les chênes et les genêts ! »</div>
+          <div class="co-desc">Enracinés dans les forêts et bocages. Force tranquille, mémoire profonde.</div>
+        </div>
+        <div class="co-radio" id="radio-bocage"></div>
+      </div>
+      <div class="clan-option" onclick="selectClan('littoral', this)">
+        <img src="./img/mascotte-littoral.png" alt="Gabin Culsmouillés" class="co-mascot">
+        <div class="co-body">
+          <div class="co-name">Clan du Littoral</div>
+          <div class="co-mascot-name">Gabin Culsmouillés — Corsaire des Sables</div>
+          <div class="co-cry">« Vents et marées ! »</div>
+          <div class="co-desc">Audacieux et libres comme l'Atlantique. Toujours en mouvement, toujours en avant.</div>
+        </div>
+        <div class="co-radio" id="radio-littoral"></div>
+      </div>
+      <div class="clan-option" onclick="selectClan('marais', this)">
+        <img src="./img/mascotte-marais.png" alt="Méric l'Ancien" class="co-mascot">
+        <div class="co-body">
+          <div class="co-name">Clan du Marais</div>
+          <div class="co-mascot-name">Méric l'Ancien — Sage des Canaux</div>
+          <div class="co-cry">« L'eau coule, la mémoire reste ! »</div>
+          <div class="co-desc">Gardiens des secrets millénaires. Stratèges patients, sages redoutables.</div>
+        </div>
+        <div class="co-radio" id="radio-marais"></div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goStep(3)">← Retour</button>
+      <button class="btn-primary" id="btn-step4" onclick="validateStep4()" disabled>Continuer →</button>
+    </div>
+  </div>
+
+  <!-- ─── ÉTAPE 5 : IDENTITÉ ─── -->
+  <div class="step" id="step-5">
+    <div class="step-eyebrow">Étape 5 — Ton identité</div>
+    <h1 class="step-title">Qui es-tu dans la Zone ?</h1>
+    <p class="step-sub">Ton avatar et ton pseudo — c'est comme ça que le reste de la Zone te connaîtra.</p>
+    <div style="margin-bottom:20px">
+      <div class="field" style="margin-bottom:6px"><label>Choisis ton avatar</label></div>
+      <div class="avatar-grid" id="avatar-grid">
+        <div class="avatar-opt selected" data-emoji="🧭" onclick="selectAvatar(this)">🧭</div>
+        <div class="avatar-opt" data-emoji="⚓" onclick="selectAvatar(this)">⚓</div>
+        <div class="avatar-opt" data-emoji="🗺️" onclick="selectAvatar(this)">🗺️</div>
+        <div class="avatar-opt" data-emoji="🏹" onclick="selectAvatar(this)">🏹</div>
+        <div class="avatar-opt" data-emoji="🌊" onclick="selectAvatar(this)">🌊</div>
+        <div class="avatar-opt" data-emoji="🌿" onclick="selectAvatar(this)">🌿</div>
+        <div class="avatar-opt" data-emoji="⚔️" onclick="selectAvatar(this)">⚔️</div>
+        <div class="avatar-opt" data-emoji="🦅" onclick="selectAvatar(this)">🦅</div>
+        <div class="avatar-opt" data-emoji="🔥" onclick="selectAvatar(this)">🔥</div>
+        <div class="avatar-opt" data-emoji="🥐" onclick="selectAvatar(this)">🥐</div>
+        <div class="avatar-opt" data-emoji="🌙" onclick="selectAvatar(this)">🌙</div>
+        <div class="avatar-opt" data-emoji="🐚" onclick="selectAvatar(this)">🐚</div>
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="field">
+        <label for="f-pseudo">Ton pseudo dans la Zone</label>
+        <input type="text" id="f-pseudo" placeholder="Ex : Gabin_Corsaire" maxlength="24">
+        <div class="field-error" id="err-pseudo">Un pseudo est requis (3 car. min.)</div>
+      </div>
+      <div class="field">
+        <label for="f-bio">Ta phrase de présentation <span style="color:var(--text-muted);font-weight:400">(optionnel)</span></label>
+        <textarea id="f-bio" rows="2" placeholder="Ex : Vendéen de cœur, corsaire des dunes..." maxlength="120" style="resize:none"></textarea>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goStep(4)">← Retour</button>
+      <button class="btn-primary" onclick="validateStep5()">Finaliser mon inscription →</button>
+    </div>
+  </div>
+
+  <!-- ─── ÉTAPE 6 : BIENVENUE ─── -->
+  <div class="step" id="step-6">
+    <div class="welcome-hero">
+      <span class="welcome-confetti" id="welcome-emoji">🎉</span>
+      <div class="welcome-title" id="welcome-title">Bienvenue dans la Zone !</div>
+      <div class="welcome-sub" id="welcome-sub">Tu fais maintenant partie de l'aventure. Ta légende commence.</div>
+    </div>
+
+    <div class="welcome-card" id="welcome-card">
+      <div class="wc-row">
+        <span class="wc-icon">👤</span>
+        <div><div class="wc-label">Aventurier.e</div><div class="wc-value" id="wc-nom">—</div></div>
+      </div>
+      <div class="wc-row">
+        <span class="wc-icon">📍</span>
+        <div><div class="wc-label">ADN vendéen</div><div class="wc-value orange" id="wc-adn">—</div></div>
+      </div>
+      <div class="wc-row">
+        <span class="wc-icon" id="wc-clan-icon">🛡️</span>
+        <div style="flex:1"><div class="wc-label">Clan</div><div class="wc-value orange" id="wc-clan">—</div></div>
+        <img id="wc-mascot" src="" class="wc-clan-mascot" alt="" style="display:none">
+      </div>
+      <div class="wc-row">
+        <span class="wc-icon" id="wc-avatar-icon">🧭</span>
+        <div><div class="wc-label">Pseudo</div><div class="wc-value" id="wc-pseudo">—</div></div>
+      </div>
+      <div class="wc-row">
+        <span class="wc-icon">⚡</span>
+        <div><div class="wc-label">XP de départ</div><div class="wc-value orange">+50 XP — Bienvenue dans la Zone !</div></div>
+      </div>
+    </div>
+
+    <a href="profil.html" class="btn-primary btn-full" style="display:flex;justify-content:center;text-decoration:none">Accéder à mon profil →</a>
+  </div>
+
+</div><!-- /page-wrap -->
+
+<script>
+const formData = {
+  prenom:'', nom:'', email:'', pw:'',
+  identity:'', clan:'',
+  avatar:'🧭', pseudo:'', bio:''
+};
+let currentStep = 1;
+const TOTAL = 6;
+
+function goStep(n){
+  document.getElementById('step-'+currentStep).classList.remove('active');
+  currentStep = n;
+  document.getElementById('step-'+n).classList.add('active');
+  updateUI();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function updateUI(){
+  const pct = (currentStep/TOTAL*100).toFixed(1);
+  document.getElementById('progress-fill').style.width = pct+'%';
+  document.getElementById('step-nav-label').textContent = 'Étape '+currentStep+' / '+TOTAL;
+  document.querySelectorAll('.step-dot').forEach(d=>{
+    const s = +d.dataset.s;
+    d.classList.remove('active','done');
+    if(s < currentStep) d.classList.add('done');
+    else if(s === currentStep) d.classList.add('active');
+  });
+  document.querySelectorAll('.step-line').forEach(l=>{
+    const i = +l.dataset.l;
+    l.classList.toggle('done', i < currentStep);
+  });
+}
+
+// STEP 1
+function togglePw(id){
+  const el = document.getElementById(id);
+  el.type = el.type==='password'?'text':'password';
+}
+document.getElementById('f-pw').addEventListener('input',function(){
+  const v = this.value, bar = document.getElementById('pw-bar');
+  let strength = 0;
+  if(v.length>=8) strength++;
+  if(/[A-Z]/.test(v)) strength++;
+  if(/[0-9]/.test(v)) strength++;
+  if(/[^A-Za-z0-9]/.test(v)) strength++;
+  const colors = ['#e53e3e','#dd6b20','#d69e2e','#38a169'];
+  bar.style.width = (strength*25)+'%';
+  bar.style.background = colors[strength-1]||'transparent';
+});
+function validateStep1(){
+  let ok = true;
+  const p=document.getElementById('f-prenom'), n=document.getElementById('f-nom'),
+        e=document.getElementById('f-email'), pw=document.getElementById('f-pw'), pw2=document.getElementById('f-pw2');
+  const showErr = (id,show)=>{
+    document.getElementById('err-'+id).classList.toggle('show',show);
+    document.getElementById('f-'+id)?.classList.toggle('error',show);
+  };
+  if(!p.value.trim()){showErr('prenom',true);ok=false}else showErr('prenom',false);
+  if(!n.value.trim()){showErr('nom',true);ok=false}else showErr('nom',false);
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.value)){showErr('email',true);ok=false}else showErr('email',false);
+  if(pw.value.length<8){showErr('pw',true);ok=false}else showErr('pw',false);
+  if(pw.value!==pw2.value){showErr('pw2',true);ok=false}else showErr('pw2',false);
+  if(!ok) return;
+  formData.prenom=p.value.trim(); formData.nom=n.value.trim();
+  formData.email=e.value.trim(); formData.pw=pw.value;
+  goStep(2);
+}
+
+// STEP 2
+function selectIdentity(val, el){
+  document.querySelectorAll('.identity-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  formData.identity = val;
+  document.getElementById('btn-step2').disabled = false;
+}
+function validateStep2(){
+  if(!formData.identity) return;
+  goStep(3);
+}
+
+// STEP 3
+function toggleAccept(){
+  const cb = document.getElementById('lecon-check');
+  const wrap = document.getElementById('lecon-accept-wrap');
+  // If called from the div click (not directly checkbox), toggle manually
+  if(event && event.target !== cb) cb.checked = !cb.checked;
+  wrap.classList.toggle('checked', cb.checked);
+  document.getElementById('btn-step3').disabled = !cb.checked;
+}
+function validateStep3(){
+  if(!document.getElementById('lecon-check').checked) return;
+  goStep(4);
+}
+
+// STEP 4
+const clanData = {
+  bocage:{name:'Clan du Bocage',mascot:'./img/mascotte-bocage.png',icon:'🛡️'},
+  littoral:{name:'Clan du Littoral',mascot:'./img/mascotte-littoral.png',icon:'⚓'},
+  marais:{name:'Clan du Marais',mascot:'./img/mascotte-marais.png',icon:'🌿'}
+};
+function selectClan(val, el){
+  document.querySelectorAll('.clan-option').forEach(c=>{c.classList.remove('selected'); c.querySelector('.co-radio').textContent='';});
+  el.classList.add('selected');
+  el.querySelector('.co-radio').textContent = '✓';
+  formData.clan = val;
+  document.getElementById('btn-step4').disabled = false;
+}
+function validateStep4(){
+  if(!formData.clan) return;
+  goStep(5);
+}
+
+// STEP 5
+function selectAvatar(el){
+  document.querySelectorAll('.avatar-opt').forEach(a=>a.classList.remove('selected'));
+  el.classList.add('selected');
+  formData.avatar = el.dataset.emoji;
+}
+function validateStep5(){
+  const pseudo = document.getElementById('f-pseudo').value.trim();
+  if(pseudo.length<3){
+    document.getElementById('err-pseudo').classList.add('show');
+    document.getElementById('f-pseudo').classList.add('error');
+    return;
+  }
+  document.getElementById('err-pseudo').classList.remove('show');
+  formData.pseudo = pseudo;
+  formData.bio = document.getElementById('f-bio').value.trim();
+  buildWelcome();
+  goStep(6);
+  spawnConfetti();
+}
+
+function buildWelcome(){
+  const adnLabels = {souche:'Vendéen.ne de souche 🌱',coeur:'Vendéen.ne de cœur ❤️',adoption:"Vendéen.ne d'adoption 🌍"};
+  document.getElementById('wc-nom').textContent = formData.prenom+' '+formData.nom;
+  document.getElementById('wc-adn').textContent = adnLabels[formData.identity]||'—';
+  const c = clanData[formData.clan]||{};
+  document.getElementById('wc-clan').textContent = c.name||'—';
+  document.getElementById('wc-clan-icon').textContent = c.icon||'🛡️';
+  if(c.mascot){const m=document.getElementById('wc-mascot');m.src=c.mascot;m.style.display='block';}
+  document.getElementById('wc-avatar-icon').textContent = formData.avatar;
+  document.getElementById('wc-pseudo').textContent = formData.pseudo;
+  document.getElementById('welcome-title').textContent = 'Bienvenue '+formData.prenom+' !';
+  document.getElementById('welcome-emoji').textContent = formData.avatar;
+}
+
+function spawnConfetti(){
+  const emojis=['🎉','⚡','🌊','🏆','🛡️','⚓','🌿','✨','🥐','❤️'];
+  for(let i=0;i<28;i++){
+    const el = document.createElement('div');
+    el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    el.style.cssText = `position:fixed;top:-30px;left:${Math.random()*100}vw;font-size:${1.2+Math.random()*.8}rem;
+      z-index:9999;pointer-events:none;animation:confettiFall ${1.5+Math.random()*2}s ease-in forwards;`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 4000);
+  }
+}
+const style = document.createElement('style');
+style.textContent='@keyframes confettiFall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}';
+document.head.appendChild(style);
+
+// Also enable step2 btn on Enter
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    if(currentStep===1) validateStep1();
+  }
+});
+</script>
+</body>
+</html>
