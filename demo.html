@@ -730,6 +730,272 @@ footer {
 .reveal { opacity: 0; transform: translateY(20px); transition: opacity .6s ease, transform .6s ease; }
 .reveal.visible { opacity: 1; transform: translateY(0); }
 
+/* ============================================================
+   BLUE ACCENT SYSTEM
+   ============================================================ */
+.eyebrow-blue {
+  color: var(--blue) !important;
+}
+.eyebrow-blue::before {
+  background: var(--blue) !important;
+}
+.nav-link-profile {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 5px 5px 12px; border-radius: 99px;
+  font-size: .88rem; font-weight: 700; color: var(--blue-dark);
+  background: rgba(59,138,181,.09);
+  border: 1.5px solid rgba(59,138,181,.2);
+  cursor: pointer;
+  transition: all var(--transition);
+  margin-left: 4px;
+}
+.nav-link-profile:hover {
+  background: rgba(59,138,181,.16);
+  border-color: var(--blue);
+  transform: translateY(-1px);
+}
+.nav-profile-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--blue-light), var(--blue));
+  display: flex; align-items: center; justify-content: center;
+  font-size: .85rem;
+}
+/* Blue decorative lines on some cards */
+.blue-accent-top { border-top: 3px solid var(--blue); }
+.coral-accent-top { border-top: 3px solid var(--coral); }
+/* Blue stat highlight */
+.stat-blue .stat-box-num { color: var(--blue); }
+/* Hero stat blue */
+.hero-stat-blue .hero-stat-num { color: var(--blue); }
+
+/* ============================================================
+   PROFILE MODAL
+   ============================================================ */
+.profile-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(42,37,32,.45);
+  backdrop-filter: blur(6px);
+  display: flex; align-items: flex-end;
+  opacity: 0; pointer-events: none;
+  transition: opacity .3s ease;
+}
+.profile-overlay.open {
+  opacity: 1; pointer-events: all;
+}
+.profile-modal {
+  background: var(--beige-pale);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  width: 100%; max-width: 780px;
+  margin: 0 auto;
+  max-height: 92vh;
+  overflow-y: auto;
+  transform: translateY(100%);
+  transition: transform .4s cubic-bezier(.4,0,.2,1);
+  box-shadow: 0 -8px 40px rgba(42,37,32,.18);
+}
+.profile-overlay.open .profile-modal {
+  transform: translateY(0);
+}
+/* desktop: centered modal */
+@media (min-width: 769px) {
+  .profile-overlay {
+    align-items: center;
+    padding: 24px;
+  }
+  .profile-modal {
+    border-radius: var(--radius-xl);
+    transform: translateY(24px) scale(.97);
+    max-height: 88vh;
+  }
+  .profile-overlay.open .profile-modal {
+    transform: translateY(0) scale(1);
+  }
+}
+.modal-close {
+  position: absolute; top: 16px; right: 16px;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(255,255,255,.25);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; cursor: pointer; z-index: 10;
+  transition: background var(--transition);
+}
+.modal-close:hover { background: rgba(255,255,255,.4); }
+
+/* Profile modal header */
+.pm-header {
+  background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue) 60%, var(--blue-light) 100%);
+  padding: 36px 28px 28px;
+  position: relative;
+  overflow: hidden;
+}
+.pm-header::before {
+  content: '';
+  position: absolute; top: -60px; right: -60px;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: rgba(255,255,255,.07);
+}
+.pm-header::after {
+  content: '';
+  position: absolute; bottom: -40px; left: -30px;
+  width: 150px; height: 150px; border-radius: 50%;
+  background: rgba(255,255,255,.05);
+}
+.pm-avatar-ring {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: rgba(255,255,255,.2);
+  border: 3px solid rgba(255,255,255,.5);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.2rem; margin-bottom: 14px;
+  position: relative; z-index: 1;
+}
+.pm-level-badge {
+  position: absolute; bottom: -2px; right: -2px;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--amber); border: 2px solid var(--white);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .7rem; font-weight: 900; color: var(--white);
+}
+.pm-name { color: var(--white); font-size: 1.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 6px; position: relative; z-index: 1; }
+.pm-title {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.3);
+  padding: 4px 12px; border-radius: 99px;
+  color: rgba(255,255,255,.9); font-size: .82rem; font-weight: 700;
+  margin-bottom: 12px; position: relative; z-index: 1;
+}
+.pm-tribe {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,.12);
+  padding: 3px 10px; border-radius: 99px;
+  color: rgba(255,255,255,.8); font-size: .78rem; font-weight: 600;
+  position: relative; z-index: 1;
+}
+.pm-xp-section { margin-top: 20px; position: relative; z-index: 1; }
+.pm-xp-label { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.pm-xp-label span { font-size: .78rem; color: rgba(255,255,255,.7); font-weight: 600; }
+.pm-xp-label strong { font-size: .82rem; color: rgba(255,255,255,.95); }
+.pm-progress-track { height: 7px; background: rgba(255,255,255,.2); border-radius: 99px; overflow: hidden; }
+.pm-progress-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, rgba(255,255,255,.7), var(--white)); width: 0; transition: width 1.2s cubic-bezier(.4,0,.2,1); }
+
+/* Profile modal stats strip */
+.pm-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  background: var(--white);
+  border-bottom: 1px solid var(--beige);
+}
+.pm-stat {
+  padding: 18px 12px; text-align: center;
+  border-right: 1px solid var(--beige);
+}
+.pm-stat:last-child { border-right: none; }
+.pm-stat-num { font-size: 1.4rem; font-weight: 800; line-height: 1; }
+.pm-stat-lbl { font-size: .72rem; color: var(--text-soft); margin-top: 4px; font-weight: 600; }
+.pm-stat-coral .pm-stat-num { color: var(--coral); }
+.pm-stat-blue  .pm-stat-num { color: var(--blue); }
+.pm-stat-green .pm-stat-num { color: var(--green-soft); }
+.pm-stat-amber .pm-stat-num { color: var(--amber); }
+
+/* Profile modal tabs */
+.pm-tabs {
+  display: flex; gap: 0;
+  background: var(--white);
+  border-bottom: 2px solid var(--beige);
+  padding: 0 24px;
+}
+.pm-tab {
+  padding: 14px 18px; font-size: .9rem; font-weight: 700; color: var(--text-soft);
+  border-bottom: 2px solid transparent; margin-bottom: -2px;
+  cursor: pointer; transition: color var(--transition), border-color var(--transition);
+  white-space: nowrap;
+}
+.pm-tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+.pm-tab:hover:not(.active) { color: var(--text); }
+
+/* Profile modal body */
+.pm-body { padding: 28px; }
+.pm-tab-content { display: none; }
+.pm-tab-content.active { display: block; }
+
+/* Progression tab */
+.pm-level-road {
+  display: flex; flex-direction: column; gap: 0;
+  position: relative;
+}
+.pm-level-road::before {
+  content: ''; position: absolute; left: 22px; top: 0; bottom: 0;
+  width: 2px; background: var(--beige-dark);
+}
+.pm-level-item {
+  display: flex; gap: 16px; align-items: flex-start;
+  padding: 14px 0; position: relative;
+}
+.pm-level-dot {
+  width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; position: relative; z-index: 1;
+  border: 2px solid transparent;
+}
+.pm-level-dot.done    { background: var(--green-soft); border-color: var(--green-soft); }
+.pm-level-dot.current { background: var(--blue); border-color: var(--blue); box-shadow: 0 0 0 4px rgba(59,138,181,.2); }
+.pm-level-dot.locked  { background: var(--beige-dark); opacity: .5; }
+.pm-level-info { flex: 1; padding-top: 4px; }
+.pm-level-name { font-weight: 700; font-size: .95rem; }
+.pm-level-range { font-size: .75rem; color: var(--text-soft); margin-bottom: 6px; }
+.pm-level-bar-wrap { margin-top: 4px; }
+
+/* Missions tab */
+.pm-missions-list { display: flex; flex-direction: column; gap: 10px; }
+.pm-mission-item {
+  display: flex; gap: 12px; align-items: center;
+  background: var(--white); border-radius: var(--radius-md);
+  padding: 12px 14px; box-shadow: var(--card-shadow);
+}
+.pm-mission-icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: var(--beige); display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; flex-shrink: 0;
+}
+.pm-mission-meta { flex: 1; min-width: 0; }
+.pm-mission-name { font-weight: 700; font-size: .88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pm-mission-sub  { font-size: .75rem; color: var(--text-soft); }
+
+/* Badges tab */
+.pm-badges-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 14px;
+}
+.pm-badge {
+  background: var(--white); border-radius: var(--radius-md);
+  padding: 18px 12px; text-align: center; box-shadow: var(--card-shadow);
+}
+.pm-badge-icon { font-size: 1.8rem; margin-bottom: 8px; }
+.pm-badge-name { font-size: .8rem; font-weight: 700; }
+.pm-badge-xp   { font-size: .72rem; color: var(--amber); margin-top: 4px; font-weight: 600; }
+.pm-badge.locked { opacity: .4; filter: saturate(.2); }
+
+/* Activity tab */
+.pm-activity-list { display: flex; flex-direction: column; gap: 8px; }
+.pm-activity-item {
+  display: flex; gap: 12px; align-items: center;
+  padding: 10px 14px; background: var(--white);
+  border-radius: var(--radius-md); box-shadow: var(--card-shadow);
+}
+.pm-activity-dot {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+.pm-activity-xp { margin-left: auto; font-size: .82rem; font-weight: 700; color: var(--amber); white-space: nowrap; }
+
+@media (max-width: 480px) {
+  .pm-stats { grid-template-columns: repeat(2, 1fr); }
+  .pm-stats .pm-stat:nth-child(2) { border-right: none; }
+  .pm-tabs { padding: 0 12px; gap: 0; overflow-x: auto; }
+  .pm-tab { padding: 12px 12px; font-size: .82rem; }
+  .pm-body { padding: 20px 16px; }
+  .pm-header { padding: 28px 20px 22px; }
+  .pm-badges-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
 </style>
 </head>
 <body>
@@ -756,7 +1022,13 @@ footer {
       <li><a href="#classement" class="nav-link">Classement</a></li>
     </ul>
 
-    <a href="#rejoindre" class="btn btn-coral btn-sm nav-cta">Rejoindre</a>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="nav-link-profile" id="openProfile" aria-label="Mon profil">
+        Mon profil
+        <div class="nav-profile-avatar">🧭</div>
+      </button>
+      <a href="#rejoindre" class="btn btn-coral btn-sm nav-cta">Rejoindre</a>
+    </div>
 
     <button class="nav-hamburger" id="hamburger" aria-label="Menu">
       <span></span><span></span><span></span>
@@ -771,6 +1043,7 @@ footer {
   <a href="#missions"   class="nav-link" onclick="closeMobile()">Missions</a>
   <a href="#badges"     class="nav-link" onclick="closeMobile()">Badges</a>
   <a href="#classement" class="nav-link" onclick="closeMobile()">Classement</a>
+  <button class="btn btn-blue" id="openProfileMobile" style="width:100%;justify-content:center" onclick="closeMobile()">🧭 Mon profil</button>
   <a href="#rejoindre"  class="btn btn-coral" onclick="closeMobile()">Rejoindre l'aventure</a>
 </div>
 
@@ -797,19 +1070,19 @@ footer {
         </div>
         <div class="hero-stats animate-in delay-4">
           <div>
-            <div class="hero-stat-num">1 240</div>
+            <div class="hero-stat-num t-coral">1 240</div>
             <div class="hero-stat-label t-xs">aventuriers</div>
           </div>
           <div>
-            <div class="hero-stat-num">3</div>
+            <div class="hero-stat-num t-blue">3</div>
             <div class="hero-stat-label t-xs">tribus actives</div>
           </div>
           <div>
-            <div class="hero-stat-num">87</div>
+            <div class="hero-stat-num t-coral">87</div>
             <div class="hero-stat-label t-xs">missions créées</div>
           </div>
           <div>
-            <div class="hero-stat-num">14k</div>
+            <div class="hero-stat-num t-blue">14k</div>
             <div class="hero-stat-label t-xs">points distribués</div>
           </div>
         </div>
@@ -822,6 +1095,7 @@ footer {
           <div class="tribe-chip tribe-littoral mb-12">🌊 Littoral</div>
           <div class="t-h3 mb-8">Sophie M.</div>
           <div class="t-small t-soft">Niveau 7 · Grand Pisteur</div>
+          <button onclick="openProfileModal()" style="margin-top:12px;font-size:.78rem;font-weight:700;color:var(--blue);background:rgba(59,138,181,.09);border:1px solid rgba(59,138,181,.2);padding:5px 12px;border-radius:99px;cursor:pointer;">Voir mon profil →</button>
           <div class="xp-section" style="margin-top:14px;margin-bottom:0">
             <div class="xp-header">
               <span class="t-xs t-soft">XP</span>
@@ -1028,15 +1302,15 @@ footer {
       <div class="profile-right-grid">
 
         <div class="stats-row">
-          <div class="stat-box">
+          <div class="stat-box coral-accent-top">
             <div class="stat-box-num t-coral">3 400</div>
             <div class="stat-box-label">Points XP</div>
           </div>
-          <div class="stat-box">
+          <div class="stat-box blue-accent-top">
             <div class="stat-box-num t-blue">6</div>
             <div class="stat-box-label">Badges obtenus</div>
           </div>
-          <div class="stat-box">
+          <div class="stat-box" style="border-top:3px solid var(--green-soft)">
             <div class="stat-box-num" style="color:var(--green-soft)">14</div>
             <div class="stat-box-label">Missions terminées</div>
           </div>
@@ -1373,7 +1647,7 @@ footer {
 <section id="carte" class="section">
   <div class="container">
     <div class="section-header reveal">
-      <div class="eyebrow">Territoire</div>
+      <div class="eyebrow eyebrow-blue">Territoire</div>
       <h2 class="t-h1 mb-16">La Vendée comme<br>terrain de jeu infini.</h2>
       <p class="t-body t-mid" style="max-width:500px">Chaque point lumineux est une mission, un lieu, une histoire à découvrir. Le territoire s'enrichit chaque semaine.</p>
     </div>
@@ -1512,7 +1786,7 @@ footer {
 <section id="classement" class="section-sm section">
   <div class="container">
     <div class="section-header reveal t-center">
-      <div class="eyebrow" style="justify-content:center">Classement</div>
+      <div class="eyebrow eyebrow-blue" style="justify-content:center">Classement</div>
       <h2 class="t-h1 mb-16">Tableau d'honneur</h2>
       <p class="t-body t-mid" style="max-width:460px;margin:0 auto">La compétition est douce ici — chaque point est une histoire partagée.</p>
     </div>
@@ -1604,6 +1878,7 @@ footer {
           <div class="lb-tribe"><span class="tribe-chip tribe-littoral" style="font-size:.7rem;padding:2px 8px">🌊 Littoral</span></div>
         </div>
         <div class="lb-score" style="color:var(--coral)">3 400 <span>pts</span></div>
+        <button onclick="openProfileModal()" class="btn btn-blue btn-sm" style="padding:6px 14px;font-size:.78rem;white-space:nowrap">Mon profil →</button>
       </div>
 
     </div>
@@ -1692,6 +1967,314 @@ footer {
 </footer>
 
 <!-- ============================================================
+     PROFILE MODAL
+     ============================================================ -->
+<div class="profile-overlay" id="profileOverlay">
+  <div class="profile-modal" id="profileModal">
+
+    <!-- Header -->
+    <div class="pm-header">
+      <button class="modal-close" id="closeProfile" aria-label="Fermer">✕</button>
+      <div style="position:relative;display:inline-block">
+        <div class="pm-avatar-ring">🧭</div>
+        <div class="pm-level-badge">7</div>
+      </div>
+      <div class="pm-name">Sophie Martin</div>
+      <div class="pm-title">🏅 Grand Pisteur</div><br>
+      <div class="pm-tribe">🌊 Tribu du Littoral · Membre depuis mars 2025</div>
+      <div class="pm-xp-section">
+        <div class="pm-xp-label">
+          <span>Niveau 7 → 8</span>
+          <strong>3 400 / 4 000 XP</strong>
+        </div>
+        <div class="pm-progress-track">
+          <div class="pm-progress-fill" id="pmXpBar" style="width:0"></div>
+        </div>
+        <div style="font-size:.75rem;color:rgba(255,255,255,.6);margin-top:6px">600 XP avant le niveau suivant</div>
+      </div>
+    </div>
+
+    <!-- Stats strip -->
+    <div class="pm-stats">
+      <div class="pm-stat pm-stat-coral">
+        <div class="pm-stat-num">3 400</div>
+        <div class="pm-stat-lbl">Points XP</div>
+      </div>
+      <div class="pm-stat pm-stat-blue">
+        <div class="pm-stat-num">6</div>
+        <div class="pm-stat-lbl">Badges</div>
+      </div>
+      <div class="pm-stat pm-stat-green">
+        <div class="pm-stat-num">14</div>
+        <div class="pm-stat-lbl">Missions</div>
+      </div>
+      <div class="pm-stat pm-stat-amber">
+        <div class="pm-stat-num">#9</div>
+        <div class="pm-stat-lbl">Classement</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="pm-tabs">
+      <button class="pm-tab active" data-tab="progression">Progression</button>
+      <button class="pm-tab" data-tab="missions">Missions</button>
+      <button class="pm-tab" data-tab="badges">Badges</button>
+      <button class="pm-tab" data-tab="activite">Activité</button>
+    </div>
+
+    <!-- Tab body -->
+    <div class="pm-body">
+
+      <!-- Progression -->
+      <div class="pm-tab-content active" id="tab-progression">
+        <div class="pm-level-road">
+
+          <div class="pm-level-item">
+            <div class="pm-level-dot done">👣</div>
+            <div class="pm-level-info">
+              <div class="pm-level-name">Néophyte</div>
+              <div class="pm-level-range">Niveaux 1–2 · Complété</div>
+              <div class="pm-level-bar-wrap">
+                <div class="progress-track" style="height:5px"><div class="progress-fill green" style="width:100%"></div></div>
+              </div>
+            </div>
+            <div style="font-size:.8rem;font-weight:700;color:var(--green-soft);white-space:nowrap">✓ Terminé</div>
+          </div>
+
+          <div class="pm-level-item">
+            <div class="pm-level-dot done">🧭</div>
+            <div class="pm-level-info">
+              <div class="pm-level-name">Explorateur</div>
+              <div class="pm-level-range">Niveaux 3–5 · Complété</div>
+              <div class="pm-level-bar-wrap">
+                <div class="progress-track" style="height:5px"><div class="progress-fill green" style="width:100%"></div></div>
+              </div>
+            </div>
+            <div style="font-size:.8rem;font-weight:700;color:var(--green-soft);white-space:nowrap">✓ Terminé</div>
+          </div>
+
+          <div class="pm-level-item">
+            <div class="pm-level-dot current">🏅</div>
+            <div class="pm-level-info">
+              <div class="pm-level-name" style="color:var(--blue)">Grand Pisteur</div>
+              <div class="pm-level-range">Niveaux 6–8 · <strong style="color:var(--blue)">En cours (Niv. 7)</strong></div>
+              <div class="pm-level-bar-wrap">
+                <div class="progress-track" style="height:5px"><div class="progress-fill blue" style="width:60%"></div></div>
+              </div>
+              <div style="font-size:.72rem;color:var(--text-soft);margin-top:4px">Débloquez encore 3 missions chasse pour passer au niveau 8</div>
+            </div>
+            <div style="font-size:.8rem;font-weight:700;color:var(--blue);white-space:nowrap">60%</div>
+          </div>
+
+          <div class="pm-level-item" style="opacity:.45">
+            <div class="pm-level-dot locked">🌟</div>
+            <div class="pm-level-info">
+              <div class="pm-level-name">Mémoire Vivante</div>
+              <div class="pm-level-range">Niveaux 9–11 · Verrouillé</div>
+              <div class="pm-level-bar-wrap">
+                <div class="progress-track" style="height:5px"><div class="progress-fill" style="width:0%"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pm-level-item" style="opacity:.28">
+            <div class="pm-level-dot locked">⚔️</div>
+            <div class="pm-level-info">
+              <div class="pm-level-name">Gardien Légendaire</div>
+              <div class="pm-level-range">Niveau 12 · Verrouillé</div>
+              <div class="pm-level-bar-wrap">
+                <div class="progress-track" style="height:5px"><div class="progress-fill" style="width:0%"></div></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Compétences de tribu -->
+        <div style="margin-top:28px">
+          <div class="t-h3 mb-16" style="font-size:.95rem">Compétences Littoral</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+                <span style="font-size:.82rem;font-weight:600">🌊 Maître des côtes</span>
+                <span style="font-size:.78rem;color:var(--text-soft)">72%</span>
+              </div>
+              <div class="progress-track" style="height:6px"><div class="progress-fill blue" style="width:72%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+                <span style="font-size:.82rem;font-weight:600">📸 Photographe du territoire</span>
+                <span style="font-size:.78rem;color:var(--text-soft)">55%</span>
+              </div>
+              <div class="progress-track" style="height:6px"><div class="progress-fill" style="width:55%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+                <span style="font-size:.82rem;font-weight:600">📜 Collecteur de mémoires</span>
+                <span style="font-size:.78rem;color:var(--text-soft)">40%</span>
+              </div>
+              <div class="progress-track" style="height:6px"><div class="progress-fill blue" style="width:40%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Missions -->
+      <div class="pm-tab-content" id="tab-missions">
+        <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+          <span class="pill pill-green">✓ 14 validées</span>
+          <span class="pill pill-coral">● 2 en cours</span>
+          <span class="pill pill-beige">○ 12 disponibles</span>
+        </div>
+        <div class="pm-missions-list">
+          <div class="pm-mission-item">
+            <div class="pm-mission-icon" style="background:rgba(125,180,154,.15)">✅</div>
+            <div class="pm-mission-meta">
+              <div class="pm-mission-name">Quiz : Légendes du Bocage</div>
+              <div class="pm-mission-sub">Quiz local · 🌿 Bocage · Score 8/10</div>
+            </div>
+            <span class="pill pill-green" style="font-size:.7rem;white-space:nowrap">+90 XP</span>
+          </div>
+          <div class="pm-mission-item">
+            <div class="pm-mission-icon" style="background:rgba(59,138,181,.1)">🔍</div>
+            <div class="pm-mission-meta">
+              <div class="pm-mission-name">Chasse aux indices — vieux port</div>
+              <div class="pm-mission-sub">En cours · 🌊 Littoral · Étape 3/5</div>
+            </div>
+            <span class="status-chip chip-active" style="font-size:.7rem;white-space:nowrap">En cours</span>
+          </div>
+          <div class="pm-mission-item">
+            <div class="pm-mission-icon" style="background:rgba(224,122,95,.1)">📸</div>
+            <div class="pm-mission-meta">
+              <div class="pm-mission-name">Défi photo : coucher de soleil</div>
+              <div class="pm-mission-sub">Validée · 🌊 Littoral · 5 clichés</div>
+            </div>
+            <span class="pill pill-green" style="font-size:.7rem;white-space:nowrap">+60 XP</span>
+          </div>
+          <div class="pm-mission-item">
+            <div class="pm-mission-icon" style="background:rgba(212,168,67,.12)">🤝</div>
+            <div class="pm-mission-meta">
+              <div class="pm-mission-name">Collecte de témoignages</div>
+              <div class="pm-mission-sub">En cours · Toutes tribus · 1/3</div>
+            </div>
+            <span class="status-chip chip-active" style="font-size:.7rem;white-space:nowrap">En cours</span>
+          </div>
+          <div class="pm-mission-item">
+            <div class="pm-mission-icon" style="background:rgba(125,180,154,.15)">🗺️</div>
+            <div class="pm-mission-meta">
+              <div class="pm-mission-name">Itinéraire des moulins</div>
+              <div class="pm-mission-sub">Validée · 🌿 Bocage · 12 km</div>
+            </div>
+            <span class="pill pill-green" style="font-size:.7rem;white-space:nowrap">+200 XP</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Badges -->
+      <div class="pm-tab-content" id="tab-badges">
+        <div class="mb-16">
+          <span class="t-xs t-soft">6 obtenus · 6 à débloquer</span>
+        </div>
+        <div class="pm-badges-grid">
+          <div class="pm-badge">
+            <div class="pm-badge-icon">👣</div>
+            <div class="pm-badge-name">Premier Pas</div>
+            <div class="pm-badge-xp">+50 XP</div>
+          </div>
+          <div class="pm-badge">
+            <div class="pm-badge-icon">🧭</div>
+            <div class="pm-badge-name">Explorateur</div>
+            <div class="pm-badge-xp">+150 XP</div>
+          </div>
+          <div class="pm-badge">
+            <div class="pm-badge-icon">🌿</div>
+            <div class="pm-badge-name">Gardien Bocage</div>
+            <div class="pm-badge-xp">+200 XP</div>
+          </div>
+          <div class="pm-badge">
+            <div class="pm-badge-icon">🦆</div>
+            <div class="pm-badge-name">Œil du Marais</div>
+            <div class="pm-badge-xp">+180 XP</div>
+          </div>
+          <div class="pm-badge">
+            <div class="pm-badge-icon">📜</div>
+            <div class="pm-badge-name">Mémoire Vivante</div>
+            <div class="pm-badge-xp">+300 XP</div>
+          </div>
+          <div class="pm-badge">
+            <div class="pm-badge-icon">📸</div>
+            <div class="pm-badge-name">Œil Vif</div>
+            <div class="pm-badge-xp">+120 XP</div>
+          </div>
+          <div class="pm-badge locked">
+            <div class="pm-badge-icon">🏆</div>
+            <div class="pm-badge-name">Grand Pisteur</div>
+            <div class="pm-badge-xp">+400 XP</div>
+          </div>
+          <div class="pm-badge locked">
+            <div class="pm-badge-icon">⚓</div>
+            <div class="pm-badge-name">Amiral</div>
+            <div class="pm-badge-xp">+500 XP</div>
+          </div>
+          <div class="pm-badge locked">
+            <div class="pm-badge-icon">🌟</div>
+            <div class="pm-badge-name">Légende</div>
+            <div class="pm-badge-xp">+1000 XP</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activité -->
+      <div class="pm-tab-content" id="tab-activite">
+        <div class="pm-activity-list">
+          <div class="pm-activity-item">
+            <div class="pm-activity-dot" style="background:rgba(125,180,154,.15)">✅</div>
+            <div>
+              <div style="font-weight:700;font-size:.88rem">Mission validée — Quiz Bocage</div>
+              <div style="font-size:.75rem;color:var(--text-soft)">Aujourd'hui · 14h32</div>
+            </div>
+            <div class="pm-activity-xp">+90 XP</div>
+          </div>
+          <div class="pm-activity-item">
+            <div class="pm-activity-dot" style="background:rgba(212,168,67,.15)">🏅</div>
+            <div>
+              <div style="font-weight:700;font-size:.88rem">Badge débloqué — Explorateur du Littoral</div>
+              <div style="font-size:.75rem;color:var(--text-soft)">Hier · 09h15</div>
+            </div>
+            <div class="pm-activity-xp">+150 XP</div>
+          </div>
+          <div class="pm-activity-item">
+            <div class="pm-activity-dot" style="background:rgba(59,138,181,.1)">🔍</div>
+            <div>
+              <div style="font-weight:700;font-size:.88rem">Chasse démarrée — vieux port</div>
+              <div style="font-size:.75rem;color:var(--text-soft)">Il y a 2 jours</div>
+            </div>
+            <div class="pm-activity-xp">—</div>
+          </div>
+          <div class="pm-activity-item">
+            <div class="pm-activity-dot" style="background:rgba(224,122,95,.1)">📸</div>
+            <div>
+              <div style="font-weight:700;font-size:.88rem">Photo soumise — coucher de soleil</div>
+              <div style="font-size:.75rem;color:var(--text-soft)">Il y a 3 jours</div>
+            </div>
+            <div class="pm-activity-xp">+60 XP</div>
+          </div>
+          <div class="pm-activity-item">
+            <div class="pm-activity-dot" style="background:rgba(155,127,191,.12)">🤝</div>
+            <div>
+              <div style="font-weight:700;font-size:.88rem">Tribu rejointe — Littoral</div>
+              <div style="font-size:.75rem;color:var(--text-soft)">Il y a 2 mois</div>
+            </div>
+            <div class="pm-activity-xp">+50 XP</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /.pm-body -->
+  </div><!-- /.profile-modal -->
+</div><!-- /.profile-overlay -->
+
+<!-- ============================================================
      JAVASCRIPT
      ============================================================ -->
 <script>
@@ -1776,6 +2359,41 @@ window.addEventListener('load', () => {
     bar.style.width = '0%';
     setTimeout(() => { bar.style.width = w; }, 600);
   });
+});
+
+/* ---- Profile modal ---- */
+function openProfileModal() {
+  const overlay = document.getElementById('profileOverlay');
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  // Animate XP bar
+  setTimeout(() => {
+    document.getElementById('pmXpBar').style.width = '85%';
+  }, 350);
+}
+function closeProfileModal() {
+  document.getElementById('profileOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  document.getElementById('pmXpBar').style.width = '0';
+}
+document.getElementById('openProfile').addEventListener('click', openProfileModal);
+document.getElementById('openProfileMobile').addEventListener('click', openProfileModal);
+document.getElementById('closeProfile').addEventListener('click', closeProfileModal);
+document.getElementById('profileOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeProfileModal();
+});
+// Profile tabs
+document.querySelectorAll('.pm-tab').forEach(tab => {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.pm-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.pm-tab-content').forEach(c => c.classList.remove('active'));
+    this.classList.add('active');
+    document.getElementById('tab-' + this.dataset.tab).classList.add('active');
+  });
+});
+// Close on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeProfileModal();
 });
 
 /* ---- Smooth scroll offset for fixed nav ---- */
