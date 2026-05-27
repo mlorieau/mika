@@ -79,28 +79,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--beige-light
 .identity-card .ic-sub{font-size:.78rem;color:var(--text-muted);line-height:1.4}
 .identity-card.selected .ic-label{color:var(--primary)}
 
-/* 7 LEÇONS */
-.lecons-intro{background:var(--navy-dark);border-radius:var(--radius-lg);padding:28px;text-align:center;margin-bottom:24px;position:relative;overflow:hidden}
-.lecons-intro::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(234,86,73,.12);pointer-events:none}
-.lecons-intro .li-pre{font-size:1rem;color:rgba(255,255,255,.7);margin-bottom:6px}
-.lecons-intro .li-pre em{font-style:italic;color:rgba(255,255,255,.9)}
-.lecons-intro .li-main{font-size:1.4rem;font-weight:900;color:white;line-height:1.3}
-.lecons-intro .li-main span{color:var(--primary)}
-.lecons-intro .li-sub{font-size:.85rem;color:rgba(255,255,255,.55);margin-top:8px}
-
-.lecons-grid{display:flex;flex-direction:column;gap:12px;margin-bottom:24px}
-.lecon-card{border-radius:var(--radius-lg);padding:20px 24px;display:flex;align-items:center;gap:18px;cursor:default}
-.lecon-card.orange{background:var(--primary)}
-.lecon-card.navy{background:var(--navy-dark)}
-.lecon-icon{font-size:2rem;flex-shrink:0;width:52px;height:52px;display:flex;align-items:center;justify-content:center;border-radius:var(--radius);flex-shrink:0}
-.lecon-card.orange .lecon-icon{background:rgba(255,255,255,.18)}
-.lecon-card.navy .lecon-icon{background:rgba(255,255,255,.1)}
-.lecon-num{font-size:.65rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-bottom:2px}
-.lecon-card.orange .lecon-num{color:rgba(255,255,255,.7)}
-.lecon-card.navy .lecon-num{color:rgba(255,255,255,.6)}
-.lecon-text{font-size:.95rem;font-weight:700;color:white;line-height:1.35}
-.lecon-text em{font-style:normal;font-weight:900}
-.lecon-zone-logo{width:32px;height:32px;flex-shrink:0;margin-left:auto;opacity:.6}
+/* 7 LEÇONS — image grid */
+.lecons-img-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
+.lecon-img{width:100%;border-radius:var(--radius-lg);display:block;object-fit:cover}
+.lecon-img-full{grid-column:1 / -1}
+.lecon-img-last{grid-column:1 / -1;max-width:50%;justify-self:center}
 
 .lecon-accept{background:white;border-radius:var(--radius-lg);padding:20px 24px;display:flex;align-items:center;gap:16px;border:2px solid var(--beige-dark);cursor:pointer;transition:all .25s}
 .lecon-accept:hover{border-color:var(--primary)}
@@ -279,41 +262,15 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--beige-light
     <h1 class="step-title">Les 7 leçons de la ZONE</h1>
     <p class="step-sub">Entrer en Zone85, tu pourras… mais d'abord, 7 vérités vendéennes tu accepteras.</p>
 
-    <div class="lecons-intro">
-      <div class="li-pre">Entrer en Zone85 <em>tu pourras…</em></div>
-      <div class="li-main"><em>mais avant,</em><br>7 leçons<br><span>tu apprendras…</span></div>
-      <div class="li-sub">Le Code sacré de l'Esprit Vendée</div>
-    </div>
-
-    <div class="lecons-grid">
-      <div class="lecon-card orange">
-        <div class="lecon-icon">🥐</div>
-        <div><div class="lecon-num">Leçon n°1</div><div class="lecon-text">Arpenter la Zone85… <em>sans brioche pur beurre</em> tu ne devras…</div></div>
-      </div>
-      <div class="lecon-card navy">
-        <div class="lecon-icon">☀️</div>
-        <div><div class="lecon-num">Leçon n°2</div><div class="lecon-text">Du soleil sur la plage… <em>tes fesses</em> tu protègeras…</div></div>
-      </div>
-      <div class="lecon-card orange">
-        <div class="lecon-icon">🌬️</div>
-        <div><div class="lecon-num">Leçon n°3</div><div class="lecon-text">Au Mont des Alouettes… <em>la force du vent</em> tu combattras…</div></div>
-      </div>
-      <div class="lecon-card navy">
-        <div class="lecon-icon">🫘</div>
-        <div><div class="lecon-num">Leçon n°4</div><div class="lecon-text">D'une mogette ingérée… <em>le gaz</em> tu maîtriseras…</div></div>
-      </div>
-      <div class="lecon-card orange">
-        <div class="lecon-icon">🧄</div>
-        <div><div class="lecon-num">Leçon n°5</div><div class="lecon-text">Galocher après le préfou… <em>tu éviteras…</em></div></div>
-      </div>
-      <div class="lecon-card navy">
-        <div class="lecon-icon">🌊</div>
-        <div><div class="lecon-num">Leçon n°6</div><div class="lecon-text">Les vagues de l'Atlantique… <em>tu affronteras…</em></div></div>
-      </div>
-      <div class="lecon-card orange">
-        <div class="lecon-icon">❤️</div>
-        <div><div class="lecon-num">Leçon n°7</div><div class="lecon-text">Dans ton cœur… <em>Vendéen.ne tu seras…</em></div></div>
-      </div>
+    <div class="lecons-img-grid">
+      <img src="./img/intro.png" alt="Entrer en Zone85" class="lecon-img lecon-img-full">
+      <img src="./img/1.png" alt="Leçon n°1" class="lecon-img">
+      <img src="./img/2.png" alt="Leçon n°2" class="lecon-img">
+      <img src="./img/3.png" alt="Leçon n°3" class="lecon-img">
+      <img src="./img/4.png" alt="Leçon n°4" class="lecon-img">
+      <img src="./img/5.png" alt="Leçon n°5" class="lecon-img">
+      <img src="./img/6.png" alt="Leçon n°6" class="lecon-img">
+      <img src="./img/7.png" alt="Leçon n°7" class="lecon-img lecon-img-last">
     </div>
 
     <div class="lecon-accept" id="lecon-accept-wrap" onclick="toggleAccept()">
