@@ -343,7 +343,7 @@ require_once 'includes/nav.php';
     <div class="contributors-row">
       <?php
       $delay = 0;
-      foreach ($top_zonautes as $i => $member):
+      foreach ($hall_contributors as $i => $member):
         $delay_style = $delay > 0 ? " style=\"transition-delay:{$delay}s\"" : '';
       ?>
       <div class="contributor-card reveal"<?= $delay_style ?>>
@@ -733,16 +733,20 @@ require_once 'includes/nav.php';
 
     <div class="trophy-shelf-wrap reveal">
       <div class="trophy-shelf-grid">
-        <?php foreach ($season_trophies as $trophy): ?>
+        <?php foreach ($season_trophies as $trophy):
+          $_t_clan    = $clans[$trophy['winner_clan']] ?? null;
+          $_t_count   = $_t_clan ? (int)$_t_clan['trophies'] : 0;
+          $_t_label   = $_t_count . ' trophée' . ($_t_count > 1 ? 's' : '');
+        ?>
         <div class="trophy-shelf-card">
-          <div class="trophy-shelf-top <?= e($trophy['clan_slug']) ?>-bg">
+          <div class="trophy-shelf-top <?= e($trophy['winner_clan']) ?>-bg">
             <span class="trophy-shelf-medal"><?= e($trophy['medal']) ?></span>
-            <span class="trophy-shelf-season"><?= e($trophy['season_title']) ?></span>
-            <div class="trophy-shelf-clan"><?= e($trophy['clan_name']) ?></div>
-            <div class="trophy-shelf-trophees"><?= e($trophy['trophies_label']) ?></div>
+            <span class="trophy-shelf-season"><?= e($trophy['season']) ?></span>
+            <div class="trophy-shelf-clan"><?= e($trophy['winner_name']) ?></div>
+            <div class="trophy-shelf-trophees"><?= e($_t_label) ?></div>
           </div>
           <div class="trophy-shelf-body">
-            <p class="trophy-shelf-note"><?= e($trophy['note']) ?></p>
+            <p class="trophy-shelf-note"><?= e($trophy['main_mission'] ?? '') ?></p>
           </div>
         </div>
         <?php endforeach; ?>
@@ -770,26 +774,28 @@ require_once 'includes/nav.php';
     </div>
 
     <div class="archives-list reveal">
-      <?php foreach ($season_trophies as $season_arc): ?>
+      <?php foreach ($season_trophies as $season_arc):
+        $_arc_color = $clans[$season_arc['winner_clan']]['color'] ?? 'var(--primary)';
+      ?>
       <div class="archive-item">
         <button class="archive-trigger" aria-expanded="false" onclick="toggleArchive(this)">
           <div class="archive-trigger-inner">
             <div class="archive-trigger-left">
-              <span class="archive-dot" style="background:<?= e($season_arc['dot_color']) ?>"></span>
+              <span class="archive-dot" style="background:<?= e($_arc_color) ?>"></span>
               <div>
-                <div class="archive-title"><?= e($season_arc['season_title']) ?></div>
-                <div class="archive-period"><?= e($season_arc['period']) ?></div>
+                <div class="archive-title"><?= e($season_arc['season']) ?></div>
+                <div class="archive-period"><?= e($season_arc['main_mission'] ?? '') ?></div>
               </div>
             </div>
             <span class="archive-chevron">▼</span>
           </div>
         </button>
         <div class="archive-panel">
-          <?php if (!empty($season_arc['winner'])): ?>
+          <?php if (!empty($season_arc['winner_name'])): ?>
           <div class="archive-detail">
-            <span class="archive-stat"><span class="archive-stat-icon">🏆</span> <span>Vainqueur : <strong><?= e($season_arc['winner']) ?></strong></span></span>
-            <span class="archive-stat"><span class="archive-stat-icon">📊</span> <span><strong><?= e($season_arc['contributions']) ?></strong> contributions</span></span>
-            <span class="archive-stat"><span class="archive-stat-icon">🗺️</span> <span>Grande mission : <strong><?= e($season_arc['main_mission']) ?></strong></span></span>
+            <span class="archive-stat"><span class="archive-stat-icon">🏆</span> <span>Vainqueur : <strong><?= e($season_arc['winner_name']) ?></strong></span></span>
+            <span class="archive-stat"><span class="archive-stat-icon">📊</span> <span><strong><?= e((string)($season_arc['contributions'] ?? '')) ?></strong> contributions</span></span>
+            <span class="archive-stat"><span class="archive-stat-icon">🗺️</span> <span>Grande mission : <strong><?= e($season_arc['main_mission'] ?? '') ?></strong></span></span>
           </div>
           <?php else: ?>
           <p class="archive-in-progress">En cours d'archivage…</p>

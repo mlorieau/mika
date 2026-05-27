@@ -255,7 +255,7 @@ require_once 'includes/nav.php';
           <div class="clan-title"><?= e($clan['name']) ?></div>
           <div class="clan-mascot-name"><?= e($clan['hero_name']) ?></div>
           <?php if (!empty($clan['description'])): ?>
-          <div class="clan-cri"><?= e(mb_substr($clan['description'], 0, 60)) ?>…</div>
+          <div class="clan-cri"><?= e(truncate_text($clan['description'], 60)) ?>…</div>
           <?php endif; ?>
           <div class="clan-stats">
             <div class="clan-stat">

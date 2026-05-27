@@ -168,7 +168,7 @@ foreach ($clan_sheet_order as $slug):
             <?php foreach ($clan['top_members'] as $i => $member): ?>
             <li>
               <span class="tm-rank"><?= $i + 1 ?></span>
-              <span class="tm-name"><?= e($member['name']) ?></span>
+              <span class="tm-name"><?= e($member['pseudo']) ?></span>
               <span class="tm-xp"><?= format_xp($member['xp_season']) ?></span>
             </li>
             <?php endforeach; ?>
@@ -201,12 +201,12 @@ foreach ($clan_sheet_order as $slug):
     <div class="trophy-grid">
       <?php foreach ($season_trophies as $trophy): ?>
       <div class="trophy-card reveal">
-        <div class="trophy-header <?= e($trophy['winner_slug'] ?? '') ?>">
+        <div class="trophy-header <?= e($trophy['winner_clan'] ?? '') ?>">
           <span class="trophy-season"><?= e($trophy['season']) ?></span>
           <span class="trophy-winner-badge"><?= e($trophy['medal']) ?> Vainqueur</span>
         </div>
         <div class="trophy-body">
-          <div class="trophy-clan <?= e($trophy['winner_slug'] ?? '') ?>-chip-sm"><?= e($trophy['winner_name']) ?></div>
+          <div class="trophy-clan <?= e($trophy['winner_clan'] ?? '') ?>-chip-sm"><?= e($trophy['winner_name']) ?></div>
           <p class="trophy-desc"><?= e($trophy['description'] ?? '') ?></p>
           <div class="trophy-scores">
             <?php if (!empty($trophy['scores'])): ?>

@@ -90,6 +90,14 @@ function render_component(string $component, array $data = []): void {
     include $file;
 }
 
+/** Tronque une chaîne en préservant les caractères multibyte */
+function truncate_text(string $str, int $len): string {
+    if (function_exists('mb_substr') && function_exists('mb_strlen')) {
+        return mb_strlen($str) > $len ? mb_substr($str, 0, $len) : $str;
+    }
+    return strlen($str) > $len ? substr($str, 0, $len) : $str;
+}
+
 /** Échappe et affiche une chaîne HTML */
 function e(string $str): string {
     return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');

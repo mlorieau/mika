@@ -505,9 +505,9 @@ $hall_photos = [
 
 // ── TOP CONTRIBUTEURS (Hall) ──────────────────────────────────
 $hall_contributors = [
-    ['pseudo' => 'MarcelBocat', 'clan' => 'bocage',   'xp_season' => 680, 'avatar' => '🗺️', 'top_type' => 'Photo'],
-    ['pseudo' => 'GabinCM',     'clan' => 'littoral', 'xp_season' => 612, 'avatar' => '⚓', 'top_type' => 'KTC'],
-    ['pseudo' => 'ÉlodieMJ',    'clan' => 'marais',   'xp_season' => 589, 'avatar' => '🌿', 'top_type' => 'Rando'],
-    ['pseudo' => 'SophieVM',    'clan' => 'littoral', 'xp_season' => 541, 'avatar' => '🧭', 'top_type' => 'Quiz'],
-    ['pseudo' => 'ThomasBV',    'clan' => 'bocage',   'xp_season' => 498, 'avatar' => '🔥', 'top_type' => 'Enquête'],
+    ['pseudo' => 'MarcelBocat', 'clan_slug' => 'bocage',   'clan_label' => '🌳 Bocage',   'season_pts' => 680, 'avatar' => '🗺️', 'type' => 'Photo'],
+    ['pseudo' => 'GabinCM',     'clan_slug' => 'littoral', 'clan_label' => '⚓ Littoral',  'season_pts' => 612, 'avatar' => '⚓', 'type' => 'KTC'],
+    ['pseudo' => 'ÉlodieMJ',    'clan_slug' => 'marais',   'clan_label' => '🌿 Marais',    'season_pts' => 589, 'avatar' => '🌿', 'type' => 'Rando'],
+    ['pseudo' => 'SophieVM',    'clan_slug' => 'littoral', 'clan_label' => '⚓ Littoral',  'season_pts' => 541, 'avatar' => '🧭', 'type' => 'Quiz'],
+    ['pseudo' => 'ThomasBV',    'clan_slug' => 'bocage',   'clan_label' => '🌳 Bocage',    'season_pts' => 498, 'avatar' => '🔥', 'type' => 'Enquête'],
 ];
