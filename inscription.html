@@ -1,960 +1,618 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Inscription — Mika</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rejoindre la Zone 85</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#ea5649;--primary-dark:#c73d31;--primary-light:#f07066;
+  --navy-dark:#12314e;--navy-mid:#163756;--navy-pale:#243d52;--navy-deep:#0c1e2e;
+  --beige:#F5F1ED;--beige-light:#FAF7F4;--beige-dark:#EAE4DC;
+  --white:#fff;--text:#1a2530;--text-mid:#3d4f5c;--text-muted:#7a8a94;
+  --gold:#C9962A;--green:#2a9d5c;--green-bg:#edfaf0;
+  --radius-sm:5px;--radius:8px;--radius-lg:12px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.08);--shadow-md:0 4px 16px rgba(0,0,0,.12);--shadow-lg:0 8px 32px rgba(0,0,0,.18);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--beige);color:var(--text);min-height:100vh;line-height:1.6}
 
-    :root {
-      --beige-100: #FAF6EF;
-      --beige-200: #F0E6D3;
-      --beige-300: #DDD0BC;
-      --coral-400: #E07A5F;
-      --coral-300: #F5A98A;
-      --coral-500: #C45E44;
-      --blue-400: #3B8AB5;
-      --blue-300: #7AB8D4;
-      --blue-500: #255F82;
-      --text: #2A2520;
-      --text-muted: #6B5E54;
-      --green: #4CAF50;
-      --green-bg: #EDFAF0;
-      --radius: 14px;
-      --radius-sm: 8px;
-      --shadow: 0 2px 12px rgba(42,37,32,.08);
-      --shadow-md: 0 4px 24px rgba(42,37,32,.12);
-      --shadow-lg: 0 8px 48px rgba(42,37,32,.14);
-    }
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--beige-light);border-bottom:3px solid var(--primary);box-shadow:var(--shadow-sm)}
+.nav-inner{max-width:1100px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.nav-logo{font-size:1.3rem;font-weight:900;color:var(--navy-dark);text-decoration:none;letter-spacing:-.02em}
+.nav-logo span{color:var(--primary)}
+.nav-back{font-size:.82rem;font-weight:600;color:var(--text-muted);text-decoration:none;display:flex;align-items:center;gap:6px;transition:color .2s}
+.nav-back:hover{color:var(--primary)}
+.nav-step-label{font-size:.78rem;font-weight:700;color:var(--primary);letter-spacing:.06em;text-transform:uppercase}
 
-    html { scroll-behavior: smooth; }
+/* PROGRESS BAR */
+.progress-wrap{height:4px;background:var(--beige-dark);position:fixed;top:67px;left:0;right:0;z-index:99}
+.progress-fill{height:100%;background:var(--primary);transition:width .5s ease;border-radius:0 2px 2px 0}
 
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      background: var(--beige-100);
-      color: var(--text);
-      line-height: 1.6;
-      min-height: 100vh;
-    }
+/* LAYOUT */
+.page-wrap{max-width:700px;margin:0 auto;padding:100px 24px 60px}
 
-    /* NAV */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      background: rgba(250,246,239,.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--beige-300);
-      box-shadow: var(--shadow);
-    }
-    .nav-inner {
-      max-width: 1180px; margin: 0 auto;
-      padding: 0 24px; height: 64px;
-      display: flex; align-items: center; gap: 32px;
-    }
-    .nav-logo {
-      font-size: 1.5rem; font-weight: 800; letter-spacing: -.5px;
-      color: var(--text); text-decoration: none; flex-shrink: 0;
-    }
-    .nav-logo .ka { color: var(--coral-400); }
-    .nav-links {
-      display: flex; gap: 24px; list-style: none; flex: 1;
-    }
-    .nav-links a {
-      font-size: .9rem; font-weight: 500; color: var(--text-muted);
-      text-decoration: none; transition: color .2s;
-    }
-    .nav-links a:hover { color: var(--text); }
-    .nav-actions { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
-    .btn-profil {
-      padding: 7px 18px; border-radius: 999px;
-      background: var(--blue-400); color: #fff;
-      font-size: .85rem; font-weight: 600; text-decoration: none; transition: background .2s;
-    }
-    .btn-profil:hover { background: var(--blue-500); }
-    .btn-rejoindre {
-      padding: 7px 18px; border-radius: 999px;
-      background: var(--coral-400); color: #fff;
-      font-size: .85rem; font-weight: 600; text-decoration: none; transition: background .2s;
-    }
-    .btn-rejoindre:hover { background: var(--coral-500); }
-    .hamburger {
-      display: none; flex-direction: column; gap: 5px;
-      background: none; border: none; cursor: pointer; padding: 4px;
-    }
-    .hamburger span {
-      display: block; width: 22px; height: 2px;
-      background: var(--text); border-radius: 2px;
-      transition: transform .3s, opacity .3s;
-    }
-    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-    .hamburger.open span:nth-child(2) { opacity: 0; }
-    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-    .mobile-menu {
-      display: none; position: fixed; top: 64px; left: 0; right: 0;
-      background: var(--beige-100); border-bottom: 1px solid var(--beige-300);
-      padding: 20px 24px 24px; z-index: 99;
-      flex-direction: column; gap: 16px;
-    }
-    .mobile-menu.open { display: flex; }
-    .mobile-menu a {
-      font-size: 1rem; font-weight: 500; color: var(--text); text-decoration: none; padding: 4px 0;
-    }
-    .mobile-menu .mobile-actions { display: flex; gap: 10px; margin-top: 8px; }
+/* STEP INDICATOR */
+.step-indicator{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:48px}
+.step-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;border:2px solid var(--beige-dark);background:white;color:var(--text-muted);transition:all .3s;flex-shrink:0}
+.step-dot.done{background:var(--primary);border-color:var(--primary);color:white}
+.step-dot.active{background:var(--navy-dark);border-color:var(--navy-dark);color:white;box-shadow:0 0 0 4px rgba(18,49,78,.15)}
+.step-line{height:2px;flex:1;background:var(--beige-dark);transition:background .3s;max-width:60px}
+.step-line.done{background:var(--primary)}
 
-    /* PAGE LAYOUT */
-    .page-wrap {
-      min-height: 100vh;
-      padding: 96px 24px 60px;
-      display: flex; flex-direction: column; align-items: center;
-    }
+/* STEP PANELS */
+.step{display:none;animation:fadeIn .35s ease}
+.step.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 
-    .page-header {
-      text-align: center; margin-bottom: 36px;
-    }
-    .page-header h1 {
-      font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 800;
-      letter-spacing: -.02em; color: var(--text); margin-bottom: 8px;
-    }
-    .page-header p { font-size: 1rem; color: var(--text-muted); }
+/* HEADINGS */
+.step-eyebrow{font-size:.7rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--primary);margin-bottom:8px}
+.step-title{font-size:clamp(1.6rem,3.5vw,2.2rem);font-weight:900;color:var(--navy-dark);letter-spacing:-.02em;line-height:1.15;margin-bottom:10px}
+.step-sub{font-size:.95rem;color:var(--text-muted);margin-bottom:32px}
 
-    /* PROGRESS INDICATOR */
-    .step-indicator {
-      display: flex; align-items: center; gap: 0;
-      margin-bottom: 40px; width: 100%; max-width: 560px;
-    }
+/* FORMS */
+.form-grid{display:flex;flex-direction:column;gap:16px;margin-bottom:28px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.field label{display:block;font-size:.78rem;font-weight:700;color:var(--text-mid);margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase}
+.field input,.field textarea{width:100%;padding:12px 14px;border:2px solid var(--beige-dark);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:.95rem;color:var(--text);background:white;transition:border-color .2s,box-shadow .2s;outline:none}
+.field input:focus,.field textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(234,86,73,.1)}
+.field input.error{border-color:#e53e3e}
+.field-error{font-size:.75rem;color:#e53e3e;margin-top:4px;display:none}
+.field-error.show{display:block}
+.pw-wrap{position:relative}
+.pw-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:.9rem;padding:4px}
+.pw-strength{height:3px;background:var(--beige-dark);border-radius:2px;margin-top:6px;overflow:hidden}
+.pw-bar{height:100%;width:0;border-radius:2px;transition:width .3s,background .3s}
 
-    .step-dot {
-      display: flex; flex-direction: column; align-items: center; gap: 6px;
-      flex: 1;
-      position: relative;
-    }
+/* IDENTITY (ADN) CARDS */
+.identity-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px}
+.identity-card{background:white;border:2px solid var(--beige-dark);border-radius:var(--radius-lg);padding:24px 16px;text-align:center;cursor:pointer;transition:all .25s;user-select:none}
+.identity-card:hover{border-color:var(--primary);transform:translateY(-3px);box-shadow:var(--shadow-md)}
+.identity-card.selected{border-color:var(--primary);background:rgba(234,86,73,.05);box-shadow:0 0 0 4px rgba(234,86,73,.15)}
+.identity-card .ic-icon{font-size:2.4rem;margin-bottom:10px;display:block}
+.identity-card .ic-label{font-size:.92rem;font-weight:800;color:var(--navy-dark);margin-bottom:4px}
+.identity-card .ic-sub{font-size:.78rem;color:var(--text-muted);line-height:1.4}
+.identity-card.selected .ic-label{color:var(--primary)}
 
-    .step-dot::before {
-      content: ''; position: absolute; top: 18px; left: calc(50% + 18px);
-      right: calc(-50% + 18px); height: 2px;
-      background: var(--beige-300);
-      transition: background .4s;
-    }
-    .step-dot:last-child::before { display: none; }
-    .step-dot.done::before { background: var(--coral-400); }
+/* 7 LEÇONS */
+.lecons-intro{background:var(--navy-dark);border-radius:var(--radius-lg);padding:28px;text-align:center;margin-bottom:24px;position:relative;overflow:hidden}
+.lecons-intro::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(234,86,73,.12);pointer-events:none}
+.lecons-intro .li-pre{font-size:1rem;color:rgba(255,255,255,.7);margin-bottom:6px}
+.lecons-intro .li-pre em{font-style:italic;color:rgba(255,255,255,.9)}
+.lecons-intro .li-main{font-size:1.4rem;font-weight:900;color:white;line-height:1.3}
+.lecons-intro .li-main span{color:var(--primary)}
+.lecons-intro .li-sub{font-size:.85rem;color:rgba(255,255,255,.55);margin-top:8px}
 
-    .step-circle {
-      width: 36px; height: 36px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: .85rem; font-weight: 700;
-      border: 2px solid var(--beige-300);
-      background: #fff; color: var(--text-muted);
-      transition: all .3s; position: relative; z-index: 1;
-    }
-    .step-dot.active .step-circle {
-      border-color: var(--coral-400); background: var(--coral-400); color: #fff;
-    }
-    .step-dot.done .step-circle {
-      border-color: var(--coral-400); background: var(--coral-400); color: #fff;
-    }
-    .step-dot.done .step-circle::after { content: '✓'; font-size: .9rem; }
-    .step-dot.done .step-circle .step-num { display: none; }
+.lecons-grid{display:flex;flex-direction:column;gap:12px;margin-bottom:24px}
+.lecon-card{border-radius:var(--radius-lg);padding:20px 24px;display:flex;align-items:center;gap:18px;cursor:default}
+.lecon-card.orange{background:var(--primary)}
+.lecon-card.navy{background:var(--navy-dark)}
+.lecon-icon{font-size:2rem;flex-shrink:0;width:52px;height:52px;display:flex;align-items:center;justify-content:center;border-radius:var(--radius);flex-shrink:0}
+.lecon-card.orange .lecon-icon{background:rgba(255,255,255,.18)}
+.lecon-card.navy .lecon-icon{background:rgba(255,255,255,.1)}
+.lecon-num{font-size:.65rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-bottom:2px}
+.lecon-card.orange .lecon-num{color:rgba(255,255,255,.7)}
+.lecon-card.navy .lecon-num{color:rgba(255,255,255,.6)}
+.lecon-text{font-size:.95rem;font-weight:700;color:white;line-height:1.35}
+.lecon-text em{font-style:normal;font-weight:900}
+.lecon-zone-logo{width:32px;height:32px;flex-shrink:0;margin-left:auto;opacity:.6}
 
-    .step-label {
-      font-size: .72rem; font-weight: 600; color: var(--text-muted);
-      text-align: center; white-space: nowrap;
-      transition: color .3s;
-    }
-    .step-dot.active .step-label,
-    .step-dot.done .step-label { color: var(--coral-400); }
+.lecon-accept{background:white;border-radius:var(--radius-lg);padding:20px 24px;display:flex;align-items:center;gap:16px;border:2px solid var(--beige-dark);cursor:pointer;transition:all .25s}
+.lecon-accept:hover{border-color:var(--primary)}
+.lecon-accept.checked{border-color:var(--primary);background:rgba(234,86,73,.04)}
+.lecon-accept input[type=checkbox]{width:22px;height:22px;accent-color:var(--primary);cursor:pointer;flex-shrink:0}
+.lecon-accept label{font-size:.9rem;font-weight:600;color:var(--text-mid);cursor:pointer;line-height:1.4}
+.lecon-accept.checked label{color:var(--primary);font-weight:700}
 
-    /* CARD */
-    .form-card {
-      background: #fff; border: 1px solid var(--beige-300);
-      border-radius: 20px; padding: 44px 48px;
-      box-shadow: var(--shadow-lg);
-      width: 100%; max-width: 560px;
-      position: relative; overflow: hidden;
-    }
+/* CLAN SELECTION */
+.clan-grid{display:flex;flex-direction:column;gap:16px;margin-bottom:28px}
+.clan-option{background:white;border:2px solid var(--beige-dark);border-radius:var(--radius-lg);display:flex;align-items:center;gap:20px;padding:16px 20px;cursor:pointer;transition:all .25s;user-select:none}
+.clan-option:hover{border-color:var(--primary);transform:translateX(4px)}
+.clan-option.selected{border-color:var(--primary);box-shadow:0 0 0 4px rgba(234,86,73,.12)}
+.clan-option .co-mascot{width:80px;height:80px;object-fit:contain;flex-shrink:0;transition:transform .3s}
+.clan-option:hover .co-mascot,.clan-option.selected .co-mascot{transform:scale(1.08)}
+.clan-option .co-head{width:56px;height:56px;border-radius:var(--radius-sm);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.5rem}
+.co-head.bocage{background:linear-gradient(135deg,#1a3d18,#2d5a27)}
+.co-head.littoral{background:linear-gradient(135deg,#0d1e2c,#163756)}
+.co-head.marais{background:linear-gradient(135deg,#2e1f0d,#4a3520)}
+.clan-option .co-body{flex:1;min-width:0}
+.co-name{font-size:1rem;font-weight:800;color:var(--navy-dark);margin-bottom:2px}
+.co-mascot-name{font-size:.78rem;font-weight:700;color:var(--primary);margin-bottom:3px}
+.co-cry{font-size:.78rem;color:var(--text-muted);font-style:italic}
+.co-desc{font-size:.8rem;color:var(--text-mid);margin-top:4px;line-height:1.4}
+.clan-option .co-radio{width:22px;height:22px;border-radius:50%;border:2px solid var(--beige-dark);flex-shrink:0;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.clan-option.selected .co-radio{background:var(--primary);border-color:var(--primary);color:white;font-size:.8rem}
 
-    /* STEPS */
-    .step {
-      display: none;
-      animation: stepIn .35s ease forwards;
-    }
-    .step.active { display: block; }
-    .step.slide-out {
-      animation: stepOut .25s ease forwards;
-    }
+/* AVATAR */
+.avatar-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:20px}
+.avatar-opt{width:100%;aspect-ratio:1;background:white;border:2px solid var(--beige-dark);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:1.5rem;cursor:pointer;transition:all .2s}
+.avatar-opt:hover{border-color:var(--primary);transform:scale(1.08)}
+.avatar-opt.selected{border-color:var(--primary);background:rgba(234,86,73,.08);box-shadow:0 0 0 3px rgba(234,86,73,.2)}
 
-    @keyframes stepIn {
-      from { opacity: 0; transform: translateX(32px); }
-      to   { opacity: 1; transform: translateX(0); }
-    }
-    @keyframes stepOut {
-      from { opacity: 1; transform: translateX(0); }
-      to   { opacity: 0; transform: translateX(-32px); }
-    }
-    @keyframes stepInBack {
-      from { opacity: 0; transform: translateX(-32px); }
-      to   { opacity: 1; transform: translateX(0); }
-    }
-    .step.slide-in-back { animation: stepInBack .35s ease forwards; }
+/* WELCOME */
+.welcome-hero{background:linear-gradient(160deg,var(--navy-dark),var(--navy-deep));border-radius:var(--radius-lg);padding:40px 32px;text-align:center;position:relative;overflow:hidden;margin-bottom:24px}
+.welcome-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:rgba(234,86,73,.12)}
+.welcome-confetti{font-size:2.5rem;margin-bottom:12px;display:block}
+.welcome-title{font-size:2rem;font-weight:900;color:white;margin-bottom:8px}
+.welcome-sub{font-size:.95rem;color:rgba(255,255,255,.65);margin-bottom:0}
+.welcome-card{background:white;border-radius:var(--radius-lg);padding:24px;box-shadow:var(--shadow-md);margin-bottom:20px}
+.wc-row{display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid var(--beige-dark)}
+.wc-row:last-child{border-bottom:none}
+.wc-icon{font-size:1.2rem;width:36px;text-align:center}
+.wc-label{font-size:.78rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.wc-value{font-size:.95rem;font-weight:700;color:var(--text)}
+.wc-value.orange{color:var(--primary)}
+.wc-clan-mascot{width:40px;height:40px;object-fit:contain}
 
-    .step-title {
-      font-size: 1.3rem; font-weight: 800; color: var(--text);
-      margin-bottom: 6px; letter-spacing: -.01em;
-    }
-    .step-subtitle {
-      font-size: .9rem; color: var(--text-muted); margin-bottom: 28px; line-height: 1.5;
-    }
+/* BUTTONS */
+.btn-primary{background:var(--primary);color:white;border:none;padding:14px 32px;border-radius:var(--radius-sm);font-family:'Inter',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:8px;text-decoration:none}
+.btn-primary:hover{background:var(--primary-dark);transform:translateY(-1px);box-shadow:0 4px 16px rgba(234,86,73,.35)}
+.btn-primary:disabled{opacity:.5;cursor:default;transform:none;box-shadow:none}
+.btn-secondary{background:white;color:var(--text);border:2px solid var(--beige-dark);padding:12px 24px;border-radius:var(--radius-sm);font-family:'Inter',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-secondary:hover{border-color:var(--text-muted)}
+.btn-row{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-top:4px}
+.btn-full{width:100%;justify-content:center}
 
-    /* FORM FIELDS */
-    .field-group { display: flex; flex-direction: column; gap: 16px; }
-    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+/* IDENTITY BADGE */
+.adn-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(234,86,73,.1);border:1px solid rgba(234,86,73,.25);border-radius:100px;padding:5px 14px;font-size:.8rem;font-weight:700;color:var(--primary);margin-bottom:20px}
 
-    .field {
-      display: flex; flex-direction: column; gap: 5px;
-    }
-    .field label {
-      font-size: .82rem; font-weight: 700; color: var(--text);
-    }
-    .field input, .field textarea {
-      padding: 11px 14px; border-radius: var(--radius-sm);
-      border: 1.5px solid var(--beige-300); background: var(--beige-100);
-      font-size: .95rem; font-family: inherit; color: var(--text);
-      transition: border-color .2s, background .2s;
-      outline: none;
-    }
-    .field input:focus, .field textarea:focus {
-      border-color: var(--blue-400); background: #fff;
-    }
-    .field input.error, .field textarea.error {
-      border-color: var(--coral-400); background: #FEF0EB;
-    }
-    .field input.valid {
-      border-color: var(--green); background: var(--green-bg);
-    }
-    .field-error {
-      font-size: .78rem; color: var(--coral-500); font-weight: 600;
-      display: none;
-    }
-    .field-error.show { display: block; }
-
-    .field textarea { resize: vertical; min-height: 80px; }
-
-    /* TRIBU CARDS */
-    .tribu-pick-grid {
-      display: flex; flex-direction: column; gap: 12px;
-    }
-    .tribu-pick {
-      border: 2px solid var(--beige-300); border-radius: var(--radius);
-      padding: 18px 20px; cursor: pointer;
-      display: flex; align-items: center; gap: 16px;
-      background: var(--beige-100);
-      transition: border-color .2s, background .2s, box-shadow .2s;
-      user-select: none;
-    }
-    .tribu-pick:hover { border-color: var(--beige-300); background: #fff; box-shadow: var(--shadow); }
-
-    .tribu-pick.selected-littoral { border-color: #3B8AB5; background: #EDF6FB; }
-    .tribu-pick.selected-bocage  { border-color: #4CAF50; background: #EDFAF0; }
-    .tribu-pick.selected-marais  { border-color: #E6B800; background: #FDF6E8; }
-
-    .tribu-pick-icon { font-size: 2rem; flex-shrink: 0; }
-    .tribu-pick-body { flex: 1; }
-    .tribu-pick-name { font-size: 1rem; font-weight: 800; color: var(--text); }
-    .tribu-pick-desc { font-size: .82rem; color: var(--text-muted); line-height: 1.4; margin-top: 2px; }
-    .tribu-pick-count { font-size: .75rem; font-weight: 600; color: var(--text-muted); margin-top: 4px; }
-    .tribu-pick-check {
-      width: 24px; height: 24px; border-radius: 50%;
-      border: 2px solid var(--beige-300); flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      font-size: .85rem; transition: all .2s;
-    }
-    .tribu-pick.selected-littoral .tribu-pick-check,
-    .tribu-pick.selected-bocage  .tribu-pick-check,
-    .tribu-pick.selected-marais  .tribu-pick-check {
-      background: var(--coral-400); border-color: var(--coral-400); color: #fff;
-    }
-
-    /* AVATAR PICKER */
-    .username-field { margin-bottom: 20px; }
-
-    .avatar-label {
-      font-size: .82rem; font-weight: 700; color: var(--text); margin-bottom: 10px;
-    }
-    .avatar-grid {
-      display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px;
-      margin-bottom: 20px;
-    }
-    .avatar-btn {
-      aspect-ratio: 1; border-radius: 12px;
-      border: 2px solid var(--beige-300); background: var(--beige-100);
-      font-size: 1.5rem; cursor: pointer; transition: all .2s;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .avatar-btn:hover { border-color: var(--blue-300); background: #EBF5FB; transform: scale(1.05); }
-    .avatar-btn.selected { border-color: var(--coral-400); background: #FEF0EB; transform: scale(1.08); }
-
-    /* MISSION PICK */
-    .mission-pick-grid { display: flex; flex-direction: column; gap: 12px; }
-    .mission-pick {
-      border: 2px solid var(--beige-300); border-radius: var(--radius);
-      padding: 18px 20px; cursor: pointer;
-      background: var(--beige-100); transition: all .2s;
-    }
-    .mission-pick:hover { border-color: var(--beige-300); background: #fff; box-shadow: var(--shadow); }
-    .mission-pick.selected { border-color: var(--coral-400); background: #FEF0EB; }
-
-    .mission-pick-header {
-      display: flex; justify-content: space-between; align-items: flex-start;
-    }
-    .mission-pick-icon { font-size: 1.6rem; margin-bottom: 8px; display: block; }
-    .mission-pick-name { font-size: .95rem; font-weight: 800; color: var(--text); }
-    .mission-pick-desc { font-size: .82rem; color: var(--text-muted); margin-top: 4px; line-height: 1.4; }
-    .mission-pick-badges {
-      display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;
-    }
-    .mission-badge {
-      display: inline-flex; align-items: center; gap: 4px;
-      background: var(--beige-200); border-radius: 999px;
-      padding: 3px 10px; font-size: .72rem; font-weight: 600; color: var(--text-muted);
-    }
-    .mission-pick.selected .mission-badge { background: rgba(224,122,95,.12); }
-
-    /* NAV BUTTONS */
-    .step-nav {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-top: 32px; gap: 12px;
-    }
-    .btn-back {
-      padding: 11px 22px; border-radius: 999px;
-      background: transparent; color: var(--text-muted);
-      border: 1.5px solid var(--beige-300);
-      font-size: .9rem; font-weight: 600; cursor: pointer;
-      font-family: inherit; transition: all .2s;
-    }
-    .btn-back:hover { border-color: var(--text-muted); color: var(--text); }
-    .btn-next {
-      flex: 1; padding: 13px 28px; border-radius: 999px;
-      background: var(--coral-400); color: #fff;
-      font-size: 1rem; font-weight: 700; cursor: pointer;
-      border: none; font-family: inherit;
-      transition: background .2s, transform .15s;
-    }
-    .btn-next:hover { background: var(--coral-500); transform: translateY(-1px); }
-
-    .step-count {
-      font-size: .78rem; color: var(--text-muted); font-weight: 600;
-    }
-
-    /* STEP 5 — WELCOME */
-    .welcome-screen { text-align: center; }
-
-    .confetti-container {
-      position: relative; overflow: hidden;
-      padding: 24px 0 8px; margin-bottom: 16px;
-    }
-    .confetti-emoji {
-      position: absolute; font-size: 1.2rem;
-      animation: confettiFall linear infinite;
-      pointer-events: none;
-    }
-    @keyframes confettiFall {
-      0%   { transform: translateY(-30px) rotate(0deg); opacity: 1; }
-      100% { transform: translateY(180px) rotate(360deg); opacity: 0; }
-    }
-
-    .welcome-avatar {
-      width: 90px; height: 90px; border-radius: 50%;
-      background: var(--beige-200); border: 3px solid var(--beige-300);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 3rem; margin: 0 auto 16px;
-    }
-
-    .welcome-name {
-      font-size: 1.5rem; font-weight: 800; color: var(--text); margin-bottom: 4px;
-    }
-
-    .welcome-chips {
-      display: flex; justify-content: center; gap: 10px;
-      flex-wrap: wrap; margin: 16px 0 24px;
-    }
-
-    .welcome-chip {
-      display: inline-flex; align-items: center; gap: 6px;
-      border-radius: 999px; padding: 6px 14px;
-      font-size: .82rem; font-weight: 700;
-    }
-    .welcome-chip.tribu {
-      background: var(--beige-200); color: var(--text);
-    }
-    .welcome-chip.level {
-      background: #EBF5FB; color: var(--blue-500);
-    }
-    .welcome-chip.xp {
-      background: #FEF0EB; color: var(--coral-500);
-    }
-
-    .welcome-mission {
-      background: var(--beige-100); border: 1px solid var(--beige-300);
-      border-radius: var(--radius); padding: 16px 20px;
-      text-align: left; margin: 20px 0 28px;
-    }
-    .welcome-mission-label {
-      font-size: .72rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: .08em; color: var(--text-muted); margin-bottom: 8px;
-    }
-    .welcome-mission-name {
-      font-size: .95rem; font-weight: 700; color: var(--text);
-    }
-
-    .btn-start {
-      display: inline-block; padding: 14px 36px; border-radius: 999px;
-      background: var(--coral-400); color: #fff;
-      font-size: 1rem; font-weight: 700; text-decoration: none;
-      transition: background .2s, transform .15s;
-    }
-    .btn-start:hover { background: var(--coral-500); transform: translateY(-2px); }
-
-    /* Error banner */
-    .step-error {
-      background: #FEF0EB; border: 1px solid var(--coral-300);
-      border-radius: var(--radius-sm); padding: 10px 14px;
-      font-size: .85rem; color: var(--coral-500); font-weight: 600;
-      margin-bottom: 20px; display: none;
-    }
-    .step-error.show { display: block; }
-
-    /* RESPONSIVE */
-    @media (max-width: 640px) {
-      .nav-links { display: none; }
-      .nav-actions .btn-profil { display: none; }
-      .hamburger { display: flex; }
-      .form-card { padding: 32px 24px; }
-      .field-row { grid-template-columns: 1fr; }
-      .avatar-grid { grid-template-columns: repeat(6, 1fr); }
-      .step-label { display: none; }
-    }
-  </style>
+@media(max-width:600px){
+  .form-row{grid-template-columns:1fr}
+  .identity-grid{grid-template-columns:1fr}
+  .avatar-grid{grid-template-columns:repeat(4,1fr)}
+  .clan-option .co-mascot{width:56px;height:56px}
+  .welcome-title{font-size:1.5rem}
+}
+</style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
   <div class="nav-inner">
-    <a href="index.html" class="nav-logo">mi<span class="ka">ka</span></a>
-    <ul class="nav-links">
-      <li><a href="index.html">Accueil</a></li>
-      <li><a href="tribu.html">Tribus</a></li>
-      <li><a href="#">Jeux</a></li>
-      <li><a href="#">Missions</a></li>
-      <li><a href="#">Badges</a></li>
-      <li><a href="#">Classement</a></li>
-    </ul>
-    <div class="nav-actions">
-      <a href="profil.html" class="btn-profil">Mon profil</a>
-      <a href="inscription.html" class="btn-rejoindre">Rejoindre</a>
-      <button class="hamburger" id="hamburger" aria-label="Menu">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
+    <a href="index.html" class="nav-back">← Retour</a>
+    <a href="zone85_v5.html" class="nav-logo">ZONE<span>85</span></a>
+    <span class="nav-step-label" id="step-nav-label">Étape 1 / 6</span>
   </div>
 </nav>
+<div class="progress-wrap"><div class="progress-fill" id="progress-fill" style="width:16.6%"></div></div>
 
-<div class="mobile-menu" id="mobileMenu">
-  <a href="index.html">Accueil</a>
-  <a href="tribu.html">Tribus</a>
-  <a href="#">Jeux</a>
-  <a href="#">Missions</a>
-  <a href="#">Badges</a>
-  <a href="#">Classement</a>
-  <div class="mobile-actions">
-    <a href="profil.html" class="btn-profil">Mon profil</a>
-    <a href="inscription.html" class="btn-rejoindre">Rejoindre</a>
-  </div>
-</div>
+<div class="page-wrap">
 
-<!-- MAIN -->
-<main class="page-wrap">
-  <div class="page-header">
-    <h1>Rejoindre l'aventure</h1>
-    <p>Créez votre compte en quelques étapes et commencez à explorer.</p>
+  <!-- STEP INDICATOR -->
+  <div class="step-indicator" id="step-indicator">
+    <div class="step-dot active" data-s="1">1</div>
+    <div class="step-line" data-l="1"></div>
+    <div class="step-dot" data-s="2">2</div>
+    <div class="step-line" data-l="2"></div>
+    <div class="step-dot" data-s="3">3</div>
+    <div class="step-line" data-l="3"></div>
+    <div class="step-dot" data-s="4">4</div>
+    <div class="step-line" data-l="4"></div>
+    <div class="step-dot" data-s="5">5</div>
+    <div class="step-line" data-l="5"></div>
+    <div class="step-dot" data-s="6">6</div>
   </div>
 
-  <!-- Step indicator -->
-  <div class="step-indicator" id="stepIndicator">
-    <div class="step-dot active" data-step="1">
-      <div class="step-circle"><span class="step-num">1</span></div>
-      <span class="step-label">Infos</span>
-    </div>
-    <div class="step-dot" data-step="2">
-      <div class="step-circle"><span class="step-num">2</span></div>
-      <span class="step-label">Tribu</span>
-    </div>
-    <div class="step-dot" data-step="3">
-      <div class="step-circle"><span class="step-num">3</span></div>
-      <span class="step-label">Identité</span>
-    </div>
-    <div class="step-dot" data-step="4">
-      <div class="step-circle"><span class="step-num">4</span></div>
-      <span class="step-label">Mission</span>
-    </div>
-    <div class="step-dot" data-step="5">
-      <div class="step-circle"><span class="step-num">5</span></div>
-      <span class="step-label">Bienvenue</span>
-    </div>
-  </div>
-
-  <!-- Form card -->
-  <div class="form-card">
-
-    <!-- STEP 1: Informations -->
-    <div class="step active" id="step1">
-      <h2 class="step-title">Vos informations</h2>
-      <p class="step-subtitle">Créez votre compte pour rejoindre la communauté Mika.</p>
-      <div id="step1Error" class="step-error"></div>
-      <div class="field-group">
-        <div class="field-row">
-          <div class="field">
-            <label for="prenom">Prénom</label>
-            <input type="text" id="prenom" placeholder="Lucie" autocomplete="given-name" />
-            <span class="field-error" id="errPrenom">Le prénom est requis.</span>
-          </div>
-          <div class="field">
-            <label for="nom">Nom</label>
-            <input type="text" id="nom" placeholder="Martin" autocomplete="family-name" />
-            <span class="field-error" id="errNom">Le nom est requis.</span>
-          </div>
+  <!-- ─── ÉTAPE 1 : INFOS ─── -->
+  <div class="step active" id="step-1">
+    <div class="step-eyebrow">Étape 1 — Tes infos</div>
+    <h1 class="step-title">Crée ton compte</h1>
+    <p class="step-sub">Le début de ton aventure en Zone 85 commence ici.</p>
+    <div class="form-grid">
+      <div class="form-row">
+        <div class="field">
+          <label for="f-prenom">Prénom</label>
+          <input type="text" id="f-prenom" placeholder="Gabin" autocomplete="given-name">
+          <div class="field-error" id="err-prenom">Ton prénom est requis</div>
         </div>
         <div class="field">
-          <label for="email">Adresse email</label>
-          <input type="email" id="email" placeholder="lucie@exemple.fr" autocomplete="email" />
-          <span class="field-error" id="errEmail">Email invalide.</span>
-        </div>
-        <div class="field">
-          <label for="password">Mot de passe</label>
-          <input type="password" id="password" placeholder="8 caractères minimum" autocomplete="new-password" />
-          <span class="field-error" id="errPassword">Au moins 8 caractères.</span>
-        </div>
-        <div class="field">
-          <label for="confirm">Confirmer le mot de passe</label>
-          <input type="password" id="confirm" placeholder="Répétez votre mot de passe" autocomplete="new-password" />
-          <span class="field-error" id="errConfirm">Les mots de passe ne correspondent pas.</span>
+          <label for="f-nom">Nom</label>
+          <input type="text" id="f-nom" placeholder="Dupuy" autocomplete="family-name">
+          <div class="field-error" id="err-nom">Ton nom est requis</div>
         </div>
       </div>
-      <div class="step-nav">
-        <span class="step-count">Étape 1 / 5</span>
-        <button class="btn-next" onclick="goNext(1)">Continuer →</button>
-      </div>
-    </div>
-
-    <!-- STEP 2: Tribu -->
-    <div class="step" id="step2">
-      <h2 class="step-title">Votre Tribu</h2>
-      <p class="step-subtitle">Choisissez le territoire qui vous ressemble. Vous pourrez le changer plus tard.</p>
-      <div id="step2Error" class="step-error"></div>
-      <div class="tribu-pick-grid">
-        <div class="tribu-pick" id="pick-littoral" onclick="selectTribu('littoral')">
-          <span class="tribu-pick-icon">⚓</span>
-          <div class="tribu-pick-body">
-            <div class="tribu-pick-name">Tribu Littoral</div>
-            <div class="tribu-pick-desc">Côtes, plages, air iodé &mdash; l'Atlantique comme terrain de jeu.</div>
-            <div class="tribu-pick-count">👥 412 membres</div>
-          </div>
-          <div class="tribu-pick-check" id="check-littoral"></div>
-        </div>
-        <div class="tribu-pick" id="pick-bocage" onclick="selectTribu('bocage')">
-          <span class="tribu-pick-icon">🌿</span>
-          <div class="tribu-pick-body">
-            <div class="tribu-pick-name">Tribu Bocage</div>
-            <div class="tribu-pick-desc">Forêts, collines, chemins creux &mdash; la nature intérieure du Vendée.</div>
-            <div class="tribu-pick-count">👥 387 membres</div>
-          </div>
-          <div class="tribu-pick-check" id="check-bocage"></div>
-        </div>
-        <div class="tribu-pick" id="pick-marais" onclick="selectTribu('marais')">
-          <span class="tribu-pick-icon">🦆</span>
-          <div class="tribu-pick-body">
-            <div class="tribu-pick-name">Tribu Marais</div>
-            <div class="tribu-pick-desc">Zones humides, oiseaux migrateurs &mdash; les secrets des marécages.</div>
-            <div class="tribu-pick-count">👥 441 membres</div>
-          </div>
-          <div class="tribu-pick-check" id="check-marais"></div>
-        </div>
-      </div>
-      <div class="step-nav">
-        <button class="btn-back" onclick="goBack(2)">← Retour</button>
-        <span class="step-count">Étape 2 / 5</span>
-        <button class="btn-next" onclick="goNext(2)">Continuer →</button>
-      </div>
-    </div>
-
-    <!-- STEP 3: Identité -->
-    <div class="step" id="step3">
-      <h2 class="step-title">Votre Identité</h2>
-      <p class="step-subtitle">Choisissez votre nom d'aventurier et votre avatar. C'est votre signature dans la communauté.</p>
-      <div id="step3Error" class="step-error"></div>
-      <div class="username-field field">
-        <label for="username">Nom d'aventurier</label>
-        <input type="text" id="username" placeholder="ex. LucieExplore" maxlength="24" />
-        <span class="field-error" id="errUsername">Le nom d'aventurier est requis (3 caractères min.).</span>
-      </div>
-
-      <div>
-        <div class="avatar-label">Choisissez votre avatar</div>
-        <div class="avatar-grid" id="avatarGrid">
-          <button class="avatar-btn" data-emoji="🧭" onclick="selectAvatar(this)">🧭</button>
-          <button class="avatar-btn" data-emoji="🌊" onclick="selectAvatar(this)">🌊</button>
-          <button class="avatar-btn" data-emoji="🌿" onclick="selectAvatar(this)">🌿</button>
-          <button class="avatar-btn" data-emoji="🦆" onclick="selectAvatar(this)">🦆</button>
-          <button class="avatar-btn" data-emoji="🏕️" onclick="selectAvatar(this)">🏕️</button>
-          <button class="avatar-btn" data-emoji="🔍" onclick="selectAvatar(this)">🔍</button>
-          <button class="avatar-btn" data-emoji="📸" onclick="selectAvatar(this)">📸</button>
-          <button class="avatar-btn" data-emoji="🎓" onclick="selectAvatar(this)">🎓</button>
-          <button class="avatar-btn" data-emoji="⚓" onclick="selectAvatar(this)">⚓</button>
-          <button class="avatar-btn" data-emoji="🌟" onclick="selectAvatar(this)">🌟</button>
-          <button class="avatar-btn" data-emoji="🦅" onclick="selectAvatar(this)">🦅</button>
-          <button class="avatar-btn" data-emoji="🪸" onclick="selectAvatar(this)">🪸</button>
-        </div>
-        <span class="field-error" id="errAvatar" style="display:none;margin-top:-12px;margin-bottom:12px">Choisissez un avatar.</span>
-      </div>
-
       <div class="field">
-        <label for="bio">Bio courte <span style="font-weight:400;color:var(--text-muted)">(optionnel)</span></label>
-        <textarea id="bio" placeholder="Quelques mots sur vous, votre rapport au Vendée..."></textarea>
+        <label for="f-email">Adresse email</label>
+        <input type="email" id="f-email" placeholder="gabin@zone85.fr" autocomplete="email">
+        <div class="field-error" id="err-email">Email invalide</div>
       </div>
+      <div class="field">
+        <label for="f-pw">Mot de passe</label>
+        <div class="pw-wrap">
+          <input type="password" id="f-pw" placeholder="8 caractères minimum" autocomplete="new-password">
+          <button class="pw-toggle" onclick="togglePw('f-pw')" tabindex="-1" type="button">👁</button>
+        </div>
+        <div class="pw-strength"><div class="pw-bar" id="pw-bar"></div></div>
+        <div class="field-error" id="err-pw">Mot de passe trop court (8 car. min.)</div>
+      </div>
+      <div class="field">
+        <label for="f-pw2">Confirmer le mot de passe</label>
+        <div class="pw-wrap">
+          <input type="password" id="f-pw2" placeholder="Répète ton mot de passe" autocomplete="new-password">
+          <button class="pw-toggle" onclick="togglePw('f-pw2')" tabindex="-1" type="button">👁</button>
+        </div>
+        <div class="field-error" id="err-pw2">Les mots de passe ne correspondent pas</div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <span style="font-size:.8rem;color:var(--text-muted)">Déjà un compte ? <a href="profil.html" style="color:var(--primary);font-weight:600">Connecte-toi</a></span>
+      <button class="btn-primary" onclick="validateStep1()">Continuer →</button>
+    </div>
+  </div>
 
-      <div class="step-nav">
-        <button class="btn-back" onclick="goBack(3)">← Retour</button>
-        <span class="step-count">Étape 3 / 5</span>
-        <button class="btn-next" onclick="goNext(3)">Continuer →</button>
+  <!-- ─── ÉTAPE 2 : ADN VENDÉEN ─── -->
+  <div class="step" id="step-2">
+    <div class="step-eyebrow">Étape 2 — Ton ADN vendéen</div>
+    <h1 class="step-title">Tu es vendéen.ne…</h1>
+    <p class="step-sub">Ton lien avec la Vendée, c'est quoi ? Pas de mauvaise réponse — chacun a sa porte d'entrée dans la Zone.</p>
+    <div class="identity-grid">
+      <div class="identity-card" onclick="selectIdentity('souche', this)">
+        <span class="ic-icon">🌱</span>
+        <div class="ic-label">De souche</div>
+        <div class="ic-sub">Né.e en terre vendéenne. Le 85 coule dans tes veines depuis toujours.</div>
+      </div>
+      <div class="identity-card" onclick="selectIdentity('coeur', this)">
+        <span class="ic-icon">❤️</span>
+        <div class="ic-label">De cœur</div>
+        <div class="ic-sub">La Vendée t'a adopté.e. Tu l'as choisie et tu ne pars plus.</div>
+      </div>
+      <div class="identity-card" onclick="selectIdentity('adoption', this)">
+        <span class="ic-icon">🌍</span>
+        <div class="ic-label">D'adoption</div>
+        <div class="ic-sub">Tu découvres la Vendée et tu tombes déjà sous le charme. Bienvenue !</div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goStep(1)">← Retour</button>
+      <button class="btn-primary" id="btn-step2" onclick="validateStep2()" disabled>Continuer →</button>
+    </div>
+  </div>
+
+  <!-- ─── ÉTAPE 3 : 7 LEÇONS ─── -->
+  <div class="step" id="step-3">
+    <div class="step-eyebrow">Étape 3 — Le Code de la Zone</div>
+    <h1 class="step-title">Les 7 leçons de la ZONE</h1>
+    <p class="step-sub">Entrer en Zone85, tu pourras… mais d'abord, 7 vérités vendéennes tu accepteras.</p>
+
+    <div class="lecons-intro">
+      <div class="li-pre">Entrer en Zone85 <em>tu pourras…</em></div>
+      <div class="li-main"><em>mais avant,</em><br>7 leçons<br><span>tu apprendras…</span></div>
+      <div class="li-sub">Le Code sacré de l'Esprit Vendée</div>
+    </div>
+
+    <div class="lecons-grid">
+      <div class="lecon-card orange">
+        <div class="lecon-icon">🥐</div>
+        <div><div class="lecon-num">Leçon n°1</div><div class="lecon-text">Arpenter la Zone85… <em>sans brioche pur beurre</em> tu ne devras…</div></div>
+      </div>
+      <div class="lecon-card navy">
+        <div class="lecon-icon">☀️</div>
+        <div><div class="lecon-num">Leçon n°2</div><div class="lecon-text">Du soleil sur la plage… <em>tes fesses</em> tu protègeras…</div></div>
+      </div>
+      <div class="lecon-card orange">
+        <div class="lecon-icon">🌬️</div>
+        <div><div class="lecon-num">Leçon n°3</div><div class="lecon-text">Au Mont des Alouettes… <em>la force du vent</em> tu combattras…</div></div>
+      </div>
+      <div class="lecon-card navy">
+        <div class="lecon-icon">🫘</div>
+        <div><div class="lecon-num">Leçon n°4</div><div class="lecon-text">D'une mogette ingérée… <em>le gaz</em> tu maîtriseras…</div></div>
+      </div>
+      <div class="lecon-card orange">
+        <div class="lecon-icon">🧄</div>
+        <div><div class="lecon-num">Leçon n°5</div><div class="lecon-text">Galocher après le préfou… <em>tu éviteras…</em></div></div>
+      </div>
+      <div class="lecon-card navy">
+        <div class="lecon-icon">🌊</div>
+        <div><div class="lecon-num">Leçon n°6</div><div class="lecon-text">Les vagues de l'Atlantique… <em>tu affronteras…</em></div></div>
+      </div>
+      <div class="lecon-card orange">
+        <div class="lecon-icon">❤️</div>
+        <div><div class="lecon-num">Leçon n°7</div><div class="lecon-text">Dans ton cœur… <em>Vendéen.ne tu seras…</em></div></div>
       </div>
     </div>
 
-    <!-- STEP 4: Première mission -->
-    <div class="step" id="step4">
-      <h2 class="step-title">Première Mission</h2>
-      <p class="step-subtitle">Choisissez par quoi commencer. Cette mission vous attend dès votre arrivée.</p>
-      <div id="step4Error" class="step-error"></div>
-      <div class="mission-pick-grid">
-        <div class="mission-pick" id="mpick-quiz" onclick="selectMission('quiz', this)">
-          <span class="mission-pick-icon">🧠</span>
-          <div class="mission-pick-header">
-            <div class="mission-pick-name">Quiz Patrimoine Vendée</div>
-          </div>
-          <div class="mission-pick-desc">Testez vos connaissances sur l'histoire et les paysages du Vendée en 10 questions.</div>
-          <div class="mission-pick-badges">
-            <span class="mission-badge">⭐ +30 XP</span>
-            <span class="mission-badge">🟢 Facile</span>
-            <span class="mission-badge">⏱ 5 min</span>
-          </div>
+    <div class="lecon-accept" id="lecon-accept-wrap" onclick="toggleAccept()">
+      <input type="checkbox" id="lecon-check" onchange="toggleAccept()">
+      <label for="lecon-check">J'ai lu et j'accepte le Code de la Zone 85. Je jure sur la brioche pur beurre.</label>
+    </div>
+
+    <div class="btn-row" style="margin-top:20px">
+      <button class="btn-secondary" onclick="goStep(2)">← Retour</button>
+      <button class="btn-primary" id="btn-step3" onclick="validateStep3()" disabled>Continuer →</button>
+    </div>
+  </div>
+
+  <!-- ─── ÉTAPE 4 : CLAN ─── -->
+  <div class="step" id="step-4">
+    <div class="step-eyebrow">Étape 4 — Ton clan</div>
+    <h1 class="step-title">Choisis ton clan</h1>
+    <p class="step-sub">Trois clans, trois caractères, une seule question : laquelle de ces forces t'appelle ?</p>
+    <div class="clan-grid">
+      <div class="clan-option" onclick="selectClan('bocage', this)">
+        <img src="./img/mascotte-bocage.png" alt="Bran le Bocager" class="co-mascot">
+        <div class="co-body">
+          <div class="co-name">Clan du Bocage</div>
+          <div class="co-mascot-name">Bran le Bocager — Gardien des Haies</div>
+          <div class="co-cry">« Par les chênes et les genêts ! »</div>
+          <div class="co-desc">Enracinés dans les forêts et bocages. Force tranquille, mémoire profonde.</div>
         </div>
-        <div class="mission-pick" id="mpick-photo" onclick="selectMission('photo', this)">
-          <span class="mission-pick-icon">📸</span>
-          <div class="mission-pick-header">
-            <div class="mission-pick-name">Défi Photo : Mon Vendée</div>
-          </div>
-          <div class="mission-pick-desc">Photographiez un paysage, un lieu ou un détail qui représente le Vendée pour vous. Partagez-le avec la communauté.</div>
-          <div class="mission-pick-badges">
-            <span class="mission-badge">⭐ +50 XP</span>
-            <span class="mission-badge">🟡 Moyen</span>
-            <span class="mission-badge">⏱ 1 heure</span>
-          </div>
-        </div>
-        <div class="mission-pick" id="mpick-walk" onclick="selectMission('walk', this)">
-          <span class="mission-pick-icon">🥾</span>
-          <div class="mission-pick-header">
-            <div class="mission-pick-name">Balade Découverte</div>
-          </div>
-          <div class="mission-pick-desc">Partez explorer un sentier, un marché ou un quartier de votre ville vendéenne. Notez 3 découvertes.</div>
-          <div class="mission-pick-badges">
-            <span class="mission-badge">⭐ +75 XP</span>
-            <span class="mission-badge">🟠 Aventure</span>
-            <span class="mission-badge">⏱ 2 heures</span>
-          </div>
-        </div>
+        <div class="co-radio" id="radio-bocage"></div>
       </div>
-      <div class="step-nav">
-        <button class="btn-back" onclick="goBack(4)">← Retour</button>
-        <span class="step-count">Étape 4 / 5</span>
-        <button class="btn-next" onclick="goNext(4)">Créer mon compte →</button>
+      <div class="clan-option" onclick="selectClan('littoral', this)">
+        <img src="./img/mascotte-littoral.png" alt="Gabin Culsmouillés" class="co-mascot">
+        <div class="co-body">
+          <div class="co-name">Clan du Littoral</div>
+          <div class="co-mascot-name">Gabin Culsmouillés — Corsaire des Sables</div>
+          <div class="co-cry">« Vents et marées ! »</div>
+          <div class="co-desc">Audacieux et libres comme l'Atlantique. Toujours en mouvement, toujours en avant.</div>
+        </div>
+        <div class="co-radio" id="radio-littoral"></div>
+      </div>
+      <div class="clan-option" onclick="selectClan('marais', this)">
+        <img src="./img/mascotte-marais.png" alt="Méric l'Ancien" class="co-mascot">
+        <div class="co-body">
+          <div class="co-name">Clan du Marais</div>
+          <div class="co-mascot-name">Méric l'Ancien — Sage des Canaux</div>
+          <div class="co-cry">« L'eau coule, la mémoire reste ! »</div>
+          <div class="co-desc">Gardiens des secrets millénaires. Stratèges patients, sages redoutables.</div>
+        </div>
+        <div class="co-radio" id="radio-marais"></div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goStep(3)">← Retour</button>
+      <button class="btn-primary" id="btn-step4" onclick="validateStep4()" disabled>Continuer →</button>
+    </div>
+  </div>
+
+  <!-- ─── ÉTAPE 5 : IDENTITÉ ─── -->
+  <div class="step" id="step-5">
+    <div class="step-eyebrow">Étape 5 — Ton identité</div>
+    <h1 class="step-title">Qui es-tu dans la Zone ?</h1>
+    <p class="step-sub">Ton avatar et ton pseudo — c'est comme ça que le reste de la Zone te connaîtra.</p>
+    <div style="margin-bottom:20px">
+      <div class="field" style="margin-bottom:6px"><label>Choisis ton avatar</label></div>
+      <div class="avatar-grid" id="avatar-grid">
+        <div class="avatar-opt selected" data-emoji="🧭" onclick="selectAvatar(this)">🧭</div>
+        <div class="avatar-opt" data-emoji="⚓" onclick="selectAvatar(this)">⚓</div>
+        <div class="avatar-opt" data-emoji="🗺️" onclick="selectAvatar(this)">🗺️</div>
+        <div class="avatar-opt" data-emoji="🏹" onclick="selectAvatar(this)">🏹</div>
+        <div class="avatar-opt" data-emoji="🌊" onclick="selectAvatar(this)">🌊</div>
+        <div class="avatar-opt" data-emoji="🌿" onclick="selectAvatar(this)">🌿</div>
+        <div class="avatar-opt" data-emoji="⚔️" onclick="selectAvatar(this)">⚔️</div>
+        <div class="avatar-opt" data-emoji="🦅" onclick="selectAvatar(this)">🦅</div>
+        <div class="avatar-opt" data-emoji="🔥" onclick="selectAvatar(this)">🔥</div>
+        <div class="avatar-opt" data-emoji="🥐" onclick="selectAvatar(this)">🥐</div>
+        <div class="avatar-opt" data-emoji="🌙" onclick="selectAvatar(this)">🌙</div>
+        <div class="avatar-opt" data-emoji="🐚" onclick="selectAvatar(this)">🐚</div>
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="field">
+        <label for="f-pseudo">Ton pseudo dans la Zone</label>
+        <input type="text" id="f-pseudo" placeholder="Ex : Gabin_Corsaire" maxlength="24">
+        <div class="field-error" id="err-pseudo">Un pseudo est requis (3 car. min.)</div>
+      </div>
+      <div class="field">
+        <label for="f-bio">Ta phrase de présentation <span style="color:var(--text-muted);font-weight:400">(optionnel)</span></label>
+        <textarea id="f-bio" rows="2" placeholder="Ex : Vendéen de cœur, corsaire des dunes..." maxlength="120" style="resize:none"></textarea>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goStep(4)">← Retour</button>
+      <button class="btn-primary" onclick="validateStep5()">Finaliser mon inscription →</button>
+    </div>
+  </div>
+
+  <!-- ─── ÉTAPE 6 : BIENVENUE ─── -->
+  <div class="step" id="step-6">
+    <div class="welcome-hero">
+      <span class="welcome-confetti" id="welcome-emoji">🎉</span>
+      <div class="welcome-title" id="welcome-title">Bienvenue dans la Zone !</div>
+      <div class="welcome-sub" id="welcome-sub">Tu fais maintenant partie de l'aventure. Ta légende commence.</div>
+    </div>
+
+    <div class="welcome-card" id="welcome-card">
+      <div class="wc-row">
+        <span class="wc-icon">👤</span>
+        <div><div class="wc-label">Aventurier.e</div><div class="wc-value" id="wc-nom">—</div></div>
+      </div>
+      <div class="wc-row">
+        <span class="wc-icon">📍</span>
+        <div><div class="wc-label">ADN vendéen</div><div class="wc-value orange" id="wc-adn">—</div></div>
+      </div>
+      <div class="wc-row">
+        <span class="wc-icon" id="wc-clan-icon">🛡️</span>
+        <div style="flex:1"><div class="wc-label">Clan</div><div class="wc-value orange" id="wc-clan">—</div></div>
+        <img id="wc-mascot" src="" class="wc-clan-mascot" alt="" style="display:none">
+      </div>
+      <div class="wc-row">
+        <span class="wc-icon" id="wc-avatar-icon">🧭</span>
+        <div><div class="wc-label">Pseudo</div><div class="wc-value" id="wc-pseudo">—</div></div>
+      </div>
+      <div class="wc-row">
+        <span class="wc-icon">⚡</span>
+        <div><div class="wc-label">XP de départ</div><div class="wc-value orange">+50 XP — Bienvenue dans la Zone !</div></div>
       </div>
     </div>
 
-    <!-- STEP 5: Bienvenue -->
-    <div class="step" id="step5">
-      <div class="welcome-screen">
-        <div class="confetti-container" id="confettiContainer">
-          <div id="welcomeAvatar" class="welcome-avatar">🧭</div>
-        </div>
+    <a href="profil.html" class="btn-primary btn-full" style="display:flex;justify-content:center;text-decoration:none">Accéder à mon profil →</a>
+  </div>
 
-        <div id="welcomeName" class="welcome-name">Bienvenue !</div>
-        <p style="font-size:.9rem;color:var(--text-muted);margin-top:4px">Votre aventure commence maintenant.</p>
-
-        <div class="welcome-chips">
-          <span class="welcome-chip tribu" id="welcomeTribu">🦆 Tribu Marais</span>
-          <span class="welcome-chip level">⚡ Niveau 1 &middot; Néophyte</span>
-          <span class="welcome-chip xp">★ 50 XP de bienvenue</span>
-        </div>
-
-        <div class="welcome-mission">
-          <div class="welcome-mission-label">🚀 Première mission choisie</div>
-          <div class="welcome-mission-name" id="welcomeMission">Quiz Patrimoine Vendée</div>
-        </div>
-
-        <a href="profil.html" class="btn-start">Commencer l'aventure →</a>
-
-        <p style="margin-top:20px;font-size:.78rem;color:var(--text-muted)">
-          Un email de confirmation a été envoyé à <strong id="welcomeEmail">votre adresse</strong>.
-        </p>
-      </div>
-    </div>
-
-  </div><!-- /form-card -->
-</main>
+</div><!-- /page-wrap -->
 
 <script>
-// ─── State ───────────────────────────────────────────────
 const formData = {
-  prenom: '', nom: '', email: '', password: '',
-  tribu: null,
-  username: '', avatar: null, bio: '',
-  mission: null
+  prenom:'', nom:'', email:'', pw:'',
+  identity:'', clan:'',
+  avatar:'🧭', pseudo:'', bio:''
 };
-
-const missionNames = {
-  quiz:  'Quiz Patrimoine Vendée',
-  photo: 'Défi Photo : Mon Vendée',
-  walk:  'Balade Découverte'
-};
-
-const tribuIcons = { littoral: '⚓', bocage: '🌿', marais: '🦆' };
-const tribuLabels = { littoral: 'Tribu Littoral', bocage: 'Tribu Bocage', marais: 'Tribu Marais' };
-
 let currentStep = 1;
-let isAnimating = false;
+const TOTAL = 6;
 
-// ─── Step transition ──────────────────────────────────────
-function showStep(from, to, direction = 'forward') {
-  if (isAnimating) return;
-  isAnimating = true;
-
-  const fromEl = document.getElementById('step' + from);
-  const toEl   = document.getElementById('step' + to);
-
-  fromEl.classList.remove('active');
-  toEl.classList.add('active');
-  toEl.classList.add(direction === 'forward' ? '' : 'slide-in-back');
-
-  updateIndicator(to);
-  currentStep = to;
-
-  setTimeout(() => {
-    toEl.classList.remove('slide-in-back');
-    isAnimating = false;
-  }, 350);
+function goStep(n){
+  document.getElementById('step-'+currentStep).classList.remove('active');
+  currentStep = n;
+  document.getElementById('step-'+n).classList.add('active');
+  updateUI();
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
-function updateIndicator(active) {
-  document.querySelectorAll('.step-dot').forEach(dot => {
-    const n = parseInt(dot.dataset.step);
-    dot.classList.remove('active', 'done');
-    if (n === active) dot.classList.add('active');
-    else if (n < active) dot.classList.add('done');
+function updateUI(){
+  const pct = (currentStep/TOTAL*100).toFixed(1);
+  document.getElementById('progress-fill').style.width = pct+'%';
+  document.getElementById('step-nav-label').textContent = 'Étape '+currentStep+' / '+TOTAL;
+  document.querySelectorAll('.step-dot').forEach(d=>{
+    const s = +d.dataset.s;
+    d.classList.remove('active','done');
+    if(s < currentStep) d.classList.add('done');
+    else if(s === currentStep) d.classList.add('active');
+  });
+  document.querySelectorAll('.step-line').forEach(l=>{
+    const i = +l.dataset.l;
+    l.classList.toggle('done', i < currentStep);
   });
 }
 
-// ─── Navigation ───────────────────────────────────────────
-function goNext(step) {
-  if (!validateStep(step)) return;
-  if (step === 4) {
-    buildWelcome();
-  }
-  showStep(step, step + 1, 'forward');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function goBack(step) {
-  showStep(step, step - 1, 'back');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-// ─── Validation ───────────────────────────────────────────
-function setError(id, show) {
+// STEP 1
+function togglePw(id){
   const el = document.getElementById(id);
-  if (el) el.classList.toggle('show', show);
+  el.type = el.type==='password'?'text':'password';
 }
-function setFieldError(inputId, errId, show) {
-  const input = document.getElementById(inputId);
-  const err   = document.getElementById(errId);
-  if (input) input.classList.toggle('error', show);
-  if (err)   err.classList.toggle('show', show);
-}
-function clearFieldError(inputId, errId) {
-  setFieldError(inputId, errId, false);
-}
-
-function validateStep(step) {
-  let valid = true;
-
-  if (step === 1) {
-    const prenom   = document.getElementById('prenom').value.trim();
-    const nom      = document.getElementById('nom').value.trim();
-    const email    = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    const confirm  = document.getElementById('confirm').value;
-
-    setFieldError('prenom', 'errPrenom', !prenom);
-    setFieldError('nom', 'errNom', !nom);
-
-    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    setFieldError('email', 'errEmail', !emailOk);
-
-    const passOk = password.length >= 8;
-    setFieldError('password', 'errPassword', !passOk);
-
-    const matchOk = password === confirm && confirm.length > 0;
-    setFieldError('confirm', 'errConfirm', !matchOk);
-
-    if (prenom && nom && emailOk && passOk && matchOk) {
-      formData.prenom = prenom; formData.nom = nom;
-      formData.email = email; formData.password = password;
-    } else {
-      valid = false;
-    }
-  }
-
-  if (step === 2) {
-    const errEl = document.getElementById('step2Error');
-    if (!formData.tribu) {
-      errEl.textContent = 'Veuillez choisir une tribu pour continuer.';
-      errEl.classList.add('show');
-      valid = false;
-    } else {
-      errEl.classList.remove('show');
-    }
-  }
-
-  if (step === 3) {
-    const username = document.getElementById('username').value.trim();
-    const usernameOk = username.length >= 3;
-    setFieldError('username', 'errUsername', !usernameOk);
-
-    const avatarErr = document.getElementById('errAvatar');
-    if (!formData.avatar) {
-      avatarErr.style.display = 'block';
-      valid = false;
-    } else {
-      avatarErr.style.display = 'none';
-    }
-
-    if (usernameOk) { formData.username = username; }
-    else { valid = false; }
-
-    formData.bio = document.getElementById('bio').value.trim();
-  }
-
-  if (step === 4) {
-    const errEl = document.getElementById('step4Error');
-    if (!formData.mission) {
-      errEl.textContent = 'Veuillez choisir une mission de départ pour continuer.';
-      errEl.classList.add('show');
-      valid = false;
-    } else {
-      errEl.classList.remove('show');
-    }
-  }
-
-  return valid;
+document.getElementById('f-pw').addEventListener('input',function(){
+  const v = this.value, bar = document.getElementById('pw-bar');
+  let strength = 0;
+  if(v.length>=8) strength++;
+  if(/[A-Z]/.test(v)) strength++;
+  if(/[0-9]/.test(v)) strength++;
+  if(/[^A-Za-z0-9]/.test(v)) strength++;
+  const colors = ['#e53e3e','#dd6b20','#d69e2e','#38a169'];
+  bar.style.width = (strength*25)+'%';
+  bar.style.background = colors[strength-1]||'transparent';
+});
+function validateStep1(){
+  let ok = true;
+  const p=document.getElementById('f-prenom'), n=document.getElementById('f-nom'),
+        e=document.getElementById('f-email'), pw=document.getElementById('f-pw'), pw2=document.getElementById('f-pw2');
+  const showErr = (id,show)=>{
+    document.getElementById('err-'+id).classList.toggle('show',show);
+    document.getElementById('f-'+id)?.classList.toggle('error',show);
+  };
+  if(!p.value.trim()){showErr('prenom',true);ok=false}else showErr('prenom',false);
+  if(!n.value.trim()){showErr('nom',true);ok=false}else showErr('nom',false);
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.value)){showErr('email',true);ok=false}else showErr('email',false);
+  if(pw.value.length<8){showErr('pw',true);ok=false}else showErr('pw',false);
+  if(pw.value!==pw2.value){showErr('pw2',true);ok=false}else showErr('pw2',false);
+  if(!ok) return;
+  formData.prenom=p.value.trim(); formData.nom=n.value.trim();
+  formData.email=e.value.trim(); formData.pw=pw.value;
+  goStep(2);
 }
 
-// ─── Tribu selection ──────────────────────────────────────
-function selectTribu(name) {
-  ['littoral', 'bocage', 'marais'].forEach(t => {
-    const el = document.getElementById('pick-' + t);
-    el.className = 'tribu-pick';
-    document.getElementById('check-' + t).textContent = '';
-  });
-  formData.tribu = name;
-  document.getElementById('pick-' + name).classList.add('selected-' + name);
-  document.getElementById('check-' + name).textContent = '✓';
-  document.getElementById('step2Error').classList.remove('show');
-}
-
-// ─── Avatar selection ─────────────────────────────────────
-function selectAvatar(btn) {
-  document.querySelectorAll('.avatar-btn').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-  formData.avatar = btn.dataset.emoji;
-  document.getElementById('errAvatar').style.display = 'none';
-}
-
-// ─── Mission selection ────────────────────────────────────
-function selectMission(name, el) {
-  document.querySelectorAll('.mission-pick').forEach(m => m.classList.remove('selected'));
+// STEP 2
+function selectIdentity(val, el){
+  document.querySelectorAll('.identity-card').forEach(c=>c.classList.remove('selected'));
   el.classList.add('selected');
-  formData.mission = name;
-  document.getElementById('step4Error').classList.remove('show');
+  formData.identity = val;
+  document.getElementById('btn-step2').disabled = false;
+}
+function validateStep2(){
+  if(!formData.identity) return;
+  goStep(3);
 }
 
-// ─── Build welcome screen ─────────────────────────────────
-function buildWelcome() {
-  const avatar = formData.avatar || '🧭';
-  const name   = formData.username || formData.prenom || 'Aventurier';
-  const tribu  = formData.tribu || 'marais';
-  const mission = missionNames[formData.mission] || 'Quiz Patrimoine Vendée';
+// STEP 3
+function toggleAccept(){
+  const cb = document.getElementById('lecon-check');
+  const wrap = document.getElementById('lecon-accept-wrap');
+  // If called from the div click (not directly checkbox), toggle manually
+  if(event && event.target !== cb) cb.checked = !cb.checked;
+  wrap.classList.toggle('checked', cb.checked);
+  document.getElementById('btn-step3').disabled = !cb.checked;
+}
+function validateStep3(){
+  if(!document.getElementById('lecon-check').checked) return;
+  goStep(4);
+}
 
-  document.getElementById('welcomeAvatar').textContent = avatar;
-  document.getElementById('welcomeName').textContent = 'Bienvenue, ' + name + ' !';
-  document.getElementById('welcomeTribu').textContent = tribuIcons[tribu] + ' ' + tribuLabels[tribu];
-  document.getElementById('welcomeMission').textContent = mission;
-  document.getElementById('welcomeEmail').textContent = formData.email || 'votre adresse';
+// STEP 4
+const clanData = {
+  bocage:{name:'Clan du Bocage',mascot:'./img/mascotte-bocage.png',icon:'🛡️'},
+  littoral:{name:'Clan du Littoral',mascot:'./img/mascotte-littoral.png',icon:'⚓'},
+  marais:{name:'Clan du Marais',mascot:'./img/mascotte-marais.png',icon:'🌿'}
+};
+function selectClan(val, el){
+  document.querySelectorAll('.clan-option').forEach(c=>{c.classList.remove('selected'); c.querySelector('.co-radio').textContent='';});
+  el.classList.add('selected');
+  el.querySelector('.co-radio').textContent = '✓';
+  formData.clan = val;
+  document.getElementById('btn-step4').disabled = false;
+}
+function validateStep4(){
+  if(!formData.clan) return;
+  goStep(5);
+}
 
+// STEP 5
+function selectAvatar(el){
+  document.querySelectorAll('.avatar-opt').forEach(a=>a.classList.remove('selected'));
+  el.classList.add('selected');
+  formData.avatar = el.dataset.emoji;
+}
+function validateStep5(){
+  const pseudo = document.getElementById('f-pseudo').value.trim();
+  if(pseudo.length<3){
+    document.getElementById('err-pseudo').classList.add('show');
+    document.getElementById('f-pseudo').classList.add('error');
+    return;
+  }
+  document.getElementById('err-pseudo').classList.remove('show');
+  formData.pseudo = pseudo;
+  formData.bio = document.getElementById('f-bio').value.trim();
+  buildWelcome();
+  goStep(6);
   spawnConfetti();
 }
 
-// ─── Confetti ─────────────────────────────────────────────
-function spawnConfetti() {
-  const container = document.getElementById('confettiContainer');
-  const pieces = ['🎉','⭐','✨','🌟','🎊','💫','🪄'];
-  for (let i = 0; i < 14; i++) {
-    const el = document.createElement('div');
-    el.className = 'confetti-emoji';
-    el.textContent = pieces[Math.floor(Math.random() * pieces.length)];
-    el.style.left = Math.random() * 100 + '%';
-    el.style.top = '-20px';
-    el.style.animationDuration = (1.2 + Math.random() * 1.6) + 's';
-    el.style.animationDelay = (Math.random() * 1.5) + 's';
-    el.style.fontSize = (0.9 + Math.random() * 0.8) + 'rem';
-    container.appendChild(el);
-  }
+function buildWelcome(){
+  const adnLabels = {souche:'Vendéen.ne de souche 🌱',coeur:'Vendéen.ne de cœur ❤️',adoption:"Vendéen.ne d'adoption 🌍"};
+  document.getElementById('wc-nom').textContent = formData.prenom+' '+formData.nom;
+  document.getElementById('wc-adn').textContent = adnLabels[formData.identity]||'—';
+  const c = clanData[formData.clan]||{};
+  document.getElementById('wc-clan').textContent = c.name||'—';
+  document.getElementById('wc-clan-icon').textContent = c.icon||'🛡️';
+  if(c.mascot){const m=document.getElementById('wc-mascot');m.src=c.mascot;m.style.display='block';}
+  document.getElementById('wc-avatar-icon').textContent = formData.avatar;
+  document.getElementById('wc-pseudo').textContent = formData.pseudo;
+  document.getElementById('welcome-title').textContent = 'Bienvenue '+formData.prenom+' !';
+  document.getElementById('welcome-emoji').textContent = formData.avatar;
 }
 
-// ─── Live validation feedback ─────────────────────────────
-['prenom','nom','email','password','confirm','username'].forEach(id => {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.addEventListener('input', () => {
-    // Remove error styling while typing
-    el.classList.remove('error');
-    const errMap = {
-      prenom: 'errPrenom', nom: 'errNom', email: 'errEmail',
-      password: 'errPassword', confirm: 'errConfirm', username: 'errUsername'
-    };
-    const errEl = document.getElementById(errMap[id]);
-    if (errEl) errEl.classList.remove('show');
-  });
-});
+function spawnConfetti(){
+  const emojis=['🎉','⚡','🌊','🏆','🛡️','⚓','🌿','✨','🥐','❤️'];
+  for(let i=0;i<28;i++){
+    const el = document.createElement('div');
+    el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    el.style.cssText = `position:fixed;top:-30px;left:${Math.random()*100}vw;font-size:${1.2+Math.random()*.8}rem;
+      z-index:9999;pointer-events:none;animation:confettiFall ${1.5+Math.random()*2}s ease-in forwards;`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 4000);
+  }
+}
+const style = document.createElement('style');
+style.textContent='@keyframes confettiFall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}';
+document.head.appendChild(style);
 
-// ─── Hamburger ────────────────────────────────────────────
-const hamburger = document.getElementById('hamburger');
-const mobileMenu = document.getElementById('mobileMenu');
-hamburger.addEventListener('click', () => {
-  hamburger.classList.toggle('open');
-  mobileMenu.classList.toggle('open');
-});
-mobileMenu.querySelectorAll('a').forEach(a => {
-  a.addEventListener('click', () => {
-    hamburger.classList.remove('open');
-    mobileMenu.classList.remove('open');
-  });
+// Also enable step2 btn on Enter
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    if(currentStep===1) validateStep1();
+  }
 });
 </script>
 </body>
