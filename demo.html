@@ -1,0 +1,1795 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mika — L'aventure collective en Vendée</title>
+<style>
+/* ============================================================
+   DESIGN SYSTEM
+   ============================================================ */
+:root {
+  --beige-pale:   #FAF6EF;
+  --beige:        #F0E6D3;
+  --beige-dark:   #DDD0BC;
+  --coral-light:  #F5A98A;
+  --coral:        #E07A5F;
+  --coral-dark:   #C45E44;
+  --blue-light:   #7AB8D4;
+  --blue:         #3B8AB5;
+  --blue-dark:    #255F82;
+  --green-soft:   #7DB49A;
+  --amber:        #D4A843;
+  --text:         #2A2520;
+  --text-mid:     #5C5248;
+  --text-soft:    #9A8E84;
+  --white:        #FFFFFF;
+  --card-shadow:  0 2px 12px rgba(42,37,32,.07);
+  --radius-sm:    8px;
+  --radius-md:    14px;
+  --radius-lg:    22px;
+  --radius-xl:    32px;
+  --font:         'Segoe UI', system-ui, -apple-system, sans-serif;
+  --transition:   .22s ease;
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font);
+  background: var(--beige-pale);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+button { font-family: var(--font); cursor: pointer; border: none; background: none; }
+ul { list-style: none; }
+
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
+.t-hero    { font-size: clamp(2.2rem, 6vw, 4.2rem); font-weight: 800; line-height: 1.1; letter-spacing: -.03em; }
+.t-h1      { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; line-height: 1.15; letter-spacing: -.02em; }
+.t-h2      { font-size: clamp(1.4rem, 3vw, 2rem);   font-weight: 700; line-height: 1.2; }
+.t-h3      { font-size: 1.15rem; font-weight: 700; }
+.t-body    { font-size: 1rem; }
+.t-small   { font-size: .875rem; }
+.t-xs      { font-size: .75rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.t-coral   { color: var(--coral); }
+.t-blue    { color: var(--blue); }
+.t-soft    { color: var(--text-soft); }
+.t-mid     { color: var(--text-mid); }
+.t-center  { text-align: center; }
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+.section   { padding: 80px 0; }
+.section-sm{ padding: 56px 0; }
+.grid-2    { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.grid-3    { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.grid-4    { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.flex      { display: flex; }
+.flex-col  { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-8     { gap: 8px; }
+.gap-12    { gap: 12px; }
+.gap-16    { gap: 16px; }
+.gap-24    { gap: 24px; }
+.mb-8      { margin-bottom: 8px; }
+.mb-12     { margin-bottom: 12px; }
+.mb-16     { margin-bottom: 16px; }
+.mb-24     { margin-bottom: 24px; }
+.mb-32     { margin-bottom: 32px; }
+.mb-48     { margin-bottom: 48px; }
+.mt-8      { margin-top: 8px; }
+.mt-16     { margin-top: 16px; }
+.mt-24     { margin-top: 24px; }
+
+/* ============================================================
+   COMPONENTS — BUTTONS
+   ============================================================ */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 26px; border-radius: var(--radius-xl);
+  font-size: .95rem; font-weight: 700;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.btn:hover { transform: translateY(-2px); }
+.btn-coral {
+  background: var(--coral); color: var(--white);
+  box-shadow: 0 4px 16px rgba(224,122,95,.28);
+}
+.btn-coral:hover { background: var(--coral-dark); box-shadow: 0 6px 20px rgba(224,122,95,.38); }
+.btn-blue {
+  background: var(--blue); color: var(--white);
+  box-shadow: 0 4px 16px rgba(59,138,181,.28);
+}
+.btn-blue:hover { background: var(--blue-dark); }
+.btn-outline {
+  background: transparent; color: var(--text);
+  border: 2px solid var(--beige-dark);
+}
+.btn-outline:hover { border-color: var(--coral); color: var(--coral); }
+.btn-white {
+  background: var(--white); color: var(--coral);
+  box-shadow: 0 4px 16px rgba(0,0,0,.1);
+}
+.btn-white:hover { transform: translateY(-2px); }
+.btn-sm { padding: 8px 18px; font-size: .85rem; }
+.btn-lg { padding: 16px 36px; font-size: 1.05rem; }
+
+/* ============================================================
+   COMPONENTS — CARDS
+   ============================================================ */
+.card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--card-shadow);
+}
+.card-beige {
+  background: var(--beige);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+}
+
+/* ============================================================
+   COMPONENTS — PILL TAGS
+   ============================================================ */
+.pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 12px; border-radius: 99px;
+  font-size: .78rem; font-weight: 700; letter-spacing: .04em;
+}
+.pill-coral  { background: rgba(224,122,95,.12); color: var(--coral-dark); }
+.pill-blue   { background: rgba(59,138,181,.12); color: var(--blue-dark); }
+.pill-green  { background: rgba(125,180,154,.15); color: #3D7A62; }
+.pill-amber  { background: rgba(212,168,67,.15); color: #9A7020; }
+.pill-beige  { background: var(--beige-dark); color: var(--text-mid); }
+
+/* ============================================================
+   COMPONENTS — PROGRESS BAR
+   ============================================================ */
+.progress-track {
+  height: 8px; background: var(--beige-dark);
+  border-radius: 99px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; border-radius: 99px;
+  background: linear-gradient(90deg, var(--coral-light), var(--coral));
+  transition: width 1.2s cubic-bezier(.4,0,.2,1);
+  width: 0;
+}
+.progress-fill.blue {
+  background: linear-gradient(90deg, var(--blue-light), var(--blue));
+}
+.progress-fill.green {
+  background: linear-gradient(90deg, #A8D5C2, var(--green-soft));
+}
+
+/* ============================================================
+   COMPONENTS — SECTION HEADER
+   ============================================================ */
+.section-header { margin-bottom: 48px; }
+.section-header .eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  color: var(--coral); font-size: .8rem; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.section-header .eyebrow::before {
+  content: ''; display: block;
+  width: 24px; height: 2px; background: var(--coral);
+  border-radius: 2px;
+}
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(250,246,239,.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(224,214,200,.5);
+  transition: box-shadow var(--transition);
+}
+.nav.scrolled { box-shadow: 0 2px 20px rgba(42,37,32,.08); }
+.nav-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  height: 68px; padding: 0 24px; max-width: 1200px; margin: 0 auto;
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+}
+.nav-logo-mark {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--coral); display: flex; align-items: center; justify-content: center;
+}
+.nav-logo-mark svg { width: 20px; height: 20px; }
+.nav-logo-text { font-size: 1.3rem; font-weight: 800; letter-spacing: -.03em; }
+.nav-logo-text span { color: var(--coral); }
+.nav-links {
+  display: flex; align-items: center; gap: 4px;
+}
+.nav-link {
+  padding: 7px 14px; border-radius: var(--radius-sm);
+  font-size: .9rem; font-weight: 600; color: var(--text-mid);
+  transition: color var(--transition), background var(--transition);
+}
+.nav-link:hover, .nav-link.active {
+  color: var(--coral); background: rgba(224,122,95,.08);
+}
+.nav-cta { margin-left: 8px; }
+.nav-hamburger {
+  display: none; flex-direction: column; gap: 5px;
+  width: 36px; height: 36px; align-items: center; justify-content: center;
+  border-radius: var(--radius-sm); cursor: pointer;
+  transition: background var(--transition);
+}
+.nav-hamburger:hover { background: var(--beige); }
+.nav-hamburger span {
+  display: block; width: 22px; height: 2px;
+  background: var(--text); border-radius: 2px;
+  transition: transform var(--transition), opacity var(--transition);
+}
+.mobile-menu {
+  display: none; position: fixed; top: 68px; left: 0; right: 0; bottom: 0;
+  background: var(--beige-pale); z-index: 99;
+  padding: 24px; flex-direction: column; gap: 8px;
+  overflow-y: auto;
+}
+.mobile-menu.open { display: flex; }
+.mobile-menu .nav-link {
+  font-size: 1.1rem; padding: 14px 18px;
+  border-radius: var(--radius-md);
+}
+.mobile-menu .btn { width: 100%; justify-content: center; margin-top: 8px; }
+
+/* ============================================================
+   HERO
+   ============================================================ */
+#hero {
+  padding-top: 108px; padding-bottom: 80px;
+  background: var(--beige-pale);
+  position: relative; overflow: hidden;
+}
+.hero-bg-shape {
+  position: absolute; top: -80px; right: -120px;
+  width: 560px; height: 560px; border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, rgba(224,122,95,.10), transparent 70%);
+  pointer-events: none;
+}
+.hero-bg-shape2 {
+  position: absolute; bottom: -100px; left: -80px;
+  width: 400px; height: 400px; border-radius: 50%;
+  background: radial-gradient(circle at 60% 60%, rgba(59,138,181,.08), transparent 70%);
+  pointer-events: none;
+}
+.hero-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 48px; align-items: center;
+}
+.hero-text { position: relative; z-index: 2; }
+.hero-text .eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 14px; border-radius: 99px;
+  background: rgba(224,122,95,.1); color: var(--coral-dark);
+  font-size: .8rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.hero-title { margin-bottom: 20px; }
+.hero-title em { font-style: normal; color: var(--coral); }
+.hero-desc { font-size: 1.1rem; color: var(--text-mid); line-height: 1.7; margin-bottom: 32px; max-width: 480px; }
+.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 40px; }
+.hero-stats {
+  display: flex; gap: 28px;
+  padding-top: 28px; border-top: 1px solid var(--beige-dark);
+}
+.hero-stat-num {
+  font-size: 1.6rem; font-weight: 800; letter-spacing: -.03em;
+  color: var(--text); line-height: 1;
+}
+.hero-stat-label { font-size: .8rem; color: var(--text-soft); margin-top: 3px; }
+.hero-visual {
+  position: relative; z-index: 2;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+}
+.hero-card-float {
+  background: var(--white); border-radius: var(--radius-lg);
+  padding: 18px; box-shadow: var(--card-shadow);
+  animation: float 6s ease-in-out infinite;
+}
+.hero-card-float:nth-child(2) { animation-delay: -2s; margin-top: 28px; }
+.hero-card-float:nth-child(3) { animation-delay: -4s; grid-column: 1 / -1; }
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+.tribe-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 11px; border-radius: 99px;
+  font-size: .78rem; font-weight: 700;
+}
+.tribe-littoral { background: rgba(59,138,181,.12); color: var(--blue-dark); }
+.tribe-bocage   { background: rgba(125,180,154,.15); color: #3D7A62; }
+.tribe-marais   { background: rgba(212,168,67,.15);  color: #9A7020; }
+
+/* mini badge row */
+.badge-mini-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+.badge-mini {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+}
+.badge-mini.locked {
+  background: var(--beige-dark); filter: grayscale(1); opacity: .5;
+}
+.badge-mini.unlocked { background: var(--beige); }
+
+/* ============================================================
+   TRIBES
+   ============================================================ */
+#tribus { background: var(--white); }
+.tribe-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.tribe-card {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+  transition: transform var(--transition), box-shadow var(--transition);
+  cursor: pointer;
+}
+.tribe-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(42,37,32,.12);
+}
+.tribe-card-header {
+  padding: 32px 24px 24px;
+  position: relative;
+}
+.tribe-littoral-card .tribe-card-header { background: linear-gradient(135deg, #E8F4F9, #C8E4F0); }
+.tribe-bocage-card   .tribe-card-header { background: linear-gradient(135deg, #EAF3EE, #C6DDD4); }
+.tribe-marais-card   .tribe-card-header { background: linear-gradient(135deg, #F5F0E0, #E8D9A8); }
+.tribe-icon-wrap {
+  width: 56px; height: 56px; border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 16px; font-size: 1.6rem;
+}
+.tribe-littoral-card .tribe-icon-wrap { background: rgba(59,138,181,.18); }
+.tribe-bocage-card   .tribe-icon-wrap { background: rgba(125,180,154,.25); }
+.tribe-marais-card   .tribe-icon-wrap { background: rgba(212,168,67,.25); }
+.tribe-card-body { background: var(--white); padding: 20px 24px 24px; }
+.tribe-members-row {
+  display: flex; align-items: center; gap: 8px; margin-top: 14px;
+}
+.member-avatars { display: flex; }
+.member-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 2px solid var(--white);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .7rem; font-weight: 700; color: var(--white);
+  margin-left: -8px;
+}
+.member-avatar:first-child { margin-left: 0; }
+.av-1 { background: var(--coral); }
+.av-2 { background: var(--blue); }
+.av-3 { background: var(--green-soft); }
+.av-4 { background: var(--amber); }
+.av-5 { background: #9B7FBF; }
+.tribe-score {
+  display: flex; align-items: center; gap: 4px;
+  margin-top: 12px; font-size: .85rem; font-weight: 600; color: var(--text-mid);
+}
+
+/* ============================================================
+   PROFILE / GAMIFICATION
+   ============================================================ */
+#profil { background: var(--beige-pale); }
+.profile-grid { display: grid; grid-template-columns: 340px 1fr; gap: 28px; }
+.profile-card {
+  background: var(--white); border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow); padding: 28px;
+}
+.profile-avatar-ring {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--coral-light), var(--coral));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem; margin-bottom: 14px;
+  box-shadow: 0 4px 14px rgba(224,122,95,.28);
+}
+.level-badge-wrap { position: relative; display: inline-block; }
+.level-badge {
+  position: absolute; bottom: -4px; right: -4px;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--amber); border: 2px solid var(--white);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .65rem; font-weight: 900; color: var(--white);
+}
+.xp-section { margin: 20px 0; }
+.xp-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.xp-num { font-size: .85rem; font-weight: 700; color: var(--text-mid); }
+.missions-mini-list { margin-top: 18px; }
+.mission-mini-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 0; border-bottom: 1px solid var(--beige);
+}
+.mission-mini-item:last-child { border-bottom: none; }
+.mission-status-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.dot-todo     { background: var(--beige-dark); }
+.dot-active   { background: var(--coral); }
+.dot-done     { background: var(--green-soft); }
+.profile-right-grid { display: flex; flex-direction: column; gap: 22px; }
+.stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.stat-box {
+  background: var(--white); border-radius: var(--radius-md);
+  padding: 18px 16px; box-shadow: var(--card-shadow); text-align: center;
+}
+.stat-box-num {
+  font-size: 1.8rem; font-weight: 800; letter-spacing: -.03em;
+  color: var(--text); line-height: 1;
+}
+.stat-box-label { font-size: .78rem; color: var(--text-soft); margin-top: 4px; }
+.recent-activity-list { display: flex; flex-direction: column; gap: 10px; }
+.activity-item {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--white); border-radius: var(--radius-md);
+  padding: 12px 16px; box-shadow: var(--card-shadow);
+}
+.activity-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; flex-shrink: 0;
+}
+.activity-coral  { background: rgba(224,122,95,.1); }
+.activity-blue   { background: rgba(59,138,181,.1); }
+.activity-green  { background: rgba(125,180,154,.15); }
+.activity-amber  { background: rgba(212,168,67,.15); }
+.activity-xp {
+  margin-left: auto; font-size: .85rem; font-weight: 700; color: var(--amber);
+  white-space: nowrap;
+}
+
+/* ============================================================
+   MISSIONS
+   ============================================================ */
+#missions { background: var(--white); }
+.missions-tabs {
+  display: flex; gap: 8px; margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+.missions-tab {
+  padding: 8px 20px; border-radius: 99px;
+  font-size: .9rem; font-weight: 700;
+  background: var(--beige); color: var(--text-mid);
+  transition: background var(--transition), color var(--transition);
+  cursor: pointer;
+}
+.missions-tab.active { background: var(--coral); color: var(--white); }
+.missions-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.mission-card {
+  background: var(--white); border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow);
+  overflow: hidden; transition: transform var(--transition);
+}
+.mission-card:hover { transform: translateY(-3px); }
+.mission-card-top {
+  padding: 20px 20px 16px; position: relative;
+}
+.mission-card-top.status-done     { background: rgba(125,180,154,.08); }
+.mission-card-top.status-active   { background: rgba(224,122,95,.07); }
+.mission-card-top.status-todo     { background: var(--beige-pale); }
+.mission-type-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; margin-bottom: 12px;
+  background: var(--beige);
+}
+.mission-card-bottom { padding: 16px 20px; }
+.mission-card-bottom .progress-track { margin-top: 8px; margin-bottom: 8px; }
+.mission-xp {
+  font-size: .8rem; font-weight: 700; color: var(--amber);
+  display: flex; align-items: center; gap: 4px;
+}
+.mission-status-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 12px;
+}
+.status-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 99px;
+  font-size: .75rem; font-weight: 700;
+}
+.chip-done   { background: rgba(125,180,154,.2); color: #3D7A62; }
+.chip-active { background: rgba(224,122,95,.15); color: var(--coral-dark); }
+.chip-todo   { background: var(--beige-dark); color: var(--text-soft); }
+
+/* ============================================================
+   BADGES
+   ============================================================ */
+#badges { background: var(--beige-pale); }
+.badges-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 18px;
+}
+.badge-card {
+  background: var(--white); border-radius: var(--radius-lg);
+  padding: 24px 16px; text-align: center;
+  box-shadow: var(--card-shadow);
+  transition: transform var(--transition);
+  position: relative; overflow: hidden;
+}
+.badge-card:hover { transform: translateY(-4px); }
+.badge-card.locked {
+  opacity: .55; filter: saturate(.3);
+}
+.badge-card.locked::after {
+  content: '🔒'; position: absolute; top: 10px; right: 10px;
+  font-size: .85rem;
+}
+.badge-icon-wrap {
+  width: 72px; height: 72px; border-radius: 50%;
+  margin: 0 auto 14px; display: flex; align-items: center; justify-content: center;
+  font-size: 2rem;
+  position: relative;
+}
+.badge-icon-wrap::before {
+  content: ''; position: absolute; inset: -4px;
+  border-radius: 50%; z-index: -1;
+}
+.badge-coral  .badge-icon-wrap { background: rgba(224,122,95,.1); }
+.badge-coral  .badge-icon-wrap::before { background: rgba(224,122,95,.08); }
+.badge-blue   .badge-icon-wrap { background: rgba(59,138,181,.1); }
+.badge-blue   .badge-icon-wrap::before { background: rgba(59,138,181,.08); }
+.badge-green  .badge-icon-wrap { background: rgba(125,180,154,.15); }
+.badge-green  .badge-icon-wrap::before { background: rgba(125,180,154,.1); }
+.badge-amber  .badge-icon-wrap { background: rgba(212,168,67,.15); }
+.badge-amber  .badge-icon-wrap::before { background: rgba(212,168,67,.1); }
+.badge-purple .badge-icon-wrap { background: rgba(155,127,191,.15); }
+.badge-purple .badge-icon-wrap::before { background: rgba(155,127,191,.1); }
+.badge-name   { font-size: .9rem; font-weight: 700; margin-bottom: 4px; }
+.badge-desc   { font-size: .75rem; color: var(--text-soft); }
+.badge-xp     { font-size: .75rem; font-weight: 700; color: var(--amber); margin-top: 8px; }
+
+/* ============================================================
+   TERRITORY MAP
+   ============================================================ */
+#carte { background: var(--white); }
+.map-container {
+  background: linear-gradient(145deg, #EDF4F8, #E4EFF5);
+  border-radius: var(--radius-xl); padding: 40px;
+  position: relative; overflow: hidden;
+  min-height: 420px;
+}
+.map-svg-wrap {
+  position: relative; max-width: 700px; margin: 0 auto;
+}
+.map-svg-wrap svg { width: 100%; height: auto; }
+.map-label {
+  position: absolute; background: var(--white);
+  border-radius: var(--radius-sm); padding: 6px 12px;
+  font-size: .8rem; font-weight: 700; color: var(--text);
+  box-shadow: var(--card-shadow); white-space: nowrap;
+  pointer-events: none;
+}
+/* animated pulse rings */
+@keyframes pulse-ring {
+  0%   { transform: scale(1); opacity: .6; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+.map-pulse {
+  animation: pulse-ring 2s ease-out infinite;
+}
+
+/* ============================================================
+   LEADERBOARD
+   ============================================================ */
+#classement { background: var(--beige-pale); }
+.leaderboard-list { display: flex; flex-direction: column; gap: 10px; max-width: 680px; margin: 0 auto; }
+.lb-item {
+  display: flex; align-items: center; gap: 16px;
+  background: var(--white); border-radius: var(--radius-md);
+  padding: 14px 18px; box-shadow: var(--card-shadow);
+  transition: transform var(--transition);
+}
+.lb-item:hover { transform: translateX(4px); }
+.lb-item.me { border: 2px solid var(--coral); }
+.lb-rank {
+  width: 28px; text-align: center;
+  font-size: 1rem; font-weight: 800; color: var(--text-soft);
+  flex-shrink: 0;
+}
+.lb-rank.gold   { color: #C9962A; }
+.lb-rank.silver { color: #8A9EB0; }
+.lb-rank.bronze { color: #A07850; }
+.lb-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; flex-shrink: 0;
+}
+.lb-info { flex: 1; min-width: 0; }
+.lb-name { font-weight: 700; font-size: .95rem; }
+.lb-tribe { font-size: .78rem; color: var(--text-soft); }
+.lb-score {
+  font-size: 1.1rem; font-weight: 800; color: var(--text);
+  white-space: nowrap;
+}
+.lb-score span { font-size: .75rem; font-weight: 600; color: var(--text-soft); }
+
+/* ============================================================
+   JOIN CTA
+   ============================================================ */
+#rejoindre {
+  background: var(--coral);
+  position: relative; overflow: hidden;
+}
+.join-bg {
+  position: absolute; top: -100px; right: -100px;
+  width: 400px; height: 400px; border-radius: 50%;
+  background: rgba(255,255,255,.06); pointer-events: none;
+}
+.join-bg2 {
+  position: absolute; bottom: -80px; left: -60px;
+  width: 300px; height: 300px; border-radius: 50%;
+  background: rgba(0,0,0,.05); pointer-events: none;
+}
+.join-inner { position: relative; z-index: 2; text-align: center; color: var(--white); }
+.join-inner h2 { color: var(--white); font-size: clamp(1.6rem, 4vw, 2.4rem); margin-bottom: 14px; }
+.join-inner p  { opacity: .88; font-size: 1.05rem; margin-bottom: 36px; max-width: 540px; margin-left: auto; margin-right: auto; }
+.join-actions  { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.join-tribe-chips { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 32px; }
+.join-tribe-chip {
+  padding: 7px 16px; border-radius: 99px;
+  background: rgba(255,255,255,.15); color: var(--white);
+  font-size: .85rem; font-weight: 700; border: 1px solid rgba(255,255,255,.25);
+  cursor: pointer; transition: background var(--transition);
+}
+.join-tribe-chip:hover { background: rgba(255,255,255,.25); }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer {
+  background: var(--text); color: rgba(255,255,255,.55);
+  padding: 48px 0 32px;
+}
+.footer-inner {
+  display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 40px;
+}
+.footer-brand .nav-logo-text { color: var(--white); margin-bottom: 8px; }
+.footer-brand .nav-logo-text span { color: var(--coral-light); }
+.footer-tagline { font-size: .88rem; opacity: .65; line-height: 1.5; }
+.footer-col-title { font-size: .8rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.85); margin-bottom: 14px; }
+.footer-links li { margin-bottom: 8px; }
+.footer-links a { font-size: .88rem; transition: color var(--transition); }
+.footer-links a:hover { color: var(--coral-light); }
+.footer-bottom {
+  margin-top: 40px; padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: .8rem;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 1024px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .footer-inner { grid-template-columns: 1fr 1fr; gap: 28px; }
+  .profile-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  .section  { padding: 56px 0; }
+  .section-sm { padding: 40px 0; }
+  .nav-links, .nav-cta { display: none; }
+  .nav-hamburger { display: flex; }
+  .hero-grid { grid-template-columns: 1fr; gap: 32px; }
+  .hero-visual { display: none; }
+  .hero-stats { gap: 20px; }
+  .tribe-cards { grid-template-columns: 1fr; }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .missions-grid { grid-template-columns: 1fr; }
+  .stats-row { grid-template-columns: repeat(3, 1fr); }
+  .footer-inner { grid-template-columns: 1fr; gap: 24px; }
+  .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+  .mb-48 { margin-bottom: 32px; }
+  .map-container { padding: 24px; }
+}
+@media (max-width: 480px) {
+  .hero-actions { flex-direction: column; }
+  .hero-actions .btn { width: 100%; justify-content: center; }
+  .stats-row { grid-template-columns: 1fr 1fr; }
+  .badges-grid { grid-template-columns: repeat(2, 1fr); }
+  .btn-lg { padding: 14px 28px; }
+  .missions-tabs { gap: 6px; }
+  .missions-tab { font-size: .82rem; padding: 7px 14px; }
+}
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-in { animation: fade-up .6s ease both; }
+.delay-1 { animation-delay: .1s; }
+.delay-2 { animation-delay: .2s; }
+.delay-3 { animation-delay: .3s; }
+.delay-4 { animation-delay: .4s; }
+
+/* Intersection Observer targets */
+.reveal { opacity: 0; transform: translateY(20px); transition: opacity .6s ease, transform .6s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     NAVIGATION
+     ============================================================ -->
+<nav class="nav" id="mainNav">
+  <div class="nav-inner">
+    <a href="#hero" class="nav-logo">
+      <div class="nav-logo-mark">
+        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10 2L13 7H17L13.5 10.5L15 16L10 13L5 16L6.5 10.5L3 7H7L10 2Z" fill="white"/>
+        </svg>
+      </div>
+      <span class="nav-logo-text">mi<span>ka</span></span>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="#hero"      class="nav-link active">Accueil</a></li>
+      <li><a href="#tribus"    class="nav-link">Tribus</a></li>
+      <li><a href="#missions"  class="nav-link">Missions</a></li>
+      <li><a href="#badges"    class="nav-link">Badges</a></li>
+      <li><a href="#classement" class="nav-link">Classement</a></li>
+    </ul>
+
+    <a href="#rejoindre" class="btn btn-coral btn-sm nav-cta">Rejoindre</a>
+
+    <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#hero"       class="nav-link" onclick="closeMobile()">Accueil</a>
+  <a href="#tribus"     class="nav-link" onclick="closeMobile()">Tribus</a>
+  <a href="#missions"   class="nav-link" onclick="closeMobile()">Missions</a>
+  <a href="#badges"     class="nav-link" onclick="closeMobile()">Badges</a>
+  <a href="#classement" class="nav-link" onclick="closeMobile()">Classement</a>
+  <a href="#rejoindre"  class="btn btn-coral" onclick="closeMobile()">Rejoindre l'aventure</a>
+</div>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<section id="hero">
+  <div class="hero-bg-shape"></div>
+  <div class="hero-bg-shape2"></div>
+  <div class="container">
+    <div class="hero-grid">
+
+      <div class="hero-text">
+        <div class="eyebrow animate-in">🌿 Vendée · Communauté locale</div>
+        <h1 class="t-hero hero-title animate-in delay-1">
+          L'aventure<br>collective<br><em>commence ici.</em>
+        </h1>
+        <p class="hero-desc animate-in delay-2">
+          Explorez votre territoire, relevez des défis, rejoignez une tribu et construisez ensemble la mémoire vivante de votre région.
+        </p>
+        <div class="hero-actions animate-in delay-3">
+          <a href="#rejoindre" class="btn btn-coral btn-lg">Rejoindre l'aventure</a>
+          <a href="#missions"  class="btn btn-outline btn-lg">Voir les missions</a>
+        </div>
+        <div class="hero-stats animate-in delay-4">
+          <div>
+            <div class="hero-stat-num">1 240</div>
+            <div class="hero-stat-label t-xs">aventuriers</div>
+          </div>
+          <div>
+            <div class="hero-stat-num">3</div>
+            <div class="hero-stat-label t-xs">tribus actives</div>
+          </div>
+          <div>
+            <div class="hero-stat-num">87</div>
+            <div class="hero-stat-label t-xs">missions créées</div>
+          </div>
+          <div>
+            <div class="hero-stat-num">14k</div>
+            <div class="hero-stat-label t-xs">points distribués</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- floating cards (desktop only) -->
+      <div class="hero-visual animate-in delay-2">
+        <div class="hero-card-float">
+          <div class="t-xs t-soft mb-8">Tribu active</div>
+          <div class="tribe-chip tribe-littoral mb-12">🌊 Littoral</div>
+          <div class="t-h3 mb-8">Sophie M.</div>
+          <div class="t-small t-soft">Niveau 7 · Grand Pisteur</div>
+          <div class="xp-section" style="margin-top:14px;margin-bottom:0">
+            <div class="xp-header">
+              <span class="t-xs t-soft">XP</span>
+              <span class="xp-num">3 400 / 4 000</span>
+            </div>
+            <div class="progress-track"><div class="progress-fill" style="width:85%"></div></div>
+          </div>
+        </div>
+
+        <div class="hero-card-float">
+          <div class="t-xs t-soft mb-12">Mission en cours</div>
+          <div class="t-h3 mb-8" style="font-size:.95rem">🔍 Chasse aux indices</div>
+          <div class="t-small t-soft mb-12">La Roche-sur-Yon · Étape 3/5</div>
+          <div class="progress-track"><div class="progress-fill" style="width:60%"></div></div>
+          <div class="flex items-center gap-8 mt-8">
+            <span class="status-chip chip-active">En cours</span>
+            <span class="mission-xp">+180 XP</span>
+          </div>
+        </div>
+
+        <div class="hero-card-float" style="padding:16px 18px">
+          <div class="flex items-center justify-between mb-12">
+            <div class="t-xs t-soft">Badges débloqués</div>
+            <div class="t-small t-coral" style="font-weight:700">6 / 12</div>
+          </div>
+          <div class="badge-mini-row">
+            <div class="badge-mini unlocked" title="Premier Pas">👣</div>
+            <div class="badge-mini unlocked" title="Explorateur">🧭</div>
+            <div class="badge-mini unlocked" title="Littoral">🌊</div>
+            <div class="badge-mini unlocked" title="Photo">📸</div>
+            <div class="badge-mini unlocked" title="Quiz">🎓</div>
+            <div class="badge-mini unlocked" title="Mémoire">📜</div>
+            <div class="badge-mini locked">🏆</div>
+            <div class="badge-mini locked">⚔️</div>
+            <div class="badge-mini locked">🌿</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     TRIBUS
+     ============================================================ -->
+<section id="tribus" class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="eyebrow">Les tribus</div>
+      <h2 class="t-h1 mb-16">Trois territoires,<br>une seule aventure.</h2>
+      <p class="t-body t-mid" style="max-width:520px">Chaque tribu incarne un territoire vendéen, ses paysages, ses histoires, son âme. Choisissez votre clan ou laissez-vous guider.</p>
+    </div>
+
+    <div class="tribe-cards">
+
+      <!-- Tribu du Littoral -->
+      <div class="tribe-card tribe-littoral-card reveal">
+        <div class="tribe-card-header">
+          <div class="tribe-icon-wrap">🌊</div>
+          <div class="tribe-chip tribe-littoral mb-8">Tribu du Littoral</div>
+          <h3 class="t-h2" style="font-size:1.3rem;margin-bottom:8px">Là où la terre<br>rencontre l'océan</h3>
+          <p class="t-small t-mid" style="line-height:1.6">Dunes, marais salants, îles et ports de pêche. Ceux du Littoral aiment l'horizon, les embruns et les histoires de mer.</p>
+        </div>
+        <div class="tribe-card-body">
+          <div class="tribe-members-row">
+            <div class="member-avatars">
+              <div class="member-avatar av-2">S</div>
+              <div class="member-avatar av-5">L</div>
+              <div class="member-avatar av-1">M</div>
+              <div class="member-avatar av-3">J</div>
+            </div>
+            <span class="t-small t-soft">+ 438 membres</span>
+          </div>
+          <div class="tribe-score">
+            <span>⭐</span> 12 840 points collectifs
+          </div>
+          <a href="#rejoindre" class="btn btn-blue btn-sm mt-16" style="display:inline-flex">Rejoindre →</a>
+        </div>
+      </div>
+
+      <!-- Tribu du Bocage -->
+      <div class="tribe-card tribe-bocage-card reveal delay-1">
+        <div class="tribe-card-header">
+          <div class="tribe-icon-wrap">🌿</div>
+          <div class="tribe-chip tribe-bocage mb-8">Tribu du Bocage</div>
+          <h3 class="t-h2" style="font-size:1.3rem;margin-bottom:8px">Haies, forêts<br>et chemins creux</h3>
+          <p class="t-small t-mid" style="line-height:1.6">Bocage vendéen, villages de granit, traditions rurales vivaces. La tribu du Bocage creuse la mémoire des campagnes.</p>
+        </div>
+        <div class="tribe-card-body">
+          <div class="tribe-members-row">
+            <div class="member-avatars">
+              <div class="member-avatar av-3">P</div>
+              <div class="member-avatar av-4">A</div>
+              <div class="member-avatar av-1">C</div>
+              <div class="member-avatar av-2">R</div>
+            </div>
+            <span class="t-small t-soft">+ 392 membres</span>
+          </div>
+          <div class="tribe-score">
+            <span>⭐</span> 10 210 points collectifs
+          </div>
+          <a href="#rejoindre" class="btn btn-sm mt-16" style="display:inline-flex;background:var(--green-soft);color:white;border-radius:99px;padding:8px 18px;font-weight:700;">Rejoindre →</a>
+        </div>
+      </div>
+
+      <!-- Tribu du Marais -->
+      <div class="tribe-card tribe-marais-card reveal delay-2">
+        <div class="tribe-card-header">
+          <div class="tribe-icon-wrap">🦆</div>
+          <div class="tribe-chip tribe-marais mb-8">Tribu du Marais</div>
+          <h3 class="t-h2" style="font-size:1.3rem;margin-bottom:8px">Canaux, roseaux<br>et ciel immense</h3>
+          <p class="t-small t-mid" style="line-height:1.6">Le Marais poitevin, les îles flottantes, les passages secrets. La tribu du Marais veille sur les eaux tranquilles et les savoirs cachés.</p>
+        </div>
+        <div class="tribe-card-body">
+          <div class="tribe-members-row">
+            <div class="member-avatars">
+              <div class="member-avatar av-4">N</div>
+              <div class="member-avatar av-1">E</div>
+              <div class="member-avatar av-5">V</div>
+              <div class="member-avatar av-3">T</div>
+            </div>
+            <span class="t-small t-soft">+ 410 membres</span>
+          </div>
+          <div class="tribe-score">
+            <span>⭐</span> 11 560 points collectifs
+          </div>
+          <a href="#rejoindre" class="btn btn-sm mt-16" style="display:inline-flex;background:var(--amber);color:white;border-radius:99px;padding:8px 18px;font-weight:700;">Rejoindre →</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PROFIL / GAMIFICATION
+     ============================================================ -->
+<section id="profil" class="section">
+  <div class="container">
+    <div class="section-header reveal t-center">
+      <div class="eyebrow" style="justify-content:center">Votre profil</div>
+      <h2 class="t-h1 mb-16">Progressez, explorez,<br>montez en légende.</h2>
+    </div>
+
+    <div class="profile-grid reveal">
+
+      <!-- Left: profile card -->
+      <div class="profile-card">
+        <div class="flex items-center gap-16 mb-20">
+          <div class="level-badge-wrap">
+            <div class="profile-avatar-ring">🧭</div>
+            <div class="level-badge">7</div>
+          </div>
+          <div>
+            <div class="t-h3" style="font-size:1.1rem">Sophie Martin</div>
+            <div class="tribe-chip tribe-littoral" style="margin-top:5px;font-size:.75rem">🌊 Tribu du Littoral</div>
+          </div>
+        </div>
+
+        <div class="pill pill-amber mb-16" style="display:inline-flex">🏅 Grand Pisteur</div>
+
+        <div class="xp-section">
+          <div class="xp-header">
+            <span class="t-xs t-soft">Niveau 7 → 8</span>
+            <span class="xp-num">3 400 / 4 000 XP</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" data-width="85"></div>
+          </div>
+          <div class="t-xs t-soft mt-8">600 XP avant le prochain niveau</div>
+        </div>
+
+        <div class="missions-mini-list">
+          <div class="t-xs t-soft mb-8">Missions en cours</div>
+          <div class="mission-mini-item">
+            <div class="mission-status-dot dot-active"></div>
+            <div style="flex:1">
+              <div class="t-small" style="font-weight:600">Chasse aux indices — Étape 3/5</div>
+              <div class="t-xs t-soft">+180 XP à la clé</div>
+            </div>
+            <div class="mission-xp">60%</div>
+          </div>
+          <div class="mission-mini-item">
+            <div class="mission-status-dot dot-active"></div>
+            <div style="flex:1">
+              <div class="t-small" style="font-weight:600">Défi Photo : La marée basse</div>
+              <div class="t-xs t-soft">+120 XP à la clé</div>
+            </div>
+            <div class="mission-xp">40%</div>
+          </div>
+          <div class="mission-mini-item">
+            <div class="mission-status-dot dot-todo"></div>
+            <div style="flex:1">
+              <div class="t-small" style="font-weight:600">Quiz : Légendes du Littoral</div>
+              <div class="t-xs t-soft">+90 XP à la clé</div>
+            </div>
+            <div class="pill pill-beige" style="font-size:.7rem">À faire</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: stats + activity -->
+      <div class="profile-right-grid">
+
+        <div class="stats-row">
+          <div class="stat-box">
+            <div class="stat-box-num t-coral">3 400</div>
+            <div class="stat-box-label">Points XP</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-box-num t-blue">6</div>
+            <div class="stat-box-label">Badges obtenus</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-box-num" style="color:var(--green-soft)">14</div>
+            <div class="stat-box-label">Missions terminées</div>
+          </div>
+        </div>
+
+        <!-- Progression niveaux -->
+        <div class="card">
+          <div class="t-h3 mb-16">Niveaux de progression</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div>
+              <div class="flex items-center justify-between mb-8">
+                <span class="t-small" style="font-weight:600">👣 Néophyte</span>
+                <span class="t-xs t-soft">Niv. 1-2 · Terminé</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill green" data-width="100"></div></div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-8">
+                <span class="t-small" style="font-weight:600">🧭 Explorateur</span>
+                <span class="t-xs t-soft">Niv. 3-5 · Terminé</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill green" data-width="100"></div></div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-8">
+                <span class="t-small" style="font-weight:600">🏅 Grand Pisteur</span>
+                <span class="t-xs t-soft">Niv. 6-8 · En cours</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" data-width="60"></div></div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-8">
+                <span class="t-small" style="font-weight:600;opacity:.45">🌟 Mémoire Vivante</span>
+                <span class="t-xs t-soft" style="opacity:.4">Niv. 9-11 · Verrouillé</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" data-width="0"></div></div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-8">
+                <span class="t-small" style="font-weight:600;opacity:.3">⚔️ Gardien Légendaire</span>
+                <span class="t-xs t-soft" style="opacity:.3">Niv. 12 · Verrouillé</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" data-width="0"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activité récente -->
+        <div>
+          <div class="t-h3 mb-12">Activité récente</div>
+          <div class="recent-activity-list">
+            <div class="activity-item">
+              <div class="activity-icon activity-green">✅</div>
+              <div>
+                <div class="t-small" style="font-weight:600">Mission validée</div>
+                <div class="t-xs t-soft">Quiz Bocage — il y a 2h</div>
+              </div>
+              <div class="activity-xp">+90 XP</div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon activity-amber">🏅</div>
+              <div>
+                <div class="t-small" style="font-weight:600">Badge débloqué</div>
+                <div class="t-xs t-soft">Explorateur du Littoral — hier</div>
+              </div>
+              <div class="activity-xp">+150 XP</div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon activity-coral">📸</div>
+              <div>
+                <div class="t-small" style="font-weight:600">Photo soumise</div>
+                <div class="t-xs t-soft">Défi coucher de soleil — il y a 3j</div>
+              </div>
+              <div class="activity-xp">+60 XP</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     MISSIONS
+     ============================================================ -->
+<section id="missions" class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="eyebrow">Missions</div>
+      <h2 class="t-h1 mb-16">87 aventures<br>vous attendent.</h2>
+      <p class="t-body t-mid" style="max-width:500px">De la découverte douce à la chasse intense — chaque mission rapproche la communauté de son territoire.</p>
+    </div>
+
+    <div class="missions-tabs reveal">
+      <button class="missions-tab active" data-filter="all">Toutes</button>
+      <button class="missions-tab" data-filter="decouverte">🗺️ Découverte</button>
+      <button class="missions-tab" data-filter="photo">📸 Photo</button>
+      <button class="missions-tab" data-filter="quiz">🎓 Quiz</button>
+      <button class="missions-tab" data-filter="chasse">🔍 Chasse</button>
+      <button class="missions-tab" data-filter="communaute">🤝 Communauté</button>
+    </div>
+
+    <div class="missions-grid" id="missionsGrid">
+
+      <div class="mission-card reveal" data-category="chasse">
+        <div class="mission-card-top status-active">
+          <div class="mission-type-icon">🔍</div>
+          <div class="pill pill-coral mb-8">Chasse aux indices</div>
+          <h3 class="t-h3" style="font-size:1rem;margin-bottom:6px">Les secrets du vieux port</h3>
+          <p class="t-small t-soft">5 indices cachés dans Les Sables-d'Olonne. Partez sur les traces des marins du XIXe.</p>
+        </div>
+        <div class="mission-card-bottom">
+          <div class="flex items-center justify-between">
+            <span class="tribe-chip tribe-littoral" style="font-size:.72rem">🌊 Littoral</span>
+            <span class="mission-xp">⭐ +180 XP</span>
+          </div>
+          <div class="progress-track mt-8 mb-8">
+            <div class="progress-fill" data-width="60"></div>
+          </div>
+          <div class="mission-status-row">
+            <span class="status-chip chip-active">● En cours (3/5)</span>
+            <a href="#" class="btn btn-coral btn-sm" style="padding:6px 14px;font-size:.8rem">Continuer</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="mission-card reveal delay-1" data-category="photo">
+        <div class="mission-card-top status-todo">
+          <div class="mission-type-icon">📸</div>
+          <div class="pill pill-beige mb-8">Défi Photo</div>
+          <h3 class="t-h3" style="font-size:1rem;margin-bottom:6px">La marée basse en 5 clichés</h3>
+          <p class="t-small t-soft">Capturez la vie révélée à marée basse. Coquillages, poulpes et reflets d'or.</p>
+        </div>
+        <div class="mission-card-bottom">
+          <div class="flex items-center justify-between">
+            <span class="tribe-chip tribe-littoral" style="font-size:.72rem">🌊 Littoral</span>
+            <span class="mission-xp">⭐ +120 XP</span>
+          </div>
+          <div class="mission-status-row" style="margin-top:14px">
+            <span class="status-chip chip-todo">○ À faire</span>
+            <a href="#rejoindre" class="btn btn-outline btn-sm" style="padding:6px 14px;font-size:.8rem">Démarrer</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="mission-card reveal delay-2" data-category="quiz">
+        <div class="mission-card-top status-done">
+          <div class="mission-type-icon">🎓</div>
+          <div class="pill pill-green mb-8">Quiz Local</div>
+          <h3 class="t-h3" style="font-size:1rem;margin-bottom:6px">Légendes du Bocage</h3>
+          <p class="t-small t-soft">10 questions sur les contes et légendes rurales de Vendée. Testez vos connaissances !</p>
+        </div>
+        <div class="mission-card-bottom">
+          <div class="flex items-center justify-between">
+            <span class="tribe-chip tribe-bocage" style="font-size:.72rem">🌿 Bocage</span>
+            <span class="mission-xp">⭐ +90 XP</span>
+          </div>
+          <div class="mission-status-row" style="margin-top:14px">
+            <span class="status-chip chip-done">✓ Validée · 8/10</span>
+            <span class="t-xs t-soft">Score : 80%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mission-card reveal" data-category="decouverte">
+        <div class="mission-card-top status-todo">
+          <div class="mission-type-icon">🗺️</div>
+          <div class="pill pill-beige mb-8">Découverte</div>
+          <h3 class="t-h3" style="font-size:1rem;margin-bottom:6px">Itinéraire des moulins</h3>
+          <p class="t-small t-soft">Partez à pied sur les 7 moulins historiques de la plaine bocagère. Un circuit de 12 km.</p>
+        </div>
+        <div class="mission-card-bottom">
+          <div class="flex items-center justify-between">
+            <span class="tribe-chip tribe-bocage" style="font-size:.72rem">🌿 Bocage</span>
+            <span class="mission-xp">⭐ +200 XP</span>
+          </div>
+          <div class="mission-status-row" style="margin-top:14px">
+            <span class="status-chip chip-todo">○ À faire</span>
+            <a href="#rejoindre" class="btn btn-outline btn-sm" style="padding:6px 14px;font-size:.8rem">Démarrer</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="mission-card reveal delay-1" data-category="chasse">
+        <div class="mission-card-top status-todo">
+          <div class="mission-type-icon">🔍</div>
+          <div class="pill pill-amber mb-8">Chasse aux indices</div>
+          <h3 class="t-h3" style="font-size:1rem;margin-bottom:6px">Les yeux du Marais</h3>
+          <p class="t-small t-soft">Huit panneaux cachés le long des canaux du Marais Breton. Chaque planche révèle un mot.</p>
+        </div>
+        <div class="mission-card-bottom">
+          <div class="flex items-center justify-between">
+            <span class="tribe-chip tribe-marais" style="font-size:.72rem">🦆 Marais</span>
+            <span class="mission-xp">⭐ +240 XP</span>
+          </div>
+          <div class="mission-status-row" style="margin-top:14px">
+            <span class="status-chip chip-todo">○ À faire</span>
+            <a href="#rejoindre" class="btn btn-outline btn-sm" style="padding:6px 14px;font-size:.8rem">Démarrer</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="mission-card reveal delay-2" data-category="communaute">
+        <div class="mission-card-top status-active">
+          <div class="mission-type-icon">🤝</div>
+          <div class="pill pill-blue mb-8">Communauté</div>
+          <h3 class="t-h3" style="font-size:1rem;margin-bottom:6px">Collecte de témoignages</h3>
+          <p class="t-small t-soft">Recueillez 3 témoignages d'anciens habitants. Enregistrement audio ou texte accepté.</p>
+        </div>
+        <div class="mission-card-bottom">
+          <div class="flex items-center justify-between">
+            <span class="pill pill-blue" style="font-size:.7rem">Toutes tribus</span>
+            <span class="mission-xp">⭐ +160 XP</span>
+          </div>
+          <div class="progress-track mt-8 mb-8">
+            <div class="progress-fill blue" data-width="33"></div>
+          </div>
+          <div class="mission-status-row">
+            <span class="status-chip chip-active">● En cours (1/3)</span>
+            <a href="#" class="btn btn-blue btn-sm" style="padding:6px 14px;font-size:.8rem">Continuer</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     BADGES
+     ============================================================ -->
+<section id="badges" class="section">
+  <div class="container">
+    <div class="section-header reveal t-center">
+      <div class="eyebrow" style="justify-content:center">Badges & Honneurs</div>
+      <h2 class="t-h1 mb-16">Chaque geste mérite<br>une distinction.</h2>
+      <p class="t-body t-mid" style="max-width:500px;margin:0 auto">Les badges Mika ne se collectent pas — ils se méritent. Ils racontent votre aventure.</p>
+    </div>
+
+    <div class="badges-grid reveal">
+
+      <div class="badge-card badge-coral">
+        <div class="badge-icon-wrap">👣</div>
+        <div class="badge-name">Premier Pas</div>
+        <div class="badge-desc">Vous avez rejoint l'aventure</div>
+        <div class="badge-xp">+50 XP · Obtenu</div>
+      </div>
+
+      <div class="badge-card badge-blue">
+        <div class="badge-icon-wrap">🧭</div>
+        <div class="badge-name">Explorateur du Littoral</div>
+        <div class="badge-desc">5 missions côtières validées</div>
+        <div class="badge-xp">+150 XP · Obtenu</div>
+      </div>
+
+      <div class="badge-card badge-green">
+        <div class="badge-icon-wrap">🌿</div>
+        <div class="badge-name">Gardien du Bocage</div>
+        <div class="badge-desc">Protecteur des savoirs ruraux</div>
+        <div class="badge-xp">+200 XP · Obtenu</div>
+      </div>
+
+      <div class="badge-card badge-amber">
+        <div class="badge-icon-wrap">🦆</div>
+        <div class="badge-name">Œil du Marais</div>
+        <div class="badge-desc">3 missions marais réalisées</div>
+        <div class="badge-xp">+180 XP · Obtenu</div>
+      </div>
+
+      <div class="badge-card badge-purple">
+        <div class="badge-icon-wrap">📜</div>
+        <div class="badge-name">Mémoire Vivante</div>
+        <div class="badge-desc">10 témoignages collectés</div>
+        <div class="badge-xp">+300 XP · Obtenu</div>
+      </div>
+
+      <div class="badge-card badge-coral">
+        <div class="badge-icon-wrap">📸</div>
+        <div class="badge-name">Œil Vif</div>
+        <div class="badge-desc">15 photos de mission soumises</div>
+        <div class="badge-xp">+120 XP · Obtenu</div>
+      </div>
+
+      <div class="badge-card badge-amber locked">
+        <div class="badge-icon-wrap">🏆</div>
+        <div class="badge-name">Grand Pisteur</div>
+        <div class="badge-desc">Niveau 8 + 20 missions</div>
+        <div class="badge-xp">+400 XP · Verrouillé</div>
+      </div>
+
+      <div class="badge-card badge-blue locked">
+        <div class="badge-icon-wrap">⚓</div>
+        <div class="badge-name">Amiral</div>
+        <div class="badge-desc">Capitaine d'une tribu active</div>
+        <div class="badge-xp">+500 XP · Verrouillé</div>
+      </div>
+
+      <div class="badge-card badge-green locked">
+        <div class="badge-icon-wrap">🌱</div>
+        <div class="badge-name">Semeur</div>
+        <div class="badge-desc">5 nouveaux membres parrainés</div>
+        <div class="badge-xp">+250 XP · Verrouillé</div>
+      </div>
+
+      <div class="badge-card badge-purple locked">
+        <div class="badge-icon-wrap">⚔️</div>
+        <div class="badge-name">Champion de Tribu</div>
+        <div class="badge-desc">1er du classement mensuel</div>
+        <div class="badge-xp">+600 XP · Verrouillé</div>
+      </div>
+
+      <div class="badge-card badge-coral locked">
+        <div class="badge-icon-wrap">🌟</div>
+        <div class="badge-name">Légende Locale</div>
+        <div class="badge-desc">Niveau 12 atteint</div>
+        <div class="badge-xp">+1000 XP · Verrouillé</div>
+      </div>
+
+      <div class="badge-card badge-amber locked">
+        <div class="badge-icon-wrap">🗝️</div>
+        <div class="badge-name">Passeur de Secrets</div>
+        <div class="badge-desc">50 indices découverts</div>
+        <div class="badge-xp">+350 XP · Verrouillé</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     TERRITOIRE / CARTE
+     ============================================================ -->
+<section id="carte" class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="eyebrow">Territoire</div>
+      <h2 class="t-h1 mb-16">La Vendée comme<br>terrain de jeu infini.</h2>
+      <p class="t-body t-mid" style="max-width:500px">Chaque point lumineux est une mission, un lieu, une histoire à découvrir. Le territoire s'enrichit chaque semaine.</p>
+    </div>
+
+    <div class="map-container reveal">
+      <!-- SVG stylized Vendée-inspired territory map -->
+      <div class="map-svg-wrap">
+        <svg viewBox="0 0 700 480" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Carte du territoire Vendée">
+
+          <!-- Water background hint -->
+          <ellipse cx="60" cy="240" rx="80" ry="180" fill="#C8E4F0" opacity=".4"/>
+
+          <!-- Territory shapes (stylized) -->
+          <!-- Bocage (high inland) -->
+          <path d="M200 60 L420 40 L480 140 L440 220 L360 200 L280 230 L200 200 L160 130 Z"
+                fill="#C6DDD4" opacity=".6" stroke="#7DB49A" stroke-width="1.5"/>
+          <!-- Littoral (coastal) -->
+          <path d="M80 180 L200 200 L280 230 L260 360 L200 420 L120 400 L60 340 L40 260 Z"
+                fill="#C8E4F0" opacity=".65" stroke="#7AB8D4" stroke-width="1.5"/>
+          <!-- Marais (south-east) -->
+          <path d="M280 230 L440 220 L500 300 L480 400 L380 440 L260 420 L200 360 L260 300 Z"
+                fill="#E8D9A8" opacity=".55" stroke="#C8A84C" stroke-width="1.5"/>
+          <!-- Plain center -->
+          <path d="M200 200 L360 200 L440 220 L280 230 Z"
+                fill="#E8EFE0" opacity=".5"/>
+
+          <!-- Zone labels -->
+          <text x="290" y="130" font-family="system-ui,sans-serif" font-size="13" font-weight="700" fill="#3D7A62" opacity=".8">Bocage</text>
+          <text x="100" y="295" font-family="system-ui,sans-serif" font-size="13" font-weight="700" fill="#255F82" opacity=".8">Littoral</text>
+          <text x="350" y="340" font-family="system-ui,sans-serif" font-size="13" font-weight="700" fill="#9A7020" opacity=".8">Marais</text>
+
+          <!-- Ocean wave suggestion -->
+          <path d="M40 200 Q60 190 80 200 Q100 210 120 200" stroke="#7AB8D4" stroke-width="2" fill="none" opacity=".4"/>
+          <path d="M35 220 Q55 210 75 220 Q95 230 115 220" stroke="#7AB8D4" stroke-width="2" fill="none" opacity=".3"/>
+
+          <!-- Mission points — active (coral) -->
+          <!-- Point 1: Les Sables -->
+          <g>
+            <circle cx="110" cy="300" r="14" fill="rgba(224,122,95,.15)" class="map-pulse"/>
+            <circle cx="110" cy="300" r="7"  fill="var(--coral)" opacity=".9"/>
+            <circle cx="110" cy="300" r="3"  fill="white"/>
+          </g>
+          <!-- Point 2: Noirmoutier zone -->
+          <g>
+            <circle cx="70" cy="190" r="12" fill="rgba(224,122,95,.12)" class="map-pulse" style="animation-delay:.8s"/>
+            <circle cx="70" cy="190" r="6"  fill="var(--coral)" opacity=".85"/>
+            <circle cx="70" cy="190" r="2.5" fill="white"/>
+          </g>
+          <!-- Point 3: Bocage center -->
+          <g>
+            <circle cx="310" cy="130" r="12" fill="rgba(125,180,154,.18)" class="map-pulse" style="animation-delay:1.2s"/>
+            <circle cx="310" cy="130" r="6"  fill="var(--green-soft)" opacity=".9"/>
+            <circle cx="310" cy="130" r="2.5" fill="white"/>
+          </g>
+          <!-- Point 4: Marais -->
+          <g>
+            <circle cx="380" cy="360" r="13" fill="rgba(212,168,67,.18)" class="map-pulse" style="animation-delay:1.8s"/>
+            <circle cx="380" cy="360" r="7"  fill="var(--amber)" opacity=".9"/>
+            <circle cx="380" cy="360" r="3"  fill="white"/>
+          </g>
+          <!-- Point 5: La Roche-sur-Yon -->
+          <g>
+            <circle cx="260" cy="270" r="10" fill="rgba(59,138,181,.15)" class="map-pulse" style="animation-delay:.5s"/>
+            <circle cx="260" cy="270" r="5"  fill="var(--blue)" opacity=".9"/>
+            <circle cx="260" cy="270" r="2"  fill="white"/>
+          </g>
+          <!-- Point 6: South littoral -->
+          <g>
+            <circle cx="150" cy="390" r="9" fill="rgba(224,122,95,.1)" class="map-pulse" style="animation-delay:2.2s"/>
+            <circle cx="150" cy="390" r="5" fill="var(--coral-light)" opacity=".8"/>
+          </g>
+          <!-- Point 7: East Bocage -->
+          <g>
+            <circle cx="430" cy="100" r="9" fill="rgba(125,180,154,.15)" class="map-pulse" style="animation-delay:1s"/>
+            <circle cx="430" cy="100" r="5" fill="var(--green-soft)" opacity=".8"/>
+          </g>
+          <!-- Point 8: Marais canaux -->
+          <g>
+            <circle cx="450" cy="310" r="8" fill="rgba(212,168,67,.15)" class="map-pulse" style="animation-delay:1.6s"/>
+            <circle cx="450" cy="310" r="4.5" fill="var(--amber)" opacity=".75"/>
+          </g>
+
+          <!-- Paths / routes between points -->
+          <path d="M110 300 Q185 285 260 270" stroke="#E07A5F" stroke-width="1.5" stroke-dasharray="5 4" opacity=".4"/>
+          <path d="M260 270 Q285 200 310 130" stroke="#7DB49A" stroke-width="1.5" stroke-dasharray="5 4" opacity=".4"/>
+          <path d="M260 270 Q320 315 380 360" stroke="#D4A843" stroke-width="1.5" stroke-dasharray="5 4" opacity=".4"/>
+          <path d="M110 300 Q115 250 70 190"  stroke="#3B8AB5" stroke-width="1.5" stroke-dasharray="5 4" opacity=".35"/>
+
+          <!-- Compass hint -->
+          <g transform="translate(620,60)">
+            <circle cx="0" cy="0" r="26" fill="white" opacity=".7"/>
+            <text x="0" y="-13" text-anchor="middle" font-size="9" fill="#5C5248" font-weight="700">N</text>
+            <text x="0" y="17" text-anchor="middle" font-size="9" fill="#5C5248" font-weight="700">S</text>
+            <text x="-16" y="4" text-anchor="middle" font-size="9" fill="#5C5248" font-weight="700">O</text>
+            <text x="16" y="4" text-anchor="middle" font-size="9" fill="#5C5248" font-weight="700">E</text>
+            <path d="M0,-18 L3,-6 L0,0 L-3,-6 Z" fill="#E07A5F"/>
+            <path d="M0,18 L3,6 L0,0 L-3,6 Z" fill="#9A8E84"/>
+          </g>
+
+        </svg>
+
+        <!-- Floating info labels -->
+        <div class="map-label" style="top:28%;left:8%;border-left:3px solid var(--coral)">
+          📍 Les Sables-d'Olonne<br><span style="font-weight:400;color:#9A8E84;font-size:.72rem">3 missions actives</span>
+        </div>
+        <div class="map-label" style="top:60%;right:10%;border-left:3px solid var(--amber)">
+          📍 Marais Poitevin<br><span style="font-weight:400;color:#9A8E84;font-size:.72rem">5 missions actives</span>
+        </div>
+        <div class="map-label" style="top:14%;left:38%;border-left:3px solid var(--green-soft)">
+          📍 La Roche-sur-Yon<br><span style="font-weight:400;color:#9A8E84;font-size:.72rem">Siège des tribus</span>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center;margin-top:24px">
+        <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:600;color:var(--text-mid)">
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--coral)"></div> Mission Littoral
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:600;color:var(--text-mid)">
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--green-soft)"></div> Mission Bocage
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:600;color:var(--text-mid)">
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--amber)"></div> Mission Marais
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:600;color:var(--text-mid)">
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--blue)"></div> Toutes tribus
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CLASSEMENT
+     ============================================================ -->
+<section id="classement" class="section-sm section">
+  <div class="container">
+    <div class="section-header reveal t-center">
+      <div class="eyebrow" style="justify-content:center">Classement</div>
+      <h2 class="t-h1 mb-16">Tableau d'honneur</h2>
+      <p class="t-body t-mid" style="max-width:460px;margin:0 auto">La compétition est douce ici — chaque point est une histoire partagée.</p>
+    </div>
+
+    <!-- Tribe scores -->
+    <div class="grid-3 reveal mb-32" style="max-width:680px;margin-left:auto;margin-right:auto;margin-bottom:32px">
+      <div class="card" style="text-align:center;border-top:4px solid var(--blue)">
+        <div style="font-size:1.5rem;margin-bottom:4px">🌊</div>
+        <div class="t-h3" style="font-size:.95rem">Tribu du Littoral</div>
+        <div style="font-size:1.4rem;font-weight:800;color:var(--blue);margin:8px 0">12 840</div>
+        <div class="t-xs t-soft">points collectifs</div>
+        <div class="progress-track mt-8"><div class="progress-fill blue" data-width="82"></div></div>
+      </div>
+      <div class="card" style="text-align:center;border-top:4px solid var(--amber)">
+        <div style="font-size:1.5rem;margin-bottom:4px">🦆</div>
+        <div class="t-h3" style="font-size:.95rem">Tribu du Marais</div>
+        <div style="font-size:1.4rem;font-weight:800;color:var(--amber);margin:8px 0">11 560</div>
+        <div class="t-xs t-soft">points collectifs</div>
+        <div class="progress-track mt-8"><div class="progress-fill" style="background:linear-gradient(90deg,#E8CB7A,var(--amber))" data-width="74"></div></div>
+      </div>
+      <div class="card" style="text-align:center;border-top:4px solid var(--green-soft)">
+        <div style="font-size:1.5rem;margin-bottom:4px">🌿</div>
+        <div class="t-h3" style="font-size:.95rem">Tribu du Bocage</div>
+        <div style="font-size:1.4rem;font-weight:800;color:var(--green-soft);margin:8px 0">10 210</div>
+        <div class="t-xs t-soft">points collectifs</div>
+        <div class="progress-track mt-8"><div class="progress-fill green" data-width="65"></div></div>
+      </div>
+    </div>
+
+    <!-- Individual leaderboard -->
+    <div class="leaderboard-list reveal">
+
+      <div class="lb-item">
+        <div class="lb-rank gold">🥇</div>
+        <div class="lb-avatar" style="background:rgba(224,122,95,.12);font-size:1.2rem">🧭</div>
+        <div class="lb-info">
+          <div class="lb-name">Thomas D.</div>
+          <div class="lb-tribe"><span class="tribe-chip tribe-littoral" style="font-size:.7rem;padding:2px 8px">🌊 Littoral</span></div>
+        </div>
+        <div class="lb-score">5 820 <span>pts</span></div>
+      </div>
+
+      <div class="lb-item">
+        <div class="lb-rank silver">🥈</div>
+        <div class="lb-avatar" style="background:rgba(212,168,67,.12);font-size:1.2rem">🦅</div>
+        <div class="lb-info">
+          <div class="lb-name">Marie-Ange L.</div>
+          <div class="lb-tribe"><span class="tribe-chip tribe-marais" style="font-size:.7rem;padding:2px 8px">🦆 Marais</span></div>
+        </div>
+        <div class="lb-score">5 210 <span>pts</span></div>
+      </div>
+
+      <div class="lb-item">
+        <div class="lb-rank bronze">🥉</div>
+        <div class="lb-avatar" style="background:rgba(125,180,154,.15);font-size:1.2rem">🌿</div>
+        <div class="lb-info">
+          <div class="lb-name">Pierre V.</div>
+          <div class="lb-tribe"><span class="tribe-chip tribe-bocage" style="font-size:.7rem;padding:2px 8px">🌿 Bocage</span></div>
+        </div>
+        <div class="lb-score">4 970 <span>pts</span></div>
+      </div>
+
+      <div class="lb-item">
+        <div class="lb-rank">4</div>
+        <div class="lb-avatar" style="background:rgba(59,138,181,.1);font-size:1.2rem">⚓</div>
+        <div class="lb-info">
+          <div class="lb-name">Lucie B.</div>
+          <div class="lb-tribe"><span class="tribe-chip tribe-littoral" style="font-size:.7rem;padding:2px 8px">🌊 Littoral</span></div>
+        </div>
+        <div class="lb-score">4 680 <span>pts</span></div>
+      </div>
+
+      <div class="lb-item">
+        <div class="lb-rank">5</div>
+        <div class="lb-avatar" style="background:rgba(155,127,191,.12);font-size:1.2rem">📜</div>
+        <div class="lb-info">
+          <div class="lb-name">Jean-Michel F.</div>
+          <div class="lb-tribe"><span class="tribe-chip tribe-bocage" style="font-size:.7rem;padding:2px 8px">🌿 Bocage</span></div>
+        </div>
+        <div class="lb-score">4 120 <span>pts</span></div>
+      </div>
+
+      <!-- Current user highlighted -->
+      <div class="lb-item me">
+        <div class="lb-rank" style="color:var(--coral);font-weight:900">9</div>
+        <div class="lb-avatar" style="background:rgba(224,122,95,.12);font-size:1.2rem">🧭</div>
+        <div class="lb-info">
+          <div class="lb-name">Sophie M. <span style="font-size:.75rem;color:var(--coral);font-weight:600">(vous)</span></div>
+          <div class="lb-tribe"><span class="tribe-chip tribe-littoral" style="font-size:.7rem;padding:2px 8px">🌊 Littoral</span></div>
+        </div>
+        <div class="lb-score" style="color:var(--coral)">3 400 <span>pts</span></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     REJOINDRE
+     ============================================================ -->
+<section id="rejoindre" class="section">
+  <div class="container">
+    <div class="card" style="background:var(--coral);border-radius:var(--radius-xl);padding:clamp(36px,6vw,72px);position:relative;overflow:hidden">
+      <div class="join-bg"></div>
+      <div class="join-bg2"></div>
+      <div class="join-inner">
+        <div class="pill" style="background:rgba(255,255,255,.18);color:white;margin-bottom:20px;justify-content:center;display:inline-flex">
+          🌟 L'aventure collective commence maintenant
+        </div>
+        <h2 style="color:white;font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;margin-bottom:14px">
+          Rejoignez votre tribu.<br>Écrivez l'histoire du territoire.
+        </h2>
+        <p style="color:rgba(255,255,255,.85);font-size:1.05rem;margin-bottom:36px;max-width:500px;margin-left:auto;margin-right:auto;line-height:1.7">
+          1 240 aventuriers explorent déjà la Vendée avec vous. Choisissez votre tribu, démarrez votre première mission, et commencez à accumuler des points d'aventure.
+        </p>
+        <div class="join-actions">
+          <a href="#" class="btn btn-white btn-lg">Créer mon compte gratuit</a>
+          <a href="#tribus" class="btn btn-lg" style="background:rgba(255,255,255,.15);color:white;border:1px solid rgba(255,255,255,.3)">Choisir ma tribu →</a>
+        </div>
+        <div class="join-tribe-chips">
+          <div class="join-tribe-chip">🌊 Tribu du Littoral</div>
+          <div class="join-tribe-chip">🌿 Tribu du Bocage</div>
+          <div class="join-tribe-chip">🦆 Tribu du Marais</div>
+        </div>
+        <p style="margin-top:20px;color:rgba(255,255,255,.55);font-size:.82rem">
+          Gratuit · Sans engagement · Communauté locale vendéenne
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="nav-logo-text" style="font-size:1.4rem;margin-bottom:10px">mi<span>ka</span></div>
+        <p class="footer-tagline">L'aventure collective en Vendée.<br>Explorez, partagez, progressez ensemble.</p>
+      </div>
+      <div>
+        <div class="footer-col-title">Explorer</div>
+        <ul class="footer-links">
+          <li><a href="#tribus">Les Tribus</a></li>
+          <li><a href="#missions">Les Missions</a></li>
+          <li><a href="#badges">Les Badges</a></li>
+          <li><a href="#carte">Le Territoire</a></li>
+          <li><a href="#classement">Classement</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Communauté</div>
+        <ul class="footer-links">
+          <li><a href="#">Forum des tribus</a></li>
+          <li><a href="#">Proposer une mission</a></li>
+          <li><a href="#">Événements locaux</a></li>
+          <li><a href="#">Blog</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">À propos</div>
+        <ul class="footer-links">
+          <li><a href="#">Concept</a></li>
+          <li><a href="#">Équipe</a></li>
+          <li><a href="#">Nous contacter</a></li>
+          <li><a href="#">Mentions légales</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Mika — Communauté Vendée. Tous droits réservés.</span>
+      <span>Fait avec ❤️ en Vendée</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+/* ---- Navigation ---- */
+const nav = document.getElementById('mainNav');
+const hamburger = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobileMenu');
+
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 20);
+
+  // Active nav link highlighting
+  const sections = ['hero','tribus','missions','badges','classement'];
+  let current = 'hero';
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.getBoundingClientRect().top <= 100) current = id;
+  });
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+  });
+});
+
+hamburger.addEventListener('click', () => {
+  mobileMenu.classList.toggle('open');
+  const bars = hamburger.querySelectorAll('span');
+  if (mobileMenu.classList.contains('open')) {
+    bars[0].style.transform = 'translateY(7px) rotate(45deg)';
+    bars[1].style.opacity = '0';
+    bars[2].style.transform = 'translateY(-7px) rotate(-45deg)';
+  } else {
+    bars.forEach(b => { b.style.transform = ''; b.style.opacity = ''; });
+  }
+});
+
+function closeMobile() {
+  mobileMenu.classList.remove('open');
+  hamburger.querySelectorAll('span').forEach(b => { b.style.transform = ''; b.style.opacity = ''; });
+}
+
+/* ---- Missions tabs filter ---- */
+document.querySelectorAll('.missions-tab').forEach(tab => {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.missions-tab').forEach(t => t.classList.remove('active'));
+    this.classList.add('active');
+
+    const filter = this.dataset.filter;
+    document.querySelectorAll('.mission-card').forEach(card => {
+      if (filter === 'all' || card.dataset.category === filter) {
+        card.style.display = '';
+        card.style.animation = 'fade-up .4s ease both';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  });
+});
+
+/* ---- Intersection Observer: reveal + progress bars ---- */
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+
+      // Animate progress bars inside the revealed element
+      entry.target.querySelectorAll('.progress-fill[data-width]').forEach(bar => {
+        const w = bar.getAttribute('data-width');
+        setTimeout(() => { bar.style.width = w + '%'; }, 200);
+      });
+
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+/* ---- Animate hero progress bars on load ---- */
+window.addEventListener('load', () => {
+  document.querySelectorAll('.hero-visual .progress-fill, #hero .progress-fill').forEach(bar => {
+    const w = bar.style.width || '0%';
+    bar.style.width = '0%';
+    setTimeout(() => { bar.style.width = w; }, 600);
+  });
+});
+
+/* ---- Smooth scroll offset for fixed nav ---- */
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function(e) {
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      const offset = 80;
+      window.scrollTo({ top: target.offsetTop - offset, behavior: 'smooth' });
+    }
+  });
+});
+</script>
+
+</body>
+</html>
