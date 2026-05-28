@@ -14,7 +14,7 @@ Moteur : InnoDB | Encodage : utf8mb4_unicode_ci
 
 ## Installation complète
 
-### 1. Créer l'utilisateur et la base
+### Étape 1 — Créer l'utilisateur et la base
 
 ```sql
 -- En tant que root MySQL :
@@ -26,19 +26,68 @@ GRANT ALL PRIVILEGES ON zone85.* TO 'zone85_user'@'localhost';
 FLUSH PRIVILEGES;
 ```
 
-### 2. Importer le schéma (tables)
+### Étape 2 — Importer le schéma (tables)
 
 ```bash
 mysql -u zone85_user -p zone85 < database/schema.sql
 ```
 
-### 3. Importer les données de test (optionnel)
+### Étape 3 — Importer les données de test
 
 ```bash
 mysql -u zone85_user -p zone85 < database/seed.sql
 ```
 
 > Ces données sont fictives (emails `@example.test`). Ne pas utiliser en production.
+
+### Étape 4 — Activer la connexion dans config.php
+
+Ouvrir `includes/config.php` et modifier le bloc base de données :
+
+```php
+define('DB_ENABLED', true);          // ← passer à true
+define('DB_HOST',    'localhost');
+define('DB_PORT',    3306);
+define('DB_NAME',    'zone85');
+define('DB_USER',    'zone85_user');
+define('DB_PASS',    'votre_mot_de_passe_fort');
+define('DB_CHARSET', 'utf8mb4');
+```
+
+> En production, utiliser une variable d'environnement pour `DB_PASS`
+> plutôt qu'une valeur en dur.
+
+### Étape 5 — Lancer le diagnostic
+
+Ouvrir dans un navigateur (serveur PHP local) :
+
+```
+http://localhost:8080/tools/db-check.php
+```
+
+Ce script vérifie automatiquement :
+- la connexion PDO
+- la présence des 10 tables principales
+- les données importées (seed)
+- le bon fonctionnement des 5 repositories clés
+
+**Résultat attendu :** tous les indicateurs en vert ✓
+
+> ⚠ Supprimer ou protéger `tools/db-check.php` avant toute mise en production.
+
+### Étape 6 — Tester les pages publiques
+
+Une fois le diagnostic vert, vérifier les pages qui utilisent MySQL :
+
+```
+http://localhost:8080/clans.php
+http://localhost:8080/missions.php
+http://localhost:8080/classement.php
+http://localhost:8080/hall.php
+```
+
+Le site doit se comporter identiquement au mode mock — les mêmes données
+apparaissent, maintenant lues depuis MySQL.
 
 ---
 
