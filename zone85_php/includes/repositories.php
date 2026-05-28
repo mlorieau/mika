@@ -760,3 +760,29 @@ function fetch_missions_by_season(int $seasonId, string $status = 'active'): ?ar
         return null;
     }
 }
+
+// ── Historique XP ─────────────────────────────────────────────
+
+/**
+ * Retourne les dernières entrées XP d'un utilisateur.
+ */
+function fetch_user_xp_logs(int $userId, int $limit = 10): array {
+    $pdo = db();
+    if (!$pdo) return [];
+    try {
+        $stmt = $pdo->prepare("
+            SELECT source_type, xp_amount, reason, created_at
+            FROM xp_logs
+            WHERE user_id = :id
+            ORDER BY created_at DESC
+            LIMIT :limit
+        ");
+        $stmt->bindValue(':id',    $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit,  PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    } catch (PDOException $e) {
+        error_log('[ZONE85] fetch_user_xp_logs : ' . $e->getMessage());
+        return [];
+    }
+}

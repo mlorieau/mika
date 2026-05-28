@@ -1,12 +1,28 @@
 # Sécurité dossier uploads/avatars
 # Interdit l'exécution de PHP et autres scripts
 Options -Indexes
-<FilesMatch "\.(php|php3|php4|php5|phtml|pl|py|cgi|sh)$">
-    Order Deny,Allow
-    Deny from all
+
+# Désactive le moteur PHP (Apache + mod_php)
+php_flag engine off
+
+# Bloque l'accès à tout fichier de script (Apache 2.2 + 2.4)
+<FilesMatch "\.(php[0-9]?|phtml|pl|py|cgi|sh|bash)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order Deny,Allow
+        Deny from all
+    </IfModule>
 </FilesMatch>
+
 # N'autorise que les images
 <FilesMatch "\.(jpg|jpeg|png|webp|gif)$">
-    Order Allow,Deny
-    Allow from all
+    <IfModule mod_authz_core.c>
+        Require all granted
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order Allow,Deny
+        Allow from all
+    </IfModule>
 </FilesMatch>

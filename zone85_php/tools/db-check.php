@@ -1,9 +1,15 @@
 <?php
-// ── Protection : ne jamais exposer en production ──────────────
-// Fichier de diagnostic à supprimer ou protéger par IP/htpasswd avant déploiement.
-if (defined('APP_ENV') && APP_ENV === 'prod') {
+// ── Protection — accès restreint ─────────────────────────────
+// Autorisé uniquement si APP_ENV = 'dev' ET DEV_TOOLS_ALLOWED = true dans config.php.
+// En production ou si DEV_TOOLS_ALLOWED = false : HTTP 403 immédiat.
+$_root_cfg = dirname(__DIR__) . '/includes/config.php';
+if (file_exists($_root_cfg)) require_once $_root_cfg;
+$_env_ok   = defined('APP_ENV') && APP_ENV === 'dev';
+$_tool_ok  = defined('DEV_TOOLS_ALLOWED') && DEV_TOOLS_ALLOWED === true;
+if (!$_env_ok || !$_tool_ok) {
     http_response_code(403);
-    die('403 Forbidden — Ce fichier de diagnostic ne doit pas être accessible en production.');
+    header('Content-Type: text/plain; charset=UTF-8');
+    die('403 Forbidden — Outil de diagnostic désactivé. Voir DEV_TOOLS_ALLOWED dans config.php.');
 }
 
 // ============================================================

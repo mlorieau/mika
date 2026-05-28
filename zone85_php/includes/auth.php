@@ -20,11 +20,26 @@ function start_secure_session(): void {
     session_start();
 }
 
-// ── Utilisateur courant ────────────────────────────────────────
+// ── Utilisateur courant + timeout de session ──────────────────
+// SESSION_TIMEOUT (config.php) = 3600 s par défaut.
+// last_activity est mis à jour à chaque requête authentifiée.
 
 function current_user(): ?array {
     if (session_status() !== PHP_SESSION_ACTIVE) return null;
-    return $_SESSION['user'] ?? null;
+    if (!isset($_SESSION['user']))               return null;
+
+    $timeout       = defined('SESSION_TIMEOUT') ? SESSION_TIMEOUT : 3600;
+    $last_activity = $_SESSION['last_activity'] ?? time();
+
+    if (time() - $last_activity > $timeout) {
+        // Session expirée — nettoyage silencieux
+        $_SESSION = [];
+        session_destroy();
+        return null;
+    }
+
+    $_SESSION['last_activity'] = time();
+    return $_SESSION['user'];
 }
 
 function is_logged_in(): bool {
@@ -63,6 +78,7 @@ function login_user(array $user): void {
         'avatar_key' => $avatar_key,
         'role'       => $user['role'] ?? 'member',
     ];
+    $_SESSION['last_activity'] = time();
 
     $pdo = db();
     if ($pdo) {
@@ -133,6 +149,11 @@ function register_user(array $data): array {
     $pdo = db();
     if (!$pdo) {
         return ['ok' => false, 'error' => 'Base de données non disponible.'];
+    }
+
+    // Vérification côté serveur de la confirmation du mot de passe
+    if (isset($data['password_confirm']) && $data['password'] !== $data['password_confirm']) {
+        return ['ok' => false, 'field' => 'password', 'error' => 'Les mots de passe ne correspondent pas.'];
     }
 
     try {
@@ -225,7 +246,7 @@ function register_user(array $data): array {
 // ── Upload avatar ──────────────────────────────────────────────
 
 function upload_avatar(array $file): array {
-    $max_size      = 2 * 1024 * 1024; // 2 Mo
+    $max_size      = defined('UPLOAD_MAX_SIZE') ? UPLOAD_MAX_SIZE : 2 * 1024 * 1024;
     $allowed_types = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
 
     if ($file['error'] !== UPLOAD_ERR_OK) {

@@ -1,4 +1,53 @@
 <?php
+require_once 'includes/config.php';
+require_once 'includes/db.php';
+require_once 'includes/functions.php';
+
+// ── Traitement POST ───────────────────────────────────────────
+$contact_success = false;
+$contact_error   = '';
+
+if (is_post_request()) {
+    if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
+        $contact_error = 'Token de sécurité invalide. Rechargez la page.';
+    } else {
+        $c_name    = safe_input($_POST['name']     ?? '', 100);
+        $c_email   = filter_var(trim($_POST['email'] ?? ''), FILTER_VALIDATE_EMAIL);
+        $c_subject = safe_input($_POST['subject']  ?? '', 200);
+        $c_reason  = safe_input($_POST['reason']   ?? '', 100);
+        $c_message = safe_input($_POST['message']  ?? '', 2000);
+        $c_rgpd    = !empty($_POST['rgpd_consent']);
+
+        if (!$c_name || !$c_email || !$c_message || !$c_rgpd) {
+            $contact_error = 'Veuillez remplir tous les champs obligatoires et accepter la politique de confidentialité.';
+        } else {
+            $pdo = db();
+            if ($pdo) {
+                try {
+                    $ip_hash = hash('sha256', $_SERVER['REMOTE_ADDR'] ?? '');
+                    $ua_hash = hash('sha256', $_SERVER['HTTP_USER_AGENT'] ?? '');
+                    $pdo->prepare("
+                        INSERT INTO contact_messages (name, email, subject, reason, message, ip_hash, user_agent_hash)
+                        VALUES (:name, :email, :subject, :reason, :message, :ip, :ua)
+                    ")->execute([
+                        ':name'    => $c_name,
+                        ':email'   => $c_email,
+                        ':subject' => $c_subject ?: null,
+                        ':reason'  => $c_reason  ?: null,
+                        ':message' => $c_message,
+                        ':ip'      => $ip_hash,
+                        ':ua'      => $ua_hash,
+                    ]);
+                } catch (PDOException $e) {
+                    error_log('[ZONE85] contact : ' . $e->getMessage());
+                    // UX : on affiche succès même si erreur DB (ne pas bloquer l'utilisateur)
+                }
+            }
+            $contact_success = true;
+        }
+    }
+}
+
 $page_title       = 'Contact';
 $page_description = 'Contacte l\'équipe ZONE85 pour toute question sur la communauté vendéenne gamifiée, les missions, les clans ou les partenariats.';
 $page_canonical   = 'https://www.zone85.fr/contact.php';
@@ -13,9 +62,7 @@ $page_schema      = [
     ],
 ];
 $current_page = 'legal';
-require_once 'includes/config.php';
 require_once 'includes/data.php';
-require_once 'includes/functions.php';
 $page_styles = '<style>
 
 /* ── HERO ── */
@@ -354,6 +401,17 @@ require_once 'includes/nav.php';
       <div class="form-card reveal">
         <div class="form-card-title">Envoyer un message</div>
 
+        <?php if ($contact_success): ?>
+          <div style="background:rgba(42,157,92,.1);border:1px solid rgba(42,157,92,.3);border-radius:8px;padding:18px 20px;margin-bottom:20px;color:#2a9d5c;font-weight:700;font-size:.9rem;line-height:1.6">
+            ✓ Message envoyé. Nous vous répondrons dans les meilleurs délais à <strong><?= e($c_email) ?></strong>.
+          </div>
+        <?php elseif ($contact_error): ?>
+          <div style="background:rgba(234,86,73,.08);border:1px solid rgba(234,86,73,.3);border-radius:8px;padding:14px 18px;margin-bottom:16px;color:#c0392b;font-weight:600;font-size:.85rem">
+            <?= e($contact_error) ?>
+          </div>
+        <?php endif; ?>
+
+        <?php if (!$contact_success): ?>
         <form action="" method="post" novalidate>
 
           <div class="form-row">
@@ -395,14 +453,15 @@ require_once 'includes/nav.php';
             <span class="form-check-label">J'ai lu la <a href="confidentialite.php">politique de confidentialité</a>.</span>
           </label>
 
-          <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
+          <?= csrf_field() ?>
           <button type="submit" class="btn-submit">Envoyer le message</button>
+        </form>
+        <?php endif; ?>
 
           <p class="rgpd-note">
             Les informations transmises via ce formulaire sont utilisées uniquement pour répondre à votre demande. Vous pouvez exercer vos droits d'accès, de rectification ou de suppression en nous contactant.
           </p>
 
-        </form>
       </div>
     </div>
 

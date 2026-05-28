@@ -226,7 +226,7 @@ Voir `docs/security-checklist-v1.md` pour la checklist complète et le plan v2.
 
 ---
 
-## État actuel (v5 — Auth V1)
+## État actuel (v6.1 — Auth V1 stabilisée)
 
 | Composant | État |
 |---|---|
@@ -236,12 +236,17 @@ Voir `docs/security-checklist-v1.md` pour la checklist complète et le plan v2.
 | Pages publiques | ✓ Alimentées par MySQL |
 | **Inscription réelle** | ✓ Multi-étapes, validation, hash password, clan, avatar, CGU |
 | **Connexion / Déconnexion** | ✓ Session PHP sécurisée, `login.php` / `logout.php` |
-| **Profil connecté** | ✓ Affiche les vraies données de l'utilisateur connecté |
+| **Session timeout** | ✓ Expiration auto après 1h d'inactivité (`SESSION_TIMEOUT`) |
+| **Profil connecté** | ✓ Données réelles, badges réels, historique XP réel |
 | **XP de bienvenue** | ✓ +50 XP à l'inscription, ligne dans `xp_logs` |
 | **Badge bienvenue** | ✓ "Pionnier de la Zone" attribué si disponible |
 | **legal_acceptances** | ✓ CGU + confidentialité enregistrées à l'inscription |
 | **Avatar preset/upload** | ✓ Emoji au choix ou photo uploadée (jpg/png/webp, max 2 Mo) |
 | **Nav connecté/déconnecté** | ✓ Menu adaptatif selon état de session |
+| **CSRF unifié** | ✓ `csrf_field()` helper utilisé dans tous les formulaires POST |
+| **Contact → DB** | ✓ Messages enregistrés dans `contact_messages` (CSRF + ip_hash) |
+| **Protection outils dev** | ✓ `DEV_TOOLS_ALLOWED` + `APP_ENV` requis pour db-check.php |
+| **Uploads sécurisés** | ✓ `.htaccess` Apache 2.4 (php_flag engine off, Require all denied) |
 | Back-office | Non |
 | Moteur de participation | Non |
 | Paiement | Non |
@@ -345,12 +350,74 @@ Le dossier `uploads/avatars/` est protégé par `.htaccess` :
 
 ---
 
-## Outils de diagnostic
+## Sécurité — détails V6.1
 
-`tools/db-check.php` est protégé par `APP_ENV` :
-- Si `APP_ENV = 'prod'` → HTTP 403
-- Ne jamais laisser accessible publiquement en production
-- Supprimer ou protéger par IP/htpasswd avant déploiement
+### Fonctions disponibles (functions.php)
+
+| Fonction | Rôle |
+|---|---|
+| `e($val)` | Échappe pour l'affichage HTML (ENT_QUOTES + UTF-8) |
+| `csrf_token()` | Génère ou retourne le token CSRF de la session |
+| `csrf_field()` | Retourne le champ `<input type="hidden">` CSRF prêt à insérer |
+| `verify_csrf_token($token)` | Vérifie le token avec `hash_equals()` |
+| `set_security_headers()` | Envoie les headers HTTP de sécurité |
+
+### Session timeout
+
+`current_user()` vérifie automatiquement `$_SESSION['last_activity']`.  
+Si la dernière activité date de plus de `SESSION_TIMEOUT` secondes (défaut : 3600), la session est détruite et `null` est retourné.  
+La valeur se met à jour à chaque appel réussi.
+
+### Outils de diagnostic
+
+`tools/db-check.php` est protégé par double condition :
+- `APP_ENV === 'dev'` ET `DEV_TOOLS_ALLOWED === true` requis
+- Sinon : HTTP 403, message générique
+- Les deux constantes sont dans `includes/config.php`
+- Ne jamais passer `DEV_TOOLS_ALLOWED = true` en production
+
+---
+
+## Checklist de test V6.1
+
+### Pages publiques (régression)
+- [ ] Accueil `index.php` — chargement, clans, stats
+- [ ] Concept `concept.php` — sections, saison active
+- [ ] Clans `clans.php` — les 3 clans, scores
+- [ ] Missions `missions.php` — liste missions
+- [ ] Classement `classement.php` — tableau classement
+- [ ] Hall `hall.php` — photos, contributeurs
+- [ ] Contact `contact.php` — formulaire s'affiche, submit → message de succès, entrée dans `contact_messages`
+
+### Inscription
+- [ ] Étapes 1→5 naviguent sans erreur
+- [ ] Étape 5 : validation JS (champs vides, CGU non cochée)
+- [ ] Submit étape 5 → créer un compte → redirect profil
+- [ ] Vérifier en base : `users`, `xp_logs` (+50 XP), `legal_acceptances`, `user_badges`
+- [ ] Avatar emoji → affiché dans nav et profil
+- [ ] Avatar upload (jpg ≤ 2 Mo) → fichier dans `uploads/avatars/`, affiché dans nav et profil
+- [ ] Email déjà pris → message d'erreur côté serveur
+- [ ] Pseudo déjà pris → message d'erreur côté serveur
+
+### Connexion / Déconnexion
+- [ ] `login.php` avec bon email + password → session ouverte, redirect profil
+- [ ] `login.php` avec mauvais password → "Identifiants incorrects." (message générique)
+- [ ] Déconnexion → nav redevient Connexion/Rejoindre
+- [ ] Accès `profil.php` sans session → page invité (boutons Se connecter/Rejoindre)
+
+### Profil connecté
+- [ ] Pseudo, clan, niveau, XP total affichés correctement
+- [ ] Badges : badge "Pionnier de la Zone" visible si base renseignée ; sinon message vide
+- [ ] Activité XP : ligne "+50 XP — Bienvenue dans la Zone" visible si base renseignée ; sinon message vide
+
+### Session timeout
+- [ ] Modifier `SESSION_TIMEOUT = 1` dans config.php, attendre 2s, recharger → déconnecté automatiquement
+- [ ] Remettre `SESSION_TIMEOUT = 3600`
+
+### Sécurité
+- [ ] `tools/db-check.php` avec `DEV_TOOLS_ALLOWED = false` → HTTP 403
+- [ ] `uploads/avatars/test.php` → HTTP 403 (exécution PHP bloquée)
+- [ ] CSRF : soumettre contact.php sans token → rejet (modifier token manuellement pour tester)
 
 ---
 
@@ -374,5 +441,5 @@ Le dossier `uploads/avatars/` est protégé par `.htaccess` :
 2. Attribution XP côté serveur — jamais côté client
 3. Attribution points clan — mis à jour à chaque participation
 4. Déclenchement badges — vérification à chaque action
-5. Contact — enregistrement dans `contact_messages` (formulaire déjà en place)
-6. Back-office minimal — modération participations, validation photos
+5. Back-office minimal — modération participations, validation photos
+6. Email transactionnel — confirmation d'inscription (SMTP)

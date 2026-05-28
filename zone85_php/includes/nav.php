@@ -28,11 +28,11 @@ if ($_nav_user) {
     <a href="index.php" class="nav-logo">ZONE<span>85</span><span class="nav-logo-sub">L'Esprit Vendée</span></a>
     <div class="nav-right">
       <?php if ($_nav_user): ?>
-        <div class="nav-avatar" title="<?= e($_nav_user['pseudo']) ?>" onclick="location.href='profil.php'" style="cursor:pointer">
+        <div class="nav-avatar" title="<?= e($_nav_user['pseudo']) ?>" onclick="location.href='profil.php'" style="cursor:pointer<?= ($_nav_user['avatar_type'] === 'upload') ? ';padding:0;overflow:hidden' : '' ?>">
           <?php if ($_nav_user['avatar_type'] === 'upload' && !empty($_nav_user['avatar_key'])): ?>
             <img src="<?= e($_nav_user['avatar_key']) ?>" alt="<?= e($_nav_user['pseudo']) ?>" style="width:100%;height:100%;object-fit:cover;border-radius:8px">
           <?php else: ?>
-            <?= mb_substr(e($_nav_user['avatar_key']), 0, 2) === strtoupper(mb_substr(e($_nav_user['avatar_key']), 0, 2)) ? e($_nav_initials) : e($_nav_user['avatar_key']) ?>
+            <?= e($_nav_user['avatar_key'] ?? $_nav_initials) ?>
           <?php endif; ?>
         </div>
         <a href="profil.php" style="font-size:.84rem;font-weight:700;color:var(--text);text-decoration:none;white-space:nowrap;display:none" class="nav-profil-link">Mon Profil</a>

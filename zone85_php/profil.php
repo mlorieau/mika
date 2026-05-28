@@ -73,8 +73,9 @@ if (!$is_guest) {
             'joined'          => $_db_profile['joined'] ?? '',
         ];
 
-        $_user_badges = fetch_user_badges((int)$_db_profile['id']);
+        $_user_badges  = fetch_user_badges((int)$_db_profile['id']);
         if (!empty($_user_badges)) $badges = $_user_badges;
+        $_xp_history   = fetch_user_xp_logs((int)$_db_profile['id'], 10);
     } else {
         // DB non disponible — construire depuis session
         $_prenom   = $_session['pseudo'];
@@ -578,51 +579,26 @@ require_once 'includes/nav.php';
 
         <div class="profil-card">
           <div class="profil-card-title">🏅 Badges obtenus <span style="color:var(--primary);font-size:.9em"><?= e($user['badges_count']) ?></span></div>
+          <?php if (!empty($badges)): ?>
           <div class="badges-grid">
-
+            <?php foreach ($badges as $_b): ?>
             <div class="badge-card">
-              <span class="badge-emoji">🌊</span>
-              <div class="badge-name">Marin d'eau douce</div>
-              <div class="badge-date">Obtenu le 12 juin 2025</div>
-              <span class="badge-xp">+50 XP</span>
+              <span class="badge-emoji"><?= e($_b['icon'] ?? '🏅') ?></span>
+              <div class="badge-name"><?= e($_b['title'] ?? '') ?></div>
+              <?php if (!empty($_b['awarded_at'])): ?>
+              <div class="badge-date">Obtenu le <?= e(date('d/m/Y', strtotime($_b['awarded_at']))) ?></div>
+              <?php endif; ?>
+              <span class="badge-xp" style="font-size:.72rem;color:var(--primary);font-weight:700"><?= e(ucfirst($_b['rarity'] ?? '')) ?></span>
             </div>
-
-            <div class="badge-card">
-              <span class="badge-emoji">📸</span>
-              <div class="badge-name">L'Œil du Littoral</div>
-              <div class="badge-date">Obtenu le 28 juin 2025</div>
-              <span class="badge-xp">+75 XP</span>
-            </div>
-
-            <div class="badge-card">
-              <span class="badge-emoji">🏹</span>
-              <div class="badge-name">Chasseur de primes</div>
-              <div class="badge-date">Obtenu il y a 3 jours</div>
-              <span class="badge-xp">+60 XP</span>
-            </div>
-
-            <div class="badge-card">
-              <span class="badge-emoji">⚡</span>
-              <div class="badge-name">Streak 7 jours</div>
-              <div class="badge-date">Obtenu le 15 mai 2025</div>
-              <span class="badge-xp">+40 XP</span>
-            </div>
-
-            <div class="badge-card">
-              <span class="badge-emoji">🥐</span>
-              <div class="badge-name">Connaisseuse de brioche</div>
-              <div class="badge-date">Obtenu le 3 mars 2025</div>
-              <span class="badge-xp">+30 XP</span>
-            </div>
-
-            <div class="badge-card">
-              <span class="badge-emoji">🗺️</span>
-              <div class="badge-name">Exploratrice du bocage</div>
-              <div class="badge-date">Obtenu le 8 avril 2025</div>
-              <span class="badge-xp">+45 XP</span>
-            </div>
-
+            <?php endforeach; ?>
           </div>
+          <?php else: ?>
+          <div style="text-align:center;padding:32px 20px;color:var(--text-muted)">
+            <div style="font-size:2rem;margin-bottom:8px">🏅</div>
+            <div style="font-size:.88rem;font-weight:600">Aucun badge encore obtenu.</div>
+            <div style="font-size:.78rem;margin-top:4px">Participe aux missions pour débloquer tes premiers badges.</div>
+          </div>
+          <?php endif; ?>
         </div>
 
         <div class="profil-card">
@@ -710,97 +686,44 @@ require_once 'includes/nav.php';
         </div>
 
         <div class="profil-card">
-          <div class="profil-card-title">📋 Historique des actions</div>
-
-          <div class="activity-filter">
-            <button class="activity-filter-btn active" onclick="filterActivity(this,'all')">Tout</button>
-            <button class="activity-filter-btn" onclick="filterActivity(this,'mission')">Missions</button>
-            <button class="activity-filter-btn" onclick="filterActivity(this,'keto')">Kéto Kolé Tché</button>
-            <button class="activity-filter-btn" onclick="filterActivity(this,'badge')">Badges</button>
-            <button class="activity-filter-btn" onclick="filterActivity(this,'quiz')">Quiz</button>
-          </div>
+          <div class="profil-card-title">⚡ Historique XP récent</div>
 
           <div id="activityFeed">
 
-            <div class="feed-item" data-activity-type="mission">
-              <div class="feed-icon">🗺️</div>
+            <?php
+            $_xp_icons = [
+                'registration'         => '🎉',
+                'mission_success'      => '✅',
+                'quiz_success'         => '🎯',
+                'photo_coup_de_coeur'  => '📸',
+                'vote'                 => '🗳️',
+                'rando_review'         => '🥾',
+                'ktc_correct'          => '🔍',
+                'investigation_solved' => '🕵️',
+            ];
+            if (!empty($_xp_history)):
+                foreach ($_xp_history as $_xlog):
+                    $_icon   = $_xp_icons[$_xlog['source_type']] ?? '⚡';
+                    $_label  = e($_xlog['reason'] ?: ucfirst(str_replace('_', ' ', $_xlog['source_type'])));
+                    $_amount = (int)$_xlog['xp_amount'];
+                    $_sign   = $_amount >= 0 ? '+' : '';
+                    $_date   = $_xlog['created_at'] ? date('d/m/Y', strtotime($_xlog['created_at'])) : '';
+            ?>
+            <div class="feed-item">
+              <div class="feed-icon"><?= $_icon ?></div>
               <div class="feed-info">
-                <div class="feed-title">Le Grand Défi de l'Été — avancé à 82 %</div>
-                <div class="feed-meta"><span class="feed-xp">Mission</span> · il y a 1 jour</div>
+                <div class="feed-title"><?= $_label ?></div>
+                <div class="feed-meta"><span class="feed-xp"><?= $_sign . $_amount ?> XP</span><?= $_date ? ' · ' . e($_date) : '' ?></div>
               </div>
             </div>
-
-            <div class="feed-item" data-activity-type="mission">
-              <div class="feed-icon">📸</div>
-              <div class="feed-info">
-                <div class="feed-title">Défi photo Noirmoutier</div>
-                <div class="feed-meta"><span class="feed-xp">+60 XP</span> · Mission · il y a 2 jours</div>
-              </div>
+            <?php endforeach; ?>
+            <?php else: ?>
+            <div style="text-align:center;padding:28px 20px;color:var(--text-muted)">
+              <div style="font-size:1.8rem;margin-bottom:8px">⚡</div>
+              <div style="font-size:.88rem;font-weight:600">Tes premières actions apparaîtront ici.</div>
+              <div style="font-size:.78rem;margin-top:4px">Participe à des missions pour gagner de l'XP.</div>
             </div>
-
-            <div class="feed-item" data-activity-type="badge">
-              <div class="feed-icon">🏹</div>
-              <div class="feed-info">
-                <div class="feed-title">Badge débloqué — Chasseur de primes</div>
-                <div class="feed-meta"><span class="feed-xp">+60 XP</span> · Badge · il y a 3 jours</div>
-              </div>
-            </div>
-
-            <div class="feed-item" data-activity-type="quiz">
-              <div class="feed-icon">🎯</div>
-              <div class="feed-info">
-                <div class="feed-title">Quiz Vendée — score parfait 10/10</div>
-                <div class="feed-meta"><span class="feed-xp">+60 XP</span> · Quiz · il y a 3 jours</div>
-              </div>
-            </div>
-
-            <div class="feed-item" data-activity-type="keto">
-              <div class="feed-icon">🔍</div>
-              <div class="feed-info">
-                <div class="feed-title">Kéto Kolé Tché — moulin de Rairé identifié</div>
-                <div class="feed-meta"><span class="feed-xp">+80 XP</span> · Kéto · il y a 5 jours</div>
-              </div>
-            </div>
-
-            <div class="feed-item" data-activity-type="mission">
-              <div class="feed-icon">🌦️</div>
-              <div class="feed-info">
-                <div class="feed-title">Météo-mission : grande marée de vive-eau</div>
-                <div class="feed-meta"><span class="feed-xp">+30 XP</span> · Mission · il y a 1 semaine</div>
-              </div>
-            </div>
-
-            <div class="feed-item" data-activity-type="mission">
-              <div class="feed-icon">🗳️</div>
-              <div class="feed-info">
-                <div class="feed-title">3 votes communauté validés</div>
-                <div class="feed-meta"><span class="feed-xp">+15 XP</span> · Participation · il y a 1 semaine</div>
-              </div>
-            </div>
-
-            <div class="feed-item" data-activity-type="keto">
-              <div class="feed-icon">🔍</div>
-              <div class="feed-info">
-                <div class="feed-title">Kéto Kolé Tché — château du Puy du Fou</div>
-                <div class="feed-meta"><span class="feed-xp">+90 XP</span> · Kéto · il y a 10 jours</div>
-              </div>
-            </div>
-
-            <div class="feed-item" data-activity-type="quiz">
-              <div class="feed-icon">🧠</div>
-              <div class="feed-info">
-                <div class="feed-title">Quiz Marais Poitevin — 8/10</div>
-                <div class="feed-meta"><span class="feed-xp">+40 XP</span> · Quiz · il y a 12 jours</div>
-              </div>
-            </div>
-
-            <div class="feed-item" data-activity-type="badge">
-              <div class="feed-icon">⚡</div>
-              <div class="feed-info">
-                <div class="feed-title">Badge débloqué — Streak 7 jours</div>
-                <div class="feed-meta"><span class="feed-xp">+40 XP</span> · Badge · il y a 2 semaines</div>
-              </div>
-            </div>
+            <?php endif; ?>
 
           </div><!-- /activityFeed -->
         </div>

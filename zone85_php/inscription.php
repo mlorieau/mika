@@ -28,9 +28,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_GET['action'] ?? '') === 'regist
     $bio         = safe_input($_POST['bio']        ?? '', 120);
     $newsletter  = !empty($_POST['newsletter']);
 
+    $password_confirm = $_POST['password_confirm'] ?? '';
+
     if (!$email)                    $errors['email']    = 'Adresse email invalide.';
     if (mb_strlen($pseudo) < 3)     $errors['pseudo']   = 'Le pseudo doit contenir au moins 3 caractères.';
     if (strlen($password) < 8)      $errors['password'] = 'Mot de passe trop court (minimum 8 caractères).';
+    if ($password_confirm && $password !== $password_confirm) $errors['password'] = 'Les mots de passe ne correspondent pas.';
     if ($clan_id === 0)             $errors['clan']     = 'Clan invalide.';
     if (empty($_POST['accept_cgu']) || empty($_POST['accept_privacy'])) {
         $errors['legal'] = 'Veuillez accepter les CGU et la politique de confidentialité.';
@@ -56,9 +59,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_GET['action'] ?? '') === 'regist
 
     // Création du compte
     $result = register_user([
-        'email'         => $email,
-        'pseudo'        => $pseudo,
-        'password'      => $password,
+        'email'            => $email,
+        'pseudo'           => $pseudo,
+        'password'         => $password,
+        'password_confirm' => $password_confirm,
         'clan_id'       => $clan_id,
         'avatar_type'   => $avatar_type,
         'avatar_config' => json_encode(['emoji' => $avatar_key]),
@@ -824,7 +828,8 @@ async function validateStep5() {
   const fd = new FormData();
   fd.append(\'csrf_token\',    document.getElementById(\'csrf_token\').value);
   fd.append(\'email\',         formData.email);
-  fd.append(\'password\',      formData.pw);
+  fd.append(\'password\',         formData.pw);
+  fd.append(\'password_confirm\', formData.pw);
   fd.append(\'first_name\',    formData.prenom);
   fd.append(\'last_name\',     formData.nom);
   fd.append(\'pseudo\',        formData.pseudo);

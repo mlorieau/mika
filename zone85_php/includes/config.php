@@ -4,7 +4,11 @@
 // ============================================================
 
 // Environnement
-define('APP_ENV', 'dev'); // 'dev' | 'prod'
+define('APP_ENV', 'dev'); // 'dev' | 'prod' — passer à 'prod' avant toute mise en ligne
+
+// Outils de diagnostic (uniquement en dev, jamais en prod)
+// Mettre à true uniquement pour une session de debug locale et remettre à false ensuite.
+define('DEV_TOOLS_ALLOWED', false);
 
 // Site
 define('SITE_NAME',    'ZONE85');
@@ -20,8 +24,8 @@ define('JS_PATH',     'assets/js/');
 define('IMG_PATH',    'assets/img/');
 define('UPLOAD_PATH', 'uploads/'); // futur
 
-// Upload (futur)
-define('UPLOAD_MAX_SIZE',          5 * 1024 * 1024); // 5 Mo
+// Upload — avatars : 2 Mo max, types image uniquement
+define('UPLOAD_MAX_SIZE',          2 * 1024 * 1024); // 2 Mo (avatars)
 define('ALLOWED_IMAGE_TYPES',      ['image/jpeg', 'image/png', 'image/webp']);
 define('ALLOWED_IMAGE_EXTENSIONS', ['jpg', 'jpeg', 'png', 'webp']);
 
