@@ -95,6 +95,42 @@ Le site est conçu pour fonctionner **avec ou sans base de données**.
 
 ---
 
+## 6.5 Compatibilité des repositories avec les données mockées
+
+Les fonctions de `includes/repositories.php` sont conçues pour retourner exactement
+les mêmes structures que les variables de `includes/data.php`. Cela permet une
+migration progressive, page par page, sans réécrire le HTML.
+
+### Règles de compatibilité appliquées
+
+| Champ | Comportement repository | Fallback si absent |
+|-------|------------------------|-------------------|
+| `race_width` | calculé : `(score/max) × 94` | `0` |
+| `podium_rank` | calculé par rang dans le résultat trié | `1` à `3` |
+| `podium_id` | `'p1'`, `'p2'`, `'p3'` | `'p1'` |
+| `top_members` | sous-requête par clan | `[]` (jamais null) |
+| `trophies` | COUNT depuis `season_trophies` | `0` |
+| `members` | alias de `members_count` | `0` |
+| `race_progress` | scores de clan en % du max | `['bocage'=>0, …]` |
+| `xp_season` | SUM depuis `xp_logs` depuis saison active | `0` |
+| `xp_this_season` | idem (profil utilisateur) | `0` |
+
+### Compatibilité MySQL / MariaDB
+
+- Aucune variable utilisateur `@rank` — le rang est calculé côté PHP (compatible MySQL 8+ et MariaDB 10.5+).
+- `FIELD()` est supporté sur les deux moteurs pour trier les raretés de badges.
+- `SET FOREIGN_KEY_CHECKS = 0` dans `reset.sql` remplace le `ALTER TABLE DROP FOREIGN KEY` non portable.
+
+### Champs présents dans data.php mais non encore chargés depuis MySQL
+
+Ces champs nécessitent une session utilisateur authentifiée — ils resteront mockés jusqu'à l'implémentation de l'auth :
+
+- `obtained` et `progress` sur les badges (requiert `user_badges` pour l'utilisateur connecté)
+- `rank_in_clan` et `rank_total` sur le profil (calculés périodiquement via cron)
+- `avatar` (emoji ou photo — lié à `avatar_type` et `avatar_file`)
+
+---
+
 ## 7. Pages connectées à MySQL (repositories prêts)
 
 | Page | Fonctions repository utilisées |
