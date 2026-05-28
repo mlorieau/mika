@@ -1,11 +1,22 @@
-# Zone 85 — Version PHP modulaire
+# ZONE85 — Version PHP modulaire v1
 
 Site communautaire de gamification vendéenne.  
 Architecture PHP modulaire (sans framework), données mockées, prêt pour migration MySQL.
 
 ---
 
-## Structure
+## Lancer en local
+
+```bash
+# PHP built-in server
+cd zone85_php
+php -S localhost:8080
+# Ouvrir http://localhost:8080
+```
+
+---
+
+## Structure des fichiers
 
 ```
 zone85_php/
@@ -22,12 +33,14 @@ zone85_php/
 ├── confidentialite.php
 ├── cookies.php
 ├── cgu.php
+├── sitemap.php             Sitemap XML dynamique
+├── robots.txt              Directives robots
 │
 ├── includes/
 │   ├── config.php          Constantes (chemins, SITE_NAME…)
 │   ├── data.php            Données mockées (TODO: → MySQL)
-│   ├── functions.php       Fonctions utilitaires
-│   ├── header.php          <!DOCTYPE>…<body>
+│   ├── functions.php       Fonctions utilitaires (e(), csrf_token(), set_security_headers()…)
+│   ├── header.php          <!DOCTYPE>…<body> + balises SEO automatiques
 │   ├── nav.php             <nav>
 │   └── footer.php          <footer>…</html>
 │
@@ -47,7 +60,9 @@ zone85_php/
 │   └── img/
 │
 └── docs/
-    └── mysql-model-v1.md   Schéma MySQL cible
+    ├── mysql-model-v1.md       Schéma MySQL cible
+    ├── security-checklist-v1.md  Checklist sécurité complète
+    └── seo-ai-ready-v1.md      Guide SEO & IA-Ready
 ```
 
 ---
@@ -58,6 +73,10 @@ zone85_php/
 <?php
 $page_title       = '…';
 $page_description = '…';          // optionnel
+$canonical        = 'https://www.zone85.fr/page.php';
+$robots           = 'index, follow';  // ou 'noindex, nofollow'
+$og_image         = '/assets/img/og-page.jpg';  // optionnel
+$schema_json_ld   = '…';          // bloc JSON-LD, optionnel
 $current_page     = '…';          // slug nav active
 require_once 'includes/config.php';
 require_once 'includes/data.php';
@@ -77,7 +96,7 @@ require_once 'includes/footer.php';
 
 ---
 
-## Données disponibles (data.php)
+## Variables disponibles (data.php)
 
 | Variable | Type | Description |
 |---|---|---|
@@ -97,7 +116,91 @@ require_once 'includes/footer.php';
 
 ---
 
-## Prochaine étape
+## SEO
 
-Voir `docs/mysql-model-v1.md` pour le schéma MySQL cible.  
-Remplacer les tableaux de `data.php` par des requêtes PDO/MySQLi.
+### Variables SEO par page
+
+Chaque page définit les variables suivantes avant d'inclure `header.php` :
+
+| Variable | Rôle |
+|---|---|
+| `$page_title` | Balise `<title>` + og:title + twitter:title |
+| `$page_description` | Balise `<meta name="description">` + og:description |
+| `$canonical` | URL canonique absolue |
+| `$robots` | `index, follow` ou `noindex, nofollow` |
+| `$og_image` | Image Open Graph (chemin absolu ou relatif à la racine) |
+| `$schema_json_ld` | Bloc JSON-LD (WebSite, BreadcrumbList, etc.) |
+
+### Génération automatique
+
+`header.php` génère automatiquement toutes les balises à partir de ces variables :
+- `<title>`, `<meta description>`, `<link rel="canonical">`, `<meta robots>`
+- Open Graph complet (`og:type`, `og:title`, `og:description`, `og:url`, `og:image`, `og:locale`)
+- Twitter Card (`summary_large_image`)
+- Bloc JSON-LD (`<script type="application/ld+json">`)
+
+### Sitemap
+
+- Fichier : `sitemap.php`
+- URL publique : `https://www.zone85.fr/sitemap.php`
+- Contenu : XML dynamique, 11 pages indexées, priorités et fréquences configurées
+- Référencé dans `robots.txt`
+
+### robots.txt
+
+- Fichier texte en racine : `robots.txt`
+- Exclut : `/profil.php`, `/inscription.php`, `/uploads/`, `/admin/`, `/back-office/`
+- Autorise : tout le reste, y compris `/assets/`
+
+Voir `docs/seo-ai-ready-v1.md` pour le guide complet.
+
+---
+
+## Sécurité
+
+### Fonctions disponibles (functions.php)
+
+| Fonction | Rôle |
+|---|---|
+| `e($val)` | Échappe une valeur pour l'affichage HTML (`htmlspecialchars` + `ENT_QUOTES` + `UTF-8`) |
+| `csrf_token()` | Génère ou retourne le token CSRF de la session |
+| `set_security_headers()` | Envoie les headers HTTP de sécurité (CSP, X-Frame-Options, etc.) |
+
+### Règles fondamentales
+
+- `e()` est utilisé sur **toutes** les sorties dynamiques — jamais de `echo` direct sur une entrée utilisateur
+- `csrf_token()` est inclus dans chaque formulaire POST
+- `set_security_headers()` est appelé dès le chargement de `config.php`
+
+### Headers HTTP actifs
+
+- `X-Content-Type-Options: nosniff`
+- `X-Frame-Options: SAMEORIGIN`
+- `Referrer-Policy: strict-origin-when-cross-origin`
+- `Permissions-Policy: camera=(), microphone=(), geolocation=()`
+- `Content-Security-Policy` (version permissive dev, à renforcer en prod)
+
+Voir `docs/security-checklist-v1.md` pour la checklist complète et le plan v2.
+
+---
+
+## Prochaines étapes
+
+1. **Migration MySQL** — Voir `docs/mysql-model-v1.md` pour le schéma complet
+2. **Authentification réelle** — Sessions sécurisées, `password_hash()`, rate limiting
+3. **Back-office admin/modérateur** — Gestion missions, saisons, validation photos
+4. **Upload photo sécurisé** — finfo, getimagesize, renommage, GD resize, modération
+5. **Gamification réelle** — XP côté serveur, points clan, badges, anti-triche
+
+---
+
+## Ce qui n'est PAS encore actif
+
+| Fonctionnalité | État | Référence |
+|---|---|---|
+| Base MySQL | Non actif — données mockées dans `data.php` | `docs/mysql-model-v1.md` |
+| Authentification | Non actif — `$mock_user` fictif | `docs/security-checklist-v1.md` §4 |
+| Upload réel | Non actif | `docs/security-checklist-v1.md` §7 |
+| Paiement | Non actif | — |
+| Back-office | Non actif | `docs/security-checklist-v1.md` §9 |
+| Gamification réelle | Non actif — XP mockés | `docs/mysql-model-v1.md` |

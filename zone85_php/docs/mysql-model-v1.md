@@ -114,6 +114,193 @@
 | season_id | INT NULL FK seasons.id | |
 | status | ENUM('upcoming','active','archived','coming_soon') | |
 
+### `user_progress`
+| Colonne | Type | Notes |
+|---|---|---|
+| user_id | INT FK users.id | |
+| level | TINYINT | calculé |
+| xp_total | INT | dupliqué pour perf |
+| xp_this_season | INT | remis à 0 chaque saison |
+| missions_done | INT | total |
+| rank_total | INT | calculé périodiquement |
+| rank_in_clan | INT | calculé périodiquement |
+| updated_at | DATETIME | |
+
+### `xp_logs`
+| Colonne | Type | Notes |
+|---|---|---|
+| id | INT PK AUTO | |
+| user_id | INT FK users.id | |
+| participation_id | INT NULL FK participations.id | |
+| xp_delta | SMALLINT | positif ou négatif |
+| reason | VARCHAR(100) | ex: 'quiz_success', 'photo_approved' |
+| created_at | DATETIME | |
+
+### `clan_score_logs`
+| Colonne | Type | Notes |
+|---|---|---|
+| id | INT PK AUTO | |
+| clan_slug | ENUM('bocage','littoral','marais') | |
+| season_id | INT FK seasons.id | |
+| delta | SMALLINT | |
+| reason | VARCHAR(100) | |
+| user_id | INT NULL FK users.id | |
+| created_at | DATETIME | |
+
+### `media`
+| Colonne | Type | Notes |
+|---|---|---|
+| id | INT PK AUTO | |
+| user_id | INT FK users.id | |
+| mission_id | INT NULL FK missions.id | |
+| filename | VARCHAR(255) | nom final (jamais le nom original) |
+| original_name | VARCHAR(255) | stocké pour modération seulement |
+| mime_type | VARCHAR(50) | |
+| size_bytes | INT | |
+| width | SMALLINT NULL | |
+| height | SMALLINT NULL | |
+| status | ENUM('pending','approved','rejected') | |
+| display_in_hall | TINYINT(1) DEFAULT 0 | |
+| created_at | DATETIME | |
+
+### `comments`
+| Colonne | Type | Notes |
+|---|---|---|
+| id | INT PK AUTO | |
+| user_id | INT FK users.id | |
+| parent_type | VARCHAR(50) | 'mission', 'media', 'rando' |
+| parent_id | INT | |
+| body | TEXT | |
+| status | ENUM('pending','approved','rejected') | |
+| created_at | DATETIME | |
+
+### `contact_messages`
+| Colonne | Type | Notes |
+|---|---|---|
+| id | INT PK AUTO | |
+| name | VARCHAR(100) | |
+| email | VARCHAR(180) | |
+| subject | VARCHAR(200) | |
+| body | TEXT | |
+| ip_address | VARCHAR(45) | |
+| status | ENUM('new','read','replied','spam') DEFAULT 'new' | |
+| created_at | DATETIME | |
+
+### `season_trophies`
+| Colonne | Type | Notes |
+|---|---|---|
+| id | INT PK AUTO | |
+| season_id | INT FK seasons.id | |
+| winner_clan_slug | ENUM('bocage','littoral','marais') | |
+| medal | VARCHAR(5) | ex: '🥇' |
+| contributions | INT | |
+| main_mission | VARCHAR(200) | |
+| archived_at | DATETIME | |
+
+---
+
+## Moteur de jeu : Game → Mission → Participation → Reward → Progression
+
+### Diagramme des relations
+
+```
+games (type de jeu)
+  └── missions (liées à une saison et/ou un game)
+        └── participations (un utilisateur tente une mission)
+              ├── xp_logs (XP accordés à l'utilisateur)
+              ├── clan_score_logs (points accordés au clan)
+              └── media (upload lié à la participation, si required)
+
+users
+  ├── participations (historique de toutes les tentatives)
+  ├── user_badges (badges obtenus)
+  └── user_progress (snapshot de progression, mis à jour périodiquement)
+
+seasons
+  ├── missions (missions rattachées à la saison)
+  ├── clan_scores (score courant des clans pour cette saison)
+  └── season_trophies (résultat final archivé)
+```
+
+### Flux complet d'une participation
+
+```
+1. L'utilisateur soumet une participation (POST /participer.php)
+   → Vérifications serveur :
+     - mission en statut 'active' et non expirée
+     - utilisateur actif (is_active = 1) et dans un clan
+     - pas de participation existante (UNIQUE KEY user_id + mission_id)
+     - CSRF valide
+
+2. La participation est créée en BDD avec statut 'pending' ou 'validated'
+   selon validation_mode de la mission :
+     - 'auto'   → validée immédiatement
+     - 'manual' → en attente d'un modérateur
+     - 'hybrid' → auto si réponse correcte, sinon manual
+
+3. Si validée (immédiatement ou par modérateur) :
+   a. xp_earned = missions.xp_success (ou xp_participation si partiel)
+   b. clan_points_earned = missions.clan_points_success
+   c. INSERT dans xp_logs (user_id, participation_id, xp_delta, reason)
+   d. INSERT dans clan_score_logs (clan_slug, season_id, delta, reason, user_id)
+   e. UPDATE users SET xp_total = xp_total + xp_earned
+   f. UPDATE clan_scores SET score = score + clan_points_earned
+   g. UPDATE user_progress (xp_total, xp_this_season, missions_done)
+   h. Si badge_reward_id → INSERT dans user_badges (si pas déjà obtenu)
+
+4. Les rangs (rank_total, rank_in_clan) sont recalculés périodiquement
+   via une tâche CRON ou au chargement du classement.
+```
+
+### Règles métier importantes
+
+- **XP à vie** : `users.xp_total` n'est jamais remis à zéro. Il détermine le niveau global.
+- **XP de saison** : `user_progress.xp_this_season` est remis à zéro au début de chaque saison.
+- **Points de clan** : `clan_scores.score` est remis à zéro chaque saison. Le clan gagnant est déterminé à `seasons.end_date`.
+- **Immutabilité des logs** : `xp_logs` et `clan_score_logs` ne sont jamais mis à jour, seulement insérés. Toute correction passe par un delta négatif avec reason='correction_admin'.
+
+---
+
+## Les Invisibles (futur jeu premium)
+
+Zone 85 prévoit un jeu narratif premium intitulé **Les Invisibles**, intégré à la table `games` existante.
+
+### Structure dans la table `games`
+
+```sql
+-- Exemple d'entrée pour Les Invisibles
+INSERT INTO games (title, slug, game_type, is_paid, season_id, status)
+VALUES ('Les Invisibles', 'les-invisibles', 'premium_game', 1, NULL, 'coming_soon');
+```
+
+### Champs additionnels prévus (migration future)
+
+| Colonne | Type | Notes |
+|---|---|---|
+| chapters | TINYINT | Nombre total de chapitres (ex: 10) |
+| free_chapters | TINYINT | Chapitres gratuits (ex: 1) |
+| price_per_chapter | DECIMAL(5,2) NULL | Prix unitaire si achat à l'unité |
+| price_full | DECIMAL(5,2) NULL | Prix accès complet |
+
+### Fonctionnement
+
+- **Chapitre 1 gratuit** : accessible à tout Zonaute inscrit
+- **Chapitres 2 à 10 payants** : débloqués après paiement (Stripe ou équivalent)
+- **Progression sauvegardée** : dans `user_progress` avec un champ JSON `game_data` (futur)
+- **Impact clan minimal** : 5 points de clan par chapitre complété (vs 20-50 pour les missions collectives)
+- **Badges spéciaux** : série de badges dédiés ("Invisible Niveau 1" → "Maître des Invisibles")
+- **Missions liées** : chaque chapitre peut contenir des missions de type `premium_game` dans la table `missions`
+
+### Intégration dans le flux existant
+
+```
+games (Les Invisibles, game_type='premium_game', is_paid=1)
+  └── missions (chapter_1, chapter_2, …, chapter_10)
+        └── participations (accès vérifié avant soumission)
+              ├── xp_logs (XP réduits vs missions collectives)
+              └── clan_score_logs (impact minimal)
+```
+
 ---
 
 ## Requêtes clés à remplacer (TODO)
