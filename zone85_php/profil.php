@@ -9,81 +9,108 @@ $current_page = 'profil';
 require_once 'includes/config.php';
 require_once 'includes/data.php';
 require_once 'includes/functions.php';
-
-// Mock user data — à remplacer par la session réelle
-$user = [
-    'pseudo'          => 'Sophie M.',
-    'first_name'      => 'Sophie',
-    'initials'        => 'SM',
-    'avatar'          => '🧭',
-    'level'           => 7,
-    'level_name'      => 'Grand Pisteur',
-    'xp_current'      => 3400,
-    'xp_next'         => 4000,
-    'xp_pct'          => 85,
-    'badges_count'    => 6,
-    'participations'  => 14,
-    'clan_slug'       => 'littoral',
-    'clan_label'      => 'Clan du Littoral',
-    'clan_chip_class' => 'littoral-chip-sm',
-    'season_pts'      => 680,
-    'clan_rank'       => 7,
-    'clan_members'    => 438,
-    'clan_score'      => 12840,
-    'clan_place'      => 1,
-];
-
-// ── Repository layer — override $user depuis MySQL si disponible ──
-// TODO auth membre : remplacer fetch_demo_user(1) par l'utilisateur connecté en session
 require_once 'includes/db.php';
 require_once 'includes/repositories.php';
-if (db_enabled()) {
-    $_demo = fetch_demo_user(1);
-    if ($_demo) {
-        // Calcul de la barre XP par niveau
-        $_xp_levels = [0, 100, 300, 600, 1000, 1500, 2500, 4000, 6000, 9000, 13000, 18000];
-        $_lvl        = max(1, min((int)$_demo['level'], count($_xp_levels) - 1));
-        $_xp_floor   = $_xp_levels[$_lvl - 1] ?? 0;
-        $_xp_ceil    = $_xp_levels[$_lvl]     ?? ($_xp_floor + 5000);
-        $_xp_range   = max(1, $_xp_ceil - $_xp_floor);
-        $_xp_pct     = min(100, (int)round(((int)$_demo['xp_total'] - $_xp_floor) / $_xp_range * 100));
-        $_level_names = ['','Novice','Éclaireur','Pisteur','Ranger','Garde','Chasseur',
-                         'Grand Pisteur','Vétéran','Légende','Ancêtre','Immortel'];
-        $_chip_map   = ['bocage'=>'bocage-chip-sm','littoral'=>'littoral-chip-sm','marais'=>'marais-chip-sm'];
-        $_clan_labels = ['bocage'=>'Clan du Bocage','littoral'=>'Clan du Littoral','marais'=>'Clan du Marais'];
-        $_prenom     = $_demo['prenom'] ?: $_demo['pseudo'];
-        $_nom        = $_demo['nom']    ?: '';
-        $_initials   = strtoupper(mb_substr($_prenom, 0, 1) . mb_substr($_nom, 0, 1)) ?: '??';
-        // Récupérer les données du clan depuis MySQL
-        $_clan_data  = null;
-        if ($_demo['clan_slug']) {
+require_once 'includes/auth.php';
+
+$_xp_levels   = [0, 100, 300, 600, 1000, 1500, 2500, 4000, 6000, 9000, 13000, 18000];
+$_level_names = ['','Novice','Éclaireur','Pisteur','Ranger','Garde','Chasseur',
+                 'Grand Pisteur','Vétéran','Légende','Ancêtre','Immortel'];
+$_chip_map    = ['bocage'=>'bocage-chip-sm','littoral'=>'littoral-chip-sm','marais'=>'marais-chip-sm'];
+$_clan_labels = ['bocage'=>'Clan du Bocage','littoral'=>'Clan du Littoral','marais'=>'Clan du Marais'];
+
+$is_guest = !is_logged_in();
+$user     = [];
+
+if (!$is_guest) {
+    $_session     = current_user();
+    $_db_profile  = fetch_user_profile((int)$_session['id']);
+
+    if ($_db_profile) {
+        $_prenom   = $_db_profile['prenom'] ?: $_db_profile['pseudo'];
+        $_nom      = $_db_profile['nom']    ?: '';
+        $_initials = strtoupper(mb_substr($_prenom, 0, 1) . mb_substr($_nom, 0, 1)) ?: '??';
+        $_xp       = (int)$_db_profile['xp_total'];
+        $_lvl      = max(1, min((int)$_db_profile['level'], count($_xp_levels) - 1));
+        $_xp_floor = $_xp_levels[$_lvl - 1] ?? 0;
+        $_xp_ceil  = $_xp_levels[$_lvl]     ?? ($_xp_floor + 5000);
+        $_xp_range = max(1, $_xp_ceil - $_xp_floor);
+        $_xp_pct   = min(100, (int)round(($_xp - $_xp_floor) / $_xp_range * 100));
+
+        $_clan_data = null;
+        if (!empty($_db_profile['clan_slug'])) {
             $_all_clans = fetch_all_clans();
-            $_clan_data = $_all_clans[$_demo['clan_slug']] ?? null;
+            $_clan_data = $_all_clans[$_db_profile['clan_slug']] ?? null;
         }
+
+        // Avatar : emoji ou chemin fichier upload
+        $_avatar     = $_db_profile['avatar'] ?? '🧭';
+        $_avatar_type = $_db_profile['avatar_type'] ?? 'preset';
+
         $user = [
-            'pseudo'          => $_demo['pseudo'],
+            'id'              => (int)$_db_profile['id'],
+            'pseudo'          => $_db_profile['pseudo'],
             'first_name'      => $_prenom,
             'initials'        => $_initials,
-            'avatar'          => $_demo['avatar'] ?? '🧭',
+            'avatar'          => $_avatar,
+            'avatar_type'     => $_avatar_type,
             'level'           => $_lvl,
             'level_name'      => $_level_names[$_lvl] ?? 'Zonaute',
-            'xp_current'      => (int)$_demo['xp_total'],
+            'xp_current'      => $_xp,
             'xp_next'         => $_xp_ceil,
             'xp_pct'          => $_xp_pct,
-            'badges_count'    => (int)$_demo['badges_count'],
-            'participations'  => (int)$_demo['missions_done'],
-            'clan_slug'       => $_demo['clan_slug'] ?? '',
-            'clan_label'      => $_clan_labels[$_demo['clan_slug'] ?? ''] ?? 'Aucun clan',
-            'clan_chip_class' => $_chip_map[$_demo['clan_slug'] ?? ''] ?? '',
-            'season_pts'      => (int)$_demo['xp_this_season'],
-            'clan_rank'       => (int)$_demo['rank_in_clan'],
+            'badges_count'    => (int)$_db_profile['badges_count'],
+            'participations'  => (int)$_db_profile['missions_done'],
+            'clan_slug'       => $_db_profile['clan_slug'] ?? '',
+            'clan_label'      => $_clan_labels[$_db_profile['clan_slug'] ?? ''] ?? 'Aucun clan',
+            'clan_chip_class' => $_chip_map[$_db_profile['clan_slug'] ?? ''] ?? '',
+            'season_pts'      => (int)$_db_profile['xp_this_season'],
+            'clan_rank'       => (int)$_db_profile['rank_in_clan'],
             'clan_members'    => $_clan_data ? (int)$_clan_data['members_count'] : 0,
             'clan_score'      => $_clan_data ? (int)$_clan_data['season_score']  : 0,
             'clan_place'      => $_clan_data ? (int)$_clan_data['podium_rank']   : 0,
+            'bio'             => $_db_profile['bio'] ?? '',
+            'joined'          => $_db_profile['joined'] ?? '',
         ];
-        // Badges réels de cet utilisateur
-        $_user_badges = fetch_user_badges($_demo['id']);
+
+        $_user_badges = fetch_user_badges((int)$_db_profile['id']);
         if (!empty($_user_badges)) $badges = $_user_badges;
+    } else {
+        // DB non disponible — construire depuis session
+        $_prenom   = $_session['pseudo'];
+        $_initials = strtoupper(mb_substr($_session['pseudo'], 0, 2));
+        $_lvl      = max(1, min((int)$_session['level'], count($_xp_levels) - 1));
+        $_xp       = (int)$_session['xp_total'];
+        $_xp_floor = $_xp_levels[$_lvl - 1] ?? 0;
+        $_xp_ceil  = $_xp_levels[$_lvl]     ?? ($_xp_floor + 5000);
+        $_xp_range = max(1, $_xp_ceil - $_xp_floor);
+        $_xp_pct   = min(100, (int)round(($_xp - $_xp_floor) / $_xp_range * 100));
+
+        $user = [
+            'id'              => (int)$_session['id'],
+            'pseudo'          => $_session['pseudo'],
+            'first_name'      => $_prenom,
+            'initials'        => $_initials,
+            'avatar'          => $_session['avatar_key'] ?? '🧭',
+            'avatar_type'     => $_session['avatar_type'] ?? 'preset',
+            'level'           => $_lvl,
+            'level_name'      => $_level_names[$_lvl] ?? 'Zonaute',
+            'xp_current'      => $_xp,
+            'xp_next'         => $_xp_ceil,
+            'xp_pct'          => $_xp_pct,
+            'badges_count'    => 0,
+            'participations'  => 0,
+            'clan_slug'       => $_session['clan_slug'] ?? '',
+            'clan_label'      => $_clan_labels[$_session['clan_slug'] ?? ''] ?? 'Aucun clan',
+            'clan_chip_class' => $_chip_map[$_session['clan_slug'] ?? ''] ?? '',
+            'season_pts'      => 0,
+            'clan_rank'       => 0,
+            'clan_members'    => 0,
+            'clan_score'      => 0,
+            'clan_place'      => 0,
+            'bio'             => '',
+            'joined'          => '',
+        ];
     }
 }
 
@@ -247,13 +274,39 @@ require_once 'includes/header.php';
 require_once 'includes/nav.php';
 ?>
 
+<?php if ($is_guest): ?>
+<!-- ── ÉTAT NON CONNECTÉ ─────────────────────────────────── -->
+<div class="profil-page" style="display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 68px)">
+  <div style="max-width:480px;width:100%;padding:0 20px;text-align:center">
+    <div style="width:80px;height:80px;background:var(--navy-dark);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 24px">🛡️</div>
+    <h1 style="font-size:clamp(1.6rem,4vw,2.2rem);font-weight:900;color:var(--navy-dark);letter-spacing:-.5px;margin-bottom:10px">Ton profil t'attend</h1>
+    <p style="font-size:.95rem;color:var(--text-muted);margin-bottom:32px;line-height:1.7">
+      Connecte-toi pour voir ta progression, tes badges et ta contribution à la Bataille des Clans.
+    </p>
+    <div style="display:flex;flex-direction:column;gap:12px;max-width:300px;margin:0 auto">
+      <a href="login.php" class="btn btn-primary btn-lg" style="text-align:center">Se connecter →</a>
+      <a href="inscription.php" class="btn btn-ghost" style="text-align:center">Rejoindre la Zone</a>
+    </div>
+    <p style="margin-top:28px;font-size:.78rem;color:var(--text-muted);font-style:italic">"Je progresse pour moi. Je fais gagner mon clan."</p>
+  </div>
+</div>
+<?php require_once 'includes/footer.php'; ?>
+<?php exit; ?>
+<?php endif; ?>
+
 <div class="profil-page">
   <div class="profil-layout">
 
     <!-- ── SIDEBAR ── -->
     <aside class="profil-sidebar">
 
-      <div class="sidebar-avatar"><?= e($user['avatar']) ?></div>
+      <div class="sidebar-avatar" style="<?= ($user['avatar_type'] === 'upload') ? 'padding:0;overflow:hidden' : '' ?>">
+        <?php if ($user['avatar_type'] === 'upload' && !empty($user['avatar'])): ?>
+          <img src="<?= e($user['avatar']) ?>" alt="<?= e($user['pseudo']) ?>" style="width:100%;height:100%;object-fit:cover">
+        <?php else: ?>
+          <?= e($user['avatar']) ?>
+        <?php endif; ?>
+      </div>
       <div class="sidebar-name"><?= e($user['pseudo']) ?> <span class="level-badge">Niv. <?= e($user['level']) ?></span></div>
       <span class="<?= e($user['clan_chip_class']) ?>"><?= e($user['clan_label']) ?></span>
 
@@ -323,7 +376,13 @@ require_once 'includes/nav.php';
       <div data-panel-group="profil" data-panel-id="apercu" class="profil-panel">
 
         <div class="welcome-card">
-          <div class="welcome-avatar"><?= e($user['avatar']) ?></div>
+          <div class="welcome-avatar" style="<?= ($user['avatar_type'] === 'upload') ? 'padding:0;overflow:hidden' : '' ?>">
+            <?php if ($user['avatar_type'] === 'upload' && !empty($user['avatar'])): ?>
+              <img src="<?= e($user['avatar']) ?>" alt="" style="width:100%;height:100%;object-fit:cover">
+            <?php else: ?>
+              <?= e($user['avatar']) ?>
+            <?php endif; ?>
+          </div>
           <div class="welcome-text">
             <h2>Bonjour <?= e($user['first_name']) ?> !</h2>
             <p>Je progresse pour moi. Je fais gagner mon clan.</p>

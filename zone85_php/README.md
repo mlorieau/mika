@@ -226,36 +226,153 @@ Voir `docs/security-checklist-v1.md` pour la checklist complète et le plan v2.
 
 ---
 
-## État actuel (v4)
+## État actuel (v5 — Auth V1)
 
 | Composant | État |
 |---|---|
 | PHP modulaire | ✓ Opérationnel |
 | MySQL + repositories | ✓ Actif (DB_ENABLED configurable) |
 | Fallback data.php | ✓ Automatique si DB indisponible |
-| Pages publiques | ✓ Alimentées par MySQL (clans, missions, classement, hall, index, profil démo) |
-| Formulaires | Simulation uniquement (inscription, contact, participation) |
-| Authentification réelle | Non — profil.php affiche un utilisateur de démo |
+| Pages publiques | ✓ Alimentées par MySQL |
+| **Inscription réelle** | ✓ Multi-étapes, validation, hash password, clan, avatar, CGU |
+| **Connexion / Déconnexion** | ✓ Session PHP sécurisée, `login.php` / `logout.php` |
+| **Profil connecté** | ✓ Affiche les vraies données de l'utilisateur connecté |
+| **XP de bienvenue** | ✓ +50 XP à l'inscription, ligne dans `xp_logs` |
+| **Badge bienvenue** | ✓ "Pionnier de la Zone" attribué si disponible |
+| **legal_acceptances** | ✓ CGU + confidentialité enregistrées à l'inscription |
+| **Avatar preset/upload** | ✓ Emoji au choix ou photo uploadée (jpg/png/webp, max 2 Mo) |
+| **Nav connecté/déconnecté** | ✓ Menu adaptatif selon état de session |
 | Back-office | Non |
-| Upload photos | Non |
+| Moteur de participation | Non |
 | Paiement | Non |
+
+---
+
+## Authentification V1
+
+### Inscription
+
+L'inscription est un tunnel multi-étapes (6 étapes) :
+1. Infos compte (prénom, nom, email, mot de passe)
+2. ADN vendéen (cosmétique — stocké dans avatar_config)
+3. Code de la Zone (acceptation des règles)
+4. Choix du clan (bocage / littoral / marais)
+5. Avatar emoji ou upload photo + pseudo + CGU obligatoires
+6. Bienvenue — connexion automatique + redirection profil
+
+À la création du compte :
+- `password_hash()` avec `PASSWORD_BCRYPT`
+- `+50 XP` crédités, ligne dans `xp_logs` (source_type = registration)
+- Acceptations dans `legal_acceptances` (cgu_v1 + confidentialite_v1)
+- Badge "Pionnier de la Zone" si disponible dans `user_badges`
+
+### Connexion
+
+```
+GET/POST login.php
+```
+
+- Vérifie email + `password_verify()`
+- Crée session PHP sécurisée (HTTPOnly, SameSite=Lax, Secure en HTTPS)
+- Régénère l'ID de session à la connexion (`session_regenerate_id(true)`)
+- Message générique "Identifiants incorrects" (ne révèle pas si l'email existe)
+
+### Déconnexion
+
+```
+GET logout.php
+```
+
+- Vide `$_SESSION`, supprime le cookie, `session_destroy()`
+- Redirige vers `index.php`
+
+### Session
+
+La session est démarrée automatiquement dans `includes/config.php` (avant tout output).
+
+`$_SESSION['user']` contient :
+
+```php
+[
+  'id'          => int,
+  'pseudo'      => string,
+  'email'       => string,
+  'clan_id'     => int,
+  'clan_slug'   => string,   // 'bocage' | 'littoral' | 'marais'
+  'level'       => int,
+  'xp_total'    => int,
+  'avatar_type' => string,   // 'preset' | 'upload'
+  'avatar_key'  => string,   // emoji ou chemin fichier
+  'role'        => string,   // 'member' | 'moderator' | 'admin'
+]
+```
+
+Fonctions disponibles dans `includes/auth.php` :
+
+| Fonction | Rôle |
+|---|---|
+| `is_logged_in()` | Retourne true si une session utilisateur est active |
+| `current_user()` | Retourne le tableau `$_SESSION['user']` ou null |
+| `require_login($url)` | Redirige vers $url si non connecté |
+| `login_user($user)` | Crée la session + met à jour last_login_at |
+| `logout_user()` | Détruit la session proprement |
+| `find_user_by_email($email)` | Cherche un utilisateur actif par email |
+| `find_user_by_id($id)` | Cherche un utilisateur actif par ID |
+| `register_user($data)` | Crée un compte, XP, legal, badge |
+| `upload_avatar($file)` | Valide et stocke un avatar photo |
+
+### Avatar
+
+**Preset (emoji)** : `avatar_type = 'preset'`, emoji stocké dans `avatar_config` (JSON).
+
+**Upload photo** :
+- Types acceptés : jpg, jpeg, png, webp
+- Taille max : 2 Mo
+- MIME type vérifié côté serveur (extension seule insuffisante)
+- Nom de fichier : 32 hex aléatoires + extension
+- Stockage : `uploads/avatars/`
+- Protection : `.htaccess` interdit l'exécution PHP dans ce dossier
+- `avatar_type = 'upload'`, chemin dans `avatar_file`
+
+> TODO : recadrage carré automatique (pas encore implémenté)
+
+### Sécurité uploads
+
+Le dossier `uploads/avatars/` est protégé par `.htaccess` :
+- PHP et scripts interdits
+- Seules les extensions image autorisées en lecture
+- Options -Indexes (pas de listing)
+
+---
+
+## Outils de diagnostic
+
+`tools/db-check.php` est protégé par `APP_ENV` :
+- Si `APP_ENV = 'prod'` → HTTP 403
+- Ne jamais laisser accessible publiquement en production
+- Supprimer ou protéger par IP/htpasswd avant déploiement
+
+---
+
+## Ce qui n'est pas encore fait
+
+- **Back-office** — pas de dashboard admin, pas de modération
+- **Moteur de participation** — inscription aux missions non persistée
+- **Attribution XP côté serveur** — pas encore déclenchée par les participations
+- **Attribution points clan** — calcul automatique non implémenté
+- **Badges avancés** — attribution conditionnelle non automatisée
+- **Paiement** — accès jeux premium non géré
+- **Les Invisibles** — fonctionnalité non développée
+- **Sessions persistantes** — pas de "rester connecté" (token long terme)
+- **Email transactionnel** — confirmation d'inscription non envoyée (SMTP non configuré)
 
 ---
 
 ## Prochaines étapes recommandées
 
-### Étape suivante prioritaire : Authentification membre
-
-1. `auth/register.php` — inscription réelle avec validation, hash mot de passe, choix clan
-2. `auth/login.php` — connexion, création session sécurisée
-3. `auth/logout.php` — destruction session
-4. `includes/session.php` — gestion centralisée de la session
-5. `profil.php` — afficher l'utilisateur connecté au lieu du démo
-
-### Puis (dans cet ordre)
-
-6. Moteur de participation — enregistrer les réponses en base
-7. Attribution XP côté serveur — jamais côté client
-8. Attribution points clan — mis à jour en base
-9. Déclenchement badges — vérification à chaque participation
-10. Back-office modération — validation photos, participations manuelles
+1. Moteur de participation — enregistrer réponses, valider, déclencher XP en base
+2. Attribution XP côté serveur — jamais côté client
+3. Attribution points clan — mis à jour à chaque participation
+4. Déclenchement badges — vérification à chaque action
+5. Contact — enregistrement dans `contact_messages` (formulaire déjà en place)
+6. Back-office minimal — modération participations, validation photos

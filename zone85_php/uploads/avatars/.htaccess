@@ -1,0 +1,12 @@
+# Sécurité dossier uploads/avatars
+# Interdit l'exécution de PHP et autres scripts
+Options -Indexes
+<FilesMatch "\.(php|php3|php4|php5|phtml|pl|py|cgi|sh)$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+# N'autorise que les images
+<FilesMatch "\.(jpg|jpeg|png|webp|gif)$">
+    Order Allow,Deny
+    Allow from all
+</FilesMatch>

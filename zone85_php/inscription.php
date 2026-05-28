@@ -1,4 +1,99 @@
 <?php
+// ── Handler AJAX inscription ──────────────────────────────────
+// Traité avant tout output HTML.
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_GET['action'] ?? '') === 'register') {
+    require_once 'includes/config.php';
+    require_once 'includes/db.php';
+    require_once 'includes/functions.php';
+    require_once 'includes/auth.php';
+    header('Content-Type: application/json; charset=UTF-8');
+
+    // Vérification CSRF
+    if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
+        echo json_encode(['ok' => false, 'error' => 'Token de sécurité invalide. Rechargez la page.']);
+        exit;
+    }
+
+    // Validation des champs
+    $errors = [];
+    $email      = filter_var(trim($_POST['email'] ?? ''), FILTER_VALIDATE_EMAIL);
+    $pseudo     = safe_input($_POST['pseudo'] ?? '', 50);
+    $password   = $_POST['password'] ?? '';
+    $clan_slug  = safe_input($_POST['clan'] ?? '', 20);
+    $clan_id    = match($clan_slug) { 'bocage' => 1, 'littoral' => 2, 'marais' => 3, default => 0 };
+    $avatar_type = in_array($_POST['avatar_type'] ?? '', ['preset', 'upload']) ? $_POST['avatar_type'] : 'preset';
+    $avatar_key  = safe_input($_POST['avatar_key'] ?? '🧭', 16);
+    $first_name  = safe_input($_POST['first_name'] ?? '', 100);
+    $last_name   = safe_input($_POST['last_name']  ?? '', 100);
+    $bio         = safe_input($_POST['bio']        ?? '', 120);
+    $newsletter  = !empty($_POST['newsletter']);
+
+    if (!$email)                    $errors['email']    = 'Adresse email invalide.';
+    if (mb_strlen($pseudo) < 3)     $errors['pseudo']   = 'Le pseudo doit contenir au moins 3 caractères.';
+    if (strlen($password) < 8)      $errors['password'] = 'Mot de passe trop court (minimum 8 caractères).';
+    if ($clan_id === 0)             $errors['clan']     = 'Clan invalide.';
+    if (empty($_POST['accept_cgu']) || empty($_POST['accept_privacy'])) {
+        $errors['legal'] = 'Veuillez accepter les CGU et la politique de confidentialité.';
+    }
+
+    if (!empty($errors)) {
+        echo json_encode(['ok' => false, 'errors' => $errors]);
+        exit;
+    }
+
+    // Upload avatar si fourni
+    $avatar_file_path = null;
+    if ($avatar_type === 'upload' && !empty($_FILES['avatar_photo']['tmp_name'])) {
+        $upload = upload_avatar($_FILES['avatar_photo']);
+        if (!$upload['ok']) {
+            echo json_encode(['ok' => false, 'errors' => ['avatar' => $upload['error']]]);
+            exit;
+        }
+        $avatar_file_path = $upload['path'];
+    } else {
+        $avatar_type = 'preset';
+    }
+
+    // Création du compte
+    $result = register_user([
+        'email'         => $email,
+        'pseudo'        => $pseudo,
+        'password'      => $password,
+        'clan_id'       => $clan_id,
+        'avatar_type'   => $avatar_type,
+        'avatar_config' => json_encode(['emoji' => $avatar_key]),
+        'avatar_file'   => $avatar_file_path,
+        'first_name'    => $first_name,
+        'last_name'     => $last_name,
+        'bio'           => $bio,
+        'newsletter'    => $newsletter,
+    ]);
+
+    if (!$result['ok']) {
+        echo json_encode($result);
+        exit;
+    }
+
+    // Auto-connexion après inscription
+    $new_user = find_user_by_id($result['user_id']);
+    if ($new_user) {
+        login_user($new_user);
+    }
+
+    echo json_encode(['ok' => true, 'user_id' => $result['user_id']]);
+    exit;
+}
+
+// ── Rediriger si déjà connecté ────────────────────────────────
+require_once 'includes/config.php';
+require_once 'includes/db.php';
+require_once 'includes/functions.php';
+require_once 'includes/auth.php';
+if (is_logged_in()) {
+    header('Location: profil.php');
+    exit;
+}
+
 $page_title       = 'Rejoindre la Zone';
 $page_description = 'Inscris-toi sur ZONE85, choisis ton clan vendéen et commence à gagner des XP. Inscription gratuite en moins de 2 minutes.';
 $page_canonical   = 'https://www.zone85.fr/inscription.php';
@@ -6,9 +101,7 @@ $page_robots      = 'noindex,follow';
 $page_og_image    = 'assets/img/ZONE852025.png';
 $page_schema      = null;
 $current_page = 'inscription';
-require_once 'includes/config.php';
 require_once 'includes/data.php';
-require_once 'includes/functions.php';
 $page_styles = '<style>
 /* ── PAGE LAYOUT ── */
 .insc-page{min-height:100vh;background:var(--beige);padding-top:100px;padding-bottom:72px}
@@ -470,9 +563,11 @@ require_once 'includes/nav.php';
           <div class="form-error" id="err-checks" style="margin-top:4px">Veuillez accepter les CGU et la politique de confidentialité pour continuer.</div>
         </div>
 
+        <div id="err-server" style="display:none;margin-top:12px;padding:11px 14px;background:rgba(234,86,73,.08);border:1px solid rgba(234,86,73,.3);border-radius:var(--radius);font-size:.85rem;color:#c0392b;font-weight:600"></div>
+
         <div class="step-actions">
           <button class="btn btn-ghost" onclick="goStep(4)">← Retour</button>
-          <button class="btn btn-primary" onclick="validateStep5()">Finaliser mon inscription →</button>
+          <button class="btn btn-primary" id="btn-step5-submit" onclick="validateStep5()">Finaliser mon inscription →</button>
         </div>
       </div>
     </div>
@@ -520,7 +615,7 @@ require_once 'includes/nav.php';
       </div>
 
       <div style="text-align:center">
-        <a href="profil.php" class="btn btn-primary btn-lg">Accéder à mon profil →</a>
+        <a href="profil.php" class="btn btn-primary btn-lg" id="btn-go-profil">Accéder à mon profil →</a>
       </div>
 
     </div>
@@ -697,7 +792,7 @@ function updateCharCount(inputId, countId, max) {
   document.getElementById(countId).textContent = val.length;
 }
 
-function validateStep5() {
+async function validateStep5() {
   const pseudo = document.getElementById(\'pseudo\').value.trim();
   if (pseudo.length < 3) {
     setError(\'pseudo\', \'err-pseudo\', true);
@@ -716,12 +811,56 @@ function validateStep5() {
   }
   errChecks.classList.remove(\'show\');
 
-  formData.pseudo = pseudo;
-  formData.bio    = document.getElementById(\'bio\').value.trim();
+  formData.pseudo     = pseudo;
+  formData.bio        = document.getElementById(\'bio\').value.trim();
   formData.newsletter = document.getElementById(\'check-newsletter\').checked;
-  buildWelcome();
-  goStep(6);
-  setTimeout(spawnConfetti, 400);
+
+  const btn    = document.getElementById(\'btn-step5-submit\');
+  const errDiv = document.getElementById(\'err-server\');
+  btn.disabled    = true;
+  btn.textContent = \'Envoi en cours…\';
+  errDiv.style.display = \'none\';
+
+  const fd = new FormData();
+  fd.append(\'csrf_token\',    document.getElementById(\'csrf_token\').value);
+  fd.append(\'email\',         formData.email);
+  fd.append(\'password\',      formData.pw);
+  fd.append(\'first_name\',    formData.prenom);
+  fd.append(\'last_name\',     formData.nom);
+  fd.append(\'pseudo\',        formData.pseudo);
+  fd.append(\'bio\',           formData.bio);
+  fd.append(\'clan\',          formData.clan);
+  fd.append(\'avatar_type\',   formData.avatarType === \'upload\' ? \'upload\' : \'preset\');
+  fd.append(\'avatar_key\',    formData.avatar || \'🧭\');
+  fd.append(\'accept_cgu\',    \'1\');
+  fd.append(\'accept_privacy\',\'1\');
+  if (formData.newsletter) fd.append(\'newsletter\', \'1\');
+  if (formData.avatarType === \'upload\') {
+    const fileInput = document.getElementById(\'photo-upload\');
+    if (fileInput && fileInput.files[0]) fd.append(\'avatar_photo\', fileInput.files[0]);
+  }
+
+  try {
+    const resp = await fetch(\'inscription.php?action=register\', { method: \'POST\', body: fd });
+    const json = await resp.json();
+    if (json.ok) {
+      buildWelcome();
+      goStep(6);
+      setTimeout(spawnConfetti, 400);
+    } else {
+      const msg = json.error || (json.errors ? Object.values(json.errors).join(\' \') : \'Erreur inattendue.\');
+      errDiv.textContent    = msg;
+      errDiv.style.display  = \'block\';
+      btn.disabled          = false;
+      btn.textContent       = \'Finaliser mon inscription →\';
+      errDiv.scrollIntoView({ behavior: \'smooth\', block: \'center\' });
+    }
+  } catch(e) {
+    errDiv.textContent   = \'Erreur de connexion. Vérifiez votre réseau et réessayez.\';
+    errDiv.style.display = \'block\';
+    btn.disabled         = false;
+    btn.textContent      = \'Finaliser mon inscription →\';
+  }
 }
 
 /* ── ÉTAPE 6 — BUILD WELCOME ── */

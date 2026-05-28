@@ -46,6 +46,20 @@ define('DB_USER',    'zone85_user');
 define('DB_PASS',    '');          // Renseigner via variable d'environnement en prod
 define('DB_CHARSET', 'utf8mb4');
 
+// ── Session auto-start ──────────────────────────────────────
+// Démarré ici pour être disponible avant header.php (cookies/CSRF).
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_name('zone85_session');
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path'     => '/',
+        'secure'   => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+    session_start();
+}
+
 // Clans (slugs valides)
 define('CLAN_SLUGS', ['bocage', 'littoral', 'marais']);
 

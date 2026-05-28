@@ -551,20 +551,31 @@ function fetch_user_profile(int $userId): ?array {
         $s4->execute([':id' => $userId, ':start' => $seasonStart]);
         $xp_season = (int)$s4->fetchColumn();
 
+        // Résolution de l'avatar
+        $avatar_config = [];
+        if (!empty($row['avatar_config'])) {
+            $avatar_config = json_decode($row['avatar_config'], true) ?? [];
+        }
+        $avatar = $row['avatar_type'] === 'upload'
+            ? ($row['avatar_file'] ?? '🧭')
+            : ($avatar_config['emoji'] ?? '🧭');
+
         return [
             'id'             => (int)$row['id'],
             'pseudo'         => $row['pseudo'],
             'prenom'         => $row['first_name'] ?? '',
             'nom'            => $row['last_name'] ?? '',
+            'email'          => $row['email'] ?? '',
             'clan_slug'      => $row['clan_slug'] ?? '',
             'level'          => (int)$row['level'],
             'xp_total'       => (int)$row['xp_total'],
             'xp_this_season' => $xp_season,
-            'avatar'         => '🧭',
+            'avatar'         => $avatar,
+            'avatar_type'    => $row['avatar_type'] ?? 'preset',
             'bio'            => $row['bio'] ?? '',
             'badges_count'   => $badges_count,
             'missions_done'  => $missions_done,
-            'rank_in_clan'   => 0, // calculé périodiquement via cron
+            'rank_in_clan'   => 0,
             'rank_total'     => 0,
             'joined'         => $row['created_at'] ? substr($row['created_at'], 0, 10) : '',
         ];
