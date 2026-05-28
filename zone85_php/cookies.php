@@ -1,6 +1,17 @@
 <?php
-$page_title = 'Cookies — Zone 85 · L\'Esprit Vendée';
-$page_description = 'Comment Zone85 utilise les cookies et comment vous pouvez les gérer.';
+$page_title       = 'Cookies';
+$page_description = 'Politique cookies de ZONE85 — informations sur les cookies utilisés sur le site et comment les gérer.';
+$page_canonical   = 'https://www.zone85.fr/cookies.php';
+$page_robots      = 'index,follow';
+$page_og_image    = null;
+$page_schema      = [
+    '@context' => 'https://schema.org',
+    '@type' => 'BreadcrumbList',
+    'itemListElement' => [
+        ['@type'=>'ListItem','position'=>1,'name'=>'Accueil','item'=>'https://www.zone85.fr/'],
+        ['@type'=>'ListItem','position'=>2,'name'=>'Cookies','item'=>'https://www.zone85.fr/cookies.php'],
+    ],
+];
 $current_page = 'legal';
 require_once 'includes/config.php';
 require_once 'includes/data.php';

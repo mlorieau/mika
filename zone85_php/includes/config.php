@@ -1,17 +1,33 @@
 <?php
 // ============================================================
-// ZONE 85 — Configuration globale
+// ZONE 85 — Configuration
 // ============================================================
 
-define('SITE_NAME',    'Zone 85 — L\'Esprit Vendée');
-define('SITE_TAGLINE', 'La Vendée qui joue, qui marche, qui enquête et qui se raconte.');
-define('SITE_EMAIL',   'contact@zone85.fr');
+// Environnement
+define('APP_ENV', 'dev'); // 'dev' | 'prod'
 
-// Chemins assets (relatifs depuis la racine du projet)
+// Site
+define('SITE_NAME',    'ZONE85');
+define('SITE_TAGLINE', "La Vendée qui joue, qui marche, qui enquête et qui se raconte.");
+define('SITE_EMAIL',   'contact@zone85.fr');
+define('SITE_URL',     'https://www.zone85.fr'); // sans slash final
+
+// Chemins (utilise __DIR__ pour être robuste)
+define('BASE_PATH',   dirname(__DIR__) . '/');
 define('ASSETS_PATH', 'assets/');
 define('CSS_PATH',    'assets/css/');
 define('JS_PATH',     'assets/js/');
 define('IMG_PATH',    'assets/img/');
+define('UPLOAD_PATH', 'uploads/'); // futur
+
+// Upload (futur)
+define('UPLOAD_MAX_SIZE',          5 * 1024 * 1024); // 5 Mo
+define('ALLOWED_IMAGE_TYPES',      ['image/jpeg', 'image/png', 'image/webp']);
+define('ALLOWED_IMAGE_EXTENSIONS', ['jpg', 'jpeg', 'png', 'webp']);
+
+// Session (futur)
+define('SESSION_NAME',    'zone85_session');
+define('SESSION_TIMEOUT', 3600); // 1h
 
 // Saisons (labels pour l'interface)
 define('SEASONS', [

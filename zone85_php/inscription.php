@@ -1,6 +1,10 @@
 <?php
-$page_title = 'Rejoindre la Zone — Zone 85 · L\'Esprit Vendée';
-$page_description = 'Crée ton compte Zone 85, choisis ton clan et commence ta légende vendéenne.';
+$page_title       = 'Rejoindre la Zone';
+$page_description = 'Inscris-toi sur ZONE85, choisis ton clan vendéen et commence à gagner des XP. Inscription gratuite en moins de 2 minutes.';
+$page_canonical   = 'https://www.zone85.fr/inscription.php';
+$page_robots      = 'noindex,follow';
+$page_og_image    = 'assets/img/ZONE852025.png';
+$page_schema      = null;
 $current_page = 'inscription';
 require_once 'includes/config.php';
 require_once 'includes/data.php';

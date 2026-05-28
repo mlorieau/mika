@@ -1,6 +1,17 @@
 <?php
-$page_title = 'Hall de la Zone — Zone85';
-$page_description = 'Ici reposent les meilleures contributions, les mystères résolus, les randos préférées et les légendes de saison.';
+$page_title       = 'Hall de la Zone';
+$page_description = 'Le Hall de la Zone conserve les meilleures contributions, photos, KTC résolus, randos préférées et trophées de saison de la communauté vendéenne ZONE85.';
+$page_canonical   = 'https://www.zone85.fr/hall.php';
+$page_robots      = 'index,follow';
+$page_og_image    = 'assets/img/ZONE852025.png';
+$page_schema      = [
+    '@context' => 'https://schema.org',
+    '@type' => 'BreadcrumbList',
+    'itemListElement' => [
+        ['@type'=>'ListItem','position'=>1,'name'=>'Accueil','item'=>'https://www.zone85.fr/'],
+        ['@type'=>'ListItem','position'=>2,'name'=>'Hall de la Zone','item'=>'https://www.zone85.fr/hall.php'],
+    ],
+];
 $current_page = 'hall';
 require_once 'includes/config.php';
 require_once 'includes/data.php';

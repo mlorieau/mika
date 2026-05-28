@@ -134,3 +134,150 @@ function mission_type_icon(string $type): string {
         'premium_game'        => '⭐',
     ][$type] ?? '📌';
 }
+
+// ============================================================
+// HELPERS SEO
+// ============================================================
+
+/** Génère le <title> final : "Page — Zone 85 · L'Esprit Vendée" */
+function seo_title(string $title): string {
+    return htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . " — Zone 85 · L'Esprit Vendée";
+}
+
+/** Tronque une meta description à 160 chars */
+function seo_description(string $desc): string {
+    if (function_exists('mb_strlen') && mb_strlen($desc) > 160) {
+        return mb_substr($desc, 0, 157) . '…';
+    }
+    return strlen($desc) > 160 ? substr($desc, 0, 157) . '…' : $desc;
+}
+
+/** Retourne l'URL canonique complète */
+function canonical_url(string $path = ''): string {
+    $base = defined('SITE_URL') ? SITE_URL : 'https://www.zone85.fr';
+    return $base . '/' . ltrim($path, '/');
+}
+
+/** Affiche un bloc <script type="application/ld+json"> */
+function json_ld(array $schema): void {
+    echo '<script type="application/ld+json">' . "\n";
+    echo json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+    echo "\n</script>\n";
+}
+
+/** Génère le schema BreadcrumbList */
+function generate_breadcrumb_schema(array $items): array {
+    $elements = [];
+    foreach ($items as $pos => $item) {
+        $elements[] = [
+            '@type'    => 'ListItem',
+            'position' => $pos + 1,
+            'name'     => $item['name'],
+            'item'     => $item['url'] ?? '',
+        ];
+    }
+    return [
+        '@context'        => 'https://schema.org',
+        '@type'           => 'BreadcrumbList',
+        'itemListElement' => $elements,
+    ];
+}
+
+/** Génère le schema WebSite */
+function generate_website_schema(): array {
+    $url = defined('SITE_URL') ? SITE_URL : 'https://www.zone85.fr';
+    return [
+        '@context' => 'https://schema.org',
+        '@type'    => 'WebSite',
+        'name'     => 'ZONE85',
+        'url'      => $url,
+        'description' => 'Terrain de jeu communautaire vendéen. Rejoins un clan, gagne des XP, fais vivre la Vendée autrement.',
+        'potentialAction' => [
+            '@type'       => 'SearchAction',
+            'target'      => $url . '/missions.php?q={search_term_string}',
+            'query-input' => 'required name=search_term_string',
+        ],
+    ];
+}
+
+/** Génère le schema Organization */
+function generate_organization_schema(): array {
+    $url = defined('SITE_URL') ? SITE_URL : 'https://www.zone85.fr';
+    return [
+        '@context' => 'https://schema.org',
+        '@type'    => 'Organization',
+        'name'     => 'ZONE85',
+        'url'      => $url,
+        'logo'     => $url . '/assets/img/ZONE852025.png',
+        'contactPoint' => [
+            '@type'             => 'ContactPoint',
+            'email'             => 'contact@zone85.fr',
+            'contactType'       => 'customer service',
+            'availableLanguage' => 'French',
+        ],
+        'areaServed' => 'Vendée, Pays de la Loire, France',
+    ];
+}
+
+/** Génère un schema CreativeWork générique */
+function generate_creativework_schema(array $data): array {
+    return array_merge([
+        '@context' => 'https://schema.org',
+        '@type'    => 'CreativeWork',
+    ], $data);
+}
+
+// ============================================================
+// HELPERS SÉCURITÉ
+// ============================================================
+
+/** Génère ou retourne le token CSRF de session */
+function csrf_token(): string {
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        // Session non démarrée — retourne un placeholder pour les maquettes statiques
+        return 'csrf_placeholder_start_session_first';
+    }
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+/** Vérifie le token CSRF (retourne false si invalide) */
+function verify_csrf_token(string $token): bool {
+    if (session_status() !== PHP_SESSION_ACTIVE) return false;
+    return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
+}
+
+/** Vérifie si la requête est en POST */
+function is_post_request(): bool {
+    return $_SERVER['REQUEST_METHOD'] === 'POST';
+}
+
+/** Redirection sécurisée (bloque les redirections ouvertes) */
+function redirect(string $url): void {
+    $base = defined('SITE_URL') ? SITE_URL : 'https://www.zone85.fr';
+    // N'autorise que les redirections relatives ou vers le même domaine
+    if (!str_starts_with($url, '/') && !str_starts_with($url, $base)) {
+        $url = '/';
+    }
+    header('Location: ' . $url, true, 302);
+    exit;
+}
+
+/** Nettoie une entrée utilisateur basique */
+function safe_input(string $value, int $max_length = 500): string {
+    return mb_substr(trim(strip_tags($value)), 0, $max_length);
+}
+
+/** Envoie les headers de sécurité HTTP */
+function set_security_headers(): void {
+    if (headers_sent()) return;
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: SAMEORIGIN');
+    header('Referrer-Policy: strict-origin-when-cross-origin');
+    header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
+    // CSP permissive (fonts Google, inline styles autorisés pour les pages actuelles)
+    // TODO: renforcer en prod après audit complet des inline styles/scripts
+    header("Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self';");
+}

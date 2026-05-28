@@ -1,6 +1,17 @@
 <?php
-$page_title = 'CGU — Règles de la Zone · Zone 85 · L\'Esprit Vendée';
-$page_description = 'Conditions générales d\'utilisation et règles communautaires de Zone85.';
+$page_title       = 'CGU — Règles de la Zone';
+$page_description = 'Conditions générales d\'utilisation et règles de la communauté ZONE85 — Les engagements des membres et les règles du jeu vendéen.';
+$page_canonical   = 'https://www.zone85.fr/cgu.php';
+$page_robots      = 'index,follow';
+$page_og_image    = null;
+$page_schema      = [
+    '@context' => 'https://schema.org',
+    '@type' => 'BreadcrumbList',
+    'itemListElement' => [
+        ['@type'=>'ListItem','position'=>1,'name'=>'Accueil','item'=>'https://www.zone85.fr/'],
+        ['@type'=>'ListItem','position'=>2,'name'=>'CGU','item'=>'https://www.zone85.fr/cgu.php'],
+    ],
+];
 $current_page = 'legal';
 require_once 'includes/config.php';
 require_once 'includes/data.php';

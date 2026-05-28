@@ -4,6 +4,18 @@
 // TODO: remplacer par des requêtes MySQL (voir /docs/mysql-model-v1.md)
 // ============================================================
 
+// ── SEO DEFAULTS ──────────────────────────────────────────────
+$seo_defaults = [
+    'site_name'           => 'ZONE85',
+    'slogan'              => "La Vendée qui joue, qui marche, qui enquête et qui se raconte.",
+    'site_url'            => 'https://www.zone85.fr',
+    'default_title'       => "ZONE85 — La Vendée qui joue, qui marche, qui enquête et qui se raconte.",
+    'default_description' => 'ZONE85 est un terrain de jeu communautaire vendéen où les membres rejoignent un clan, gagnent des XP, participent à des missions et font vivre la Vendée autrement.',
+    'default_og_image'    => 'assets/img/ZONE852025.png',
+    'contact_email'       => 'contact@zone85.fr',
+    'social_profiles'     => [], // compléter quand les profils sont créés
+];
+
 // ── SAISONS ──────────────────────────────────────────────────
 $seasons = [
     [

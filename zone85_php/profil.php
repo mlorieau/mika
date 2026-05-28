@@ -1,6 +1,10 @@
 <?php
-$page_title = 'Mon Profil — Zone85';
-$page_description = 'Mon espace personnel Zone85 : progression, badges, activité et contribution au clan.';
+$page_title       = 'Mon Profil';
+$page_description = 'Consulte ta progression, tes badges, ton XP à vie et ta contribution à la Bataille des Clans sur ZONE85.';
+$page_canonical   = 'https://www.zone85.fr/profil.php';
+$page_robots      = 'noindex,follow';
+$page_og_image    = null;
+$page_schema      = null;
 $current_page = 'profil';
 require_once 'includes/config.php';
 require_once 'includes/data.php';

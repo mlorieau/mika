@@ -1,6 +1,17 @@
 <?php
-$page_title = 'Missions & Actions';
-$page_description = 'Toutes les missions et actions de la Zone 85 — Quiz, photos, randos, Kéto Kolé Tché, enquêtes. Je progresse pour moi. Je fais gagner mon clan.';
+$page_title       = 'Missions';
+$page_description = 'Explore les missions vendéennes : quiz, défis photo, Kéto Kolé Tché, randos, météo-missions, enquêtes. Participe, gagne des XP, fais progresser ton clan.';
+$page_canonical   = 'https://www.zone85.fr/missions.php';
+$page_robots      = 'index,follow';
+$page_og_image    = 'assets/img/ZONE852025.png';
+$page_schema      = [
+    '@context' => 'https://schema.org',
+    '@type' => 'BreadcrumbList',
+    'itemListElement' => [
+        ['@type'=>'ListItem','position'=>1,'name'=>'Accueil','item'=>'https://www.zone85.fr/'],
+        ['@type'=>'ListItem','position'=>2,'name'=>'Missions','item'=>'https://www.zone85.fr/missions.php'],
+    ],
+];
 $current_page = 'missions';
 require_once 'includes/config.php';
 require_once 'includes/data.php';

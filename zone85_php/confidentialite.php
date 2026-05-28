@@ -1,6 +1,17 @@
 <?php
-$page_title = 'Politique de confidentialité — Zone 85 | L\'Esprit Vendée';
-$page_description = 'Comment Zone85 collecte, utilise et protège vos données personnelles.';
+$page_title       = 'Politique de confidentialité';
+$page_description = 'Politique de confidentialité de ZONE85 — comment vos données personnelles sont collectées, utilisées et protégées.';
+$page_canonical   = 'https://www.zone85.fr/confidentialite.php';
+$page_robots      = 'index,follow';
+$page_og_image    = null;
+$page_schema      = [
+    '@context' => 'https://schema.org',
+    '@type' => 'BreadcrumbList',
+    'itemListElement' => [
+        ['@type'=>'ListItem','position'=>1,'name'=>'Accueil','item'=>'https://www.zone85.fr/'],
+        ['@type'=>'ListItem','position'=>2,'name'=>'Confidentialité','item'=>'https://www.zone85.fr/confidentialite.php'],
+    ],
+];
 $current_page = 'legal';
 require_once 'includes/config.php';
 require_once 'includes/data.php';

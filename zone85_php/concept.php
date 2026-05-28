@@ -1,6 +1,17 @@
 <?php
-$page_title = 'Le Concept';
-$page_description = 'Zone 85, c\'est quoi exactement ? Un terrain de jeu vendéen, ancré dans la communauté, où chaque interaction devient une petite aventure.';
+$page_title       = 'Le Concept';
+$page_description = 'Comprends comment fonctionne ZONE85 : deux modes de jeu, trois clans, quatre saisons. Je progresse pour moi. Je fais gagner mon clan.';
+$page_canonical   = 'https://www.zone85.fr/concept.php';
+$page_robots      = 'index,follow';
+$page_og_image    = 'assets/img/ZONE852025.png';
+$page_schema      = [
+    '@context' => 'https://schema.org',
+    '@type' => 'BreadcrumbList',
+    'itemListElement' => [
+        ['@type'=>'ListItem','position'=>1,'name'=>'Accueil','item'=>'https://www.zone85.fr/'],
+        ['@type'=>'ListItem','position'=>2,'name'=>'Le Concept','item'=>'https://www.zone85.fr/concept.php'],
+    ],
+];
 $current_page = 'concept';
 require_once 'includes/config.php';
 require_once 'includes/data.php';

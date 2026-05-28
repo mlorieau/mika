@@ -1,5 +1,17 @@
 <?php
-$page_title = 'Classement — Zone85';
+$page_title       = 'Classement';
+$page_description = 'Classement de la Bataille des Clans et des meilleurs Zonautes vendéens. Qui mène la danse cette saison ? Découvre ta position dans l\'histoire de la Zone.';
+$page_canonical   = 'https://www.zone85.fr/classement.php';
+$page_robots      = 'index,follow';
+$page_og_image    = 'assets/img/ZONE852025.png';
+$page_schema      = [
+    '@context' => 'https://schema.org',
+    '@type' => 'BreadcrumbList',
+    'itemListElement' => [
+        ['@type'=>'ListItem','position'=>1,'name'=>'Accueil','item'=>'https://www.zone85.fr/'],
+        ['@type'=>'ListItem','position'=>2,'name'=>'Classement','item'=>'https://www.zone85.fr/classement.php'],
+    ],
+];
 $current_page = 'classement';
 require_once 'includes/config.php';
 require_once 'includes/data.php';

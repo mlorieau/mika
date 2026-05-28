@@ -1,6 +1,17 @@
 <?php
-$page_title = 'Mentions légales — Zone 85 | L\'Esprit Vendée';
-$page_description = 'Informations légales relatives au site Zone 85 — L\'Esprit Vendée.';
+$page_title       = 'Mentions légales';
+$page_description = 'Mentions légales du site ZONE85 — terrain de jeu communautaire vendéen.';
+$page_canonical   = 'https://www.zone85.fr/mentions-legales.php';
+$page_robots      = 'index,follow';
+$page_og_image    = null;
+$page_schema      = [
+    '@context' => 'https://schema.org',
+    '@type' => 'BreadcrumbList',
+    'itemListElement' => [
+        ['@type'=>'ListItem','position'=>1,'name'=>'Accueil','item'=>'https://www.zone85.fr/'],
+        ['@type'=>'ListItem','position'=>2,'name'=>'Mentions légales','item'=>'https://www.zone85.fr/mentions-legales.php'],
+    ],
+];
 $current_page = 'legal';
 require_once 'includes/config.php';
 require_once 'includes/data.php';

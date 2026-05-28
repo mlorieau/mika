@@ -1,5 +1,17 @@
 <?php
-$page_title = 'Les Clans — Zone85';
+$page_title       = 'Les Clans';
+$page_description = 'Bocage, Littoral, Marais — trois clans vendéens s\'affrontent chaque saison dans la Bataille des Clans. Découvre leur identité et rejoins le tien.';
+$page_canonical   = 'https://www.zone85.fr/clans.php';
+$page_robots      = 'index,follow';
+$page_og_image    = 'assets/img/ZONE852025.png';
+$page_schema      = [
+    '@context' => 'https://schema.org',
+    '@type' => 'BreadcrumbList',
+    'itemListElement' => [
+        ['@type'=>'ListItem','position'=>1,'name'=>'Accueil','item'=>'https://www.zone85.fr/'],
+        ['@type'=>'ListItem','position'=>2,'name'=>'Les Clans','item'=>'https://www.zone85.fr/clans.php'],
+    ],
+];
 $current_page = 'clans';
 require_once 'includes/config.php';
 require_once 'includes/data.php';

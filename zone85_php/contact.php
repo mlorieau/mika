@@ -1,6 +1,17 @@
 <?php
-$page_title = 'Contact — Zone 85 · L\'Esprit Vendée';
-$page_description = 'Une question, une idée, un signalement ? Contactez l\'équipe Zone 85.';
+$page_title       = 'Contact';
+$page_description = 'Contacte l\'équipe ZONE85 pour toute question sur la communauté vendéenne gamifiée, les missions, les clans ou les partenariats.';
+$page_canonical   = 'https://www.zone85.fr/contact.php';
+$page_robots      = 'index,follow';
+$page_og_image    = null;
+$page_schema      = [
+    '@context' => 'https://schema.org',
+    '@type' => 'BreadcrumbList',
+    'itemListElement' => [
+        ['@type'=>'ListItem','position'=>1,'name'=>'Accueil','item'=>'https://www.zone85.fr/'],
+        ['@type'=>'ListItem','position'=>2,'name'=>'Contact','item'=>'https://www.zone85.fr/contact.php'],
+    ],
+];
 $current_page = 'legal';
 require_once 'includes/config.php';
 require_once 'includes/data.php';
@@ -384,6 +395,7 @@ require_once 'includes/nav.php';
             <span class="form-check-label">J'ai lu la <a href="confidentialite.php">politique de confidentialité</a>.</span>
           </label>
 
+          <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
           <button type="submit" class="btn-submit">Envoyer le message</button>
 
           <p class="rgpd-note">

@@ -1,6 +1,23 @@
 <?php
-$page_title = 'Zone 85 — L\'Esprit Vendée';
-$page_description = 'Rejoins ton clan, explore la Vendée, gagne des XP. Fais entrer ton clan dans la légende.';
+$page_title       = 'Accueil';
+$page_description = 'Rejoins un clan vendéen, gagne des XP, participe à des missions et fais entrer ton clan dans la légende. ZONE85 — Le terrain de jeu vendéen.';
+$page_canonical   = 'https://www.zone85.fr/index.php';
+$page_robots      = 'index,follow';
+$page_og_title    = 'ZONE85 — Le terrain de jeu vendéen';
+$page_og_description = 'Rejoins un clan vendéen, gagne des XP et fais entrer ton clan dans la légende. Bocage, Littoral ou Marais — quel territoire te ressemble ?';
+$page_og_image    = 'assets/img/ZONE852025.png';
+$page_schema      = [
+    '@context' => 'https://schema.org',
+    '@type' => 'WebSite',
+    'name' => 'ZONE85',
+    'url' => 'https://www.zone85.fr',
+    'description' => "Terrain de jeu communautaire vendéen. Rejoins un clan, gagne des XP, fais vivre la Vendée autrement.",
+    'potentialAction' => [
+        '@type' => 'SearchAction',
+        'target' => 'https://www.zone85.fr/missions.php?q={search_term_string}',
+        'query-input' => 'required name=search_term_string',
+    ],
+];
 $current_page = 'index';
 require_once 'includes/config.php';
 require_once 'includes/data.php';
