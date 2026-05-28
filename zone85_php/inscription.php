@@ -290,14 +290,14 @@ require_once 'includes/nav.php';
         </div>
 
         <div class="lecons-grid">
-          <img src="./img/intro.png" alt="Intro" class="lecon-img lecon-full">
-          <img src="./img/lecon-1.png" alt="Leçon 1" class="lecon-img">
-          <img src="./img/lecon-2.png" alt="Leçon 2" class="lecon-img">
-          <img src="./img/lecon-3.png" alt="Leçon 3" class="lecon-img">
-          <img src="./img/lecon-4.png" alt="Leçon 4" class="lecon-img">
-          <img src="./img/lecon-5.png" alt="Leçon 5" class="lecon-img">
-          <img src="./img/lecon-6.png" alt="Leçon 6" class="lecon-img">
-          <img src="./img/lecon-7.png" alt="Leçon 7" class="lecon-img lecon-last">
+          <img src="<?= img('intro.png') ?>" alt="Intro" class="lecon-img lecon-full">
+          <img src="<?= img('lecon-1.png') ?>" alt="Leçon 1" class="lecon-img">
+          <img src="<?= img('lecon-2.png') ?>" alt="Leçon 2" class="lecon-img">
+          <img src="<?= img('lecon-3.png') ?>" alt="Leçon 3" class="lecon-img">
+          <img src="<?= img('lecon-4.png') ?>" alt="Leçon 4" class="lecon-img">
+          <img src="<?= img('lecon-5.png') ?>" alt="Leçon 5" class="lecon-img">
+          <img src="<?= img('lecon-6.png') ?>" alt="Leçon 6" class="lecon-img">
+          <img src="<?= img('lecon-7.png') ?>" alt="Leçon 7" class="lecon-img lecon-last">
         </div>
 
         <div class="accept-row" id="accept-row" onclick="toggleAccept()">
@@ -325,7 +325,7 @@ require_once 'includes/nav.php';
           <!-- BOCAGE -->
           <div class="clan-option" onclick="selectClan('bocage',this)">
             <div class="clan-thumb">
-              <img src="./img/mascotte-bocage.png" alt="Mascotte Bocage">
+              <img src="<?= img('mascotte-bocage.png') ?>" alt="Mascotte Bocage">
             </div>
             <div class="clan-info">
               <div class="clan-nom">Clan Bocage</div>
@@ -344,7 +344,7 @@ require_once 'includes/nav.php';
           <!-- LITTORAL -->
           <div class="clan-option" onclick="selectClan('littoral',this)">
             <div class="clan-thumb">
-              <img src="./img/mascotte-littoral.png" alt="Mascotte Littoral">
+              <img src="<?= img('mascotte-littoral.png') ?>" alt="Mascotte Littoral">
             </div>
             <div class="clan-info">
               <div class="clan-nom">Clan Littoral</div>
@@ -363,7 +363,7 @@ require_once 'includes/nav.php';
           <!-- MARAIS -->
           <div class="clan-option" onclick="selectClan('marais',this)">
             <div class="clan-thumb">
-              <img src="./img/mascotte-marais.png" alt="Mascotte Marais">
+              <img src="<?= img('mascotte-marais.png') ?>" alt="Mascotte Marais">
             </div>
             <div class="clan-info">
               <div class="clan-nom">Clan Marais</div>
