@@ -42,12 +42,12 @@ define('SEASONS', [
 ]);
 
 // Base de données (désactivée par défaut — activer quand la base est installée)
-define('DB_ENABLED', false);       // Mettre true après avoir importé schema.sql + seed.sql
+define('DB_ENABLED', true);        // Mettre true après avoir importé schema.sql + seed.sql
 define('DB_HOST',    'localhost');
 define('DB_PORT',    3306);
-define('DB_NAME',    'zone85');
-define('DB_USER',    'zone85_user');
-define('DB_PASS',    '');          // Renseigner via variable d'environnement en prod
+define('DB_NAME',    'qg_');
+define('DB_USER',    'AdminQg85');
+define('DB_PASS',    'AdminQg85!'); // Renseigner via variable d'environnement en prod
 define('DB_CHARSET', 'utf8mb4');
 
 // ── Session auto-start ──────────────────────────────────────
