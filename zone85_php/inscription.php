@@ -167,6 +167,9 @@ require_once 'includes/nav.php';
 <div class="insc-page">
   <div class="insc-wrap">
 
+    <!-- CSRF -->
+    <input type="hidden" id="csrf_token" name="csrf_token" value="<?= e(csrf_token()) ?>">
+
     <!-- STEP DOTS -->
     <div class="step-nav" id="step-dots">
       <div class="step-dot active" id="step-dot-1">1</div>
@@ -542,9 +545,9 @@ const TOTAL = 6;
 const adnLabels = { souche: \'De souche 🌱\', coeur: \'De cœur ❤️\', adoption: "D\'adoption 🌍" };
 const clanLabels = { bocage: \'Clan Bocage\', littoral: \'Clan Littoral\', marais: \'Clan Marais\' };
 const clanImages = {
-  bocage:  \'./img/mascotte-bocage.png\',
-  littoral:\'./img/mascotte-littoral.png\',
-  marais:  \'./img/mascotte-marais.png\'
+  bocage:  \'' . img('mascotte-bocage.png') . '\',
+  littoral:\'' . img('mascotte-littoral.png') . '\',
+  marais:  \'' . img('mascotte-marais.png') . '\'
 };
 
 /* ── NAVIGATION ── */

@@ -21,6 +21,8 @@ $_robots      = isset($page_robots) ? htmlspecialchars($page_robots, ENT_QUOTES,
 $_og_title    = isset($page_og_title) ? htmlspecialchars($page_og_title, ENT_QUOTES, 'UTF-8') : $_title;
 $_og_desc     = isset($page_og_description) ? htmlspecialchars($page_og_description, ENT_QUOTES, 'UTF-8') : $_description;
 $_og_image    = isset($page_og_image) ? htmlspecialchars($_site_url . '/' . ltrim($page_og_image, '/'), ENT_QUOTES, 'UTF-8') : htmlspecialchars($_og_image_default, ENT_QUOTES, 'UTF-8');
+
+if (function_exists('set_security_headers')) { set_security_headers(); }
 ?>
 <!DOCTYPE html>
 <html lang="fr">
