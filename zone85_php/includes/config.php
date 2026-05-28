@@ -22,7 +22,12 @@ define('ASSETS_PATH', 'assets/');
 define('CSS_PATH',    'assets/css/');
 define('JS_PATH',     'assets/js/');
 define('IMG_PATH',    'assets/img/');
-define('UPLOAD_PATH', 'uploads/'); // futur
+define('UPLOAD_PATH', 'uploads/');
+
+// URL de base — adapter selon l'installation
+// '/'                    si le site est à la racine du domaine
+// '/test/zone85_php/'    si le site est dans un sous-dossier
+define('BASE_URL', '/test/zone85_php/');
 
 // Upload — avatars : 2 Mo max, types image uniquement
 define('UPLOAD_MAX_SIZE',          2 * 1024 * 1024); // 2 Mo (avatars)

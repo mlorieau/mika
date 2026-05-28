@@ -81,6 +81,7 @@ if ($db_enabled) {
 $required_tables = [
     'clans', 'seasons', 'games', 'missions', 'badges',
     'users', 'participations', 'xp_logs', 'clan_score_logs', 'hall_items',
+    'legal_acceptances', 'user_badges',
 ];
 $table_results = [];
 if ($pdo) {

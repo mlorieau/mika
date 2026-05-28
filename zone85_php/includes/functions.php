@@ -3,7 +3,7 @@
 // ZONE 85 — Fonctions utilitaires
 // ============================================================
 
-/** Retourne le chemin complet d'un asset */
+/** Retourne le chemin complet d'un asset (relatif, compatible sous-dossier) */
 function asset(string $path): string {
     return ASSETS_PATH . ltrim($path, '/');
 }
@@ -16,6 +16,42 @@ function img(string $filename): string {
 /** Retourne l'URL d'une page .php */
 function page_url(string $slug): string {
     return $slug . '.php';
+}
+
+/**
+ * URL absolue vers une ressource du site (tient compte de BASE_URL).
+ * url('profil.php')          → /test/zone85_php/profil.php
+ * url('assets/css/zone85.css') → /test/zone85_php/assets/css/zone85.css
+ */
+function url(string $path = ''): string {
+    $base = defined('BASE_URL') ? BASE_URL : '/';
+    return rtrim($base, '/') . '/' . ltrim($path, '/');
+}
+
+/**
+ * URL absolue vers un fichier uploadé.
+ * upload_url('uploads/avatars/photo.png') → /test/zone85_php/uploads/avatars/photo.png
+ */
+function upload_url(string $path = ''): string {
+    return url(ltrim($path, '/'));
+}
+
+/**
+ * URL de l'avatar d'un utilisateur pour un attribut src HTML.
+ * - avatar_type = 'upload' : retourne l'URL absolue du fichier
+ * - avatar_type = 'preset' : retourne '' (afficher l'emoji directement)
+ * Accepte les deux structures : session (['avatar_key']) et profil (['avatar']).
+ */
+function avatar_url(array $user): string {
+    $type = $user['avatar_type'] ?? 'preset';
+    if ($type !== 'upload') {
+        return '';
+    }
+    $file = $user['avatar_key'] ?? ($user['avatar'] ?? '');
+    if (empty($file)) {
+        return '';
+    }
+    return upload_url(ltrim($file, '/'));
 }
 
 /** Formate un nombre d'XP : 3400 → "3 400 XP" */

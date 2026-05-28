@@ -1,11 +1,18 @@
 # Sécurité dossier uploads/avatars
-# Interdit l'exécution de PHP et autres scripts
 Options -Indexes
 
-# Désactive le moteur PHP (Apache + mod_php)
-php_flag engine off
+# Désactive PHP si mod_php est actif (ignoré silencieusement sur FastCGI/FPM)
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+    php_flag engine off
+</IfModule>
 
-# Bloque l'accès à tout fichier de script (Apache 2.2 + 2.4)
+# Bloque l'exécution de scripts (Apache 2.4 et 2.2)
 <FilesMatch "\.(php[0-9]?|phtml|pl|py|cgi|sh|bash)$">
     <IfModule mod_authz_core.c>
         Require all denied
@@ -16,8 +23,8 @@ php_flag engine off
     </IfModule>
 </FilesMatch>
 
-# N'autorise que les images
-<FilesMatch "\.(jpg|jpeg|png|webp|gif)$">
+# Images autorisées explicitement (jpg, jpeg, png, webp — pas de SVG)
+<FilesMatch "\.(jpg|jpeg|png|webp)$">
     <IfModule mod_authz_core.c>
         Require all granted
     </IfModule>

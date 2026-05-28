@@ -295,15 +295,20 @@ require_once 'includes/nav.php';
 <?php exit; ?>
 <?php endif; ?>
 
+<?php if (defined('APP_ENV') && APP_ENV === 'dev' && !$is_guest): ?>
+<!-- avatar-debug: type=<?= e($user['avatar_type'] ?? '') ?> file=<?= e($user['avatar'] ?? '') ?> url=<?= e($_profil_avatar_url ?? '') ?> -->
+<?php endif; ?>
+
 <div class="profil-page">
   <div class="profil-layout">
 
     <!-- ── SIDEBAR ── -->
     <aside class="profil-sidebar">
 
+      <?php $_profil_avatar_url = avatar_url($user); ?>
       <div class="sidebar-avatar" style="<?= ($user['avatar_type'] === 'upload') ? 'padding:0;overflow:hidden' : '' ?>">
-        <?php if ($user['avatar_type'] === 'upload' && !empty($user['avatar'])): ?>
-          <img src="<?= e($user['avatar']) ?>" alt="<?= e($user['pseudo']) ?>" style="width:100%;height:100%;object-fit:cover">
+        <?php if (!empty($_profil_avatar_url)): ?>
+          <img src="<?= e($_profil_avatar_url) ?>" alt="<?= e($user['pseudo']) ?>" style="width:100%;height:100%;object-fit:cover">
         <?php else: ?>
           <?= e($user['avatar']) ?>
         <?php endif; ?>
@@ -378,8 +383,8 @@ require_once 'includes/nav.php';
 
         <div class="welcome-card">
           <div class="welcome-avatar" style="<?= ($user['avatar_type'] === 'upload') ? 'padding:0;overflow:hidden' : '' ?>">
-            <?php if ($user['avatar_type'] === 'upload' && !empty($user['avatar'])): ?>
-              <img src="<?= e($user['avatar']) ?>" alt="" style="width:100%;height:100%;object-fit:cover">
+            <?php if (!empty($_profil_avatar_url)): ?>
+              <img src="<?= e($_profil_avatar_url) ?>" alt="" style="width:100%;height:100%;object-fit:cover">
             <?php else: ?>
               <?= e($user['avatar']) ?>
             <?php endif; ?>

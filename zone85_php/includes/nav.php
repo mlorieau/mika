@@ -28,9 +28,10 @@ if ($_nav_user) {
     <a href="index.php" class="nav-logo">ZONE<span>85</span><span class="nav-logo-sub">L'Esprit Vendée</span></a>
     <div class="nav-right">
       <?php if ($_nav_user): ?>
+        <?php $_nav_avatar_url = avatar_url($_nav_user); ?>
         <div class="nav-avatar" title="<?= e($_nav_user['pseudo']) ?>" onclick="location.href='profil.php'" style="cursor:pointer<?= ($_nav_user['avatar_type'] === 'upload') ? ';padding:0;overflow:hidden' : '' ?>">
-          <?php if ($_nav_user['avatar_type'] === 'upload' && !empty($_nav_user['avatar_key'])): ?>
-            <img src="<?= e($_nav_user['avatar_key']) ?>" alt="<?= e($_nav_user['pseudo']) ?>" style="width:100%;height:100%;object-fit:cover;border-radius:8px">
+          <?php if (!empty($_nav_avatar_url)): ?>
+            <img src="<?= e($_nav_avatar_url) ?>" alt="<?= e($_nav_user['pseudo']) ?>" style="width:100%;height:100%;object-fit:cover;border-radius:8px">
           <?php else: ?>
             <?= e($_nav_user['avatar_key'] ?? $_nav_initials) ?>
           <?php endif; ?>

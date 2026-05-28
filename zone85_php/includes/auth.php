@@ -157,7 +157,7 @@ function register_user(array $data): array {
     }
 
     try {
-        // Email unique
+        // Email unique (avant transaction pour éviter un lock inutile)
         $s = $pdo->prepare("SELECT id FROM users WHERE email = :e LIMIT 1");
         $s->execute([':e' => $data['email']]);
         if ($s->fetch()) {
@@ -170,6 +170,8 @@ function register_user(array $data): array {
         if ($s->fetch()) {
             return ['ok' => false, 'field' => 'pseudo', 'error' => 'Ce pseudo est déjà pris.'];
         }
+
+        $pdo->beginTransaction();
 
         $hash = password_hash($data['password'], PASSWORD_BCRYPT);
 
@@ -200,11 +202,11 @@ function register_user(array $data): array {
         ]);
         $user_id = (int)$pdo->lastInsertId();
 
-        // XP de bienvenue
+        // XP de bienvenue — :uid et :src_id distincts pour éviter HY093
         $pdo->prepare("
             INSERT INTO xp_logs (user_id, source_type, source_id, xp_amount, reason)
-            VALUES (:uid, 'registration', :uid, 50, 'Bienvenue dans la Zone')
-        ")->execute([':uid' => $user_id]);
+            VALUES (:uid, 'registration', :src_id, 50, 'Bienvenue dans la Zone')
+        ")->execute([':uid' => $user_id, ':src_id' => $user_id]);
 
         // Acceptations légales
         $ip_hash = hash('sha256', $_SERVER['REMOTE_ADDR'] ?? '');
@@ -220,7 +222,9 @@ function register_user(array $data): array {
             ]);
         }
 
-        // Badge de bienvenue (non-bloquant)
+        $pdo->commit();
+
+        // Badge de bienvenue — non-bloquant, hors transaction
         try {
             $s = $pdo->prepare("SELECT id FROM badges WHERE slug = 'pionnier-zone' LIMIT 1");
             $s->execute();
@@ -232,14 +236,22 @@ function register_user(array $data): array {
                 ")->execute([':uid' => $user_id, ':bid' => (int)$badge['id']]);
             }
         } catch (PDOException $e) {
-            // Non-bloquant : le badge n'est pas critique
+            error_log('[ZONE85] register_user badge : ' . $e->getMessage());
         }
 
         return ['ok' => true, 'user_id' => $user_id];
 
-    } catch (PDOException $e) {
+    } catch (Throwable $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
         error_log('[ZONE85] register_user : ' . $e->getMessage());
-        return ['ok' => false, 'error' => 'Une erreur est survenue. Veuillez réessayer.'];
+        $debug = (defined('APP_ENV') && APP_ENV === 'dev') ? $e->getMessage() : null;
+        return [
+            'ok'          => false,
+            'error'       => 'Une erreur est survenue. Veuillez réessayer.',
+            'debug_error' => $debug,
+        ];
     }
 }
 

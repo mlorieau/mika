@@ -226,6 +226,26 @@ Voir `docs/security-checklist-v1.md` pour la checklist complète et le plan v2.
 
 ---
 
+## État actuel (v6.2 — Correctifs inscription, avatar, sous-dossier)
+
+### Changements V6.2
+
+| Correction | Détail |
+|---|---|
+| **Bug inscription front** | `register_user()` : paramètre `:uid` dupliqué dans xp_logs INSERT → PDO `HY093` → rollback silencieux. Corrigé avec `:src_id` distinct. |
+| **Transaction atomique** | `register_user()` enveloppé dans `beginTransaction()` / `commit()` / `rollBack()`. user + xp_logs + legal_acceptances en tout-ou-rien. Badge hors transaction (non-bloquant). |
+| **Double sélecteur fichier** | `<label for="photo-upload" onclick="...click()">` — le `onclick` était redondant avec `for`. Supprimé. |
+| **Avatar upload invisible** | `.htaccess` : `php_flag engine off` causait une 500 sur FastCGI/FPM. Enveloppé dans `<IfModule mod_php.c>` etc. |
+| **BASE_URL sous-dossier** | `config.php` : ajout de `define('BASE_URL', '/test/zone85_php/')`. Configurable selon le serveur. |
+| **avatar_url($user)** | `functions.php` : nouvelle fonction centralisée. Gère les deux structures (session + profil). Utilisée dans `nav.php` et `profil.php`. |
+| **url() / upload_url()** | `functions.php` : helpers d'URL absolues basés sur `BASE_URL`. |
+| **Debug dev inscription** | En `APP_ENV=dev`, `debug_error` retourné dans JSON et loggé en `console.warn`. |
+| **Debug dev profil** | Commentaire HTML `<!-- avatar-debug: ... -->` en dev uniquement. |
+| **db-check enrichi** | `legal_acceptances` et `user_badges` ajoutés à la liste des tables vérifiées. |
+| **Migration 002** | `database/migrations/002_auth_fix.sql` : CREATE TABLE IF NOT EXISTS pour les 3 tables auth + badge pionnier-zone. |
+
+---
+
 ## État actuel (v6.1 — Auth V1 stabilisée)
 
 | Composant | État |
@@ -375,6 +395,41 @@ La valeur se met à jour à chaque appel réussi.
 - Sinon : HTTP 403, message générique
 - Les deux constantes sont dans `includes/config.php`
 - Ne jamais passer `DEV_TOOLS_ALLOWED = true` en production
+
+---
+
+## Checklist de test V6.2
+
+### Inscription
+- [ ] 1. Inscription avec avatar preset — front affiche bienvenue (étape 6)
+- [ ] 2. Inscription avec upload photo — front affiche bienvenue (étape 6)
+- [ ] 3. Upload photo : un clic = une seule ouverture de fenêtre
+- [ ] 4. User créé en base (`SELECT * FROM users WHERE pseudo = '...'`)
+- [ ] 5. xp_logs créé (`SELECT * FROM xp_logs WHERE user_id = X`)
+- [ ] 6. legal_acceptances créé (`SELECT * FROM legal_acceptances WHERE user_id = X`)
+- [ ] 7. Doublon email bloqué proprement (message côté front)
+- [ ] 8. Doublon pseudo bloqué proprement
+- [ ] 9. Erreur DB → pas d'utilisateur partiel (transaction rollback)
+- [ ] 10. En APP_ENV=dev, debug_error visible en console navigateur si erreur
+
+### Avatar
+- [ ] 11. Profil affiche avatar preset (emoji)
+- [ ] 12. Nav affiche avatar preset (emoji)
+- [ ] 13. Profil affiche photo uploadée (pas d'image cassée)
+- [ ] 14. Nav affiche photo uploadée
+- [ ] 15. URL directe `/test/zone85_php/uploads/avatars/xxx.png` accessible (200 OK)
+- [ ] 16. `/test/zone85_php/uploads/avatars/test.php` → 403 Forbidden
+- [ ] 17. En APP_ENV=dev : commentaire `<!-- avatar-debug: ... -->` visible dans source de profil.php
+
+### Connexion
+- [ ] 18. Connexion OK → profil connecté
+- [ ] 19. Déconnexion → nav redevient Connexion/Rejoindre
+- [ ] 20. Mauvais mot de passe → "Identifiants incorrects."
+- [ ] 21. Profil sans session → page invité
+
+### Pages publiques (régression)
+- [ ] 22. Accueil, Clans, Missions, Classement, Hall — chargement OK
+- [ ] 23. Contact → submit → message succès, entrée dans contact_messages
 
 ---
 

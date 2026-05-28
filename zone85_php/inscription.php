@@ -524,7 +524,7 @@ require_once 'includes/nav.php';
 
           <!-- Panel : upload photo -->
           <div class="avatar-panel" id="avatar-panel-upload">
-            <label class="upload-zone" for="photo-upload" onclick="document.getElementById('photo-upload').click()">
+            <label class="upload-zone" for="photo-upload">
               <input type="file" id="photo-upload" accept="image/*" onchange="handlePhotoUpload(this)">
               <div class="upload-preview" id="upload-preview"><img id="upload-preview-img" src="" alt="Aperçu"></div>
               <span class="upload-icon" id="upload-icon">📷</span>
@@ -853,6 +853,7 @@ async function validateStep5() {
       goStep(6);
       setTimeout(spawnConfetti, 400);
     } else {
+      if (json.debug_error) console.warn(\'[ZONE85 debug]\', json.debug_error);
       const msg = json.error || (json.errors ? Object.values(json.errors).join(\' \') : \'Erreur inattendue.\');
       errDiv.textContent    = msg;
       errDiv.style.display  = \'block\';
@@ -861,6 +862,7 @@ async function validateStep5() {
       errDiv.scrollIntoView({ behavior: \'smooth\', block: \'center\' });
     }
   } catch(e) {
+    console.error(\'[ZONE85]\', e);
     errDiv.textContent   = \'Erreur de connexion. Vérifiez votre réseau et réessayez.\';
     errDiv.style.display = \'block\';
     btn.disabled         = false;
