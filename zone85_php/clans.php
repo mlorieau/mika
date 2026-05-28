@@ -16,6 +16,15 @@ $current_page = 'clans';
 require_once 'includes/config.php';
 require_once 'includes/data.php';
 require_once 'includes/functions.php';
+// ── Repository layer ──────────────────────────────────────────
+require_once 'includes/db.php';
+require_once 'includes/repositories.php';
+if (db_enabled()) {
+    $_clans_db = fetch_all_clans();
+    if ($_clans_db !== null) $clans = $_clans_db;
+    $_season_db = fetch_active_season();
+    if ($_season_db !== null) $active_season = $_season_db;
+}
 $page_styles = '<style>/* No page-specific CSS for clans */</style>';
 require_once 'includes/header.php';
 require_once 'includes/nav.php';

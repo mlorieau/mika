@@ -16,6 +16,17 @@ $current_page = 'hall';
 require_once 'includes/config.php';
 require_once 'includes/data.php';
 require_once 'includes/functions.php';
+// ── Repository layer ──────────────────────────────────────────
+require_once 'includes/db.php';
+require_once 'includes/repositories.php';
+if (db_enabled()) {
+    $_contributors_db = fetch_hall_contributors(5);
+    if ($_contributors_db !== null) $hall_contributors = $_contributors_db;
+    $_photos_db = fetch_hall_photos(8);
+    if ($_photos_db !== null) $hall_photos = $_photos_db;
+    $_season_db = fetch_active_season();
+    if ($_season_db !== null) $active_season = $_season_db;
+}
 $page_styles = '<style>
 
 /* ============================================================

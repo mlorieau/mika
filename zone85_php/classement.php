@@ -16,6 +16,19 @@ $current_page = 'classement';
 require_once 'includes/config.php';
 require_once 'includes/data.php';
 require_once 'includes/functions.php';
+// ── Repository layer ──────────────────────────────────────────
+require_once 'includes/db.php';
+require_once 'includes/repositories.php';
+if (db_enabled()) {
+    $_top_db = fetch_top_members(8);
+    if ($_top_db !== null) $top_zonautes = $_top_db;
+    $_clans_db = fetch_all_clans();
+    if ($_clans_db !== null) $clans = $_clans_db;
+    $_season_db = fetch_active_season();
+    if ($_season_db !== null) $active_season = $_season_db;
+    $_trophies_db = fetch_trophies();
+    if ($_trophies_db !== null) $season_trophies = $_trophies_db;
+}
 $page_styles = '<style>
 /* HERO */
 .classement-hero{background:linear-gradient(160deg,#0d1e2c 0%,#12314e 100%);padding:100px 0 56px;position:relative;overflow:hidden}

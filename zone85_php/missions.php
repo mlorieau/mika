@@ -16,6 +16,17 @@ $current_page = 'missions';
 require_once 'includes/config.php';
 require_once 'includes/data.php';
 require_once 'includes/functions.php';
+// ── Repository layer ──────────────────────────────────────────
+require_once 'includes/db.php';
+require_once 'includes/repositories.php';
+if (db_enabled()) {
+    $_missions_db = fetch_featured_missions(9);
+    if ($_missions_db !== null) $missions = $_missions_db;
+    $_season_db = fetch_active_season();
+    if ($_season_db !== null) $active_season = $_season_db;
+    $_badges_db = fetch_badges();
+    if ($_badges_db !== null) $badges = $_badges_db;
+}
 
 // La grande mission collective de la saison active
 $grande_mission = null;

@@ -36,13 +36,21 @@ zone85_php/
 ├── sitemap.php             Sitemap XML dynamique
 ├── robots.txt              Directives robots
 │
+├── database/
+│   ├── schema.sql          Schéma MySQL complet (18 tables)
+│   ├── seed.sql            Données de test
+│   ├── reset.sql           Suppression des tables
+│   └── README.md           Guide d'installation MySQL
+│
 ├── includes/
 │   ├── config.php          Constantes (chemins, SITE_NAME…)
 │   ├── data.php            Données mockées (TODO: → MySQL)
 │   ├── functions.php       Fonctions utilitaires (e(), csrf_token(), set_security_headers()…)
 │   ├── header.php          <!DOCTYPE>…<body> + balises SEO automatiques
 │   ├── nav.php             <nav>
-│   └── footer.php          <footer>…</html>
+│   ├── footer.php          <footer>…</html>
+│   ├── db.php              Connexion PDO (fallback automatique si DB_ENABLED=false)
+│   └── repositories.php    Fonctions de lecture des données (MySQL ou mock)
 │
 ├── components/
 │   ├── clan-card.php
@@ -64,6 +72,40 @@ zone85_php/
     ├── security-checklist-v1.md  Checklist sécurité complète
     └── seo-ai-ready-v1.md      Guide SEO & IA-Ready
 ```
+
+---
+
+## Base de données
+
+Par défaut, le site fonctionne sans base MySQL grâce aux données mockées de `includes/data.php`.
+
+### Mode mock (défaut)
+`DB_ENABLED = false` dans `includes/config.php` → aucune connexion requise.
+
+### Activer MySQL
+
+1. Créer la base et l'utilisateur :
+   ```sql
+   CREATE DATABASE zone85 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   CREATE USER 'zone85_user'@'localhost' IDENTIFIED BY 'mot_de_passe_fort';
+   GRANT ALL PRIVILEGES ON zone85.* TO 'zone85_user'@'localhost';
+   ```
+
+2. Importer le schéma et les données de test :
+   ```bash
+   mysql -u zone85_user -p zone85 < database/schema.sql
+   mysql -u zone85_user -p zone85 < database/seed.sql
+   ```
+
+3. Configurer dans `includes/config.php` :
+   ```php
+   define('DB_ENABLED', true);
+   define('DB_USER',    'zone85_user');
+   define('DB_PASS',    'mot_de_passe_fort');
+   ```
+
+> **Ne pas utiliser en production sans sécuriser les credentials.**  
+> Voir `docs/mysql-implementation-v1.md` pour le guide complet.
 
 ---
 
@@ -198,7 +240,7 @@ Voir `docs/security-checklist-v1.md` pour la checklist complète et le plan v2.
 
 | Fonctionnalité | État | Référence |
 |---|---|---|
-| Base MySQL | Non actif — données mockées dans `data.php` | `docs/mysql-model-v1.md` |
+| Base MySQL | Optionnel — `DB_ENABLED=false` par défaut, data.php en fallback | `docs/mysql-implementation-v1.md` |
 | Authentification | Non actif — `$mock_user` fictif | `docs/security-checklist-v1.md` §4 |
 | Upload réel | Non actif | `docs/security-checklist-v1.md` §7 |
 | Paiement | Non actif | — |
