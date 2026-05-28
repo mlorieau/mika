@@ -573,3 +573,179 @@ function fetch_user_profile(int $userId): ?array {
         return null;
     }
 }
+
+// ── Hall items ────────────────────────────────────────────────
+
+/**
+ * Retourne les items du Hall (tous types confondus).
+ */
+function fetch_hall_items(int $limit = 12): ?array {
+    $pdo = db();
+    if (!$pdo) return null;
+    try {
+        $stmt = $pdo->prepare("
+            SELECT h.*, u.pseudo AS author_pseudo, c.slug AS clan_slug
+            FROM hall_items h
+            LEFT JOIN users u ON u.id = h.user_id
+            LEFT JOIN clans c ON c.id = h.clan_id
+            WHERE h.published_at IS NOT NULL
+            ORDER BY h.is_featured DESC, h.published_at DESC
+            LIMIT :limit
+        ");
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll() ?: null;
+    } catch (PDOException $e) {
+        error_log('[ZONE85] fetch_hall_items : ' . $e->getMessage());
+        return null;
+    }
+}
+
+/**
+ * Retourne les items du Hall filtrés par type.
+ * Types : 'photo', 'contribution', 'keto', 'rando', 'trophy', 'member', 'archive'
+ */
+function fetch_hall_items_by_type(string $type, int $limit = 12): array {
+    $pdo = db();
+    if (!$pdo) return [];
+    try {
+        $stmt = $pdo->prepare("
+            SELECT h.*, u.pseudo AS author_pseudo, c.slug AS clan_slug
+            FROM hall_items h
+            LEFT JOIN users u ON u.id = h.user_id
+            LEFT JOIN clans c ON c.id = h.clan_id
+            WHERE h.item_type = :type AND h.published_at IS NOT NULL
+            ORDER BY h.is_featured DESC, h.published_at DESC
+            LIMIT :limit
+        ");
+        $stmt->bindValue(':type',  $type,  PDO::PARAM_STR);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    } catch (PDOException $e) {
+        error_log('[ZONE85] fetch_hall_items_by_type : ' . $e->getMessage());
+        return [];
+    }
+}
+
+/**
+ * Retourne les items du Hall mis en avant (is_featured = 1).
+ */
+function fetch_featured_hall_items(int $limit = 6): array {
+    $pdo = db();
+    if (!$pdo) return [];
+    try {
+        $stmt = $pdo->prepare("
+            SELECT h.*, u.pseudo AS author_pseudo, c.slug AS clan_slug
+            FROM hall_items h
+            LEFT JOIN users u ON u.id = h.user_id
+            LEFT JOIN clans c ON c.id = h.clan_id
+            WHERE h.is_featured = 1 AND h.published_at IS NOT NULL
+            ORDER BY h.published_at DESC
+            LIMIT :limit
+        ");
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    } catch (PDOException $e) {
+        error_log('[ZONE85] fetch_featured_hall_items : ' . $e->getMessage());
+        return [];
+    }
+}
+
+// ── Utilisateur (démo & enrichissement) ──────────────────────
+
+/**
+ * Retourne un utilisateur de démonstration par ID (pour profil.php sans auth réelle).
+ * Délègue à fetch_user_profile() — retourne null si indisponible.
+ */
+function fetch_demo_user(int $userId = 1): ?array {
+    return fetch_user_profile($userId);
+}
+
+/**
+ * Retourne les badges obtenus par un utilisateur.
+ * Compatible avec $badges de data.php (champs : obtained=true, progress=100).
+ * Retourne [] (jamais null) pour ne pas casser les foreach.
+ */
+function fetch_user_badges(int $userId): array {
+    $pdo = db();
+    if (!$pdo) return [];
+    try {
+        $stmt = $pdo->prepare("
+            SELECT b.*, ub.awarded_at
+            FROM user_badges ub
+            JOIN badges b ON b.id = ub.badge_id
+            WHERE ub.user_id = :id
+            ORDER BY ub.awarded_at DESC
+        ");
+        $stmt->execute([':id' => $userId]);
+        $rows = $stmt->fetchAll();
+        foreach ($rows as &$r) {
+            $r['obtained']     = true;
+            $r['progress']     = 100;
+            $r['xp_threshold'] = ($r['condition_type'] === 'xp_threshold') ? (int)$r['condition_value'] : null;
+        }
+        return $rows;
+    } catch (PDOException $e) {
+        error_log('[ZONE85] fetch_user_badges : ' . $e->getMessage());
+        return [];
+    }
+}
+
+/**
+ * Retourne les participations d'un utilisateur, avec le titre de la mission.
+ * Retourne [] (jamais null) pour ne pas casser les foreach.
+ */
+function fetch_user_participations(int $userId, int $limit = 20): array {
+    $pdo = db();
+    if (!$pdo) return [];
+    try {
+        $stmt = $pdo->prepare("
+            SELECT p.*, m.title AS mission_title, m.mission_type, m.slug AS mission_slug
+            FROM participations p
+            JOIN missions m ON m.id = p.mission_id
+            WHERE p.user_id = :id
+            ORDER BY p.created_at DESC
+            LIMIT :limit
+        ");
+        $stmt->bindValue(':id',    $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit,  PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    } catch (PDOException $e) {
+        error_log('[ZONE85] fetch_user_participations : ' . $e->getMessage());
+        return [];
+    }
+}
+
+// ── Missions par saison ───────────────────────────────────────
+
+/**
+ * Retourne les missions liées à une saison donnée.
+ */
+function fetch_missions_by_season(int $seasonId, string $status = 'active'): ?array {
+    $pdo = db();
+    if (!$pdo) return null;
+    try {
+        $stmt = $pdo->prepare("
+            SELECT * FROM missions
+            WHERE season_id = :sid AND status = :status
+            ORDER BY mission_type = 'seasonal_collective' DESC, id ASC
+        ");
+        $stmt->execute([':sid' => $seasonId, ':status' => $status]);
+        $rows = $stmt->fetchAll();
+        if (empty($rows)) return null;
+        foreach ($rows as &$r) {
+            foreach (['is_collective','requires_answer','requires_upload',
+                      'requires_vote','requires_code','display_in_hall'] as $k) {
+                $r[$k] = (bool)(int)$r[$k];
+            }
+            $r['race_progress'] = ['bocage' => 0, 'littoral' => 0, 'marais' => 0];
+        }
+        return $rows;
+    } catch (PDOException $e) {
+        error_log('[ZONE85] fetch_missions_by_season : ' . $e->getMessage());
+        return null;
+    }
+}

@@ -33,6 +33,60 @@ $user = [
     'clan_place'      => 1,
 ];
 
+// ── Repository layer — override $user depuis MySQL si disponible ──
+// TODO auth membre : remplacer fetch_demo_user(1) par l'utilisateur connecté en session
+require_once 'includes/db.php';
+require_once 'includes/repositories.php';
+if (db_enabled()) {
+    $_demo = fetch_demo_user(1);
+    if ($_demo) {
+        // Calcul de la barre XP par niveau
+        $_xp_levels = [0, 100, 300, 600, 1000, 1500, 2500, 4000, 6000, 9000, 13000, 18000];
+        $_lvl        = max(1, min((int)$_demo['level'], count($_xp_levels) - 1));
+        $_xp_floor   = $_xp_levels[$_lvl - 1] ?? 0;
+        $_xp_ceil    = $_xp_levels[$_lvl]     ?? ($_xp_floor + 5000);
+        $_xp_range   = max(1, $_xp_ceil - $_xp_floor);
+        $_xp_pct     = min(100, (int)round(((int)$_demo['xp_total'] - $_xp_floor) / $_xp_range * 100));
+        $_level_names = ['','Novice','Éclaireur','Pisteur','Ranger','Garde','Chasseur',
+                         'Grand Pisteur','Vétéran','Légende','Ancêtre','Immortel'];
+        $_chip_map   = ['bocage'=>'bocage-chip-sm','littoral'=>'littoral-chip-sm','marais'=>'marais-chip-sm'];
+        $_clan_labels = ['bocage'=>'Clan du Bocage','littoral'=>'Clan du Littoral','marais'=>'Clan du Marais'];
+        $_prenom     = $_demo['prenom'] ?: $_demo['pseudo'];
+        $_nom        = $_demo['nom']    ?: '';
+        $_initials   = strtoupper(mb_substr($_prenom, 0, 1) . mb_substr($_nom, 0, 1)) ?: '??';
+        // Récupérer les données du clan depuis MySQL
+        $_clan_data  = null;
+        if ($_demo['clan_slug']) {
+            $_all_clans = fetch_all_clans();
+            $_clan_data = $_all_clans[$_demo['clan_slug']] ?? null;
+        }
+        $user = [
+            'pseudo'          => $_demo['pseudo'],
+            'first_name'      => $_prenom,
+            'initials'        => $_initials,
+            'avatar'          => $_demo['avatar'] ?? '🧭',
+            'level'           => $_lvl,
+            'level_name'      => $_level_names[$_lvl] ?? 'Zonaute',
+            'xp_current'      => (int)$_demo['xp_total'],
+            'xp_next'         => $_xp_ceil,
+            'xp_pct'          => $_xp_pct,
+            'badges_count'    => (int)$_demo['badges_count'],
+            'participations'  => (int)$_demo['missions_done'],
+            'clan_slug'       => $_demo['clan_slug'] ?? '',
+            'clan_label'      => $_clan_labels[$_demo['clan_slug'] ?? ''] ?? 'Aucun clan',
+            'clan_chip_class' => $_chip_map[$_demo['clan_slug'] ?? ''] ?? '',
+            'season_pts'      => (int)$_demo['xp_this_season'],
+            'clan_rank'       => (int)$_demo['rank_in_clan'],
+            'clan_members'    => $_clan_data ? (int)$_clan_data['members_count'] : 0,
+            'clan_score'      => $_clan_data ? (int)$_clan_data['season_score']  : 0,
+            'clan_place'      => $_clan_data ? (int)$_clan_data['podium_rank']   : 0,
+        ];
+        // Badges réels de cet utilisateur
+        $_user_badges = fetch_user_badges($_demo['id']);
+        if (!empty($_user_badges)) $badges = $_user_badges;
+    }
+}
+
 $page_styles = '<style>
 /* ── PAGE LAYOUT ── */
 .profil-page { padding-top: 68px; min-height: 100vh; background: var(--beige); }

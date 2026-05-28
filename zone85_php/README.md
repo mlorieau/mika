@@ -226,23 +226,36 @@ Voir `docs/security-checklist-v1.md` pour la checklist complète et le plan v2.
 
 ---
 
-## Prochaines étapes
+## État actuel (v4)
 
-1. **Migration MySQL** — Voir `docs/mysql-model-v1.md` pour le schéma complet
-2. **Authentification réelle** — Sessions sécurisées, `password_hash()`, rate limiting
-3. **Back-office admin/modérateur** — Gestion missions, saisons, validation photos
-4. **Upload photo sécurisé** — finfo, getimagesize, renommage, GD resize, modération
-5. **Gamification réelle** — XP côté serveur, points clan, badges, anti-triche
+| Composant | État |
+|---|---|
+| PHP modulaire | ✓ Opérationnel |
+| MySQL + repositories | ✓ Actif (DB_ENABLED configurable) |
+| Fallback data.php | ✓ Automatique si DB indisponible |
+| Pages publiques | ✓ Alimentées par MySQL (clans, missions, classement, hall, index, profil démo) |
+| Formulaires | Simulation uniquement (inscription, contact, participation) |
+| Authentification réelle | Non — profil.php affiche un utilisateur de démo |
+| Back-office | Non |
+| Upload photos | Non |
+| Paiement | Non |
 
 ---
 
-## Ce qui n'est PAS encore actif
+## Prochaines étapes recommandées
 
-| Fonctionnalité | État | Référence |
-|---|---|---|
-| Base MySQL | Optionnel — `DB_ENABLED=false` par défaut, data.php en fallback | `docs/mysql-implementation-v1.md` |
-| Authentification | Non actif — `$mock_user` fictif | `docs/security-checklist-v1.md` §4 |
-| Upload réel | Non actif | `docs/security-checklist-v1.md` §7 |
-| Paiement | Non actif | — |
-| Back-office | Non actif | `docs/security-checklist-v1.md` §9 |
-| Gamification réelle | Non actif — XP mockés | `docs/mysql-model-v1.md` |
+### Étape suivante prioritaire : Authentification membre
+
+1. `auth/register.php` — inscription réelle avec validation, hash mot de passe, choix clan
+2. `auth/login.php` — connexion, création session sécurisée
+3. `auth/logout.php` — destruction session
+4. `includes/session.php` — gestion centralisée de la session
+5. `profil.php` — afficher l'utilisateur connecté au lieu du démo
+
+### Puis (dans cet ordre)
+
+6. Moteur de participation — enregistrer les réponses en base
+7. Attribution XP côté serveur — jamais côté client
+8. Attribution points clan — mis à jour en base
+9. Déclenchement badges — vérification à chaque participation
+10. Back-office modération — validation photos, participations manuelles

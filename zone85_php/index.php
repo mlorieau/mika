@@ -23,6 +23,18 @@ require_once 'includes/config.php';
 require_once 'includes/data.php';
 require_once 'includes/functions.php';
 
+// ── Repository layer (MySQL si disponible, sinon fallback data.php) ──
+require_once 'includes/db.php';
+require_once 'includes/repositories.php';
+if (db_enabled()) {
+    $_clans_db = fetch_all_clans();
+    if ($_clans_db !== null) $clans = $_clans_db;
+    $_season_db = fetch_active_season();
+    if ($_season_db !== null) $active_season = $_season_db;
+    $_missions_db = fetch_featured_missions(6);
+    if ($_missions_db !== null) $missions = $_missions_db;
+}
+
 // Trier les clans par score décroissant pour la course de saison
 $clans_race = $clans;
 uasort($clans_race, fn($a, $b) => $b['season_score'] <=> $a['season_score']);

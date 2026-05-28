@@ -1,4 +1,11 @@
 <?php
+// ── Protection : ne jamais exposer en production ──────────────
+// Fichier de diagnostic à supprimer ou protéger par IP/htpasswd avant déploiement.
+if (defined('APP_ENV') && APP_ENV === 'prod') {
+    http_response_code(403);
+    die('403 Forbidden — Ce fichier de diagnostic ne doit pas être accessible en production.');
+}
+
 // ============================================================
 // ZONE 85 — Diagnostic de connexion MySQL
 // ⚠ SUPPRIMER ou PROTÉGER ce fichier avant toute mise en production.

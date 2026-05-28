@@ -281,3 +281,19 @@ function set_security_headers(): void {
     // TODO: renforcer en prod après audit complet des inline styles/scripts
     header("Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self';");
 }
+
+/**
+ * Exécute un callback repository et retourne le résultat ou le fallback si null/exception.
+ * Usage : $clans = safe_fetch(fn() => fetch_all_clans(), $clans);
+ */
+function safe_fetch(callable $callback, $fallback = []) {
+    try {
+        $result = $callback();
+        return ($result !== null) ? $result : $fallback;
+    } catch (Throwable $e) {
+        if (defined('APP_ENV') && APP_ENV === 'dev') {
+            error_log('[ZONE85 safe_fetch] ' . $e->getMessage());
+        }
+        return $fallback;
+    }
+}
