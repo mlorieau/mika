@@ -877,16 +877,6 @@ require_once 'includes/nav.php';
           <span class="rando-info-item-label">D&eacute;part</span>
         </div>
       <?php endif; ?>
-      <?php $_top_gpx = $rando['gpx_file'] ?? $rando['gpx_url'] ?? ''; ?>
-      <?php if (!empty($_top_gpx)): ?>
-        <div class="rando-info-item" style="border-right:none">
-          <a href="<?= e(media_url($_top_gpx)) ?>"
-             class="rando-gpx-btn"
-             download>
-            &#x1F4E5; T&eacute;l&eacute;charger GPX
-          </a>
-        </div>
-      <?php endif; ?>
     </div>
   </div>
 </div>
@@ -913,7 +903,7 @@ require_once 'includes/nav.php';
             <img class="rando-cover-img" data-lightbox="1"
                  src="<?= e(media_url($rando['cover_image'])) ?>"
                  alt="<?= htmlspecialchars($rando['title'], ENT_QUOTES, 'UTF-8') ?>"
-                 loading="lazy" data-lightbox="1" onerror="this.style.display='none';">
+                 loading="lazy" onerror="this.style.display='none';">
           <?php endif; ?>
 
 
@@ -986,18 +976,6 @@ require_once 'includes/nav.php';
             </div>
           <?php endif; ?>
 
-          <?php // GPX téléchargement ?>
-          <?php $_gpx = $rando['gpx_file'] ?? $rando['gpx_url'] ?? ''; ?>
-          <?php if ($_gpx): ?>
-            <div style="padding:16px 36px 0">
-              <a href="<?= e(media_url($_gpx)) ?>"
-                 download class="rando-gpx-btn">
-                &#x1F5FA;&#xFE0F; Télécharger le tracé GPX
-              </a>
-            </div>
-          <?php endif; ?>
-
-          
           <?php if (!empty($rando['gps_lat']) && !empty($rando['gps_lng'])): ?>
             <div class="rando-map-block">
               <div id="zone85RandoMap"
@@ -1338,6 +1316,12 @@ require_once 'includes/nav.php';
 
 
           <div class="rando-validation-box">
+            <?php if (!$user_has_completed && $is_logged_in): ?>
+              <p style="font-size:.74rem;color:#6b7f96;line-height:1.5;margin-bottom:12px">
+                🥾 Tamponnez votre Passeport gratuitement.<br>
+                📸 Ajoutez une photo devant le Trésor pour débloquer +25 XP.
+              </p>
+            <?php endif; ?>
             <?php if ($user_has_completed): ?>
               <?php if ($user_rando_status === 'validated'): ?>
                 <button type="button" class="rando-passport-btn done">✓ Rando validée · +25 XP</button>

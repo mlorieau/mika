@@ -869,14 +869,18 @@ require_once 'includes/nav.php';
       <?php if (empty($randos)): ?>
         <div class="randos-empty">
           <div class="randos-empty-icon">&#x1F97E;</div>
-          <p class="randos-empty-title">Les premi&egrave;res randonn&eacute;es Zone85 arrivent bient&ocirc;t.</p>
-          <p class="randos-empty-text">
-            En attendant, d&eacute;couvrez les missions de randonn&eacute;e disponibles<br>
-            et explorez la Vend&eacute;e &agrave; votre rythme.
-          </p>
-          <a href="missions.php" class="randos-empty-btn">
-            &#x1F3AF; Voir les missions
-          </a>
+          <?php if ($has_filters): ?>
+            <p class="randos-empty-title">Aucune randonn&eacute;e ne correspond &agrave; vos filtres.</p>
+            <p class="randos-empty-text">Essayez de modifier ou r&eacute;initialiser vos crit&egrave;res de recherche.</p>
+            <a href="randos.php" class="randos-empty-btn">&#x21BA; R&eacute;initialiser les filtres</a>
+          <?php else: ?>
+            <p class="randos-empty-title">Les premi&egrave;res randonn&eacute;es Zone85 arrivent bient&ocirc;t.</p>
+            <p class="randos-empty-text">
+              En attendant, d&eacute;couvrez les missions de randonn&eacute;e disponibles<br>
+              et explorez la Vend&eacute;e &agrave; votre rythme.
+            </p>
+            <a href="missions.php" class="randos-empty-btn">&#x1F3AF; Voir les missions</a>
+          <?php endif; ?>
         </div>
 
       <?php else: ?>

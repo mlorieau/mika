@@ -36,6 +36,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
                 $up = $pdo->prepare('UPDATE rando_participations SET status="validated", xp_awarded=1, validated_at=NOW(), validated_by=:admin WHERE id=:id');
                 $admin_id = (int)((current_user()['id'] ?? 0));
                 $up->execute([':admin'=>$admin_id ?: null, ':id'=>$id]);
+                // Vérification badge "Chasseur de Randos" (5 randos validées)
+                $cnt_s = $pdo->prepare("SELECT COUNT(*) FROM rando_participations WHERE user_id=:uid AND status='validated'");
+                $cnt_s->execute([':uid' => (int)$row['uid']]);
+                if ((int)$cnt_s->fetchColumn() >= 5) {
+                    $b = $pdo->prepare("SELECT id FROM badges WHERE slug='chasseur-randos' LIMIT 1");
+                    $b->execute();
+                    $badge = $b->fetch();
+                    if ($badge) {
+                        $pdo->prepare("INSERT IGNORE INTO user_badges (user_id, badge_id, source_type) VALUES (:uid,:bid,'rando')")
+                            ->execute([':uid' => (int)$row['uid'], ':bid' => (int)$badge['id']]);
+                    }
+                }
                 $pdo->commit();
                 $flash = 'Rando validée : +25 XP attribués.';
             } elseif ($action === 'reject') {
