@@ -302,6 +302,15 @@ function upload_avatar(array $file): array {
         return ['ok' => false, 'error' => 'Type non autorisé. Utilisez jpg, png ou webp.'];
     }
 
+    // Vérification dimensions — évite les images DoS (ex: 50 000×50 000 px)
+    $img_size = @getimagesize($file['tmp_name']);
+    if ($img_size === false) {
+        return ['ok' => false, 'error' => 'Fichier image illisible.'];
+    }
+    if ($img_size[0] > 4000 || $img_size[1] > 4000) {
+        return ['ok' => false, 'error' => 'Image trop grande (max 4000×4000 px).'];
+    }
+
     $upload_dir = defined('BASE_PATH')
         ? BASE_PATH . 'uploads/avatars/'
         : dirname(__DIR__) . '/uploads/avatars/';

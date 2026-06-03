@@ -33,7 +33,7 @@ if (!$is_guest && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['compte_
     $_action = $_POST['compte_action'];
 
     if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
-        $_compte_flash = ['type'=>'err','msg'=>'Jeton invalide. Rafraîchis la page.'];
+        $_compte_flash = ['type'=>'err','msg'=>'Token de sécurité invalide. Rechargez la page.'];
     } elseif ($_cpdo) {
 
         if ($_action === 'update_profile') {

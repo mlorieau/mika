@@ -31,6 +31,14 @@ if (!is_logged_in()) {
     exit;
 }
 
+// Rate limiting : 20 validations max par IP par minute
+if (!check_rate_limit('collectible_found', 20, 60)) {
+    http_response_code(429);
+    header('Retry-After: 60');
+    echo json_encode(['ok' => false, 'reason' => 'rate_limit', 'message' => 'Trop de tentatives. Veuillez patienter.']);
+    exit;
+}
+
 // CSRF
 if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
     http_response_code(403);

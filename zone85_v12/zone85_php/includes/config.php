@@ -22,19 +22,18 @@ function _env(string $key, string $default = ''): string {
     return ($v !== false && $v !== null && $v !== '') ? (string)$v : $default;
 }
 
-// Environnement : surcharger via APP_ENV=prod dans .env ou variables serveur
-define('APP_ENV', _env('APP_ENV', 'dev')); // 'dev' | 'prod'
-
-// Outils de diagnostic (uniquement en dev, jamais en prod)
+// ── Environnement ──────────────────────────────────────────
+// Surcharger via APP_ENV=prod dans .env ou variable serveur avant mise en ligne.
+define('APP_ENV',           _env('APP_ENV', 'dev'));            // 'dev' | 'prod'
 define('DEV_TOOLS_ALLOWED', _env('DEV_TOOLS_ALLOWED', 'false') === 'true');
 
-// Site
+// ── Identité du site ───────────────────────────────────────
 define('SITE_NAME',    'ZONE85');
 define('SITE_TAGLINE', "La Vendée qui joue, qui marche, qui enquête et qui se raconte.");
 define('SITE_EMAIL',   'contact@zone85.fr');
 define('SITE_URL',     'https://www.zone85.fr'); // sans slash final
 
-// Chemins (utilise __DIR__ pour être robuste)
+// ── Chemins filesystem ─────────────────────────────────────
 define('BASE_PATH',   dirname(__DIR__) . '/');
 define('ASSETS_PATH', 'assets/');
 define('CSS_PATH',    'assets/css/');
@@ -42,21 +41,22 @@ define('JS_PATH',     'assets/js/');
 define('IMG_PATH',    'assets/img/');
 define('UPLOAD_PATH', 'uploads/');
 
-// URL de base — adapter selon l'installation
-// '/'                    si le site est à la racine du domaine
-// '/test/zone85_php/'    si le site est dans un sous-dossier
+// URL de base — '/' si la racine du domaine, '/sous-dossier/' sinon
 define('BASE_URL', '/test/zone85_php/');
 
-// Upload — avatars : 2 Mo max, types image uniquement
-define('UPLOAD_MAX_SIZE',          2 * 1024 * 1024); // 2 Mo (avatars)
+// ── Upload ─────────────────────────────────────────────────
+define('UPLOAD_MAX_SIZE',          2 * 1024 * 1024);                     // 2 Mo (avatars)
+define('UPLOAD_MAX_SIZE_MEDIA',    5 * 1024 * 1024);                     // 5 Mo (randos/médias)
+define('UPLOAD_MAX_DIM',           4000);                                 // px max par côté (anti-DoS)
 define('ALLOWED_IMAGE_TYPES',      ['image/jpeg', 'image/png', 'image/webp']);
 define('ALLOWED_IMAGE_EXTENSIONS', ['jpg', 'jpeg', 'png', 'webp']);
 
-// Session (futur)
+// ── Session ────────────────────────────────────────────────
 define('SESSION_NAME',    'zone85_session');
 define('SESSION_TIMEOUT', 3600); // 1h
 
-// Saisons (labels pour l'interface)
+// ── Données métier ─────────────────────────────────────────
+define('CLAN_SLUGS', ['bocage', 'littoral', 'marais']);
 define('SEASONS', [
     'saison-du-reveil'         => 'Saison du Réveil',
     'camp-ete-zone85'          => 'Camp d\'Été Zone85',
@@ -64,17 +64,17 @@ define('SEASONS', [
     'saison-des-veillees'      => 'Saison des Veillées',
 ]);
 
-// Base de données — surcharger via .env ou variables d'environnement serveur
+// ── Base de données ────────────────────────────────────────
+// Toujours surcharger DB_USER et DB_PASS via .env ou variables serveur en prod.
 define('DB_ENABLED', _env('DB_ENABLED', 'true') !== 'false');
 define('DB_HOST',    _env('DB_HOST',    'localhost'));
 define('DB_PORT',    (int)_env('DB_PORT', '3306'));
 define('DB_NAME',    _env('DB_NAME',    'qg_'));
 define('DB_USER',    _env('DB_USER',    'AdminQg85'));
-define('DB_PASS',    _env('DB_PASS',    'AdminQg85!')); // TOUJOURS via .env ou var serveur en prod
+define('DB_PASS',    _env('DB_PASS',    'AdminQg85!')); // TOUJOURS via .env en prod
 define('DB_CHARSET', 'utf8mb4');
 
-// ── Session auto-start ──────────────────────────────────────
-// Démarré ici pour être disponible avant header.php (cookies/CSRF).
+// ── Session auto-start ─────────────────────────────────────
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_name('zone85_session');
     session_set_cookie_params([
@@ -87,40 +87,36 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
-// Clans (slugs valides)
-define('CLAN_SLUGS', ['bocage', 'littoral', 'marais']);
-
-// ── Brevo (transactionnel) ─────────────────────────────────
-define('BREVO_API_KEY',    _env('BREVO_API_KEY', ''));  // xkeysib-... (via .env en prod)
+// ── Emails transactionnels (Brevo) ─────────────────────────
+// Renseigner BREVO_API_KEY dans .env pour activer — sinon fallback sur mail().
+define('BREVO_API_KEY',    _env('BREVO_API_KEY', ''));  // xkeysib-...
 define('BREVO_API_URL',    'https://api.brevo.com/v3/smtp/email');
 define('BREVO_FROM_EMAIL', 'noreply@zone85.fr');
 define('BREVO_FROM_NAME',  'ZONE85');
 define('BREVO_ENABLED',    _env('BREVO_API_KEY', '') !== '');
 
 // ── Analytics ──────────────────────────────────────────────
-// GA4 : renseigner l'ID de mesure (ex: G-XXXXXXXXXX) pour activer.
-define('GA4_MEASUREMENT_ID', '');        // G-XXXXXXXXXX
+// GA4 : renseigner G-XXXXXXXXXX pour activer.
+define('GA4_MEASUREMENT_ID', _env('GA4_MEASUREMENT_ID', ''));
 
-// Matomo : renseigner l'URL + ID site pour activer (alternative à GA4).
-define('MATOMO_URL',     '');            // https://matomo.votredomaine.fr/
-define('MATOMO_SITE_ID', 0);
+// Matomo : alternative privacy-friendly à GA4.
+define('MATOMO_URL',     _env('MATOMO_URL', ''));
+define('MATOMO_SITE_ID', (int)_env('MATOMO_SITE_ID', '0'));
 
 // ── PWA ────────────────────────────────────────────────────
-define('PWA_ENABLED', true);
-define('PWA_APP_NAME',      'ZONE85');
-define('PWA_SHORT_NAME',    'Zone85');
-define('PWA_THEME_COLOR',   '#0c1e2e');
-define('PWA_BG_COLOR',      '#f8f4ef');
-define('PWA_DISPLAY',       'standalone');
+define('PWA_ENABLED',    true);
+define('PWA_APP_NAME',   'ZONE85');
+define('PWA_SHORT_NAME', 'Zone85');
+define('PWA_THEME_COLOR','#0c1e2e');
+define('PWA_BG_COLOR',   '#f8f4ef');
+define('PWA_DISPLAY',    'standalone');
 
-// ── Chargement settings DB ─────────────────────────────────
-// Les valeurs de la table `settings` écrasent les constantes ci-dessus
-// dès que la DB est disponible. Pas de rechargement nécessaire.
-// Utiliser get_setting('brevo_api_key') dans le code applicatif
-// pour bénéficier de la priorité DB → config.php.
-// Le fichier includes/settings.php est auto-chargé depuis db.php au besoin.
+// ── Settings DB ────────────────────────────────────────────
+// La table `settings` écrase ces constantes dès que la DB est disponible.
+// Utiliser get_setting('clé') dans le code pour bénéficier de la priorité DB → config.
+// includes/settings.php est auto-chargé par db.php.
 
-// ── Barème XP (référence)
+// ── Barème XP ──────────────────────────────────────────────
 define('XP_RATES', [
     'vote'                        => 2,
     'quiz_attempt'                => 5,

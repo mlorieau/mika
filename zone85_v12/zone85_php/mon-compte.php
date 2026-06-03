@@ -125,11 +125,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     $flash = ['type' => 'err', 'msg' => 'Mot de passe actuel incorrect.'];
                 } else {
                     try {
+                        $pdo->beginTransaction();
                         $hash = password_hash($pwd_new, PASSWORD_BCRYPT);
                         $pdo->prepare("UPDATE users SET password_hash=:h, updated_at=NOW() WHERE id=:id")
                             ->execute([':h' => $hash, ':id' => $user_id]);
+                        $pdo->commit();
                         $flash = ['type' => 'ok', 'msg' => 'Mot de passe mis à jour.'];
                     } catch (PDOException $e) {
+                        if ($pdo->inTransaction()) $pdo->rollBack();
+                        error_log('[mon-compte update_password] ' . $e->getMessage());
                         $flash = ['type' => 'err', 'msg' => 'Erreur lors de la mise à jour.'];
                     }
                 }

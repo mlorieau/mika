@@ -1,7 +1,10 @@
 <?php
 // ============================================================
-// ZONE 85 — Données mockées v1
-// TODO: remplacer par des requêtes MySQL (voir /docs/mysql-model-v1.md)
+// ZONE 85 — Données mockées (fallback développement uniquement)
+// Ces données sont utilisées en dernier recours si la DB est indisponible.
+// En production, toutes les pages chargent leurs données depuis MySQL via
+// les fonctions fetch_* de repositories.php. Ce fichier ne doit jamais
+// être la source principale de données.
 // ============================================================
 
 // ── SEO DEFAULTS ──────────────────────────────────────────────

@@ -469,6 +469,26 @@ function safe_input(string $value, int $max_length = 500): string {
 }
 
 /**
+ * Formate une date MySQL en français.
+ * $format : 'long' (3 juin 2025) | 'short' (03/06/2025) | 'medium' (3 jun. 2025) | 'time' (03/06/2025 à 14h30)
+ * Ou tout format PHP valide passé directement (ex: 'd/m/Y').
+ */
+function format_date(string $date, string $format = 'long'): string {
+    if (!$date) return '';
+    $ts = strtotime($date);
+    if (!$ts) return $date;
+    static $months = ['', 'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
+                      'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+    return match($format) {
+        'long'   => (int)date('j', $ts) . ' ' . $months[(int)date('n', $ts)] . ' ' . date('Y', $ts),
+        'short'  => date('d/m/Y', $ts),
+        'medium' => (int)date('j', $ts) . ' ' . mb_substr($months[(int)date('n', $ts)], 0, 3) . '. ' . date('Y', $ts),
+        'time'   => date('d/m/Y', $ts) . ' à ' . date('H', $ts) . 'h' . date('i', $ts),
+        default  => date($format, $ts),
+    };
+}
+
+/**
  * Affiche les objets cachés pour une page donnée (Hidden Hunt V9).
  * À appeler en bas de chaque page publique avant le footer.
  * Ne produit aucune sortie si la DB est indisponible ou aucun objet actif.

@@ -28,6 +28,14 @@ require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/repositories.php';
 
 $pdo = db();
+
+// Rate limiting : 60 requêtes par IP par minute
+if (!check_rate_limit('passport_api', 60, 60)) {
+    http_response_code(429);
+    header('Retry-After: 60');
+    echo json_encode(['ok' => false, 'error' => 'Trop de requêtes. Veuillez patienter.'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
 if (!$pdo) {
     http_response_code(503);
     echo json_encode(['ok' => false, 'error' => 'DB indisponible'], JSON_UNESCAPED_UNICODE);

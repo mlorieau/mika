@@ -1012,11 +1012,22 @@ require_once 'includes/nav.php';
     </div>
 
     <?php if (empty($missions_list)): ?>
-    <div style="text-align:center;padding:48px 0;color:var(--text-muted)">
-      <div style="font-size:2.5rem;margin-bottom:12px">🗺️</div>
-      <p>Les missions arrivent bientôt. Reviens dans la Zone !</p>
+    <div style="text-align:center;padding:64px 24px;color:var(--text-muted)">
+      <div style="font-size:3rem;margin-bottom:16px">🗺️</div>
+      <p style="font-size:1.05rem;font-weight:700;color:var(--navy-dark);margin-bottom:8px">Les missions arrivent bientôt.</p>
+      <p style="font-size:.9rem">Reviens dans la Zone — les premières aventures se préparent.</p>
     </div>
     <?php endif; ?>
+    <!-- Message affiché par JS si les filtres ne donnent aucun résultat -->
+    <div id="missions-filter-empty" style="display:none;text-align:center;padding:64px 24px;color:var(--text-muted)">
+      <div style="font-size:2.5rem;margin-bottom:16px">🔍</div>
+      <p style="font-size:1.05rem;font-weight:700;color:var(--navy-dark);margin-bottom:8px">Aucune mission dans cette catégorie.</p>
+      <p style="font-size:.9rem;margin-bottom:20px">Essaie un autre filtre ou reviens sur "Toutes".</p>
+      <button onclick="filterMissions(document.querySelector('[data-filter=all]'),'all')"
+              style="padding:10px 24px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius);font-weight:700;cursor:pointer">
+        Voir toutes les missions
+      </button>
+    </div>
 
   </div>
 </section>
@@ -1130,13 +1141,17 @@ $page_scripts = '<script>
   window.filterMissions = function(btn, type) {
     document.querySelectorAll(".filter-tab-v2").forEach(function(b) { b.classList.remove("active"); });
     btn.classList.add("active");
+    var visible = 0;
     document.querySelectorAll("#missions-grid .mission-card").forEach(function(card) {
       if (type === "all" || card.dataset.type === type) {
         card.style.display = "";
+        visible++;
       } else {
         card.style.display = "none";
       }
     });
+    var emptyEl = document.getElementById("missions-filter-empty");
+    if (emptyEl) emptyEl.style.display = (visible === 0 && type !== "all") ? "" : "none";
   };
 
   /* ── Anime les barres de progression ── */
