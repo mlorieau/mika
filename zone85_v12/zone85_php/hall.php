@@ -64,25 +64,24 @@ if (db_enabled()) {
         $flash_active = null;
     }
 
-    // KTC : total bonnes reponses
+    // KTC : épisodes révélés (nouveau modèle éditorial)
     try {
         $pdo = db();
         $ktc_count = (int)$pdo->query(
-            "SELECT COUNT(*) FROM ktc_answers WHERE is_correct = 1"
+            "SELECT COUNT(*) FROM ktc_episodes WHERE status IN ('revealed','archived')"
         )->fetchColumn();
     } catch (PDOException $e) {
         $ktc_count = 0;
     }
 
-    // KTC : 3 dernieres questions resolues
+    // KTC : 3 derniers épisodes révélés
     try {
         $pdo = db();
         $stmt = $pdo->query("
-            SELECT DISTINCT kq.title, kq.id
-            FROM ktc_answers ka
-            JOIN ktc_questions kq ON kq.id = ka.question_id
-            WHERE ka.is_correct = 1
-            ORDER BY ka.created_at DESC
+            SELECT title, id, date_revelation
+            FROM ktc_episodes
+            WHERE status IN ('revealed','archived')
+            ORDER BY id DESC
             LIMIT 3
         ");
         $ktc_last3 = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -774,7 +773,7 @@ require_once 'includes/nav.php';
     <div class="ktc-block">
       <div class="ktc-count-row">
         <span class="ktc-count-number"><?= number_format($ktc_count) ?></span>
-        <span class="ktc-count-label">bonne<?= $ktc_count > 1 ? 's' : '' ?> reponse<?= $ktc_count > 1 ? 's' : '' ?><br>donnee<?= $ktc_count > 1 ? 's' : '' ?> par la communaute</span>
+        <span class="ktc-count-label">mystere<?= $ktc_count > 1 ? 's' : '' ?><br>resolu<?= $ktc_count > 1 ? 's' : '' ?></span>
       </div>
 
       <?php if (!empty($ktc_last3)): ?>
@@ -788,7 +787,7 @@ require_once 'includes/nav.php';
           <?php endforeach; ?>
         </div>
       <?php elseif ($ktc_count === 0): ?>
-        <p class="ktc-empty">Aucune enigme encore resolue — la premiere sera legendaire.</p>
+        <p class="ktc-empty">Aucun mystere encore revele &mdash; le premier sera legendaire.</p>
       <?php endif; ?>
     </div>
   </div>

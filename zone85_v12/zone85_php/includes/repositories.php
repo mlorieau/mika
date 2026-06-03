@@ -1814,13 +1814,18 @@ function fetch_user_passport(int $user_id): array {
             $passport['collectibles'] = (int)$s->fetchColumn();
         } catch (PDOException $e) {}
 
-        // KTC
+        // KTC : épisodes auxquels l'utilisateur a participé (proposition ou vote)
         try {
-            $s = $pdo->prepare("SELECT COUNT(*), SUM(is_correct) FROM ktc_answers WHERE user_id=:uid");
-            $s->execute([':uid' => $user_id]);
-            $row = $s->fetch(PDO::FETCH_NUM);
-            $passport['ktc_total']   = (int)($row[0] ?? 0);
-            $passport['ktc_correct'] = (int)($row[1] ?? 0);
+            $s = $pdo->prepare("
+                SELECT COUNT(DISTINCT episode_id) FROM (
+                    SELECT episode_id FROM ktc_propositions WHERE user_id=:uid
+                    UNION ALL
+                    SELECT episode_id FROM ktc_votes WHERE user_id=:uid2
+                ) ktc_part
+            ");
+            $s->execute([':uid' => $user_id, ':uid2' => $user_id]);
+            $passport['ktc_total']   = (int)$s->fetchColumn();
+            $passport['ktc_correct'] = 0;
         } catch (PDOException $e) {}
 
         // Randos validées admin — depuis rando_participations (source V12)
@@ -1943,27 +1948,6 @@ function fetch_weather_alerts(): array {
             WHERE is_alert=1 AND (expires_at IS NULL OR expires_at > NOW())
             ORDER BY published_at DESC
         ");
-        return $stmt->fetchAll();
-    } catch (PDOException $e) {
-        return [];
-    }
-}
-
-/**
- * Retourne les questions KTC (pour admin ou liste).
- */
-function fetch_ktc_questions(string $category = '', int $limit = 20): array {
-    $pdo = db();
-    if (!$pdo) return [];
-    try {
-        if ($category) {
-            $stmt = $pdo->prepare("SELECT * FROM ktc_questions WHERE is_active=1 AND category=:cat ORDER BY RAND() LIMIT :lim");
-            $stmt->bindValue(':cat', $category, PDO::PARAM_STR);
-        } else {
-            $stmt = $pdo->prepare("SELECT * FROM ktc_questions WHERE is_active=1 ORDER BY RAND() LIMIT :lim");
-        }
-        $stmt->bindValue(':lim', $limit, PDO::PARAM_INT);
-        $stmt->execute();
         return $stmt->fetchAll();
     } catch (PDOException $e) {
         return [];

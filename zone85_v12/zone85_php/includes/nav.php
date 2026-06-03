@@ -6,6 +6,7 @@ $_nav_links = [
     ['slug' => 'index',     'label' => 'Accueil',        'file' => 'index.php'],
     ['slug' => 'missions',  'label' => 'Missions',        'file' => 'missions.php'],
     ['slug' => 'randos',    'label' => 'Randos',          'file' => 'randos.php'],
+    ['slug' => 'ktc',       'label' => 'KTC',             'file' => 'ktc.php'],
     ['slug' => 'clans',     'label' => 'Clans',           'file' => 'clans.php'],
     ['slug' => 'zonautes',  'label' => 'Zonautes',        'file' => 'zonautes.php'],
     ['slug' => 'les-echos', 'label' => 'Les Echos',       'file' => 'les-echos.php'],
@@ -65,7 +66,6 @@ if ($_nav_user) {
     <a href="inscription.php" style="color:var(--primary);font-weight:800">Rejoindre la Zone &#8594;</a>
   <?php endif; ?>
   <div style="border-top:1px solid rgba(255,255,255,.08);margin-top:8px;padding-top:8px">
-    <a href="ktc.php" style="font-size:.8rem;color:rgba(255,255,255,.45);font-weight:600">&#129360; KTC — Keto Kole Tche</a>
     <a href="trophees.php" style="font-size:.8rem;color:rgba(255,255,255,.45);font-weight:600;border-bottom:none">&#127942; Trophees</a>
   </div>
 </div>

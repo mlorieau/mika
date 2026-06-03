@@ -1,750 +1,764 @@
 <?php
 // ============================================================
-// V11 : KTC devient une rubrique editoriale mensuelle premium.
-// 1 objet mystere par mois · 1 rencontre locale · 4 phases
+// ZONE85 V12 — KTC : Kéto Kolé Tché
+// Rubrique éditoriale mensuelle — 4 phases
 // DB : ktc_episodes, ktc_episode_photos, ktc_propositions, ktc_votes
-// Admin : admin/ktc-episodes.php (V12)
 // ============================================================
-$page_title       = 'Keto Kole Tche — Zone85';
-$page_description = 'Chaque mois, un objet mysterieux vendeen et la rencontre avec un passionnne local. Quel est cet objet ? Keto Kole Tche !';
-$page_canonical   = 'https://www.zone85.fr/ktc.php';
-$page_robots      = 'index,follow';
-$page_og_image    = 'assets/img/ZONE852025.png';
-$current_page     = 'ktc';
-
 require_once 'includes/config.php';
-require_once 'includes/data.php';
 require_once 'includes/functions.php';
 require_once 'includes/db.php';
 require_once 'includes/auth.php';
-require_once 'includes/repositories.php';
 
-// ── Session & utilisateur ─────────────────────────────────────
-$user_session = (session_status() === PHP_SESSION_ACTIVE) ? ($_SESSION['user'] ?? null) : null;
-$user_id      = $user_session ? (int)$user_session['id'] : 0;
-$is_logged    = $user_id > 0;
-$csrf         = csrf_token();
+// ── Session ───────────────────────────────────────────────────
+$is_logged = function_exists('is_logged_in') ? is_logged_in() : (!empty($_SESSION['user_id']));
+$user_id   = $is_logged ? (int)($_SESSION['user']['id'] ?? $_SESSION['user_id'] ?? 0) : 0;
+
+// ── État initial ──────────────────────────────────────────────
+$episode     = null;
+$photos      = [];
+$user_prop   = null;
+$user_vote   = null;
+$vote_counts = [];
+$vote_total  = 0;
+$past_eps    = [];
+$flash       = '';
+$flash_type  = 'ok';
+$current_week = 0;
+$week_map = ['week1' => 1, 'week2' => 2, 'week3' => 3, 'revealed' => 4];
 
 // ── Chargement DB ─────────────────────────────────────────────
-$question     = null;
-$user_answers = [];
-$user_stats   = ['total' => 0, 'correct' => 0, 'xp' => 0];
-$cat_counts   = [];
-
 try {
     $pdo = db();
     if ($pdo) {
+        // Épisode actif : préférer en cours (week1/2/3) sur révélé
+        $s = $pdo->query("
+            SELECT * FROM ktc_episodes
+            WHERE status IN ('week1','week2','week3','revealed')
+            ORDER BY (status = 'revealed') ASC, id DESC
+            LIMIT 1
+        ");
+        $episode = $s->fetch() ?: null;
 
-        // 1. IDs déjà répondus (si connecté)
-        $answered_ids = [];
-        if ($is_logged) {
-            $st = $pdo->prepare('SELECT question_id FROM ktc_answers WHERE user_id = :uid');
-            $st->execute([':uid' => $user_id]);
-            $answered_ids = $st->fetchAll(PDO::FETCH_COLUMN);
-        }
+        if ($episode) {
+            $current_week = $week_map[$episode['status']] ?? 0;
 
-        // 2. Question aléatoire (exclure déjà répondues si connecté)
-        if ($is_logged && !empty($answered_ids)) {
-            $placeholders = implode(',', array_fill(0, count($answered_ids), '?'));
-            $st2 = $pdo->prepare(
-                'SELECT * FROM ktc_questions
-                 WHERE is_active = 1
-                   AND id NOT IN (' . $placeholders . ')
-                 ORDER BY RAND()
-                 LIMIT 1'
-            );
-            $st2->execute(array_values($answered_ids));
-            $question = $st2->fetch() ?: null;
-            // Si toutes répondues, prendre n'importe laquelle
-            if (!$question) {
-                $st3 = $pdo->prepare('SELECT * FROM ktc_questions WHERE is_active = 1 ORDER BY RAND() LIMIT 1');
-                $st3->execute();
-                $question = $st3->fetch() ?: null;
+            // Photos visibles dans cette phase
+            $sp = $pdo->prepare("
+                SELECT * FROM ktc_episode_photos
+                WHERE episode_id = :eid AND reveal_week <= :wk
+                ORDER BY sort_order ASC, id ASC
+            ");
+            $sp->execute([':eid' => $episode['id'], ':wk' => $current_week]);
+            $photos = $sp->fetchAll();
+
+            if ($user_id > 0) {
+                $s2 = $pdo->prepare("SELECT * FROM ktc_propositions WHERE episode_id=:eid AND user_id=:uid LIMIT 1");
+                $s2->execute([':eid' => $episode['id'], ':uid' => $user_id]);
+                $user_prop = $s2->fetch() ?: null;
+
+                $s3 = $pdo->prepare("SELECT * FROM ktc_votes WHERE episode_id=:eid AND user_id=:uid LIMIT 1");
+                $s3->execute([':eid' => $episode['id'], ':uid' => $user_id]);
+                $user_vote = $s3->fetch() ?: null;
             }
-        } else {
-            $st2 = $pdo->prepare('SELECT * FROM ktc_questions WHERE is_active = 1 ORDER BY RAND() LIMIT 1');
-            $st2->execute();
-            $question = $st2->fetch() ?: null;
-        }
 
-        // 3. Stats si connecté
-        if ($is_logged) {
-            $st4 = $pdo->prepare(
-                'SELECT COUNT(*) AS total, SUM(is_correct) AS correct, COALESCE(SUM(xp_earned), 0) AS xp
-                 FROM ktc_answers
-                 WHERE user_id = :uid'
-            );
-            $st4->execute([':uid' => $user_id]);
-            $row = $st4->fetch();
-            if ($row) {
-                $user_stats = [
-                    'total'   => (int)$row['total'],
-                    'correct' => (int)$row['correct'],
-                    'xp'      => (int)$row['xp'],
-                ];
+            // Résultats des votes (semaine 3+)
+            if ($current_week >= 3) {
+                $sv = $pdo->prepare("SELECT vote_choice, COUNT(*) AS cnt FROM ktc_votes WHERE episode_id=:eid GROUP BY vote_choice");
+                $sv->execute([':eid' => $episode['id']]);
+                while ($row = $sv->fetch()) {
+                    $vote_counts[$row['vote_choice']] = (int)$row['cnt'];
+                }
+                $vote_total = array_sum($vote_counts);
             }
         }
 
-        // 4. Counts par catégorie
-        $st5 = $pdo->prepare('SELECT category, COUNT(*) AS cnt FROM ktc_questions WHERE is_active = 1 GROUP BY category');
-        $st5->execute();
-        while ($row = $st5->fetch()) {
-            $cat_counts[$row['category']] = (int)$row['cnt'];
-        }
+        // Épisodes passés (révélés + archivés)
+        $exclude = $episode ? ' AND id != ' . (int)$episode['id'] : '';
+        $past_eps = $pdo->query("
+            SELECT id, title, slug, date_revelation, object_name, object_hidden
+            FROM ktc_episodes
+            WHERE status IN ('revealed','archived') {$exclude}
+            ORDER BY id DESC LIMIT 6
+        ")->fetchAll();
     }
 } catch (Exception $e) {
     // Dégradé silencieux
 }
 
-// Active season pour footer
-try {
-    $active_season = (db_enabled() && function_exists('fetch_active_season')) ? fetch_active_season() : null;
-} catch (Exception $e) {
-    $active_season = null;
-}
-
-// ── Catégories définies ───────────────────────────────────────
-$categories = [
-    ['slug' => 'expressions', 'label' => 'Le Parler Vendéen',         'emoji' => '🗣️',  'desc' => 'Expressions, patois et tournures vendéennes'],
-    ['slug' => 'quiz',        'label' => 'La Vendée et ses Secrets',   'emoji' => '🧠',  'desc' => 'Culture générale vendéenne'],
-    ['slug' => 'devinettes',  'label' => 'Joue avec les mots du bocage', 'emoji' => '🎭', 'desc' => 'Devinettes et jeux de mots du terroir'],
-    ['slug' => 'histoire',    'label' => 'La Vendée à travers les âges', 'emoji' => '📜', 'desc' => 'Histoire, guerres de Vendée, patrimoine'],
-    ['slug' => 'nature',      'label' => 'Bocage, marais, littoral',   'emoji' => '🌿',  'desc' => 'Faune, flore et paysages vendéens'],
-    ['slug' => 'gastronomie', 'label' => 'À table !',                  'emoji' => '🥐',  'desc' => 'Saveurs et recettes du terroir vendéen'],
-];
-
-// ── Décodage des options ──────────────────────────────────────
-$options = [];
-if ($question) {
-    if (!empty($question['options'])) {
-        $decoded = json_decode($question['options'], true);
-        $options = is_array($decoded) ? $decoded : [];
-    }
-    if (empty($options)) {
-        foreach (['option_a', 'option_b', 'option_c', 'option_d'] as $k => $col) {
-            if (!empty($question[$col])) {
-                $options[chr(65 + $k)] = $question[$col];
+// ── Traitement POST ───────────────────────────────────────────
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $episode) {
+    if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
+        $flash = 'Session expirée. Rechargez la page.';
+        $flash_type = 'err';
+    } elseif (!$is_logged) {
+        $flash = 'Connectez-vous pour participer.';
+        $flash_type = 'err';
+    } else {
+        $action = $_POST['action'] ?? '';
+        try {
+            if ($action === 'submit_proposition' && in_array($current_week, [1, 2], true)) {
+                $text = trim(safe_input($_POST['proposition'] ?? '', 500));
+                if ($text === '') {
+                    $flash = 'Votre proposition ne peut pas être vide.';
+                    $flash_type = 'err';
+                } elseif ($user_prop) {
+                    $flash = 'Vous avez déjà soumis une proposition pour cet épisode.';
+                    $flash_type = 'err';
+                } else {
+                    $pdo->prepare("INSERT INTO ktc_propositions (episode_id, user_id, proposition) VALUES (:eid,:uid,:prop)")
+                        ->execute([':eid' => $episode['id'], ':uid' => $user_id, ':prop' => $text]);
+                    $s2 = $pdo->prepare("SELECT * FROM ktc_propositions WHERE episode_id=:eid AND user_id=:uid LIMIT 1");
+                    $s2->execute([':eid' => $episode['id'], ':uid' => $user_id]);
+                    $user_prop = $s2->fetch() ?: null;
+                    $flash = 'Votre proposition a été enregistrée !';
+                }
+            } elseif ($action === 'submit_vote' && $current_week === 3) {
+                $choice = trim($_POST['vote_choice'] ?? '');
+                $valid_choices = array_values(array_filter([
+                    $episode['vote_choice_1'] ?? '', $episode['vote_choice_2'] ?? '',
+                    $episode['vote_choice_3'] ?? '', $episode['vote_choice_4'] ?? '',
+                ]));
+                if (empty($choice) || !in_array($choice, $valid_choices, true)) {
+                    $flash = 'Choisissez une proposition valide.';
+                    $flash_type = 'err';
+                } elseif ($user_vote) {
+                    $flash = 'Vous avez déjà voté pour cet épisode.';
+                    $flash_type = 'err';
+                } else {
+                    $pdo->prepare("INSERT INTO ktc_votes (episode_id, user_id, vote_choice) VALUES (:eid,:uid,:ch)")
+                        ->execute([':eid' => $episode['id'], ':uid' => $user_id, ':ch' => $choice]);
+                    $user_vote = ['vote_choice' => $choice];
+                    $sv = $pdo->prepare("SELECT vote_choice, COUNT(*) AS cnt FROM ktc_votes WHERE episode_id=:eid GROUP BY vote_choice");
+                    $sv->execute([':eid' => $episode['id']]);
+                    $vote_counts = [];
+                    while ($row = $sv->fetch()) {
+                        $vote_counts[$row['vote_choice']] = (int)$row['cnt'];
+                    }
+                    $vote_total = array_sum($vote_counts);
+                    $flash = 'Vote enregistré. Rendez-vous à la révélation !';
+                }
             }
+        } catch (Exception $e) {
+            $flash = 'Une erreur est survenue. Réessayez.';
+            $flash_type = 'err';
         }
     }
 }
 
-// Déjà répondu à cette question ?
-$already_answered = ($question && $is_logged && in_array($question['id'], $answered_ids ?? []));
-
-// Étoiles de difficulté
-function _difficulty_stars(int $d): string {
-    $d = max(1, min(5, $d));
-    return str_repeat('★', $d) . str_repeat('☆', 5 - $d);
+// ── Méta SEO ──────────────────────────────────────────────────
+$phase_label_seo = [
+    'week1'    => 'Semaine 1 — Découverte',
+    'week2'    => 'Semaine 2 — Indices',
+    'week3'    => 'Semaine 3 — Votes',
+    'revealed' => 'Révélation !',
+];
+if ($episode) {
+    $page_title       = 'KTC — ' . ($phase_label_seo[$episode['status']] ?? 'Kéto Kolé Tché');
+    $page_description = strip_tags(substr($episode['teaser_text'] ?? 'Chaque mois, un objet mystérieux vendéen. Kéto Kolé Tché !', 0, 160));
+    $page_og_image    = !empty($photos) ? $photos[0]['file_path'] : 'assets/img/ZONE852025.png';
+} else {
+    $page_title       = 'Kéto Kolé Tché — Zone85';
+    $page_description = 'Chaque mois, un objet mystérieux vendéen et la rencontre avec un passionné local. Kéto Kolé Tché !';
+    $page_og_image    = 'assets/img/ZONE852025.png';
 }
+$page_canonical = function_exists('absolute_url') ? absolute_url('ktc.php') : 'https://www.zone85.fr/ktc.php';
+$page_robots    = 'index,follow';
+$current_page   = 'ktc';
 
 // ── Styles ────────────────────────────────────────────────────
 $page_styles = '<style>
 /* ============================================================
-   KTC PAGE V11 — Mobile-first
+   KTC V12 — Mobile-first, éditorial
 ============================================================ */
-
-/* HERO — plus sombre, plus mystérieux */
 .ktc-hero {
   background:
     radial-gradient(circle at 80% 15%, rgba(50,10,10,.55), transparent 35%),
     radial-gradient(circle at 12% 88%, rgba(18,49,78,.6), transparent 38%),
     linear-gradient(160deg, #0a0a0a 0%, #150800 45%, #0d0508 100%);
-  padding: 120px 0 72px;
-  position: relative;
-  overflow: hidden;
+  padding: 100px 0 64px;
+  position: relative; overflow: hidden;
 }
 .ktc-hero::before {
   content: "🥐";
-  position: absolute;
-  right: 5%;
-  top: 50%;
+  position: absolute; right: 5%; top: 50%;
   transform: translateY(-50%);
-  font-size: 13rem;
-  opacity: .05;
-  pointer-events: none;
-  line-height: 1;
-  user-select: none;
+  font-size: 12rem; opacity: .05;
+  pointer-events: none; line-height: 1; user-select: none;
 }
 .ktc-hero-inner { position: relative; z-index: 1; }
-
-/* Badge mystère EN-TÊTE */
-.ktc-hero-season-label {
+.ktc-phase-badge {
   display: inline-block;
-  background: rgba(220,30,30,.22);
-  border: 1px solid rgba(220,30,30,.4);
-  color: #e84040;
-  font-size: .68rem;
-  font-weight: 900;
-  letter-spacing: .16em;
-  text-transform: uppercase;
-  padding: 5px 14px;
-  border-radius: 4px;
-  margin-bottom: 16px;
+  font-size: .68rem; font-weight: 900;
+  letter-spacing: .14em; text-transform: uppercase;
+  padding: 5px 14px; border-radius: 4px; margin-bottom: 16px;
 }
-
 .ktc-hero h1 {
-  font-size: clamp(1.8rem, 4.5vw, 3rem);
-  font-weight: 900;
-  color: #fff;
-  letter-spacing: -1px;
-  line-height: 1.1;
-  margin-bottom: 14px;
+  font-size: clamp(1.7rem, 4vw, 2.6rem); font-weight: 900;
+  color: #fff; letter-spacing: -1px; line-height: 1.1; margin-bottom: 12px;
 }
-.ktc-hero-sub {
-  font-size: .97rem;
-  color: rgba(255,255,255,.48);
-  max-width: 500px;
-  line-height: 1.7;
+.ktc-hero-sub { font-size: .95rem; color: rgba(255,255,255,.48); max-width: 480px; line-height: 1.7; }
+.ktc-hero-title-ep { font-size: .82rem; color: rgba(201,150,42,.75); font-weight: 700; margin-top: 8px; }
+
+.ktc-section { background: #f5efe6; padding: 56px 0 96px; }
+
+.ktc-layout { display: grid; grid-template-columns: 1fr; gap: 28px; }
+@media (min-width: 900px) {
+  .ktc-layout { grid-template-columns: 1fr 300px; gap: 36px; align-items: start; }
 }
 
-/* Ancien badge Quiz Vendée — conservé mais repositionné */
-.ktc-hero-badge {
-  display: inline-block;
-  background: rgba(201,150,42,.18);
-  border: 1px solid rgba(201,150,42,.35);
-  color: #d4a830;
-  font-size: .7rem;
-  font-weight: 800;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  padding: 5px 14px;
-  border-radius: 999px;
-  margin-top: 20px;
-  display: none; /* remplacé par le label rouge */
+.ktc-flash {
+  border-radius: 10px; padding: 12px 16px; margin-bottom: 20px;
+  font-size: .88rem; font-weight: 600;
+}
+.ktc-flash-ok  { background: rgba(42,140,64,.1);  border: 1px solid rgba(42,140,64,.25);  color: #1a5c28; }
+.ktc-flash-err { background: rgba(201,64,48,.08); border: 1px solid rgba(201,64,48,.22);  color: #8a1a10; }
+
+/* Photos */
+.ktc-photos { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 28px; }
+@media (min-width: 600px) { .ktc-photos { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 900px) { .ktc-photos { grid-template-columns: repeat(3, 1fr); } }
+.ktc-photo { border-radius: 12px; overflow: hidden; aspect-ratio: 4/3; cursor: zoom-in; }
+.ktc-photo img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s; }
+.ktc-photo:hover img { transform: scale(1.04); }
+.ktc-photo-caption { font-size: .72rem; color: #6b7f96; margin-top: 5px; text-align: center; }
+
+/* Blocs texte */
+.ktc-teaser-block {
+  background: #fff; border-radius: 16px;
+  border: 1px solid rgba(139,90,43,.1);
+  padding: 28px; margin-bottom: 20px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.05);
+}
+.ktc-section-kicker {
+  font-size: .66rem; font-weight: 800; letter-spacing: .14em;
+  text-transform: uppercase; color: #8a4020; margin-bottom: 12px;
+}
+.ktc-teaser-text { font-size: 1rem; color: #0c1e2e; line-height: 1.75; white-space: pre-wrap; }
+
+.ktc-details-block {
+  background: linear-gradient(135deg, #fff8f0, #fdf5e8);
+  border: 1px solid rgba(201,150,42,.22); border-radius: 14px;
+  padding: 22px 24px; margin-bottom: 20px;
+}
+.ktc-details-block .ktc-section-kicker { color: #7a5010; }
+.ktc-details-text { font-size: .93rem; color: #3d3020; line-height: 1.7; white-space: pre-wrap; }
+
+/* Révélation */
+.ktc-revelation-object {
+  background: linear-gradient(135deg, #12314e, #1a4a24);
+  border-radius: 16px; padding: 28px; margin-bottom: 20px; text-align: center;
+}
+.ktc-object-label {
+  font-size: .7rem; font-weight: 800; letter-spacing: .16em;
+  text-transform: uppercase; color: rgba(201,150,42,.85); margin-bottom: 10px;
+}
+.ktc-object-name {
+  font-size: clamp(1.4rem, 3.5vw, 2.2rem); font-weight: 900; color: #fff; line-height: 1.2;
+}
+.ktc-revelation-text-block {
+  background: #fff; border-radius: 14px; padding: 28px;
+  border: 1px solid rgba(139,90,43,.1); margin-bottom: 20px;
+}
+.ktc-revelation-text { font-size: .97rem; color: #0c1e2e; line-height: 1.8; }
+
+/* Formulaire proposition */
+.ktc-prop-form {
+  background: #fff; border-radius: 14px; padding: 24px;
+  border: 1px solid rgba(18,49,78,.1);
+  box-shadow: 0 2px 10px rgba(0,0,0,.04); margin-bottom: 20px;
+}
+.ktc-prop-form-title { font-size: .92rem; font-weight: 800; color: #0c1e2e; margin-bottom: 6px; }
+.ktc-prop-form-hint { font-size: .78rem; color: #6b7f96; margin-bottom: 14px; line-height: 1.5; }
+.ktc-prop-existing {
+  background: rgba(42,140,64,.07); border: 1px solid rgba(42,140,64,.2);
+  border-radius: 10px; padding: 14px 18px; font-size: .9rem;
+  color: #1a5c28; font-weight: 600;
+}
+.ktc-prop-existing-label { color: #6b7f96; font-weight: 400; font-size: .76rem; display: block; margin-bottom: 5px; }
+.ktc-prop-textarea {
+  width: 100%; min-height: 80px; padding: 12px 14px;
+  border: 1.5px solid rgba(18,49,78,.14); border-radius: 10px;
+  font-family: inherit; font-size: .9rem; color: #0c1e2e;
+  resize: vertical; box-sizing: border-box; line-height: 1.5; background: #f8f4ef;
+}
+.ktc-prop-textarea:focus { outline: none; border-color: #c9962a; background: #fff; }
+
+/* Formulaire vote */
+.ktc-vote-form {
+  background: #fff; border-radius: 14px; padding: 24px;
+  border: 1px solid rgba(18,49,78,.1);
+  box-shadow: 0 2px 10px rgba(0,0,0,.04); margin-bottom: 20px;
+}
+.ktc-vote-question {
+  font-size: 1rem; font-weight: 800; color: #0c1e2e; margin-bottom: 18px; line-height: 1.4;
+}
+.ktc-vote-options { display: grid; gap: 10px; margin-bottom: 18px; }
+.ktc-vote-option {
+  display: flex; align-items: center; gap: 12px;
+  background: #f8f4ef; border: 2px solid rgba(139,90,43,.12);
+  border-radius: 12px; padding: 14px 16px;
+  cursor: pointer; font-size: .9rem; font-weight: 600; color: #0c1e2e;
+  transition: border-color .18s, background .18s;
+}
+.ktc-vote-option:hover { border-color: rgba(201,150,42,.5); background: rgba(201,150,42,.07); }
+.ktc-vote-option input[type="radio"] { accent-color: #c9962a; width: 18px; height: 18px; flex-shrink: 0; }
+.ktc-vote-already {
+  background: rgba(42,140,64,.07); border: 1px solid rgba(42,140,64,.22);
+  border-radius: 10px; padding: 14px 18px; font-size: .88rem;
+  color: #1a5c28; font-weight: 600;
 }
 
-/* SECTION */
-.ktc-section { background: #f5efe6; padding: 64px 0 96px; }
-.section-title {
-  font-size: .68rem;
-  font-weight: 700;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 28px;
-  padding-bottom: 12px;
+/* Résultats vote */
+.ktc-vote-results { margin-top: 20px; }
+.ktc-vote-results-title {
+  font-size: .66rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+  color: #6b7f96; margin-bottom: 14px; padding-bottom: 8px;
   border-bottom: 1px solid rgba(18,49,78,.1);
 }
-/* Titre MYSTÈRE renommé */
-.section-title-mystere {
-  font-size: .68rem;
-  font-weight: 700;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: #8a1a10;
-  margin-bottom: 28px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid rgba(180,30,20,.15);
+.ktc-vote-bar-item { margin-bottom: 12px; }
+.ktc-vote-bar-label {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: .84rem; font-weight: 600; color: #0c1e2e; margin-bottom: 5px;
 }
+.ktc-vote-bar-pct { font-size: .74rem; color: #6b7f96; }
+.ktc-vote-bar-track {
+  height: 8px; background: rgba(18,49,78,.08); border-radius: 999px; overflow: hidden;
+}
+.ktc-vote-bar-fill {
+  height: 100%; border-radius: 999px;
+  background: linear-gradient(90deg, #c9962a, #ea5649);
+}
+.ktc-vote-bar-fill.winning { background: linear-gradient(90deg, #2a8c40, #1a6c2c); }
 
-/* QUIZ CARD */
-.ktc-quiz-card {
-  background: #fff;
-  border-radius: 20px;
-  box-shadow: 0 6px 32px rgba(139,90,43,.13);
-  overflow: hidden;
-  margin-bottom: 48px;
+/* Carte brocanteur */
+.ktc-person-card {
+  background: #fff; border-radius: 16px; overflow: hidden;
   border: 1px solid rgba(139,90,43,.12);
+  box-shadow: 0 2px 12px rgba(0,0,0,.06); margin-bottom: 16px;
 }
-.quiz-card-header {
-  background: linear-gradient(135deg, #1a0a00 0%, #3a1800 100%);
-  padding: 28px 32px 22px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
+.ktc-person-header {
+  background: linear-gradient(135deg, #12314e, #1a3a1a);
+  padding: 18px 20px 14px;
 }
-.quiz-category-badge {
-  display: inline-block;
-  background: rgba(201,150,42,.25);
-  color: #d4a830;
-  font-size: .65rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: .1em;
-  padding: 4px 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(201,150,42,.35);
+.ktc-person-name { font-size: 1rem; font-weight: 800; color: #fff; margin-bottom: 2px; }
+.ktc-person-subtitle { font-size: .78rem; color: rgba(201,150,42,.85); font-weight: 600; }
+.ktc-person-body { padding: 16px 20px; }
+.ktc-person-photo {
+  width: 68px; height: 68px; border-radius: 50%; object-fit: cover;
+  border: 3px solid #e8e2db; float: right; margin: 0 0 10px 12px;
 }
-.quiz-difficulty { font-size: .8rem; color: rgba(255,255,255,.45); letter-spacing: .04em; }
-.quiz-difficulty span { color: #d4a830; }
-.quiz-question-text {
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: #fff;
-  line-height: 1.45;
-  margin-top: 14px;
-}
-.quiz-card-body { padding: 28px 32px 32px; }
-.quiz-options {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-  margin-bottom: 24px;
-}
-.quiz-option-btn {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: #f8f3ec;
-  border: 2px solid rgba(139,90,43,.12);
-  border-radius: 12px;
-  padding: 16px 18px;
-  cursor: pointer;
-  font-family: "Inter", sans-serif;
-  font-size: .9rem;
-  font-weight: 600;
-  color: var(--navy-dark);
-  text-align: left;
-  transition: all .18s ease;
-  width: 100%;
-}
-.quiz-option-btn:hover:not(:disabled) {
-  border-color: rgba(201,150,42,.5);
-  background: rgba(201,150,42,.08);
-  transform: translateY(-1px);
-}
-.quiz-option-btn:disabled { cursor: default; }
-.quiz-option-btn.selected  { border-color: #c9962a; background: rgba(201,150,42,.12); }
-.quiz-option-btn.correct   { border-color: #2a8c40; background: rgba(42,140,64,.1);  color: #1a5c28; }
-.quiz-option-btn.incorrect { border-color: #c94030; background: rgba(201,64,48,.08); color: #8a1a10; }
-.quiz-option-btn.revealed-correct { border-color: #2a8c40; background: rgba(42,140,64,.06); }
-.quiz-opt-letter {
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  background: rgba(139,90,43,.12);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: .8rem;
-  font-weight: 900;
-  color: #5a3010;
-  flex-shrink: 0;
-  transition: background .18s;
-}
-.quiz-option-btn.correct .quiz-opt-letter           { background: #2a8c40; color: #fff; }
-.quiz-option-btn.incorrect .quiz-opt-letter         { background: #c94030; color: #fff; }
-.quiz-option-btn.revealed-correct .quiz-opt-letter  { background: #2a8c40; color: #fff; }
+.ktc-person-bio { font-size: .84rem; color: #3d5166; line-height: 1.6; }
 
-/* RESULT PANEL */
-.quiz-result { display: none; border-radius: 12px; padding: 18px 20px; margin-top: 4px; margin-bottom: 8px; }
-.quiz-result.show { display: block; }
-.quiz-result.good { background: rgba(42,140,64,.1);  border: 1px solid rgba(42,140,64,.25); }
-.quiz-result.bad  { background: rgba(201,64,48,.08); border: 1px solid rgba(201,64,48,.22); }
-.result-title { font-size: .92rem; font-weight: 800; margin-bottom: 6px; }
-.result-title.good { color: #1a6c2c; }
-.result-title.bad  { color: #8a2010; }
-.result-explication { font-size: .84rem; color: var(--text-mid); line-height: 1.55; }
-.result-xp {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(201,150,42,.15);
-  color: #8a6000;
-  font-size: .8rem;
-  font-weight: 800;
-  padding: 4px 12px;
-  border-radius: 999px;
-  margin-top: 10px;
+/* Sidebar infos */
+.ktc-sidebar-card {
+  background: #fff; border-radius: 14px;
+  border: 1px solid rgba(18,49,78,.1);
+  padding: 18px 20px; margin-bottom: 16px;
 }
+.ktc-sidebar-title {
+  font-size: .65rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+  color: #6b7f96; margin-bottom: 12px; padding-bottom: 8px;
+  border-bottom: 1px solid rgba(18,49,78,.08);
+}
+.ktc-date-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 0; border-bottom: 1px solid rgba(18,49,78,.06);
+  font-size: .82rem;
+}
+.ktc-date-row:last-child { border-bottom: none; padding-bottom: 0; }
+.ktc-date-dot {
+  width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+  background: rgba(18,49,78,.15);
+}
+.ktc-date-dot.active { background: #ea5649; box-shadow: 0 0 0 3px rgba(234,86,73,.2); }
+.ktc-date-dot.done { background: #2a8c40; }
+.ktc-date-label { font-weight: 600; color: #0c1e2e; flex: 1; }
+.ktc-date-val { font-size: .74rem; color: #6b7f96; }
 
-/* LOGIN NOTICE */
-.login-notice {
-  background: rgba(18,49,78,.05);
-  border: 1px solid rgba(18,49,78,.12);
-  border-radius: 12px;
-  padding: 16px 20px;
-  font-size: .88rem;
-  color: var(--text-mid);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-.login-notice a { font-weight: 800; color: var(--navy-dark); text-decoration: none; }
-.login-notice a:hover { text-decoration: underline; }
-
-/* ALREADY ANSWERED */
-.already-done {
-  background: rgba(42,140,64,.08);
-  border: 1px solid rgba(42,140,64,.2);
-  border-radius: 12px;
-  padding: 14px 18px;
-  font-size: .88rem;
-  color: #1a5c28;
-  font-weight: 600;
-}
-
-/* BOUTON SUIVANT */
-.btn-next {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: linear-gradient(135deg, #7a5010, #c9962a);
-  color: #fff;
-  font-size: .9rem;
-  font-weight: 800;
-  padding: 13px 24px;
-  border-radius: 10px;
-  text-decoration: none;
-  transition: opacity .18s;
-  margin-top: 16px;
-}
-.btn-next:hover { opacity: .88; }
-
-/* EMPTY QUIZ */
-.empty-quiz {
-  background: #fff;
-  border-radius: 16px;
-  border: 1px dashed rgba(139,90,43,.2);
-  padding: 56px 24px;
-  text-align: center;
-  margin-bottom: 48px;
-}
-.empty-quiz-icon { font-size: 3.2rem; margin-bottom: 14px; }
-.empty-quiz h3   { font-size: 1rem; font-weight: 800; color: var(--navy-dark); margin-bottom: 6px; }
-.empty-quiz p    { font-size: .84rem; color: var(--text-muted); }
-
-/* STATS */
-.ktc-stats-card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 28px 32px;
-  box-shadow: 0 2px 14px rgba(0,0,0,.07);
-  margin-bottom: 48px;
-  border: 1px solid rgba(139,90,43,.1);
-}
-.stats-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-.stat-box {
-  text-align: center;
-  padding: 18px 12px;
-  background: #f8f3ec;
-  border-radius: 12px;
-}
-.stat-val {
-  font-size: 1.8rem;
-  font-weight: 900;
-  color: var(--navy-dark);
-  line-height: 1;
-  margin-bottom: 4px;
-  display: block;
-}
-.stat-lbl {
-  font-size: .68rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  color: var(--text-muted);
-}
-.stat-box.gold .stat-val { color: #9a6800; }
-
-/* CATÉGORIES — EXPLORER LES MYSTÈRES */
-.cats-section-title {
-  font-size: .68rem;
-  font-weight: 700;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: #1a2d3e;
-  margin-bottom: 28px;
-  padding-bottom: 12px;
+/* Épisodes passés */
+.ktc-past-section { margin-top: 48px; }
+.ktc-past-title {
+  font-size: .68rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+  color: #1a2d3e; margin-bottom: 20px; padding-bottom: 10px;
   border-bottom: 1px solid rgba(18,49,78,.12);
 }
-.cats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.cat-card {
-  background: #fff;
-  border-radius: 14px;
-  padding: 22px 18px 18px;
-  text-align: center;
+.ktc-past-grid { display: grid; gap: 14px; }
+@media (min-width: 600px) { .ktc-past-grid { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 900px) { .ktc-past-grid { grid-template-columns: repeat(3, 1fr); } }
+.ktc-past-card {
+  background: #fff; border-radius: 12px;
   border: 1px solid rgba(139,90,43,.1);
-  box-shadow: 0 2px 10px rgba(0,0,0,.05);
-  cursor: pointer;
-  text-decoration: none;
-  transition: transform .2s, box-shadow .2s;
-  display: block;
+  padding: 18px 16px; display: block; text-decoration: none;
+  transition: transform .18s, box-shadow .18s;
 }
-.cat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(139,90,43,.15); }
-.cat-emoji  { font-size: 2.2rem; margin-bottom: 10px; display: block; }
-.cat-name   { font-size: .88rem; font-weight: 800; color: var(--navy-dark); margin-bottom: 6px; line-height: 1.3; }
-.cat-desc   { font-size: .72rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 10px; }
-.cat-count  { font-size: .7rem; font-weight: 700; color: #9a6800; background: rgba(201,150,42,.12); padding: 3px 10px; border-radius: 999px; }
+.ktc-past-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(139,90,43,.12); }
+.ktc-past-card-kicker { font-size: .64rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: #9a6800; margin-bottom: 6px; }
+.ktc-past-card-title { font-size: .88rem; font-weight: 800; color: #0c1e2e; line-height: 1.35; margin-bottom: 5px; }
+.ktc-past-card-object { font-size: .8rem; color: #3d5166; }
 
-/* ============================================================
-   RESPONSIVE
-============================================================ */
-@media (min-width: 600px) {
-  .quiz-options { grid-template-columns: 1fr 1fr; }
-  .stats-grid   { grid-template-columns: repeat(3, 1fr); }
-  .cats-grid    { grid-template-columns: repeat(3, 1fr); }
+/* Bouton submit */
+.ktc-btn-submit {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  background: linear-gradient(135deg, #7a5010, #c9962a);
+  color: #fff; font-size: .9rem; font-weight: 800;
+  padding: 13px 22px; border-radius: 10px;
+  border: none; cursor: pointer; font-family: inherit;
+  transition: opacity .18s; width: 100%; margin-top: 14px;
 }
-@media (min-width: 900px) {
-  .cats-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
-  .quiz-card-body { padding: 28px 32px 32px; }
+.ktc-btn-submit:hover { opacity: .88; }
+
+/* Login CTA */
+.ktc-login-cta {
+  background: rgba(18,49,78,.05); border: 1px solid rgba(18,49,78,.12);
+  border-radius: 12px; padding: 14px 18px;
+  font-size: .87rem; color: #4a5f73;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
 }
+.ktc-login-cta a { font-weight: 800; color: #0c1e2e; }
+
+/* Empty state */
+.ktc-empty {
+  background: #fff; border-radius: 16px;
+  border: 1px dashed rgba(139,90,43,.2);
+  padding: 56px 24px; text-align: center; margin-bottom: 32px;
+}
+.ktc-empty-icon { font-size: 3rem; margin-bottom: 14px; }
+.ktc-empty h3 { font-size: 1rem; font-weight: 800; color: #0c1e2e; margin-bottom: 6px; }
+.ktc-empty p { font-size: .84rem; color: #6b7f96; }
+
 @media (max-width: 599px) {
-  .ktc-hero { padding: 100px 0 56px; }
+  .ktc-hero { padding: 80px 0 48px; }
   .ktc-hero::before { display: none; }
+  .ktc-teaser-block, .ktc-prop-form, .ktc-vote-form { padding: 18px; }
 }
 </style>';
 
-// ── Scripts page ──────────────────────────────────────────────
-// ATTENTION : tout le JS AJAX de ajax/ktc-answer.php est conservé intact.
-$page_scripts = '<script>
-(function() {
-  var CSRF       = ' . json_encode($csrf) . ';
-  var questionId = ' . ($question ? (int)$question['id'] : 0) . ';
-
-  function submitAnswer(letter) {
-    if (!questionId) return;
-    var btns = document.querySelectorAll(".quiz-option-btn");
-    btns.forEach(function(b) { b.disabled = true; });
-    var selected = document.querySelector("[data-letter=\"" + letter + "\"]");
-    if (selected) selected.classList.add("selected");
-
-    var form = new FormData();
-    form.append("question_id", questionId);
-    form.append("answer", letter);
-    form.append("csrf_token", CSRF);
-
-    fetch("ajax/ktc-answer.php", {
-      method: "POST",
-      body: form,
-      credentials: "same-origin"
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      if (data.error) { showResult(false, data.error, null, null); return; }
-      btns.forEach(function(b) {
-        var l = b.getAttribute("data-letter");
-        if (l === data.correct_answer) b.classList.add("revealed-correct");
-      });
-      if (selected) {
-        selected.classList.remove("selected");
-        selected.classList.add(data.is_correct ? "correct" : "incorrect");
-      }
-      showResult(data.is_correct, null, data.explanation, data.xp_earned);
-    })
-    .catch(function() {
-      showResult(false, "Une erreur est survenue. Réessaie.", null, null);
-    });
-  }
-
-  function showResult(ok, errMsg, explanation, xp) {
-    var panel = document.getElementById("quiz-result-panel");
-    if (!panel) return;
-    panel.classList.remove("good", "bad");
-    panel.innerHTML = "";
-
-    var t = document.createElement("div");
-    t.className = "result-title";
-
-    if (errMsg) {
-      panel.classList.add("bad");
-      t.classList.add("bad");
-      t.textContent = errMsg;
-      panel.appendChild(t);
-    } else if (ok) {
-      panel.classList.add("good");
-      t.classList.add("good");
-      t.textContent = "🎉 Bonne réponse !";
-      panel.appendChild(t);
-      if (explanation) {
-        var e1 = document.createElement("div");
-        e1.className = "result-explication";
-        e1.textContent = explanation;
-        panel.appendChild(e1);
-      }
-      if (xp) {
-        var x1 = document.createElement("div");
-        x1.className = "result-xp";
-        x1.textContent = "⚡ +" + xp + " XP gagnés !";
-        panel.appendChild(x1);
-      }
-    } else {
-      panel.classList.add("bad");
-      t.classList.add("bad");
-      t.textContent = "✗ Pas cette fois…";
-      panel.appendChild(t);
-      if (explanation) {
-        var e2 = document.createElement("div");
-        e2.className = "result-explication";
-        e2.textContent = explanation;
-        panel.appendChild(e2);
-      }
-    }
-
-    panel.classList.add("show");
-    var nextBtn = document.getElementById("btn-next-question");
-    if (nextBtn) nextBtn.style.display = "inline-flex";
-  }
-
-  // Connexion requise — message au clic
-  function requireLogin() {
-    var notice = document.getElementById("login-notice");
-    if (notice) {
-      notice.style.outline = "2px solid #c9962a";
-      notice.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      setTimeout(function() { notice.style.outline = ""; }, 1800);
-    }
-  }
-
-  window.ktcSubmit      = submitAnswer;
-  window.ktcRequireLogin = requireLogin;
-})();
-</script>';
-
 require 'includes/header.php';
 require 'includes/nav.php';
+
+// ── Helpers locaux ────────────────────────────────────────────
+function _ktc_phase_badge(string $status): string {
+    $d = [
+        'week1'    => ['Semaine 1 — Découverte', '#1d4ed8', 'rgba(147,197,253,.2)'],
+        'week2'    => ['Semaine 2 — Indices',    '#1e40af', 'rgba(96,165,250,.18)'],
+        'week3'    => ['Semaine 3 — Votes',      '#c2410c', 'rgba(251,146,60,.18)'],
+        'revealed' => ['✨ Révélation !',         '#1a7a42', 'rgba(42,157,92,.14)'],
+    ];
+    $b = $d[$status] ?? null;
+    if (!$b) return '';
+    return '<span class="ktc-phase-badge" style="background:' . $b[2] . ';color:' . $b[1] . '">'
+         . htmlspecialchars($b[0], ENT_QUOTES, 'UTF-8') . '</span>';
+}
+
+function _ktc_fmt_date(?string $d): string {
+    if (!$d) return '—';
+    $dt = DateTime::createFromFormat('Y-m-d', $d);
+    if (!$dt) return htmlspecialchars($d, ENT_QUOTES, 'UTF-8');
+    return $dt->format('d/m/Y');
+}
 ?>
 
-<!-- HERO — Mystère de la Saison -->
+<!-- ══════════════════════════════════════════════
+     HERO
+══════════════════════════════════════════════ -->
 <section class="ktc-hero">
   <div class="container">
     <div class="ktc-hero-inner">
-      <div class="ktc-hero-season-label">LE MYSTÈRE DE LA SAISON</div>
-      <h1>🥐 Ketokolé Tché !</h1>
-      <p class="ktc-hero-sub">Chaque saison, un objet étrange apparaît dans la Zone. À vous de découvrir son origine, son histoire, ses secrets vendéens.</p>
+      <?php if ($episode): ?>
+        <?= _ktc_phase_badge($episode['status']) ?>
+        <h1>🥐 Kéto Kolé Tché !</h1>
+        <p class="ktc-hero-sub"><?= e($episode['title']) ?></p>
+        <?php if (!empty($episode['person_name'])): ?>
+          <p class="ktc-hero-title-ep">
+            Rencontre avec <?= e($episode['person_name']) ?>
+            <?php if (!empty($episode['person_title'])): ?>— <?= e($episode['person_title']) ?><?php endif; ?>
+          </p>
+        <?php endif; ?>
+      <?php else: ?>
+        <div class="ktc-phase-badge" style="background:rgba(220,30,30,.22);color:#e84040">CHAQUE MOIS</div>
+        <h1>🥐 Kéto Kolé Tché !</h1>
+        <p class="ktc-hero-sub">Chaque mois, un objet mystérieux vendéen et la rencontre avec un passionné local. C'est quoi cet objet ?</p>
+      <?php endif; ?>
     </div>
   </div>
 </section>
 
-<!-- CONTENU -->
+<!-- ══════════════════════════════════════════════
+     CONTENU
+══════════════════════════════════════════════ -->
 <section class="ktc-section">
   <div class="container">
 
-    <!-- MYSTÈRE DU MOMENT (ex "Question du moment") -->
-    <div class="section-title-mystere">Mystère du moment</div>
-
-    <?php if ($question && !empty($options)): ?>
-    <div class="ktc-quiz-card">
-      <div class="quiz-card-header">
-        <div>
-          <?php if (!empty($question['category'])): ?>
-          <span class="quiz-category-badge"><?= e($question['category']) ?></span>
-          <?php endif; ?>
-          <?php if (!empty($question['difficulty'])): ?>
-          <div class="quiz-difficulty" style="margin-top:8px">
-            Difficulté&nbsp;: <span><?= _difficulty_stars((int)$question['difficulty']) ?></span>
-          </div>
-          <?php endif; ?>
-          <div class="quiz-question-text">
-            <?= e($question['question_text'] ?? $question['question'] ?? '') ?>
-          </div>
-        </div>
-        <?php if (!empty($question['xp_reward'])): ?>
-        <span style="background:rgba(201,150,42,.2);border:1px solid rgba(201,150,42,.35);color:#d4a830;font-size:.75rem;font-weight:800;padding:5px 12px;border-radius:999px;white-space:nowrap;align-self:flex-start">
-          ⚡ +<?= format_xp((int)$question['xp_reward']) ?>
-        </span>
-        <?php endif; ?>
+    <?php if ($flash): ?>
+      <div class="ktc-flash ktc-flash-<?= $flash_type === 'err' ? 'err' : 'ok' ?>">
+        <?= e($flash) ?>
       </div>
+    <?php endif; ?>
 
-      <div class="quiz-card-body">
+    <?php if ($episode): ?>
+    <div class="ktc-layout">
 
-        <?php if ($already_answered): ?>
-        <div class="already-done">
-          ✓ Tu as déjà répondu à cette question. Clique sur "Question suivante" pour en découvrir une autre.
-        </div>
+      <!-- ── COLONNE PRINCIPALE ─────────────────────── -->
+      <div>
 
-        <?php elseif ($is_logged): ?>
-        <div class="quiz-options">
-          <?php foreach ($options as $letter => $text): ?>
-          <button
-            class="quiz-option-btn"
-            data-letter="<?= htmlspecialchars((string)$letter, ENT_QUOTES, 'UTF-8') ?>"
-            onclick="window.ktcSubmit('<?= htmlspecialchars((string)$letter, ENT_QUOTES, 'UTF-8') ?>')"
-          >
-            <span class="quiz-opt-letter"><?= htmlspecialchars((string)$letter, ENT_QUOTES, 'UTF-8') ?></span>
-            <span><?= e((string)$text) ?></span>
-          </button>
-          <?php endforeach; ?>
-        </div>
-        <div id="quiz-result-panel" class="quiz-result"></div>
-
-        <?php else: ?>
-        <!-- Non connecté : options visibles, validation impossible -->
-        <div class="quiz-options">
-          <?php foreach ($options as $letter => $text): ?>
-          <button
-            class="quiz-option-btn"
-            data-letter="<?= htmlspecialchars((string)$letter, ENT_QUOTES, 'UTF-8') ?>"
-            onclick="window.ktcRequireLogin()"
-          >
-            <span class="quiz-opt-letter"><?= htmlspecialchars((string)$letter, ENT_QUOTES, 'UTF-8') ?></span>
-            <span><?= e((string)$text) ?></span>
-          </button>
-          <?php endforeach; ?>
-        </div>
-        <div class="login-notice" id="login-notice">
-          <span>🔒</span>
-          <span>
-            <a href="login.php">Connecte-toi</a> pour valider ta réponse et gagner des XP —
-            ou <a href="inscription.php">rejoins la Zone</a> si tu n'as pas encore de compte.
-          </span>
-        </div>
+        <?php // ── Semaine 1 : Découverte ── ?>
+        <?php if (in_array($episode['status'], ['week1','week2','week3','revealed'], true) && !empty($episode['teaser_text'])): ?>
+          <div class="ktc-teaser-block">
+            <div class="ktc-section-kicker">Découverte</div>
+            <div class="ktc-teaser-text"><?= e($episode['teaser_text']) ?></div>
+          </div>
         <?php endif; ?>
 
-        <a href="ktc.php" class="btn-next" id="btn-next-question"
-          <?= ($already_answered ? '' : 'style="display:none"') ?>>
-          Question suivante →
-        </a>
+        <?php // ── Semaine 2+ : Indices supplémentaires ── ?>
+        <?php if ($current_week >= 2 && !empty($episode['details_text'])): ?>
+          <div class="ktc-details-block">
+            <div class="ktc-section-kicker">Indices supplémentaires</div>
+            <div class="ktc-details-text"><?= e($episode['details_text']) ?></div>
+          </div>
+        <?php endif; ?>
 
-      </div>
-    </div>
+        <?php // ── Révélation : objet + histoire ── ?>
+        <?php if ($current_week >= 4): ?>
+          <?php $show_name = !empty($episode['object_name']); ?>
+          <?php if ($show_name): ?>
+            <div class="ktc-revelation-object">
+              <div class="ktc-object-label">L'objet mystérieux était…</div>
+              <div class="ktc-object-name"><?= e($episode['object_name']) ?></div>
+            </div>
+          <?php endif; ?>
+          <?php if (!empty($episode['revelation_text'])): ?>
+            <div class="ktc-revelation-text-block">
+              <div class="ktc-section-kicker">L'histoire complète</div>
+              <div class="ktc-revelation-text"><?= nl2br(e($episode['revelation_text'])) ?></div>
+            </div>
+          <?php endif; ?>
+        <?php endif; ?>
+
+        <?php // ── Photos ── ?>
+        <?php if (!empty($photos)): ?>
+          <div class="ktc-photos">
+            <?php foreach ($photos as $ph): ?>
+              <div>
+                <div class="ktc-photo" data-lightbox="1">
+                  <img src="<?= e(media_url($ph['file_path'])) ?>"
+                       alt="<?= e($ph['caption'] ?? 'Photo KTC') ?>"
+                       onerror="this.closest('.ktc-photo').style.display='none'">
+                </div>
+                <?php if (!empty($ph['caption'])): ?>
+                  <div class="ktc-photo-caption"><?= e($ph['caption']) ?></div>
+                <?php endif; ?>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
+
+        <?php // ── Formulaire proposition (semaines 1 & 2) ── ?>
+        <?php if (in_array($current_week, [1, 2], true)): ?>
+          <div class="ktc-prop-form">
+            <div class="ktc-prop-form-title">💬 Quelle est votre théorie ?</div>
+            <div class="ktc-prop-form-hint">Selon vous, c'est quoi cet objet ? Proposez votre réponse — elle sera dévoilée à la révélation.</div>
+            <?php if ($user_prop): ?>
+              <div class="ktc-prop-existing">
+                <span class="ktc-prop-existing-label">Votre proposition :</span>
+                <?= e($user_prop['proposition']) ?>
+              </div>
+            <?php elseif ($is_logged): ?>
+              <form method="post">
+                <?= csrf_field() ?>
+                <input type="hidden" name="action" value="submit_proposition">
+                <textarea name="proposition" class="ktc-prop-textarea"
+                          maxlength="500"
+                          placeholder="Décrivez votre théorie sur cet objet mystérieux…" required></textarea>
+                <button type="submit" class="ktc-btn-submit">&#x1F4AC; Soumettre ma proposition</button>
+              </form>
+            <?php else: ?>
+              <div class="ktc-login-cta">
+                🔒 <span><a href="login.php">Connectez-vous</a> pour soumettre votre théorie et participer au mystère.</span>
+              </div>
+            <?php endif; ?>
+          </div>
+        <?php endif; ?>
+
+        <?php // ── Formulaire vote (semaine 3) ── ?>
+        <?php if ($current_week === 3): ?>
+          <?php $vote_choices = array_filter([
+              $episode['vote_choice_1'] ?? '', $episode['vote_choice_2'] ?? '',
+              $episode['vote_choice_3'] ?? '', $episode['vote_choice_4'] ?? '',
+          ]); ?>
+          <?php if (!empty($vote_choices)): ?>
+          <div class="ktc-vote-form">
+            <div class="ktc-vote-question">
+              <?= e($episode['vote_question'] ?: 'Selon vous, cet objet est…') ?>
+            </div>
+            <?php if ($user_vote): ?>
+              <div class="ktc-vote-already">
+                ✓ Vous avez voté : <strong><?= e($user_vote['vote_choice']) ?></strong><br>
+                <span style="font-size:.78rem;color:#3d7a4a;font-weight:400">Rendez-vous à la révélation pour connaître la réponse !</span>
+              </div>
+            <?php elseif ($is_logged): ?>
+              <form method="post">
+                <?= csrf_field() ?>
+                <input type="hidden" name="action" value="submit_vote">
+                <div class="ktc-vote-options">
+                  <?php foreach ($vote_choices as $ch): ?>
+                    <label class="ktc-vote-option">
+                      <input type="radio" name="vote_choice" value="<?= e($ch) ?>" required>
+                      <?= e($ch) ?>
+                    </label>
+                  <?php endforeach; ?>
+                </div>
+                <button type="submit" class="ktc-btn-submit">🗳️ Valider mon vote</button>
+              </form>
+            <?php else: ?>
+              <div class="ktc-login-cta">
+                🔒 <span><a href="login.php">Connectez-vous</a> pour voter et participer à la révélation.</span>
+              </div>
+            <?php endif; ?>
+
+            <?php // Résultats provisoires si déjà voté ?>
+            <?php if ($user_vote && $vote_total > 0): ?>
+              <div class="ktc-vote-results">
+                <div class="ktc-vote-results-title">Résultats provisoires — <?= $vote_total ?> vote<?= $vote_total > 1 ? 's' : '' ?></div>
+                <?php foreach ($vote_choices as $ch): ?>
+                  <?php $cnt = $vote_counts[$ch] ?? 0; $pct = $vote_total > 0 ? round($cnt / $vote_total * 100) : 0; ?>
+                  <div class="ktc-vote-bar-item">
+                    <div class="ktc-vote-bar-label">
+                      <?= e($ch) ?><span class="ktc-vote-bar-pct"><?= $pct ?>%</span>
+                    </div>
+                    <div class="ktc-vote-bar-track">
+                      <div class="ktc-vote-bar-fill" style="width:<?= $pct ?>%"></div>
+                    </div>
+                  </div>
+                <?php endforeach; ?>
+              </div>
+            <?php endif; ?>
+          </div>
+          <?php endif; ?>
+        <?php endif; ?>
+
+        <?php // ── Résultats finaux à la révélation ── ?>
+        <?php if ($current_week >= 4 && $vote_total > 0): ?>
+          <?php $correct_answer = $episode['object_name'] ?? ''; ?>
+          <div class="ktc-vote-form">
+            <div class="ktc-vote-results-title" style="margin:0 0 16px">
+              🗳️ Résultats du vote — <?= $vote_total ?> vote<?= $vote_total > 1 ? 's' : '' ?>
+            </div>
+            <?php
+              $vote_choices_rev = array_filter([
+                  $episode['vote_choice_1'] ?? '', $episode['vote_choice_2'] ?? '',
+                  $episode['vote_choice_3'] ?? '', $episode['vote_choice_4'] ?? '',
+              ]);
+              arsort($vote_counts);
+            ?>
+            <?php foreach ($vote_choices_rev as $ch): ?>
+              <?php $cnt = $vote_counts[$ch] ?? 0; $pct = $vote_total > 0 ? round($cnt / $vote_total * 100) : 0; ?>
+              <?php $is_win = $correct_answer !== '' && strcasecmp(trim($ch), trim($correct_answer)) === 0; ?>
+              <div class="ktc-vote-bar-item">
+                <div class="ktc-vote-bar-label">
+                  <?= e($ch) ?><?= $is_win ? ' ✓' : '' ?>
+                  <span class="ktc-vote-bar-pct"><?= $pct ?>% (<?= $cnt ?>)</span>
+                </div>
+                <div class="ktc-vote-bar-track">
+                  <div class="ktc-vote-bar-fill<?= $is_win ? ' winning' : '' ?>" style="width:<?= $pct ?>%"></div>
+                </div>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
+
+      </div><!-- /main -->
+
+      <!-- ── SIDEBAR ─────────────────────────────────── -->
+      <aside>
+
+        <?php // Carte brocanteur ?>
+        <?php if (!empty($episode['person_name'])): ?>
+          <div class="ktc-person-card">
+            <div class="ktc-person-header">
+              <div class="ktc-person-name"><?= e($episode['person_name']) ?></div>
+              <?php if (!empty($episode['person_title'])): ?>
+                <div class="ktc-person-subtitle"><?= e($episode['person_title']) ?></div>
+              <?php endif; ?>
+            </div>
+            <div class="ktc-person-body">
+              <?php if (!empty($episode['person_photo'])): ?>
+                <img src="<?= e($episode['person_photo']) ?>" alt="<?= e($episode['person_name']) ?>"
+                     class="ktc-person-photo" onerror="this.style.display='none'">
+              <?php endif; ?>
+              <?php if (!empty($episode['person_bio'])): ?>
+                <div class="ktc-person-bio"><?= nl2br(e($episode['person_bio'])) ?></div>
+              <?php endif; ?>
+            </div>
+          </div>
+        <?php endif; ?>
+
+        <?php // Calendrier des phases ?>
+        <?php if (!empty($episode['date_week1']) || !empty($episode['date_week2']) || !empty($episode['date_week3']) || !empty($episode['date_revelation'])): ?>
+          <div class="ktc-sidebar-card">
+            <div class="ktc-sidebar-title">Calendrier</div>
+            <?php $phases = [
+              ['label' => 'Sem. 1 — Découverte',       'date' => $episode['date_week1']    ?? '', 'week' => 1],
+              ['label' => 'Sem. 2 — Indices',           'date' => $episode['date_week2']    ?? '', 'week' => 2],
+              ['label' => 'Sem. 3 — Votes',             'date' => $episode['date_week3']    ?? '', 'week' => 3],
+              ['label' => 'Sem. 4 — Révélation',        'date' => $episode['date_revelation'] ?? '', 'week' => 4],
+            ]; ?>
+            <?php foreach ($phases as $ph): ?>
+              <?php
+                $dot_class = '';
+                if ($ph['week'] < $current_week)       $dot_class = 'done';
+                elseif ($ph['week'] === $current_week) $dot_class = 'active';
+              ?>
+              <div class="ktc-date-row">
+                <div class="ktc-date-dot <?= $dot_class ?>"></div>
+                <div class="ktc-date-label"><?= e($ph['label']) ?></div>
+                <div class="ktc-date-val"><?= _ktc_fmt_date($ph['date']) ?></div>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
+
+        <?php // XP info ?>
+        <?php if (!empty($episode['xp_reward'])): ?>
+          <div class="ktc-sidebar-card" style="text-align:center">
+            <div style="font-size:1.6rem;font-weight:900;color:#c9962a">+<?= (int)$episode['xp_reward'] ?> XP</div>
+            <div style="font-size:.74rem;color:#6b7f96;margin-top:4px">à la révélation pour les participants</div>
+          </div>
+        <?php endif; ?>
+
+      </aside>
+
+    </div><!-- /ktc-layout -->
 
     <?php else: ?>
-    <div class="empty-quiz">
-      <div class="empty-quiz-icon">🥐</div>
-      <h3>Aucun mystère disponible pour l'instant</h3>
-      <p>Les mystères arrivent bientôt. Reviens dans la Zone !</p>
+    <!-- Empty state -->
+    <div class="ktc-empty">
+      <div class="ktc-empty-icon">🥐</div>
+      <h3>Aucun épisode en cours</h3>
+      <p>Le prochain mystère vendéen arrive bientôt. Revenez dans la Zone !</p>
     </div>
     <?php endif; ?>
 
-    <!-- STATS (si connecté et au moins une réponse) -->
-    <?php if ($is_logged && $user_stats['total'] > 0): ?>
-    <div class="section-title">Ma progression KTC</div>
-    <div class="ktc-stats-card">
-      <div class="stats-grid">
-        <div class="stat-box">
-          <span class="stat-val"><?= $user_stats['correct'] ?> / <?= $user_stats['total'] ?></span>
-          <span class="stat-lbl">Bonnes réponses</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-val">
-            <?= $user_stats['total'] > 0 ? round($user_stats['correct'] / $user_stats['total'] * 100) : 0 ?>%
-          </span>
-          <span class="stat-lbl">Taux de réussite</span>
-        </div>
-        <div class="stat-box gold">
-          <span class="stat-val"><?= format_xp($user_stats['xp']) ?></span>
-          <span class="stat-lbl">XP KTC gagnés</span>
+    <?php // ── Épisodes passés ── ?>
+    <?php if (!empty($past_eps)): ?>
+      <div class="ktc-past-section">
+        <div class="ktc-past-title">Épisodes précédents</div>
+        <div class="ktc-past-grid">
+          <?php foreach ($past_eps as $ep): ?>
+            <a href="ktc.php" class="ktc-past-card">
+              <div class="ktc-past-card-kicker">
+                <?= $ep['date_revelation'] ? _ktc_fmt_date($ep['date_revelation']) : 'Révélé' ?>
+              </div>
+              <div class="ktc-past-card-title"><?= e($ep['title']) ?></div>
+              <?php if (!empty($ep['object_name']) && !(int)$ep['object_hidden']): ?>
+                <div class="ktc-past-card-object">🔍 <?= e($ep['object_name']) ?></div>
+              <?php else: ?>
+                <div class="ktc-past-card-object" style="color:#bbb">Objet mystérieux révélé</div>
+              <?php endif; ?>
+            </a>
+          <?php endforeach; ?>
         </div>
       </div>
-    </div>
     <?php endif; ?>
-
-    <!-- EXPLORER LES MYSTÈRES (ex "Catégories") -->
-    <div class="cats-section-title">Explorer les Mystères</div>
-    <div class="cats-grid">
-      <?php foreach ($categories as $cat): ?>
-      <a href="ktc.php?cat=<?= urlencode($cat['slug']) ?>" class="cat-card">
-        <span class="cat-emoji"><?= $cat['emoji'] ?></span>
-        <div class="cat-name"><?= e($cat['label']) ?></div>
-        <div class="cat-desc"><?= e($cat['desc']) ?></div>
-        <?php $cnt = $cat_counts[$cat['slug']] ?? 0; ?>
-        <?php if ($cnt > 0): ?>
-        <span class="cat-count"><?= $cnt ?> mystère<?= $cnt > 1 ? 's' : '' ?></span>
-        <?php else: ?>
-        <span class="cat-count" style="opacity:.4">Bientôt</span>
-        <?php endif; ?>
-      </a>
-      <?php endforeach; ?>
-    </div>
 
   </div>
 </section>
