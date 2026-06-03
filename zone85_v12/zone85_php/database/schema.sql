@@ -399,4 +399,18 @@ CREATE TABLE legal_acceptances (
   CONSTRAINT fk_la_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ============================================================
+-- Rate limiting (anti brute-force login/inscription)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS rate_limits (
+  id           INT UNSIGNED      NOT NULL AUTO_INCREMENT,
+  ip_hash      VARCHAR(64)       NOT NULL,
+  endpoint     VARCHAR(60)       NOT NULL,
+  attempts     SMALLINT UNSIGNED NOT NULL DEFAULT 1,
+  window_start DATETIME          NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_rl_ip_endpoint (ip_hash, endpoint),
+  KEY idx_rl_window (window_start)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 SET FOREIGN_KEY_CHECKS = 1;

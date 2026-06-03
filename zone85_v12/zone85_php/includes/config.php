@@ -3,12 +3,30 @@
 // ZONE 85 — Configuration
 // ============================================================
 
-// Environnement
-define('APP_ENV', 'dev'); // 'dev' | 'prod' — passer à 'prod' avant toute mise en ligne
+// Chargement du fichier .env (développement local uniquement)
+// En prod, les variables sont injectées par le serveur (Apache SetEnv / .env Nginx / secrets hébergeur).
+$_env_file = dirname(__DIR__) . '/.env';
+if (file_exists($_env_file)) {
+    foreach (parse_ini_file($_env_file, false, INI_SCANNER_RAW) as $_k => $_v) {
+        if (getenv($_k) === false) putenv("$_k=$_v");
+        if (!isset($_ENV[$_k])) $_ENV[$_k] = $_v;
+    }
+    unset($_env_file, $_k, $_v);
+} else {
+    unset($_env_file);
+}
+
+/** Lit une variable d'environnement avec valeur par défaut */
+function _env(string $key, string $default = ''): string {
+    $v = $_ENV[$key] ?? getenv($key);
+    return ($v !== false && $v !== null && $v !== '') ? (string)$v : $default;
+}
+
+// Environnement : surcharger via APP_ENV=prod dans .env ou variables serveur
+define('APP_ENV', _env('APP_ENV', 'dev')); // 'dev' | 'prod'
 
 // Outils de diagnostic (uniquement en dev, jamais en prod)
-// Mettre à true uniquement pour une session de debug locale et remettre à false ensuite.
-define('DEV_TOOLS_ALLOWED', false);
+define('DEV_TOOLS_ALLOWED', _env('DEV_TOOLS_ALLOWED', 'false') === 'true');
 
 // Site
 define('SITE_NAME',    'ZONE85');
@@ -46,13 +64,13 @@ define('SEASONS', [
     'saison-des-veillees'      => 'Saison des Veillées',
 ]);
 
-// Base de données (désactivée par défaut — activer quand la base est installée)
-define('DB_ENABLED', true);        // Mettre true après avoir importé schema.sql + seed.sql
-define('DB_HOST',    'localhost');
-define('DB_PORT',    3306);
-define('DB_NAME',    'qg_');
-define('DB_USER',    'AdminQg85');
-define('DB_PASS',    'AdminQg85!'); // Renseigner via variable d'environnement en prod
+// Base de données — surcharger via .env ou variables d'environnement serveur
+define('DB_ENABLED', _env('DB_ENABLED', 'true') !== 'false');
+define('DB_HOST',    _env('DB_HOST',    'localhost'));
+define('DB_PORT',    (int)_env('DB_PORT', '3306'));
+define('DB_NAME',    _env('DB_NAME',    'qg_'));
+define('DB_USER',    _env('DB_USER',    'AdminQg85'));
+define('DB_PASS',    _env('DB_PASS',    'AdminQg85!')); // TOUJOURS via .env ou var serveur en prod
 define('DB_CHARSET', 'utf8mb4');
 
 // ── Session auto-start ──────────────────────────────────────
@@ -73,13 +91,11 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 define('CLAN_SLUGS', ['bocage', 'littoral', 'marais']);
 
 // ── Brevo (transactionnel) ─────────────────────────────────
-// Renseigner la clé API Brevo (anciennement Sendinblue) en production.
-// Laisser vide ('') pour désactiver les envois Brevo (utilise mail() en fallback).
-define('BREVO_API_KEY',    '');           // xkeysib-...
+define('BREVO_API_KEY',    _env('BREVO_API_KEY', ''));  // xkeysib-... (via .env en prod)
 define('BREVO_API_URL',    'https://api.brevo.com/v3/smtp/email');
 define('BREVO_FROM_EMAIL', 'noreply@zone85.fr');
 define('BREVO_FROM_NAME',  'ZONE85');
-define('BREVO_ENABLED',    false);        // passer à true + renseigner clé en prod
+define('BREVO_ENABLED',    _env('BREVO_API_KEY', '') !== '');
 
 // ── Analytics ──────────────────────────────────────────────
 // GA4 : renseigner l'ID de mesure (ex: G-XXXXXXXXXX) pour activer.

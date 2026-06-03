@@ -15,7 +15,10 @@ $error   = '';
 $prefill = '';
 
 if (is_post_request()) {
-    if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
+    // Rate limiting : 10 tentatives par IP sur 10 minutes
+    if (!check_rate_limit('login', 10, 600)) {
+        $error = 'Trop de tentatives. Veuillez patienter quelques minutes.';
+    } elseif (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
         $error = 'Token de sécurité invalide. Rechargez la page.';
     } else {
         $email    = trim($_POST['email'] ?? '');
@@ -26,6 +29,7 @@ if (is_post_request()) {
         } else {
             $user = find_user_by_email($email);
             if ($user && password_verify($password, $user['password_hash'])) {
+                reset_rate_limit('login');
                 login_user($user);
                 $redirect = $_GET['redirect'] ?? 'profil.php';
                 // Sécurité : on n'autorise que les redirections relatives

@@ -488,9 +488,51 @@ function set_security_headers(): void {
     header('X-Frame-Options: SAMEORIGIN');
     header('Referrer-Policy: strict-origin-when-cross-origin');
     header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
-    // CSP permissive (fonts Google, inline styles autorisés pour les pages actuelles)
-    // TODO: renforcer en prod après audit complet des inline styles/scripts
-    header("Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://unpkg.com; img-src 'self' data: blob: https://unpkg.com https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://www.zone85.fr https://zone85.fr; connect-src 'self' https://unpkg.com https://*.tile.openstreetmap.org https://tile.openstreetmap.org;");
+    // upgrade-insecure-requests : force HTTPS sur toutes les sous-ressources
+    // unsafe-inline conservé le temps de migrer les inline styles/scripts vers fichiers externes
+    header("Content-Security-Policy: upgrade-insecure-requests; default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://unpkg.com; img-src 'self' data: blob: https://unpkg.com https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://www.zone85.fr https://zone85.fr; connect-src 'self' https://unpkg.com https://*.tile.openstreetmap.org https://tile.openstreetmap.org; frame-ancestors 'self'; base-uri 'self'; form-action 'self';");
+}
+
+/**
+ * Vérifie si l'IP courante est en dessous du seuil de tentatives pour un endpoint.
+ * Retourne true si la requête est autorisée, false si bloquée.
+ */
+function check_rate_limit(string $endpoint, int $max = 5, int $window_seconds = 300): bool {
+    global $pdo;
+    if (!$pdo) return true;
+    $ip_hash = hash('sha256', $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0');
+    try {
+        $pdo->prepare("DELETE FROM rate_limits WHERE window_start < DATE_SUB(NOW(), INTERVAL :w SECOND)")
+            ->execute([':w' => $window_seconds]);
+        $s = $pdo->prepare("SELECT attempts FROM rate_limits WHERE ip_hash=:h AND endpoint=:e LIMIT 1");
+        $s->execute([':h' => $ip_hash, ':e' => $endpoint]);
+        $row = $s->fetch();
+        if ($row && (int)$row['attempts'] >= $max) return false;
+        if ($row) {
+            $pdo->prepare("UPDATE rate_limits SET attempts=attempts+1 WHERE ip_hash=:h AND endpoint=:e")
+                ->execute([':h' => $ip_hash, ':e' => $endpoint]);
+        } else {
+            $pdo->prepare("INSERT INTO rate_limits (ip_hash, endpoint, attempts, window_start) VALUES (:h,:e,1,NOW())")
+                ->execute([':h' => $ip_hash, ':e' => $endpoint]);
+        }
+        return true;
+    } catch (Throwable $e) {
+        error_log('[ZONE85 rate_limit] ' . $e->getMessage());
+        return true;
+    }
+}
+
+/** Réinitialise le compteur rate limit pour l'IP courante (ex: après succès login) */
+function reset_rate_limit(string $endpoint): void {
+    global $pdo;
+    if (!$pdo) return;
+    $ip_hash = hash('sha256', $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0');
+    try {
+        $pdo->prepare("DELETE FROM rate_limits WHERE ip_hash=:h AND endpoint=:e")
+            ->execute([':h' => $ip_hash, ':e' => $endpoint]);
+    } catch (Throwable $e) {
+        error_log('[ZONE85 rate_limit] ' . $e->getMessage());
+    }
 }
 
 /**

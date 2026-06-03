@@ -8,6 +8,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_GET['action'] ?? '') === 'regist
     require_once 'includes/auth.php';
     header('Content-Type: application/json; charset=UTF-8');
 
+    // Rate limiting : 5 créations de compte par IP sur 30 minutes
+    if (!check_rate_limit('register', 5, 1800)) {
+        echo json_encode(['ok' => false, 'error' => 'Trop de tentatives. Veuillez patienter quelques minutes.']);
+        exit;
+    }
+
     // Vérification CSRF
     if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
         echo json_encode(['ok' => false, 'error' => 'Token de sécurité invalide. Rechargez la page.']);
