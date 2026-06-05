@@ -11,6 +11,7 @@ $_nav_links = [
     ['slug' => 'zonautes',  'label' => 'Zonautes',        'file' => 'zonautes.php'],
     ['slug' => 'les-echos', 'label' => 'Les Echos',       'file' => 'les-echos.php'],
     ['slug' => 'hall',      'label' => 'Hall de la Zone', 'file' => 'hall.php'],
+    ['slug' => 'communaute','label' => 'Communauté',      'file' => 'communaute.php'],
 ];
 
 $_cp       = $current_page ?? '';
@@ -18,8 +19,12 @@ $_nav_user = (session_status() === PHP_SESSION_ACTIVE) ? ($_SESSION['user'] ?? n
 
 // Initiales pour l'avatar nav
 $_nav_initials = '';
+$_nav_notif_count = 0;
 if ($_nav_user) {
     $_nav_initials = strtoupper(mb_substr($_nav_user['pseudo'], 0, 2));
+    if (function_exists('count_unread_notifications')) {
+        $_nav_notif_count = count_unread_notifications((int)$_nav_user['id']);
+    }
 }
 ?>
 <nav id="navbar">
@@ -32,6 +37,15 @@ if ($_nav_user) {
     <a href="index.php" class="nav-logo" aria-label="ZONE85 — Accueil"><img src="<?= img('logo-header.png') ?>" alt="ZONE85 — L'Esprit Vendee"></a>
     <div class="nav-right">
       <?php if ($_nav_user): ?>
+        <!-- Cloche notifications -->
+        <a href="notifications.php" class="nav-notif-bell" title="Notifications" style="position:relative;display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;text-decoration:none;font-size:1.1rem;color:var(--text-mid);transition:background .15s<?= ($_cp === 'notifications') ? ';background:rgba(234,86,73,.1)' : '' ?>">
+          🔔
+          <?php if ($_nav_notif_count > 0): ?>
+          <span style="position:absolute;top:2px;right:2px;min-width:16px;height:16px;background:var(--primary);color:#fff;border-radius:8px;font-size:.6rem;font-weight:900;display:flex;align-items:center;justify-content:center;padding:0 3px;line-height:1">
+            <?= $_nav_notif_count > 9 ? '9+' : $_nav_notif_count ?>
+          </span>
+          <?php endif; ?>
+        </a>
         <?php $_nav_avatar_url = avatar_url($_nav_user); ?>
         <div class="nav-avatar" title="<?= e($_nav_user['pseudo']) ?>" onclick="location.href='profil.php'" style="cursor:pointer<?= ($_nav_user['avatar_type'] === 'upload') ? ';padding:0;overflow:hidden' : '' ?>">
           <?php if (!empty($_nav_avatar_url)): ?>

@@ -184,6 +184,11 @@ if (!$is_guest) {
             'joined'          => $_db_profile['joined'] ?? '',
         ];
 
+        // XP saison (depuis le début de la saison active)
+        $_xp_season = function_exists('fetch_user_xp_season')
+            ? fetch_user_xp_season((int)$_db_profile['id'])
+            : 0;
+
         $_user_badges       = fetch_user_badges((int)$_db_profile['id']);
         if (!empty($_user_badges)) $badges = $_user_badges;
         $_xp_history        = fetch_user_xp_logs((int)$_db_profile['id'], 10);
@@ -784,6 +789,53 @@ require_once 'includes/nav.php';
            TAB 2 — PROGRESSION
       ══════════════════════════════ -->
       <div data-panel-group="profil" data-panel-id="progression" class="profil-panel" style="display:none">
+
+        <!-- Progression saisonnière -->
+        <?php if (isset($_xp_season)): ?>
+        <?php
+        $_szn_xp    = $_xp_season;
+        $_szn_lvl   = get_user_level_from_xp($_szn_xp);
+        $_szn_floor = $_xp_levels[$_szn_lvl - 1] ?? 0;
+        $_szn_ceil  = $_xp_levels[$_szn_lvl]     ?? ($_szn_floor + 5000);
+        $_szn_range = max(1, $_szn_ceil - $_szn_floor);
+        $_szn_pct   = min(100, (int)round(($_szn_xp - $_szn_floor) / $_szn_range * 100));
+        $_szn_next  = get_level_name($_szn_lvl + 1);
+        ?>
+        <div class="profil-card" style="margin-bottom:20px">
+          <div class="profil-card-title">🗓 Progression cette saison</div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
+            <span style="font-size:1.6rem;font-weight:900;color:var(--navy-dark)"><?= number_format($_szn_xp, 0, ',', ' ') ?> <span style="font-size:.85rem;font-weight:600;color:var(--text-muted)">XP saison</span></span>
+            <a href="classement.php" style="font-size:.78rem;font-weight:700;color:var(--primary);text-decoration:none">Voir classement →</a>
+          </div>
+          <!-- Barre XP saison vers prochain niveau -->
+          <div style="background:var(--beige-dark);border-radius:20px;height:10px;overflow:hidden;margin-bottom:6px">
+            <div style="width:<?= $_szn_pct ?>%;height:100%;background:linear-gradient(90deg,var(--primary),#f07066);border-radius:20px;transition:width .6s ease"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--text-muted);font-weight:600">
+            <span><?= number_format($_szn_floor, 0, ',', ' ') ?> XP</span>
+            <?php if ($_szn_lvl < 10): ?>
+            <span>Prochain niveau : <strong style="color:var(--primary)"><?= e($_szn_next) ?></strong> à <?= number_format($_szn_ceil, 0, ',', ' ') ?> XP</span>
+            <?php else: ?>
+            <span style="color:#d4af37;font-weight:800">🏆 Niveau max atteint !</span>
+            <?php endif; ?>
+          </div>
+          <!-- Mini stat XP total vs saison -->
+          <div style="display:flex;gap:16px;margin-top:16px;flex-wrap:wrap">
+            <div style="flex:1;min-width:100px;background:var(--beige-light);border-radius:8px;padding:10px 14px;text-align:center">
+              <div style="font-size:1.1rem;font-weight:900;color:var(--navy-dark)"><?= number_format((int)$user['xp_current'], 0, ',', ' ') ?></div>
+              <div style="font-size:.68rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">XP total à vie</div>
+            </div>
+            <div style="flex:1;min-width:100px;background:rgba(234,86,73,.06);border-radius:8px;padding:10px 14px;text-align:center;border:1px solid rgba(234,86,73,.15)">
+              <div style="font-size:1.1rem;font-weight:900;color:var(--primary)"><?= number_format($_szn_xp, 0, ',', ' ') ?></div>
+              <div style="font-size:.68rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">XP cette saison</div>
+            </div>
+            <div style="flex:1;min-width:100px;background:var(--beige-light);border-radius:8px;padding:10px 14px;text-align:center">
+              <div style="font-size:1.1rem;font-weight:900;color:var(--navy-dark)"><?= (int)$user['participations'] ?></div>
+              <div style="font-size:.68rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">Missions validées</div>
+            </div>
+          </div>
+        </div>
+        <?php endif; ?>
 
         <div class="profil-card">
           <div class="profil-card-title">🛤️ Roadmap des niveaux</div>

@@ -1954,4 +1954,102 @@ function fetch_weather_alerts(): array {
     }
 }
 
+// ── Notifications ─────────────────────────────────────────────
 
+/**
+ * Crée une notification in-app pour un utilisateur.
+ * Non-bloquant : silencieux si table inexistante.
+ */
+function push_notification(int $user_id, string $type, string $title, array $opts = []): void {
+    $pdo = db();
+    if (!$pdo || $user_id <= 0) return;
+    $allowed_types = ['badge_unlock','mission_validated','mission_new','flash_start',
+                      'level_up','clan_event','season_end','system'];
+    if (!in_array($type, $allowed_types, true)) return;
+    try {
+        $pdo->prepare("
+            INSERT INTO notifications (user_id, type, title, body, icon_emoji, link_url)
+            VALUES (:uid, :type, :title, :body, :icon, :link)
+        ")->execute([
+            ':uid'   => $user_id,
+            ':type'  => $type,
+            ':title' => mb_substr($title, 0, 200),
+            ':body'  => $opts['body']       ?? null,
+            ':icon'  => $opts['icon_emoji'] ?? null,
+            ':link'  => $opts['link_url']   ?? null,
+        ]);
+    } catch (PDOException $e) { /* silencieux */ }
+}
+
+/**
+ * Nombre de notifications non lues d'un utilisateur.
+ */
+function count_unread_notifications(int $user_id): int {
+    $pdo = db();
+    if (!$pdo) return 0;
+    try {
+        $s = $pdo->prepare("SELECT COUNT(*) FROM notifications WHERE user_id=:uid AND read_at IS NULL");
+        $s->execute([':uid' => $user_id]);
+        return (int)$s->fetchColumn();
+    } catch (PDOException $e) {
+        return 0;
+    }
+}
+
+/**
+ * Retourne les notifications d'un utilisateur (récentes en premier).
+ */
+function fetch_user_notifications(int $user_id, int $limit = 30, bool $unread_only = false): array {
+    $pdo = db();
+    if (!$pdo) return [];
+    $where_unread = $unread_only ? 'AND read_at IS NULL' : '';
+    try {
+        $stmt = $pdo->prepare("
+            SELECT * FROM notifications
+            WHERE user_id = :uid {$where_unread}
+            ORDER BY created_at DESC
+            LIMIT :lim
+        ");
+        $stmt->bindValue(':uid', $user_id, PDO::PARAM_INT);
+        $stmt->bindValue(':lim', $limit,   PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    } catch (PDOException $e) {
+        return [];
+    }
+}
+
+/**
+ * Marque les notifications comme lues.
+ * $notif_id = null → marque toutes les notifications de l'utilisateur.
+ */
+function mark_notifications_read(int $user_id, ?int $notif_id = null): void {
+    $pdo = db();
+    if (!$pdo) return;
+    try {
+        if ($notif_id) {
+            $pdo->prepare("UPDATE notifications SET read_at=NOW() WHERE id=:id AND user_id=:uid AND read_at IS NULL")
+                ->execute([':id' => $notif_id, ':uid' => $user_id]);
+        } else {
+            $pdo->prepare("UPDATE notifications SET read_at=NOW() WHERE user_id=:uid AND read_at IS NULL")
+                ->execute([':uid' => $user_id]);
+        }
+    } catch (PDOException $e) { /* silencieux */ }
+}
+
+/**
+ * Retourne les XP gagnés depuis le début de la saison active.
+ */
+function fetch_user_xp_season(int $user_id): int {
+    $pdo = db();
+    if (!$pdo) return 0;
+    try {
+        $sr    = _active_season_row();
+        $start = $sr ? $sr['start_date'] : '1970-01-01';
+        $stmt  = $pdo->prepare("SELECT COALESCE(SUM(xp_amount),0) FROM xp_logs WHERE user_id=:uid AND created_at >= :s");
+        $stmt->execute([':uid' => $user_id, ':s' => $start]);
+        return (int)$stmt->fetchColumn();
+    } catch (PDOException $e) {
+        return 0;
+    }
+}

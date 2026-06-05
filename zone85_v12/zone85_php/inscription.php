@@ -648,7 +648,7 @@ require_once 'includes/nav.php';
       </div>
 
       <div style="text-align:center">
-        <a href="profil.php?pwa_install=1" class="btn btn-primary btn-lg" id="btn-go-profil">Accéder à mon profil →</a>
+        <a href="bienvenue.php" class="btn btn-primary btn-lg" id="btn-go-profil">Démarrer l'aventure →</a>
       </div>
 
     </div>
