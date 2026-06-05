@@ -1,6 +1,6 @@
 <?php
-$page_title       = 'Le Concept';
-$page_description = 'Zone85 : le terrain de jeu communautaire vendéen. Trois clans, des missions, des saisons, un Passeport Vendéen. Je progresse pour moi. Je fais gagner mon clan.';
+$page_title       = 'Le Concept — Zone85';
+$page_description = 'Zone85 : randos, articles, livres, jeux — et un terrain de jeu communautaire pour tout relier. La Vendée vécue, racontée et jouée par ceux qui l\'habitent.';
 $page_canonical   = 'https://www.zone85.fr/concept.php';
 $page_robots      = 'index,follow';
 $page_og_image    = 'assets/img/ZONE852025.png';
@@ -18,393 +18,435 @@ require_once 'includes/data.php';
 require_once 'includes/functions.php';
 
 $page_styles = '<style>
-/* ── PAGE HERO BEIGE ── */
-.page-hero{background:var(--beige-light);padding:140px 0 80px;border-bottom:1px solid var(--beige-dark)}
-.page-hero-inner{max-width:740px;margin:0 auto;padding:0 24px}
-.page-hero h1{font-size:clamp(2.2rem,5vw,3.6rem);font-weight:900;color:var(--navy-dark);letter-spacing:-1.5px;line-height:1.1;margin-bottom:16px}
-.page-hero h1 em{color:var(--primary);font-style:normal}
-.page-hero p{font-size:1.05rem;color:var(--text-mid);line-height:1.75;max-width:600px}
 
-/* ── PHRASE CENTRALE ── */
-#phrase{background:var(--navy-dark);padding:64px 0}
-.phrase-inner{max-width:800px;margin:0 auto;padding:0 24px;text-align:center}
-.phrase-text{font-size:clamp(1.4rem,3vw,2rem);font-weight:900;color:#fff;line-height:1.3;letter-spacing:-.5px;margin-bottom:12px}
-.phrase-text em{color:var(--primary);font-style:normal}
-.phrase-sub{font-size:.95rem;color:rgba(255,255,255,.55);line-height:1.7}
+/* ── Sections communes ── */
+.cp-section{padding:88px 0}
+.cp-section-beige{background:var(--beige)}
+.cp-section-white{background:var(--white)}
+.cp-section-navy{background:linear-gradient(155deg,#060e16,#0c1e2e);padding:88px 0}
 
-/* ── MODES ── */
-#modes{background:var(--beige);padding:100px 0 80px}
-.modes-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:48px}
-.mode-card{background:var(--white);border-radius:var(--radius-lg);padding:36px 28px;box-shadow:var(--shadow-sm);border-top:4px solid transparent}
-.mode-card.orange{border-top-color:var(--primary)}
-.mode-card.navy{border-top-color:var(--navy-dark)}
-.mode-icon{font-size:2.4rem;margin-bottom:16px}
-.mode-title{font-size:1.3rem;font-weight:800;color:var(--text);margin-bottom:8px}
-.mode-desc{font-size:.9rem;color:var(--text-mid);line-height:1.65;margin-bottom:20px}
-.mode-points{display:flex;flex-direction:column;gap:8px}
-.mode-point{display:flex;align-items:flex-start;gap:10px;font-size:.85rem;color:var(--text-mid)}
-.mode-point::before{content:\'✓\';font-weight:900;flex-shrink:0;margin-top:1px}
-.mode-card.orange .mode-point::before{color:var(--primary)}
-.mode-card.navy .mode-point::before{color:var(--navy-dark)}
-.reset-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:36px}
-.reset-card{border-radius:var(--radius);padding:20px}
-.reset-card.ok{background:rgba(42,157,92,.08);border:1px solid rgba(42,157,92,.2)}
-.reset-card.zero{background:rgba(234,86,73,.08);border:1px solid rgba(234,86,73,.2)}
-.reset-card-title{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px}
-.reset-card.ok .reset-card-title{color:#2a9d5c}
-.reset-card.zero .reset-card-title{color:var(--primary)}
-.reset-item{font-size:.85rem;color:var(--text-mid);padding:6px 0;border-bottom:1px solid var(--beige-dark);display:flex;align-items:center;gap:8px}
-.reset-item:last-child{border-bottom:none}
-.reset-card.ok .reset-item::before{content:\'✓\';color:#2a9d5c;font-weight:700}
-.reset-card.zero .reset-item::before{content:\'↺\';color:var(--primary);font-weight:700}
+/* ── Section header ── */
+.cp-head{margin-bottom:52px}
+.cp-eyebrow{font-size:.67rem;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:var(--primary);margin-bottom:10px}
+.cp-title{font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:900;color:var(--text);letter-spacing:-.5px;line-height:1.15;margin-bottom:12px}
+.cp-sub{font-size:.96rem;color:var(--text-muted);max-width:560px;line-height:1.75}
+.cp-section-navy .cp-title{color:#fff}
+.cp-section-navy .cp-sub{color:rgba(255,255,255,.5)}
+.cp-section-navy .cp-eyebrow{color:#f5a99f}
 
-/* ── SAISONS TIMELINE ── */
-#saisons{background:var(--navy-dark);padding:100px 0}
-.season-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:48px}
-.season-card{border-radius:var(--radius-lg);padding:28px 20px;text-align:center;border:1px solid rgba(255,255,255,.08)}
-.season-card.active{background:rgba(234,86,73,.12);border-color:rgba(234,86,73,.3)}
-.season-card:not(.active){background:rgba(255,255,255,.04)}
-.season-emoji{font-size:2rem;margin-bottom:12px;display:block}
-.season-badge{display:inline-block;font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:3px 10px;border-radius:3px;margin-bottom:10px}
-.season-card.active .season-badge{background:var(--primary);color:#fff}
-.season-card:not(.active) .season-badge{background:rgba(255,255,255,.1);color:rgba(255,255,255,.5)}
-.season-name{font-size:1rem;font-weight:800;color:#fff;margin-bottom:4px;line-height:1.2}
-.season-period{font-size:.72rem;color:rgba(255,255,255,.45);font-weight:600;margin-bottom:10px}
-.season-theme{font-size:.8rem;color:rgba(255,255,255,.6);line-height:1.5;margin-bottom:12px}
-.season-mission{font-size:.75rem;font-weight:700;color:var(--primary);background:rgba(234,86,73,.1);padding:6px 12px;border-radius:4px;line-height:1.4}
-.season-legend{text-align:center;margin-top:32px;font-size:.82rem;color:rgba(255,255,255,.4)}
-.season-legend strong{color:rgba(255,255,255,.7)}
+/* ── Piliers de contenu ── */
+.cp-pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.cp-pillar{border-radius:14px;overflow:hidden;border:1.5px solid var(--beige-dark);background:var(--white);transition:transform .25s,box-shadow .25s}
+.cp-pillar:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.09)}
+.cp-pillar-header{padding:28px 22px 20px;position:relative}
+.cp-pillar-header-echos{background:linear-gradient(135deg,#1a1a2e,#12314e)}
+.cp-pillar-header-randos{background:linear-gradient(135deg,#1a3d1a,#12314e)}
+.cp-pillar-header-ktc{background:linear-gradient(135deg,#2b1a0a,#12314e)}
+.cp-pillar-header-victor{background:linear-gradient(135deg,#1a1500,#3a2a00)}
+.cp-pillar-header-invisibles{background:linear-gradient(135deg,#0e0514,#1a0a2e)}
+.cp-pillar-icon{font-size:2.2rem;line-height:1;margin-bottom:12px;display:block}
+.cp-pillar-name{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:rgba(255,255,255,.5);margin-bottom:6px}
+.cp-pillar-title{font-size:1rem;font-weight:900;color:#fff;line-height:1.2}
+.cp-pillar-tag{position:absolute;top:14px;right:14px;font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:3px 8px;border-radius:3px}
+.cp-pillar-tag-members{background:rgba(201,150,42,.2);color:#d4a43a;border:1px solid rgba(201,150,42,.3)}
+.cp-pillar-tag-soon{background:rgba(139,59,140,.2);color:#c471c4;border:1px solid rgba(139,59,140,.3)}
+.cp-pillar-body{padding:18px 22px 22px}
+.cp-pillar-desc{font-size:.85rem;color:var(--text-muted);line-height:1.65;margin-bottom:16px}
+.cp-pillar-link{display:inline-flex;align-items:center;gap:6px;font-size:.82rem;font-weight:700;color:var(--primary);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .15s}
+.cp-pillar-link:hover{border-bottom-color:var(--primary)}
+.cp-pillar-link-muted{color:var(--text-muted);pointer-events:none}
 
-/* ── XP ACTIONS ── */
-#xp-actions{background:var(--beige);padding:100px 0 80px}
-.xp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:48px}
-.xp-card{background:var(--white);border-radius:var(--radius);padding:20px 16px;box-shadow:var(--shadow-sm);text-align:center}
-.xp-icon{font-size:1.6rem;margin-bottom:8px}
-.xp-action-name{font-size:.88rem;font-weight:800;color:var(--text);margin-bottom:4px}
-.xp-range{font-size:.82rem;font-weight:800;color:var(--primary)}
-.xp-note{font-size:.7rem;color:var(--text-muted);margin-top:4px;line-height:1.4}
+/* ── Victor highlight ── */
+.cp-victor{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;padding:48px;background:linear-gradient(135deg,#1a1500,#3a2800);border-radius:16px;border:1px solid rgba(201,150,42,.2)}
+.cp-victor-text .cp-eyebrow{color:#d4a43a}
+.cp-victor-text h3{font-size:clamp(1.4rem,2.5vw,2rem);font-weight:900;color:#fff;letter-spacing:-.5px;margin-bottom:10px}
+.cp-victor-text p{font-size:.9rem;color:rgba(255,255,255,.55);line-height:1.7;margin-bottom:24px}
+.cp-victor-cta{display:inline-flex;align-items:center;gap:8px;background:rgba(201,150,42,.15);border:1.5px solid rgba(201,150,42,.4);color:#d4a43a;padding:12px 22px;border-radius:7px;font-size:.9rem;font-weight:800;text-decoration:none;transition:background .2s}
+.cp-victor-cta:hover{background:rgba(201,150,42,.25)}
+.cp-victor-cta-locked{color:rgba(255,255,255,.3);border-color:rgba(255,255,255,.1);pointer-events:none;cursor:default}
+.cp-victor-visual{display:flex;align-items:center;justify-content:center;font-size:6rem;text-align:center;opacity:.8}
 
-/* ── CODE DE LA ZONE ── */
-#code{background:var(--beige-light);padding:100px 0 80px}
-.code-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:48px}
-.code-card{background:var(--white);border-radius:var(--radius-lg);padding:24px 18px;box-shadow:var(--shadow-sm);border-bottom:3px solid var(--primary)}
-.code-num{font-size:.72rem;font-weight:800;color:var(--primary);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
-.code-rule{font-size:.92rem;font-weight:800;color:var(--navy-dark);margin-bottom:6px;line-height:1.3}
-.code-detail{font-size:.78rem;color:var(--text-mid);line-height:1.5}
+/* ── Les Invisibles teaser ── */
+.cp-invisibles{border-radius:16px;overflow:hidden;border:1px solid rgba(139,59,140,.2);background:linear-gradient(135deg,#0e0514,#1a0a2e);padding:40px;text-align:center;position:relative}
+.cp-invisibles::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(180,80,180,.08),transparent 70%);pointer-events:none}
+.cp-invisibles-eyebrow{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:rgba(180,80,180,.8);margin-bottom:14px}
+.cp-invisibles h3{font-size:clamp(1.4rem,2.5vw,2rem);font-weight:900;color:#fff;letter-spacing:-.5px;margin-bottom:10px}
+.cp-invisibles p{font-size:.9rem;color:rgba(255,255,255,.45);max-width:440px;margin:0 auto 24px;line-height:1.7}
+.cp-invisibles-tag{display:inline-block;padding:6px 18px;border-radius:20px;background:rgba(180,80,180,.12);border:1px solid rgba(180,80,180,.25);color:rgba(180,80,180,.8);font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+
+/* ── 2 modes jeu ── */
+.cp-modes{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.cp-mode{background:var(--white);border-radius:14px;padding:32px 26px;border:1.5px solid var(--beige-dark);border-top:4px solid transparent}
+.cp-mode.orange{border-top-color:var(--primary)}
+.cp-mode.navy{border-top-color:var(--navy-dark)}
+.cp-mode-icon{font-size:2rem;margin-bottom:14px}
+.cp-mode-title{font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:8px}
+.cp-mode-desc{font-size:.87rem;color:var(--text-muted);line-height:1.65;margin-bottom:18px}
+.cp-mode-points{display:flex;flex-direction:column;gap:7px}
+.cp-mode-point{font-size:.83rem;color:var(--text-muted);display:flex;align-items:flex-start;gap:8px}
+.cp-mode-point::before{content:"✓";flex-shrink:0;font-weight:800;margin-top:1px}
+.cp-mode.orange .cp-mode-point::before{color:var(--primary)}
+.cp-mode.navy .cp-mode-point::before{color:var(--navy-dark)}
+.cp-reset{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:28px}
+.cp-reset-card{border-radius:var(--radius);padding:18px 20px}
+.cp-reset-ok{background:rgba(42,157,92,.07);border:1px solid rgba(42,157,92,.18)}
+.cp-reset-zero{background:rgba(234,86,73,.07);border:1px solid rgba(234,86,73,.18)}
+.cp-reset-label{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
+.cp-reset-ok .cp-reset-label{color:#2a9d5c}
+.cp-reset-zero .cp-reset-label{color:var(--primary)}
+.cp-reset-item{font-size:.83rem;color:var(--text-mid);padding:5px 0;border-bottom:1px solid var(--beige-dark);display:flex;align-items:center;gap:8px}
+.cp-reset-item:last-child{border-bottom:none}
+.cp-reset-ok .cp-reset-item::before{content:"✓";color:#2a9d5c;font-weight:700}
+.cp-reset-zero .cp-reset-item::before{content:"↺";color:var(--primary);font-weight:700}
+
+/* ── Saisons ── */
+.cp-season-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.cp-season{border-radius:12px;padding:24px 18px;text-align:center;border:1px solid rgba(255,255,255,.08)}
+.cp-season.active{background:rgba(234,86,73,.1);border-color:rgba(234,86,73,.3)}
+.cp-season:not(.active){background:rgba(255,255,255,.04)}
+.cp-season-emoji{font-size:1.8rem;margin-bottom:10px;display:block}
+.cp-season-badge{display:inline-block;font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:3px 9px;border-radius:3px;margin-bottom:8px}
+.cp-season.active .cp-season-badge{background:var(--primary);color:#fff}
+.cp-season:not(.active) .cp-season-badge{background:rgba(255,255,255,.1);color:rgba(255,255,255,.4)}
+.cp-season-name{font-size:.95rem;font-weight:800;color:#fff;margin-bottom:3px;line-height:1.2}
+.cp-season-period{font-size:.68rem;color:rgba(255,255,255,.4);font-weight:600;margin-bottom:8px}
+.cp-season-theme{font-size:.78rem;color:rgba(255,255,255,.55);line-height:1.5;margin-bottom:10px}
+.cp-season-mission{font-size:.72rem;font-weight:700;color:var(--primary);background:rgba(234,86,73,.1);padding:5px 10px;border-radius:4px;line-height:1.4}
+
+/* ── Code de la Zone ── */
+.cp-code-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.cp-code-card{background:rgba(255,255,255,.04);border-radius:12px;padding:22px 18px;border:1px solid rgba(255,255,255,.08);border-bottom:3px solid var(--primary)}
+.cp-code-num{font-size:.6rem;font-weight:800;color:var(--primary);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.cp-code-rule{font-size:.9rem;font-weight:800;color:#fff;margin-bottom:6px;line-height:1.3}
+.cp-code-detail{font-size:.78rem;color:rgba(255,255,255,.5);line-height:1.5}
 
 /* ── FAQ ── */
-#faq{background:var(--navy-dark);padding:100px 0 80px}
-.faq-list{max-width:820px;margin:40px auto 0;display:flex;flex-direction:column;gap:10px}
-.faq-item{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius)}
-.faq-q{padding:18px 22px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px}
-.faq-q-text{font-size:.95rem;font-weight:700;color:#fff}
-.faq-chevron{color:rgba(255,255,255,.4);font-size:1.1rem;transition:transform .25s;flex-shrink:0}
-.faq-item.open .faq-chevron{transform:rotate(180deg)}
-.faq-a{display:none;padding:0 22px 18px;font-size:.88rem;color:rgba(255,255,255,.6);line-height:1.7}
-.faq-item.open .faq-a{display:block}
+.cp-faq-list{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+.cp-faq-item{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:var(--radius)}
+.cp-faq-q{padding:16px 22px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.cp-faq-q-text{font-size:.92rem;font-weight:700;color:#fff}
+.cp-faq-chevron{color:rgba(255,255,255,.35);font-size:1rem;transition:transform .22s;flex-shrink:0}
+.cp-faq-item.open .cp-faq-chevron{transform:rotate(180deg)}
+.cp-faq-a{display:none;padding:0 22px 16px;font-size:.86rem;color:rgba(255,255,255,.55);line-height:1.72}
+.cp-faq-item.open .cp-faq-a{display:block}
 
-@media(max-width:1024px){.season-grid{grid-template-columns:repeat(2,1fr)}.xp-grid{grid-template-columns:repeat(2,1fr)}.code-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:768px){.modes-grid,.reset-row{grid-template-columns:1fr}.season-grid,.xp-grid,.code-grid{grid-template-columns:1fr}}
+@media(max-width:1024px){
+  .cp-season-grid{grid-template-columns:repeat(2,1fr)}
+  .cp-code-grid{grid-template-columns:repeat(2,1fr)}
+  .cp-pillars{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:768px){
+  .cp-pillars,.cp-modes,.cp-reset,.cp-victor{grid-template-columns:1fr}
+  .cp-season-grid,.cp-code-grid{grid-template-columns:1fr}
+  .cp-victor{padding:28px 24px}
+  .cp-section,.cp-section-navy{padding:64px 0}
+}
 </style>';
 
 require_once 'includes/header.php';
 require_once 'includes/nav.php';
 ?>
 
-<!-- PAGE HERO -->
+<!-- ── HERO ─────────────────────────────────────────────────── -->
 <section class="page-hero">
-  <div class="page-hero-inner">
-    <span class="eyebrow-tag">Le Concept</span>
-    <h1>Zone85, <em>le terrain de jeu</em><br>vendéen.</h1>
-    <p>Facebook est la place du village. Zone85 est le terrain de jeu. Trois clans, des missions, des saisons — chaque action fait vivre la Vendée autrement. En moins de 30 secondes, tu comprends pourquoi tu es là.</p>
-  </div>
-</section>
-
-<!-- PHRASE CENTRALE -->
-<section id="phrase">
-  <div class="phrase-inner">
-    <div class="phrase-text">"La Vendée qui joue, qui enquête, qui marche,<br><em>qui se raconte et qui se chambre gentiment.</em>"</div>
-    <p class="phrase-sub">Zone 85, c'est la Vendée en version participative. Chaque membre progresse à son rythme, tout en faisant grandir son clan dans une compétition saisonnière amicale.</p>
-  </div>
-</section>
-
-<!-- LES 2 MODES -->
-<section id="modes">
   <div class="container">
-    <div class="section-head reveal">
-      <span class="eyebrow-tag">Les 2 dimensions</span>
-      <h2 class="section-title">Un jeu à deux niveaux</h2>
-      <p class="section-sub">Zone 85 fonctionne sur deux modes complémentaires. Les deux se nourrissent, mais ils fonctionnent indépendamment.</p>
+    <div class="page-hero-inner">
+      <div class="page-eyebrow">Le Concept</div>
+      <h1 class="page-h1">La Vendée vécue,<br>racontée et <em>jouée</em>.</h1>
+      <p class="page-sub">Zone85 n'est pas un site de jeu avec des articles sur le côté. C'est une revue vivante sur la Vendée — ses chemins, ses histoires, ses objets, ses gens — avec un terrain de jeu communautaire pour relier tout ça.</p>
     </div>
-    <div class="modes-grid">
-      <div class="mode-card orange reveal">
-        <div class="mode-icon">⚡</div>
-        <div class="mode-title">Mode personnel</div>
-        <p class="mode-desc">Ton profil, ta légende. L'XP que tu accumules est à toi pour toujours. Aucune saison ne peut te l'enlever.</p>
-        <div class="mode-points">
-          <div class="mode-point">Quiz, photos, randos, votes, Kéto Kolé Tché</div>
-          <div class="mode-point">Chaque action rapporte des XP personnels</div>
-          <div class="mode-point">Tu montes de niveau et débloque des badges</div>
-          <div class="mode-point">Ton XP est <strong>permanent</strong> — à vie, jamais remis à zéro</div>
+  </div>
+</section>
+
+
+<!-- ── LE CONTENU ─────────────────────────────────────────────── -->
+<section class="cp-section cp-section-white">
+  <div class="container">
+    <div class="cp-head">
+      <div class="cp-eyebrow">Ce que vous trouverez ici</div>
+      <h2 class="cp-title">Cinq façons de vivre la Vendée</h2>
+      <p class="cp-sub">Le jeu est l'ambiance. Le contenu est la raison d'être. Voici ce que Zone85 produit, rassemble et fait vivre.</p>
+    </div>
+    <div class="cp-pillars">
+
+      <!-- Les Échos -->
+      <div class="cp-pillar">
+        <div class="cp-pillar-header cp-pillar-header-echos">
+          <span class="cp-pillar-icon">📰</span>
+          <div class="cp-pillar-name">Éditorial</div>
+          <div class="cp-pillar-title">Les Échos de la Zone</div>
+        </div>
+        <div class="cp-pillar-body">
+          <p class="cp-pillar-desc">Le magazine communautaire. Histoires, curiosités, récits du territoire vendéen — courts, humains, locaux. Pas de commentaires, juste de la lecture.</p>
+          <a href="les-echos.php" class="cp-pillar-link">Lire les Échos →</a>
         </div>
       </div>
-      <div class="mode-card navy reveal" style="transition-delay:.1s">
-        <div class="mode-icon">🛡️</div>
-        <div class="mode-title">Mode collectif</div>
-        <p class="mode-desc">La Bataille des Clans. 4 saisons par an, 1 grande mission collective par saison. Les clans s'affrontent. Le vainqueur entre dans la légende.</p>
-        <div class="mode-points">
-          <div class="mode-point">4 saisons par an — 1 grande mission par saison</div>
-          <div class="mode-point">Les 3 clans s'affrontent dans la Bataille des Clans</div>
-          <div class="mode-point">Le score de clan repart à zéro chaque saison</div>
-          <div class="mode-point">Le clan gagnant reçoit un trophée archivé pour toujours</div>
+
+      <!-- Randos -->
+      <div class="cp-pillar">
+        <div class="cp-pillar-header cp-pillar-header-randos">
+          <span class="cp-pillar-icon">🥾</span>
+          <div class="cp-pillar-name">Terrain</div>
+          <div class="cp-pillar-title">Les Randos</div>
+        </div>
+        <div class="cp-pillar-body">
+          <p class="cp-pillar-desc">Des sentiers commentés et vécus par la communauté. GR, circuits, chemins oubliés — chaque Zonaute qui marche laisse son avis, gagne des XP, enrichit le guide.</p>
+          <a href="randos.php" class="cp-pillar-link">Explorer les randos →</a>
         </div>
       </div>
-    </div>
 
-    <div class="reset-row reveal" style="transition-delay:.2s">
-      <div class="reset-card ok">
-        <div class="reset-card-title">Ce qui ne revient jamais à zéro</div>
-        <div class="reset-item">Ton XP personnel</div>
-        <div class="reset-item">Ton niveau</div>
-        <div class="reset-item">Tes badges</div>
-        <div class="reset-item">Ton historique de participations</div>
-        <div class="reset-item">Les trophées archivés des clans</div>
+      <!-- KTC -->
+      <div class="cp-pillar">
+        <div class="cp-pillar-header cp-pillar-header-ktc">
+          <span class="cp-pillar-icon">🔍</span>
+          <div class="cp-pillar-name">Jeu culturel</div>
+          <div class="cp-pillar-title">Kéto Kolé Tché</div>
+        </div>
+        <div class="cp-pillar-body">
+          <p class="cp-pillar-desc">"Qu'est-ce que c'est que ça ?" en vendéen populaire. Objets mystères, lieux à identifier, expressions à deviner. Court, fun, local — et souvent plus difficile qu'il n'y paraît.</p>
+          <a href="ktc.php" class="cp-pillar-link">Jouer au KTC →</a>
+        </div>
       </div>
-      <div class="reset-card zero">
-        <div class="reset-card-title">Ce qui repart à zéro chaque saison</div>
-        <div class="reset-item">Le score saisonnier de chaque clan</div>
-        <div class="reset-item">Le classement collectif de la Bataille</div>
-        <div class="reset-item">La grande mission collective</div>
-      </div>
-    </div>
 
-    <div style="text-align:center;margin-top:36px;padding:20px 28px;background:var(--beige-dark);border-radius:var(--radius);font-size:1.1rem;font-weight:800;color:var(--navy-dark)" class="reveal">
-      Le clan gagne la saison. <span style="color:var(--primary)">Le joueur construit sa légende.</span>
+      <!-- VICTOR -->
+      <div class="cp-pillar">
+        <div class="cp-pillar-header cp-pillar-header-victor">
+          <span class="cp-pillar-icon">📖</span>
+          <div class="cp-pillar-name">Livre membre</div>
+          <div class="cp-pillar-title">VICTOR</div>
+          <span class="cp-pillar-tag cp-pillar-tag-members">Membres</span>
+        </div>
+        <div class="cp-pillar-body">
+          <p class="cp-pillar-desc">Un livre téléchargeable réservé aux membres de Zone85. Une histoire vendéenne — personnages, territoire, mémoire. Votre première récompense pour avoir rejoint la Zone.</p>
+          <a href="profil.php" class="cp-pillar-link">Télécharger VICTOR →</a>
+        </div>
+      </div>
+
+      <!-- Les Invisibles -->
+      <div class="cp-pillar">
+        <div class="cp-pillar-header cp-pillar-header-invisibles">
+          <span class="cp-pillar-icon">🎭</span>
+          <div class="cp-pillar-name">Prochain jeu</div>
+          <div class="cp-pillar-title">Les Invisibles</div>
+          <span class="cp-pillar-tag cp-pillar-tag-soon">Bientôt</span>
+        </div>
+        <div class="cp-pillar-body">
+          <p class="cp-pillar-desc">Le prochain jeu immersif de Zone85. Une aventure qui sortira du terrain numérique pour entrer dans la Vendée réelle. Plus d'informations prochainement.</p>
+          <span class="cp-pillar-link cp-pillar-link-muted">En préparation…</span>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
 
-<!-- LES 4 SAISONS -->
-<section id="saisons">
+
+<!-- ── VICTOR ─────────────────────────────────────────────────── -->
+<section class="cp-section cp-section-beige">
   <div class="container">
-    <div class="section-head reveal">
-      <span class="eyebrow-tag-white">Le calendrier</span>
-      <h2 class="section-title" style="color:#fff">Les 4 saisons de la Zone</h2>
-      <p class="section-sub" style="color:rgba(255,255,255,.6)">Moins de missions collectives, mais plus d'impact. 4 saisons par an. 1 grande mission par saison. 1 trophée archivé.</p>
+    <div class="cp-victor">
+      <div class="cp-victor-text">
+        <div class="cp-eyebrow" style="color:#d4a43a">Réservé aux membres</div>
+        <h3>VICTOR, le livre de la Zone</h3>
+        <p>Un livre à télécharger librement — pour ceux qui ont rejoint la Zone. C'est votre première récompense, et un avant-goût de ce que Zone85 produit quand le jeu devient récit.</p>
+        <a href="inscription.php" class="cp-victor-cta">Rejoindre pour télécharger →</a>
+      </div>
+      <div class="cp-victor-visual">📖</div>
     </div>
-    <div class="season-grid">
+  </div>
+</section>
+
+
+<!-- ── LES INVISIBLES ──────────────────────────────────────────── -->
+<section class="cp-section cp-section-white">
+  <div class="container">
+    <div class="cp-invisibles">
+      <div class="cp-invisibles-eyebrow">Prochain projet</div>
+      <h3>Les Invisibles</h3>
+      <p>Zone85 prépare un jeu immersif ancré dans la Vendée réelle. Des personnages, des lieux, des indices — une enquête qui se joue sur le terrain. Les détails arrivent bientôt pour les membres.</p>
+      <span class="cp-invisibles-tag">En préparation</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- ── LE TERRAIN DE JEU ───────────────────────────────────────── -->
+<section class="cp-section cp-section-beige">
+  <div class="container">
+    <div class="cp-head">
+      <div class="cp-eyebrow">Le terrain de jeu</div>
+      <h2 class="cp-title">L'environnement qui relie tout</h2>
+      <p class="cp-sub">Le jeu n'est pas le site. C'est ce qui rend le contenu engageant — une façon de participer, de progresser et de contribuer à la communauté.</p>
+    </div>
+    <div class="cp-modes">
+      <div class="cp-mode orange">
+        <div class="cp-mode-icon">⚡</div>
+        <div class="cp-mode-title">Ta progression personnelle</div>
+        <p class="cp-mode-desc">Chaque contribution — avis de rando, réponse au KTC, article lu et commenté — rapporte de l'XP. Ton profil grandit à vie, jamais remis à zéro.</p>
+        <div class="cp-mode-points">
+          <div class="cp-mode-point">Randos, quiz, photos, KTC, votes</div>
+          <div class="cp-mode-point">Tu montes de niveau, tu débloque des badges</div>
+          <div class="cp-mode-point">Ton XP est permanent — à vie</div>
+          <div class="cp-mode-point">Accès à des contenus réservés (VICTOR, Les Invisibles)</div>
+        </div>
+      </div>
+      <div class="cp-mode navy">
+        <div class="cp-mode-icon">🛡️</div>
+        <div class="cp-mode-title">La Bataille des Clans</div>
+        <p class="cp-mode-desc">3 clans vendéens s'affrontent en saison. Bocage, Littoral, Marais. 4 saisons par an, 1 grande mission collective, 1 trophée archivé pour l'éternité.</p>
+        <div class="cp-mode-points">
+          <div class="cp-mode-point">4 saisons · 1 grande mission par saison</div>
+          <div class="cp-mode-point">Score de clan repart à zéro chaque saison</div>
+          <div class="cp-mode-point">Le clan vainqueur reçoit un trophée archivé</div>
+          <div class="cp-mode-point">Ta contribution compte pour toi et pour ton clan</div>
+        </div>
+      </div>
+    </div>
+    <div class="cp-reset">
+      <div class="cp-reset-card cp-reset-ok">
+        <div class="cp-reset-label">Ce qui ne revient jamais à zéro</div>
+        <div class="cp-reset-item">Ton XP personnel</div>
+        <div class="cp-reset-item">Ton niveau et tes badges</div>
+        <div class="cp-reset-item">Ton accès à VICTOR</div>
+        <div class="cp-reset-item">Les trophées archivés des clans</div>
+      </div>
+      <div class="cp-reset-card cp-reset-zero">
+        <div class="cp-reset-label">Ce qui repart à zéro chaque saison</div>
+        <div class="cp-reset-item">Le score de chaque clan</div>
+        <div class="cp-reset-item">Le classement collectif de saison</div>
+        <div class="cp-reset-item">La grande mission collective</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ── LES 4 SAISONS ───────────────────────────────────────────── -->
+<section class="cp-section-navy">
+  <div class="container">
+    <div class="cp-head" style="margin-bottom:40px">
+      <div class="cp-eyebrow">Le rythme</div>
+      <h2 class="cp-title">4 saisons, 4 ambiances</h2>
+      <p class="cp-sub">Chaque saison porte un thème vendéen. Les missions collectives, les Échos, les randos mises en avant — tout suit ce fil.</p>
+    </div>
+    <div class="cp-season-grid">
       <?php
-      $season_emojis  = ['🌱', '☀️', '🍂', '🕯️'];
-      $season_themes  = [
-          'Retour dehors. Nature, villages, chemins, biodiversité vendéenne.',
-          'Soleil, littoral, vacances, humour, météo fun et esprit estival.',
-          'Bocage, brume, patrimoine, villages, mémoire et chemins cachés.',
-          'Objets anciens, souvenirs, expressions, récits et enquêtes de l\'hiver.',
+      $season_emojis = ['🌱','☀️','🍂','🕯️'];
+      $season_themes = [
+          'Nature, villages, chemins, biodiversité vendéenne.',
+          'Littoral, vacances, humour, esprit estival.',
+          'Bocage, brume, patrimoine, mémoire et chemins cachés.',
+          'Objets anciens, expressions, récits et enquêtes hivernales.',
       ];
-      $season_missions_labels = [
-          'La Grande Remise en Route',
-          'Le Grand Défi de l\'Été',
-          'La Traversée des Clans',
-          'Le Grand Kéto Kolé Tché',
-      ];
-      $season_delays = [0, .1, .2, .3];
-
+      $season_missions_labels = ['La Grande Remise en Route','Le Grand Défi de l\'Été','La Traversée des Clans','Le Grand Kéto Kolé Tché'];
       foreach ($seasons as $i => $season):
-        $is_active   = ($season['status'] === 'active');
-        $badge_label = $is_active ? 'En cours' : 'Saison ' . ($i + 1);
-        $delay_style = $season_delays[$i] > 0 ? ' style="transition-delay:' . $season_delays[$i] . 's"' : '';
-        $mission_label = $season['main_mission'] ?? $season_missions_labels[$i];
+          $is_active = ($season['status'] === 'active');
+          $mission_label = $season['main_mission'] ?? ($season_missions_labels[$i] ?? '');
       ?>
-      <div class="season-card<?= $is_active ? ' active' : '' ?> reveal"<?= $delay_style ?>>
-        <span class="season-emoji"><?= $season_emojis[$i] ?></span>
-        <div class="season-badge"><?= e($badge_label) ?></div>
-        <div class="season-name"><?= e($season['title']) ?></div>
-        <div class="season-period"><?= e(ucfirst($season['period'])) ?></div>
-        <div class="season-theme"><?= e($season_themes[$i]) ?></div>
-        <div class="season-mission"><?= e($mission_label) ?></div>
+      <div class="cp-season<?= $is_active ? ' active' : '' ?>">
+        <span class="cp-season-emoji"><?= $season_emojis[$i] ?? '📅' ?></span>
+        <div class="cp-season-badge"><?= $is_active ? 'En cours' : 'Saison '.($i+1) ?></div>
+        <div class="cp-season-name"><?= e($season['title']) ?></div>
+        <div class="cp-season-period"><?= e(ucfirst($season['period'] ?? '')) ?></div>
+        <div class="cp-season-theme"><?= e($season_themes[$i] ?? '') ?></div>
+        <?php if ($mission_label): ?><div class="cp-season-mission"><?= e($mission_label) ?></div><?php endif; ?>
       </div>
       <?php endforeach; ?>
     </div>
-    <div class="season-legend reveal" style="transition-delay:.4s">
-      <strong>4 saisons · 4 grandes missions collectives · 4 trophées par an</strong><br>
-      Des actions personnelles disponibles toute l'année.
-    </div>
   </div>
 </section>
 
-<!-- COMMENT GAGNER DES XP -->
-<section id="xp-actions">
-  <div class="container">
-    <div class="section-head reveal">
-      <span class="eyebrow-tag">XP Personnel</span>
-      <h2 class="section-title">Comment gagner des XP ?</h2>
-      <p class="section-sub">Des actions simples, variées, accessibles à tout le monde. Pas besoin d'être un expert — juste de participer à ton rythme.</p>
-    </div>
-    <div class="xp-grid">
-      <div class="xp-card reveal">
-        <div class="xp-icon">🎯</div>
-        <div class="xp-action-name">Quiz</div>
-        <div class="xp-range">+20 à +60 XP</div>
-        <div class="xp-note">Histoire, nature, folklore, spécialités vendéennes</div>
-      </div>
-      <div class="xp-card reveal" style="transition-delay:.05s">
-        <div class="xp-icon">📸</div>
-        <div class="xp-action-name">Défi photo</div>
-        <div class="xp-range">+25 à +80 XP</div>
-        <div class="xp-note">Capturez la Vendée telle que vous la vivez</div>
-      </div>
-      <div class="xp-card reveal" style="transition-delay:.1s">
-        <div class="xp-icon">🥾</div>
-        <div class="xp-action-name">Avis de rando</div>
-        <div class="xp-range">+30 à +50 XP</div>
-        <div class="xp-note">Sentiers, GR, chemins — partagez votre expérience</div>
-      </div>
-      <div class="xp-card reveal" style="transition-delay:.15s">
-        <div class="xp-icon">🔍</div>
-        <div class="xp-action-name">Kéto Kolé Tché</div>
-        <div class="xp-range">+40 à +100 XP</div>
-        <div class="xp-note">Identifiez objets, lieux et expressions vendéennes mystères</div>
-      </div>
-      <div class="xp-card reveal" style="transition-delay:.2s">
-        <div class="xp-icon">🌦️</div>
-        <div class="xp-action-name">Météo-mission</div>
-        <div class="xp-range">+15 à +40 XP</div>
-        <div class="xp-note">La météo ouvre des mini-missions spéciales</div>
-      </div>
-      <div class="xp-card reveal" style="transition-delay:.25s">
-        <div class="xp-icon">🗳️</div>
-        <div class="xp-action-name">Vote</div>
-        <div class="xp-range">+5 à +15 XP</div>
-        <div class="xp-note">Votez pour les meilleures contributions de la semaine</div>
-      </div>
-      <div class="xp-card reveal" style="transition-delay:.3s">
-        <div class="xp-icon">💬</div>
-        <div class="xp-action-name">Commentaire</div>
-        <div class="xp-range">+5 à +15 XP</div>
-        <div class="xp-note">Réagissez, encouragez, débattez — avec le sourire</div>
-      </div>
-      <div class="xp-card reveal" style="transition-delay:.35s">
-        <div class="xp-icon">🛡️</div>
-        <div class="xp-action-name">Mission de saison</div>
-        <div class="xp-range">+50 à +200 XP</div>
-        <div class="xp-note">La grande mission collective rapporte aussi de l'XP perso</div>
-      </div>
-    </div>
-    <p style="text-align:center;margin-top:24px;font-size:.82rem;color:var(--text-muted)" class="reveal">L'XP personnel ne revient jamais à zéro. Chaque participation compte pour toujours.</p>
-  </div>
-</section>
 
-<!-- CODE DE LA ZONE -->
-<section id="code">
+<!-- ── CODE DE LA ZONE ─────────────────────────────────────────── -->
+<section class="cp-section-navy" style="border-top:1px solid rgba(255,255,255,.06)">
   <div class="container">
-    <div class="section-head reveal">
-      <span class="eyebrow-tag">Code de la Zone</span>
-      <h2 class="section-title">Les 5 règles de l'Esprit Vendée</h2>
-      <p class="section-sub">Entrer en Zone85, tu pourras… mais d'abord, quelques vérités vendéennes tu accepteras.</p>
+    <div class="cp-head" style="margin-bottom:40px">
+      <div class="cp-eyebrow">Code de la Zone</div>
+      <h2 class="cp-title">5 règles de l'Esprit Vendée</h2>
+      <p class="cp-sub">Entrer en Zone85, tu pourras… mais d'abord quelques vérités vendéennes tu accepteras.</p>
     </div>
-    <div class="code-grid">
-      <div class="code-card reveal">
-        <div class="code-num">Règle 01</div>
-        <div class="code-rule">Tu participes avec bonne humeur</div>
-        <div class="code-detail">La Zone, c'est une ambiance. Pas un concours de sérieux. La brioche se mange avec le sourire.</div>
+    <div class="cp-code-grid">
+      <div class="cp-code-card">
+        <div class="cp-code-num">Règle 01</div>
+        <div class="cp-code-rule">Tu participes avec bonne humeur</div>
+        <div class="cp-code-detail">La Zone, c'est une ambiance. Pas un concours de sérieux. La brioche se mange avec le sourire.</div>
       </div>
-      <div class="code-card reveal" style="transition-delay:.05s">
-        <div class="code-num">Règle 02</div>
-        <div class="code-rule">Tu chambres sans être lourd</div>
-        <div class="code-detail">Rivaliser entre clans, oui. Se respecter, toujours. Le terrain de jeu reste convivial.</div>
+      <div class="cp-code-card">
+        <div class="cp-code-num">Règle 02</div>
+        <div class="cp-code-rule">Tu chambres sans être lourd</div>
+        <div class="cp-code-detail">Rivaliser entre clans, oui. Se respecter, toujours. Le terrain de jeu reste convivial.</div>
       </div>
-      <div class="code-card reveal" style="transition-delay:.1s">
-        <div class="code-num">Règle 03</div>
-        <div class="code-rule">Tu respectes les lieux</div>
-        <div class="code-detail">Chaque mission te fait découvrir la Vendée. Ce patrimoine, c'est aussi le nôtre à tous.</div>
+      <div class="cp-code-card">
+        <div class="cp-code-num">Règle 03</div>
+        <div class="cp-code-rule">Tu respectes les lieux</div>
+        <div class="cp-code-detail">Chaque mission, chaque rando te fait découvrir la Vendée réelle. Ce patrimoine est à nous tous.</div>
       </div>
-      <div class="code-card reveal" style="transition-delay:.15s">
-        <div class="code-num">Règle 04</div>
-        <div class="code-rule">Tu ne triches pas pour une mogette</div>
-        <div class="code-detail">Même pour gagner des trophées. Le jeu n'a de valeur que si tout le monde joue vraiment.</div>
+      <div class="cp-code-card">
+        <div class="cp-code-num">Règle 04</div>
+        <div class="cp-code-rule">Tu ne triches pas pour une mogette</div>
+        <div class="cp-code-detail">Même pour un trophée. Le jeu n'a de valeur que si tout le monde joue vraiment.</div>
       </div>
-      <div class="code-card reveal" style="transition-delay:.2s;grid-column:span 2">
-        <div class="code-num">Règle 05</div>
-        <div class="code-rule">Tu joues pour toi et pour ton clan</div>
-        <div class="code-detail">Ta progression personnelle et la victoire de ton clan sont les deux faces d'une même pièce. Les deux comptent. Toujours.</div>
+      <div class="cp-code-card" style="grid-column:span 2">
+        <div class="cp-code-num">Règle 05</div>
+        <div class="cp-code-rule">Tu joues pour toi et pour ton clan</div>
+        <div class="cp-code-detail">Ta progression et la victoire de ton clan sont les deux faces d'une même pièce. Les deux comptent.</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- FAQ -->
-<section id="faq">
+
+<!-- ── FAQ ─────────────────────────────────────────────────────── -->
+<section class="cp-section-navy" style="border-top:1px solid rgba(255,255,255,.06)">
   <div class="container">
-    <div class="section-head reveal">
-      <span class="eyebrow-tag-white">Questions fréquentes</span>
-      <h2 class="section-title" style="color:#fff">Ce que tu te demandes peut-être</h2>
+    <div class="cp-head" style="margin-bottom:36px">
+      <div class="cp-eyebrow">Questions fréquentes</div>
+      <h2 class="cp-title">Ce que tu te demandes peut-être</h2>
     </div>
-    <div class="faq-list">
+    <div class="cp-faq-list">
       <?php
       $faqs = [
-          [
-              'q' => 'Est-ce que mon XP peut disparaître ?',
-              'a' => 'Non, jamais. Ton XP personnel est à vie. Chaque participation enrichit ton profil de façon permanente. Seul le score saisonnier du clan repart à zéro entre chaque saison.',
-          ],
-          [
-              'q' => 'Puis-je changer de clan ?',
-              'a' => 'Le changement de clan est possible, mais réfléchi. Tu peux demander un transfert entre deux saisons. Ton XP perso te suit, mais tu repars à zéro dans la Bataille des Clans de la nouvelle saison.',
-          ],
-          [
-              'q' => 'Combien de missions collectives par saison ?',
-              'a' => 'Une seule grande mission collective par saison. Cette règle est centrale : moins de missions collectives, mais plus d\'impact. Les actions personnelles (quiz, photos, randos…) sont disponibles toute l\'année.',
-          ],
-          [
-              'q' => 'Zone 85 est-il gratuit ?',
-              'a' => 'Oui, entièrement. Rejoindre la Zone, participer, gagner des XP, accéder au Hall — tout est gratuit. Zone 85 est une initiative communautaire pour faire vivre l\'Esprit Vendée.',
-          ],
-          [
-              'q' => 'Que se passe-t-il quand une saison se termine ?',
-              'a' => 'Le clan en tête remporte un trophée archivé dans la Bibliothèque des Trophées. Les scores de saison des clans sont remis à zéro. La nouvelle saison commence avec une nouvelle grande mission collective. Vos XP personnels, eux, restent intacts.',
-          ],
-          [
-              'q' => 'Faut-il habiter en Vendée pour participer ?',
-              'a' => 'Non. Zone85 accueille les Vendéens de souche, de cœur, et d\'adoption. Si la Vendée t\'appelle, tu as ta place dans la Zone. Chacun a sa porte d\'entrée dans l\'Esprit Vendée.',
-          ],
-          [
-              'q' => 'C\'est quoi le Passeport Vendéen ?',
-              'a' => 'Le Passeport Vendéen est ta carte d\'identité dans la Zone. Il résume ton clan, ton niveau, tes badges et tes missions accomplies. Il est partageable sur Facebook pour faire découvrir Zone85 à tes amis.',
-          ],
-          [
-              'q' => 'C\'est quoi Les Échos de la Zone ?',
-              'a' => 'Les Échos sont le magazine communautaire de Zone85 : histoires, curiosités et nouvelles du territoire vendéen. Des articles courts, humains et locaux. Aucun commentaire — juste de la lecture.',
-          ],
-          [
-              'q' => 'C\'est quoi Kéto Kolé Tché ?',
-              'a' => '"Kéto Kolé Tché" signifie "Qu\'est-ce que c\'est que ça ?" en vendéen populaire. C\'est notre jeu de devinettes culturelles : chaque semaine, un mystère vendéen à résoudre. Court, fun, local.',
-          ],
-          [
-              'q' => 'En quoi Zone85 est différent de la page Facebook ?',
-              'a' => 'Facebook est la place du village : discussions, partages, réactions. Zone85 est le terrain de jeu : missions, défis, clans, progression. Les deux se complètent — Zone85 rend l\'expérience vendéenne interactive.',
-          ],
+          ['q'=>"C'est quoi VICTOR ?",
+           'a'=>"VICTOR est un livre téléchargeable réservé aux membres de Zone85. Une histoire vendéenne — personnages, territoire, mémoire. En rejoignant la Zone, tu le reçois gratuitement. C'est aussi un avant-goût de ce que Zone85 produit au-delà du jeu."],
+          ['q'=>"C'est quoi Les Invisibles ?",
+           'a'=>"Les Invisibles est le prochain jeu immersif de Zone85. Une enquête ancrée dans la Vendée réelle — des lieux, des indices, des personnages à découvrir sur le terrain. Plus d'infos bientôt pour les membres."],
+          ['q'=>"C'est quoi Les Échos de la Zone ?",
+           'a'=>"Les Échos sont le magazine communautaire de Zone85 : histoires, curiosités et nouvelles du territoire vendéen. Des articles courts, humains et locaux. La lecture comme moteur, pas la réaction."],
+          ['q'=>"C'est quoi le Kéto Kolé Tché ?",
+           'a'=>"'Kéto Kolé Tché' signifie 'Qu'est-ce que c'est que ça ?' en vendéen populaire. Un jeu de devinettes culturelles : objets mystères, lieux à identifier, expressions vendéennes. Court, fun, local."],
+          ['q'=>"Mon XP peut-il disparaître ?",
+           'a'=>"Non, jamais. Ton XP personnel est à vie. Chaque participation enrichit ton profil de façon permanente. Seul le score saisonnier du clan repart à zéro entre chaque saison."],
+          ['q'=>"Puis-je changer de clan ?",
+           'a'=>"Le changement est possible mais réfléchi. Tu peux demander un transfert entre deux saisons. Ton XP perso te suit, mais tu repars à zéro dans la Bataille des Clans de la nouvelle saison."],
+          ['q'=>"Zone85 est-il gratuit ?",
+           'a'=>"Oui, entièrement. Rejoindre la Zone, participer, accéder à VICTOR, lire les Échos, faire des randos — tout est gratuit. Zone85 est une initiative communautaire pour faire vivre l'Esprit Vendée."],
+          ['q'=>"Faut-il habiter en Vendée ?",
+           'a'=>"Non. Zone85 accueille les Vendéens de souche, de cœur et d'adoption. Si la Vendée t'appelle, tu as ta place dans la Zone."],
+          ['q'=>"En quoi c'est différent de la page Facebook ?",
+           'a'=>"Facebook est la place du village : discussions, partages, réactions. Zone85 est le terrain de jeu : missions, randos, Échos, VICTOR, clans. Les deux se complètent — Zone85 rend l'expérience vendéenne interactive et durable."],
       ];
-      foreach ($faqs as $faq):
-      ?>
-      <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">
-          <span class="faq-q-text"><?= e($faq['q']) ?></span>
-          <span class="faq-chevron">▾</span>
+      foreach ($faqs as $faq): ?>
+      <div class="cp-faq-item">
+        <div class="cp-faq-q" onclick="this.closest('.cp-faq-item').classList.toggle('open')">
+          <span class="cp-faq-q-text"><?= e($faq['q']) ?></span>
+          <span class="cp-faq-chevron">▾</span>
         </div>
-        <div class="faq-a"><?= e($faq['a']) ?></div>
+        <div class="cp-faq-a"><?= e($faq['a']) ?></div>
       </div>
       <?php endforeach; ?>
     </div>
   </div>
 </section>
 
-<!-- CTA -->
+
+<!-- ── CTA ─────────────────────────────────────────────────────── -->
 <section style="background:var(--primary);padding:80px 0;position:relative;overflow:hidden">
-  <div style="position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:rgba(255,255,255,.06)"></div>
+  <div style="position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:rgba(255,255,255,.06);pointer-events:none"></div>
   <div class="container">
     <div style="display:grid;grid-template-columns:1fr auto;gap:48px;align-items:center;position:relative;z-index:1">
       <div>
-        <h2 style="font-size:clamp(1.6rem,3vw,2.4rem);font-weight:900;color:#fff;margin-bottom:12px;letter-spacing:-.5px">Prêt.e à rejoindre la Zone ?</h2>
-        <p style="color:rgba(255,255,255,.8);font-size:.95rem;line-height:1.65;max-width:480px">En 6 étapes, tu choisis ton clan, tu acceptes le Code de la Zone, et tu reçois tes 50 XP de bienvenue. Ta légende commence maintenant.</p>
+        <h2 style="font-size:clamp(1.6rem,3vw,2.2rem);font-weight:900;color:#fff;margin-bottom:10px;letter-spacing:-.5px">Rejoins Zone85 — et reçois VICTOR.</h2>
+        <p style="color:rgba(255,255,255,.78);font-size:.93rem;line-height:1.65;max-width:500px">Choisis ton clan, commence à contribuer, télécharge VICTOR. La Vendée t'attend — avec ses chemins, ses histoires et ses mystères.</p>
       </div>
       <div style="flex-shrink:0">
         <a href="<?= page_url('inscription') ?>" class="btn-white">Rejoindre la Zone →</a>

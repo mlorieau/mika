@@ -202,7 +202,7 @@ require_once 'includes/nav.php';
           <?php if ($has_done): ?>
             <span class="ev-btn-done">✓ Participé</span>
           <?php elseif ($is_logged): ?>
-            <a href="missions.php" class="ev-btn">Participer →</a>
+            <a href="mission.php?id=<?= (int)$ev['id'] ?>" class="ev-btn">Participer →</a>
           <?php else: ?>
             <a href="login.php?redirect=evenements.php" class="ev-btn">Se connecter →</a>
           <?php endif; ?>

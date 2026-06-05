@@ -35,7 +35,7 @@ if ($pdo) {
 
 $steps = [
     ['done' => true,       'icon' => '✅', 'title' => 'Compte créé',             'desc' => 'Tu es officiellement Zonaute. Bienvenue !'],
-    ['done' => $has_clan,  'icon' => '🛡', 'title' => 'Rejoindre un clan',        'desc' => 'Rejoins Bocage, Littoral ou Marais pour contribuer à la Bataille des Clans.', 'link' => 'inscription.php', 'cta' => 'Choisir un clan'],
+    ['done' => $has_clan,  'icon' => '🛡', 'title' => 'Rejoindre un clan',        'desc' => 'Rejoins Bocage, Littoral ou Marais pour contribuer à la Bataille des Clans.', 'link' => 'clans.php', 'cta' => 'Choisir un clan'],
     ['done' => $has_avatar,'icon' => '🧭', 'title' => 'Personnaliser ton avatar',  'desc' => 'Donne un visage à ton profil — preset, généré ou photo.', 'link' => 'mon-compte.php', 'cta' => 'Modifier mon avatar'],
     ['done' => $missions_done > 0, 'icon' => '🎯', 'title' => 'Première mission', 'desc' => 'Lance-toi dans une mission pour gagner tes premiers XP.', 'link' => 'missions.php', 'cta' => 'Voir les missions'],
 ];
