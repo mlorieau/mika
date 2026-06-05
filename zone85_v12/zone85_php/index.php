@@ -1,17 +1,17 @@
 <?php
-$page_title       = 'La Vendée Joue';
-$page_description = 'Choisis ton clan, pars en mission, laisse une trace. ZONE85 — Le terrain de jeu communautaire vendéen. Bocage, Littoral ou Marais.';
+$page_title       = 'Zone85 — La Vendée vécue, racontée et jouée';
+$page_description = 'Les Échos de terrain, les Randos vendéennes, VICTOR le livre, Les Invisibles — dans un jeu communautaire pour la Vendée. Rejoins Zone85, c\'est gratuit.';
 $page_canonical   = 'https://www.zone85.fr/index.php';
 $page_robots      = 'index,follow';
-$page_og_title    = 'ZONE85 — La Vendée Joue';
-$page_og_description = 'Choisis ton clan vendéen, pars en mission, gagne des XP pour ton clan. Bocage, Littoral ou Marais — lequel te ressemble ?';
+$page_og_title    = 'Zone85 — La Vendée vécue, racontée et jouée';
+$page_og_description = 'Les Échos, les Randos, VICTOR le livre, Les Invisibles — et un jeu communautaire qui tisse le tout. Rejoins la Zone.';
 $page_og_image    = 'assets/img/ZONE852025.png';
 $page_schema = [
     '@context' => 'https://schema.org',
     '@type'    => 'WebSite',
     'name'     => 'ZONE85',
     'url'      => 'https://www.zone85.fr',
-    'description' => 'Terrain de jeu communautaire vendéen. Rejoins un clan, gagne des XP, fais vivre la Vendée autrement.',
+    'description' => 'Plateforme communautaire vendéenne : articles, randonnées, livre VICTOR, jeu Les Invisibles et Bataille des Clans.',
     'potentialAction' => [
         '@type'       => 'SearchAction',
         'target'      => 'https://www.zone85.fr/missions.php?q={search_term_string}',
@@ -78,7 +78,7 @@ $_mtype_icons = [
 $page_styles = '<style>
 /* ── INDEX — styles spécifiques ── */
 
-/* Hero mascots */
+/* Hero */
 .idx-hero{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:100px 20px 0;position:relative;overflow:hidden;background:linear-gradient(160deg,#060e16 0%,#0c1e2e 40%,#12314e 100%)}
 .idx-hero::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(234,86,73,.07) 0%,transparent 70%);pointer-events:none}
 .idx-hero::after{content:"";position:absolute;bottom:0;left:0;right:0;height:100px;background:linear-gradient(to bottom,transparent,#0c1e2e);pointer-events:none}
@@ -86,9 +86,9 @@ $page_styles = '<style>
 @keyframes heroIn{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
 .idx-eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(234,86,73,.12);border:1px solid rgba(234,86,73,.28);color:#f5a99f;padding:5px 16px;border-radius:4px;font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:24px}
 .idx-eyebrow-dot{width:6px;height:6px;background:#ea5649;border-radius:50%;animation:blink 1.6s ease-in-out infinite}
-.idx-h1{font-size:clamp(3rem,7vw,5.6rem);font-weight:900;color:#fff;text-align:center;line-height:1.04;letter-spacing:-2px;margin-bottom:18px}
+.idx-h1{font-size:clamp(2.6rem,6.5vw,5rem);font-weight:900;color:#fff;text-align:center;line-height:1.08;letter-spacing:-2px;margin-bottom:18px}
 .idx-h1 em{color:#ea5649;font-style:normal}
-.idx-tagline{font-size:clamp(.92rem,2vw,1.06rem);color:rgba(255,255,255,.5);text-align:center;margin-bottom:40px;line-height:1.7;max-width:520px}
+.idx-tagline{font-size:clamp(.9rem,2vw,1.04rem);color:rgba(255,255,255,.5);text-align:center;margin-bottom:40px;line-height:1.7;max-width:540px}
 .idx-tagline strong{color:rgba(255,255,255,.8);font-weight:700}
 .idx-ctas{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:56px}
 .idx-btn-primary{display:inline-flex;align-items:center;gap:8px;background:#ea5649;color:#fff;padding:14px 30px;border-radius:6px;font-size:1rem;font-weight:800;text-decoration:none;transition:background .2s,transform .15s}
@@ -102,33 +102,55 @@ $page_styles = '<style>
 .idx-masc-wrap.center img{height:230px}
 .idx-masc-label{margin-top:10px;font-size:.7rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.65);background:rgba(255,255,255,.08);padding:5px 16px;border-radius:20px;border:1px solid rgba(255,255,255,.12);white-space:nowrap}
 
-/* Étapes concept */
-.idx-steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-.idx-step{background:var(--white);border-radius:14px;padding:30px 24px;border:1.5px solid var(--beige-dark);position:relative;overflow:hidden}
-.idx-step::before{content:attr(data-num);position:absolute;top:-10px;right:16px;font-size:5rem;font-weight:900;color:rgba(0,0,0,.04);line-height:1;user-select:none}
-.idx-step-icon{font-size:2rem;margin-bottom:14px;display:block}
-.idx-step-num{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--primary);margin-bottom:6px}
-.idx-step-title{font-size:1rem;font-weight:800;color:var(--text);margin-bottom:8px}
-.idx-step-desc{font-size:.83rem;color:var(--text-muted);line-height:1.65}
+/* Piliers de contenu */
+.idx-pillars-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.idx-pillar-card{background:#fff;border-radius:14px;overflow:hidden;border:1.5px solid var(--beige-dark);transition:transform .2s,box-shadow .2s;display:flex;flex-direction:column}
+.idx-pillar-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.09)}
+.idx-pillar-head{padding:22px 20px 14px;display:flex;align-items:center;gap:12px}
+.idx-pillar-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+.idx-pillar-label{font-size:.93rem;font-weight:800;color:var(--navy-dark);line-height:1.2}
+.idx-pillar-sub{font-size:.7rem;color:var(--text-muted);font-weight:600;margin-top:2px}
+.idx-pillar-body{padding:0 20px 20px;font-size:.83rem;color:var(--text-muted);line-height:1.65;flex:1}
+.idx-pillar-link{display:inline-flex;align-items:center;gap:5px;margin-top:14px;font-size:.78rem;font-weight:700;color:var(--primary);text-decoration:none}
+.idx-pillar-tag{display:inline-block;font-size:.58rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:4px;margin-left:7px;vertical-align:middle}
+.idx-pillar-tag-member{background:rgba(234,86,73,.1);color:var(--primary)}
+.idx-pillar-tag-soon{background:rgba(123,71,178,.12);color:#7b47b2}
 
-/* Cards clans */
-.idx-clan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-.idx-clan-card{border-radius:14px;overflow:hidden;border:1.5px solid var(--beige-dark);transition:transform .25s,box-shadow .25s;background:var(--white)}
-.idx-clan-card:hover{transform:translateY(-5px);box-shadow:0 16px 40px rgba(0,0,0,.1)}
-.idx-clan-header{padding:32px 20px 24px;display:flex;flex-direction:column;align-items:center;gap:0}
-.idx-clan-header-bocage{background:linear-gradient(160deg,#0d2018,#1e3d2b)}
-.idx-clan-header-littoral{background:linear-gradient(160deg,#0a1a2e,#12314e)}
-.idx-clan-header-marais{background:linear-gradient(160deg,#2b1a0a,#4a2e15)}
-.idx-clan-masc{height:120px;width:auto;object-fit:contain;filter:drop-shadow(0 6px 20px rgba(0,0,0,.4));margin-bottom:12px}
-.idx-clan-name{font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.8);background:rgba(255,255,255,.12);padding:4px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.2)}
-.idx-clan-body{padding:20px 22px}
-.idx-clan-title{font-size:1rem;font-weight:800;color:var(--text);margin-bottom:6px}
-.idx-clan-desc{font-size:.83rem;color:var(--text-muted);line-height:1.6;margin-bottom:16px}
-.idx-clan-stats{display:flex;gap:16px;margin-bottom:16px;font-size:.78rem;color:var(--text-muted);font-weight:600}
-.idx-clan-btn{display:flex;align-items:center;justify-content:center;gap:6px;background:var(--text);color:#fff;padding:10px 16px;border-radius:7px;font-size:.84rem;font-weight:700;text-decoration:none;transition:background .2s}
-.idx-clan-btn:hover{background:var(--primary)}
+/* VICTOR block */
+.idx-victor{background:linear-gradient(135deg,#1a1200,#2d2000);border-radius:16px;overflow:hidden;display:grid;grid-template-columns:1fr auto}
+.idx-victor-content{padding:40px 36px}
+.idx-victor-tag{font-size:.62rem;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:#d4af37;margin-bottom:14px;display:block}
+.idx-victor-title{font-size:1.8rem;font-weight:900;color:#fff;margin-bottom:12px;line-height:1.2}
+.idx-victor-desc{font-size:.9rem;color:rgba(255,255,255,.6);line-height:1.7;margin-bottom:24px}
+.idx-victor-cta{display:inline-flex;align-items:center;gap:8px;background:#d4af37;color:#1a1200;padding:12px 24px;border-radius:7px;font-weight:800;font-size:.9rem;text-decoration:none;transition:background .2s}
+.idx-victor-cta:hover{background:#c9a430}
+.idx-victor-visual{background:rgba(212,175,55,.06);display:flex;align-items:center;justify-content:center;padding:36px 40px;border-left:1px solid rgba(212,175,55,.12);font-size:7rem;line-height:1}
 
-/* Dashboard (connecté) */
+/* Les Invisibles teaser */
+.idx-invisibles{border-radius:14px;overflow:hidden;background:linear-gradient(135deg,#0d0520,#1a0a35);border:1px solid rgba(123,71,178,.2);padding:36px 32px;display:flex;align-items:center;gap:32px}
+.idx-invisibles-icon{font-size:3.2rem;flex-shrink:0;line-height:1;filter:drop-shadow(0 0 16px rgba(168,125,224,.4))}
+.idx-invisibles-body{flex:1}
+.idx-invisibles-tag{font-size:.6rem;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:#a87de0;margin-bottom:8px;display:block}
+.idx-invisibles-title{font-size:1.2rem;font-weight:900;color:#fff;margin-bottom:6px}
+.idx-invisibles-desc{font-size:.86rem;color:rgba(255,255,255,.5);line-height:1.6}
+.idx-invisibles-badge{background:rgba(168,125,224,.15);border:1px solid rgba(168,125,224,.3);color:#c9a7ef;border-radius:20px;padding:5px 14px;font-size:.72rem;font-weight:800;white-space:nowrap;flex-shrink:0}
+
+/* Terrain de jeu — 3 étapes slim */
+.idx-game-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.idx-game-step{background:rgba(255,255,255,.04);border-radius:12px;padding:24px 20px;border:1px solid rgba(255,255,255,.07)}
+.idx-game-step-num{font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--primary);margin-bottom:10px}
+.idx-game-step-icon{font-size:1.5rem;margin-bottom:10px;display:block}
+.idx-game-step-title{font-size:.92rem;font-weight:800;color:#fff;margin-bottom:6px}
+.idx-game-step-desc{font-size:.79rem;color:rgba(255,255,255,.45);line-height:1.6}
+
+/* Clan race */
+.idx-clan-race{background:rgba(255,255,255,.04);border-radius:12px;padding:20px;border:1px solid rgba(255,255,255,.08)}
+.idx-clan-race-row{display:grid;grid-template-columns:120px 1fr 64px;align-items:center;gap:10px}
+.idx-clan-race-row+.idx-clan-race-row{margin-top:14px}
+.idx-race-bar{background:rgba(255,255,255,.07);border-radius:4px;height:9px;overflow:hidden}
+.idx-race-fill{height:100%;border-radius:4px;background:#ea5649;transition:width .8s cubic-bezier(.22,1,.36,1)}
+
+/* Dashboard membre */
 .idx-dash-hero{background:linear-gradient(155deg,#060e16 0%,#0c1e2e 60%,#0e2540 100%);padding:100px 0 48px;border-bottom:3px solid rgba(234,86,73,.35)}
 .idx-dash-greeting{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
 .idx-dash-avatar{width:56px;height:56px;border-radius:12px;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:800;color:#fff;flex-shrink:0;overflow:hidden}
@@ -139,8 +161,6 @@ $page_styles = '<style>
 .idx-xp-label{display:flex;justify-content:space-between;font-size:.72rem;color:rgba(255,255,255,.45);font-weight:600;margin-bottom:6px}
 .idx-xp-track{background:rgba(255,255,255,.1);border-radius:20px;height:8px;overflow:hidden}
 .idx-xp-fill{height:100%;background:linear-gradient(90deg,#ea5649,#f07066);border-radius:20px;transition:width .8s cubic-bezier(.4,0,.2,1)}
-
-/* Mission card (dashboard) */
 .idx-mission-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .idx-mission-card{background:var(--white);border-radius:12px;padding:20px 18px;border:1.5px solid var(--beige-dark);display:flex;flex-direction:column;gap:10px;transition:transform .2s,box-shadow .2s;text-decoration:none}
 .idx-mission-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.09)}
@@ -149,22 +169,11 @@ $page_styles = '<style>
 .idx-mission-footer{display:flex;align-items:center;justify-content:space-between;margin-top:auto}
 .idx-mission-xp{font-size:.78rem;font-weight:800;color:var(--primary)}
 .idx-mission-badge{font-size:.65rem;font-weight:700;padding:3px 8px;border-radius:4px;background:rgba(42,157,92,.1);color:#1a6b3a}
-
-/* Clan race (dashboard) */
-.idx-clan-race{background:rgba(255,255,255,.04);border-radius:12px;padding:20px;border:1px solid rgba(255,255,255,.08)}
-.idx-clan-race-row{display:grid;grid-template-columns:120px 1fr 64px;align-items:center;gap:10px}
-.idx-clan-race-row+.idx-clan-race-row{margin-top:14px}
-.idx-race-bar{background:rgba(255,255,255,.07);border-radius:4px;height:9px;overflow:hidden}
-.idx-race-fill{height:100%;border-radius:4px;background:#ea5649;transition:width .8s cubic-bezier(.22,1,.36,1)}
-
-/* Feed (dashboard) */
 .idx-feed-item{display:flex;align-items:flex-start;gap:10px;padding:12px 0;border-bottom:1px solid var(--beige-dark)}
 .idx-feed-item:last-child{border-bottom:none}
 .idx-feed-icon{font-size:1.1rem;flex-shrink:0;line-height:1;margin-top:2px}
 .idx-feed-text{font-size:.84rem;font-weight:600;color:var(--text);line-height:1.35}
 .idx-feed-meta{font-size:.7rem;color:var(--text-muted);margin-top:2px}
-
-/* Flash badge */
 .idx-flash-badge{display:inline-flex;align-items:center;gap:6px;background:#ea5649;color:#fff;font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:4px 12px;border-radius:4px}
 .idx-flash-dot{width:6px;height:6px;background:#fff;border-radius:50%;animation:blink .9s infinite}
 
@@ -174,12 +183,16 @@ $page_styles = '<style>
   .idx-mascots{gap:14px}
   .idx-masc-wrap img{height:130px!important}
   .idx-masc-wrap.center img{height:165px!important}
-  .idx-steps-grid,.idx-clan-grid,.idx-mission-grid{grid-template-columns:1fr}
+  .idx-pillars-grid,.idx-game-steps,.idx-mission-grid{grid-template-columns:1fr}
+  .idx-victor{grid-template-columns:1fr}
+  .idx-victor-visual{display:none}
+  .idx-invisibles{flex-direction:column;text-align:center;gap:16px}
   .idx-dash-hero{padding:90px 0 40px}
 }
 @media(max-width:640px){
   .idx-h1{letter-spacing:-1px}
   .idx-ctas{flex-direction:column;align-items:stretch;max-width:280px;margin-left:auto;margin-right:auto}
+  .idx-clan-race-row{grid-template-columns:100px 1fr 50px}
 }
 </style>';
 
@@ -193,8 +206,9 @@ $_is_guest = empty($_nav_me);
 
 <?php if ($_is_guest): ?>
 <!-- ================================================================
-     VISITEUR NON CONNECTÉ — Cheminement narratif
-     Beat 1 : Hero  |  Beat 2 : Concept  |  Beat 3 : Clans  |  Beat 4 : CTA
+     VISITEUR — Contenu d'abord, jeu comme atmosphère
+     Beat 1 : Hero  |  Beat 2 : Piliers  |  Beat 3 : VICTOR
+     Beat 4 : Les Invisibles  |  Beat 5 : Le jeu  |  Beat 6 : CTA
 ================================================================ -->
 
 <!-- BEAT 1 : HERO ─────────────────────────────────────────── -->
@@ -206,19 +220,19 @@ $_is_guest = empty($_nav_me);
       <?= !empty($active_season['title']) ? e($active_season['title']) . ' — Saison en cours' : 'Zone85 · L\'Esprit Vendée' ?>
     </div>
 
-    <h1 class="idx-h1">LA <em>VENDÉE</em> JOUE</h1>
+    <h1 class="idx-h1">La <em>Vendée</em><br>vécue. Racontée. Jouée.</h1>
 
     <p class="idx-tagline">
-      Un terrain de jeu communautaire vendéen.<br>
-      <strong>Choisis ton clan. Pars en mission. Laisse une trace.</strong>
+      Les Échos de terrain, les Randos vendéennes, VICTOR le livre —<br>
+      <strong>dans un jeu communautaire qui tisse le tout.</strong>
     </p>
 
     <div class="idx-ctas">
       <a href="inscription.php" class="idx-btn-primary">Rejoindre la Zone →</a>
-      <a href="missions.php"    class="idx-btn-secondary">Voir les missions</a>
+      <a href="concept.php"     class="idx-btn-secondary">Découvrir le concept</a>
     </div>
 
-    <!-- Mascottes cliquables -->
+    <!-- Mascottes — atmosphère des 3 clans -->
     <div class="idx-mascots">
       <?php
       $masc_order = [
@@ -241,80 +255,229 @@ $_is_guest = empty($_nav_me);
 </section>
 
 
-<!-- BEAT 2 : COMMENT ÇA MARCHE ─────────────────────────────── -->
+<!-- BEAT 2 : PILIERS DE CONTENU ────────────────────────────── -->
 <section class="page-section-white" style="border-top:3px solid rgba(234,86,73,.35)">
   <div class="container">
     <div class="page-section-head">
-      <div class="page-section-eyebrow">Le concept</div>
-      <h2 class="page-section-title">3 étapes. C'est tout.</h2>
-      <p class="page-section-sub">Zone85 est un jeu communautaire ancré dans la Vendée réelle. Pas d'écran — le terrain est votre terrain.</p>
+      <div class="page-section-eyebrow">La Zone</div>
+      <h2 class="page-section-title">Ce qui t'attend</h2>
+      <p class="page-section-sub">Zone85 c'est d'abord des contenus sur la Vendée — portés par une communauté qui joue ensemble.</p>
     </div>
-    <div class="idx-steps-grid">
-      <div class="idx-step" data-num="1">
-        <span class="idx-step-num">Étape 01</span>
-        <span class="idx-step-icon">⚔️</span>
-        <div class="idx-step-title">Choisis ton clan</div>
-        <div class="idx-step-desc">Bocage, Littoral ou Marais — trois identités vendéennes, trois façons de vivre la Zone. Lequel te ressemble ? L'appartenance est pour toujours.</div>
+
+    <div class="idx-pillars-grid">
+
+      <!-- Les Échos -->
+      <div class="idx-pillar-card">
+        <div class="idx-pillar-head">
+          <div class="idx-pillar-icon" style="background:rgba(15,40,70,.08)">📰</div>
+          <div>
+            <div class="idx-pillar-label">Les Échos</div>
+            <div class="idx-pillar-sub">Articles · Portraits · Terrain</div>
+          </div>
+        </div>
+        <div class="idx-pillar-body">
+          Histoires vraies, portraits de Vendéens, actualités du territoire. Nos reporters de terrain racontent la Vendée qui ne fait pas les unes.
+          <a href="les-echos.php" class="idx-pillar-link">Lire les Échos →</a>
+        </div>
       </div>
-      <div class="idx-step" data-num="2">
-        <span class="idx-step-num">Étape 02</span>
-        <span class="idx-step-icon">🎯</span>
-        <div class="idx-step-title">Pars en mission</div>
-        <div class="idx-step-desc">Quiz sur la Vendée, photos de terrain, randos balisées, objets mystères, défis collectifs saisonniers. Chaque mission validée = XP pour toi et points pour ton clan.</div>
+
+      <!-- Les Randos -->
+      <div class="idx-pillar-card">
+        <div class="idx-pillar-head">
+          <div class="idx-pillar-icon" style="background:rgba(30,80,50,.08)">🥾</div>
+          <div>
+            <div class="idx-pillar-label">Les Randos</div>
+            <div class="idx-pillar-sub">Itinéraires · Découverte · Terrain</div>
+          </div>
+        </div>
+        <div class="idx-pillar-body">
+          Des circuits vendéens pour explorer bocage, littoral et marais à pied ou à vélo. Chaque rando complétée rapporte des XP à ton clan.
+          <a href="randos.php" class="idx-pillar-link">Voir les randos →</a>
+        </div>
       </div>
-      <div class="idx-step" data-num="3">
-        <span class="idx-step-num">Étape 03</span>
-        <span class="idx-step-icon">📊</span>
-        <div class="idx-step-title">Monte dans le classement</div>
-        <div class="idx-step-desc">Ton XP est personnel et permanent — à vie. Les points de saison de ton clan s'accumulent jusqu'au trophée final. Deux métriques, deux histoires.</div>
+
+      <!-- KTC -->
+      <div class="idx-pillar-card">
+        <div class="idx-pillar-head">
+          <div class="idx-pillar-icon" style="background:rgba(60,30,10,.08)">🥐</div>
+          <div>
+            <div class="idx-pillar-label">Kéto Kolé Tché</div>
+            <div class="idx-pillar-sub">Objet mystère · Culture vendéenne</div>
+          </div>
+        </div>
+        <div class="idx-pillar-body">
+          Un objet. Des indices. Une histoire enfouie dans la mémoire vendéenne. Chaque semaine, un nouveau mystère à élucider ensemble.
+          <a href="ktc.php" class="idx-pillar-link">Jouer →</a>
+        </div>
       </div>
+
+      <!-- VICTOR -->
+      <div class="idx-pillar-card" style="border-color:rgba(212,175,55,.35)">
+        <div class="idx-pillar-head">
+          <div class="idx-pillar-icon" style="background:rgba(212,175,55,.12)">📖</div>
+          <div>
+            <div class="idx-pillar-label">
+              VICTOR
+              <span class="idx-pillar-tag idx-pillar-tag-member">Membres</span>
+            </div>
+            <div class="idx-pillar-sub">Le livre de la Zone</div>
+          </div>
+        </div>
+        <div class="idx-pillar-body">
+          VICTOR est le livre offert à tous les membres de Zone85. Une œuvre vendéenne, en téléchargement libre, réservée à la communauté.
+          <a href="inscription.php" class="idx-pillar-link" style="color:#b8860b">Rejoindre pour recevoir VICTOR →</a>
+        </div>
+      </div>
+
+      <!-- Les Invisibles -->
+      <div class="idx-pillar-card" style="border-color:rgba(123,71,178,.3)">
+        <div class="idx-pillar-head">
+          <div class="idx-pillar-icon" style="background:rgba(123,71,178,.1)">🎭</div>
+          <div>
+            <div class="idx-pillar-label">
+              Les Invisibles
+              <span class="idx-pillar-tag idx-pillar-tag-soon">Bientôt</span>
+            </div>
+            <div class="idx-pillar-sub">Jeu immersif vendéen</div>
+          </div>
+        </div>
+        <div class="idx-pillar-body">
+          Un jeu grandeur nature ancré dans l'histoire secrète de la Vendée. Les Invisibles arrivent. Inscris-toi pour être parmi les premiers à jouer.
+          <a href="concept.php#les-invisibles" class="idx-pillar-link" style="color:#9b6de0">En savoir plus →</a>
+        </div>
+      </div>
+
+      <!-- Missions -->
+      <div class="idx-pillar-card">
+        <div class="idx-pillar-head">
+          <div class="idx-pillar-icon" style="background:rgba(234,86,73,.08)">🎯</div>
+          <div>
+            <div class="idx-pillar-label">Les Missions</div>
+            <div class="idx-pillar-sub">Quiz · Photos · Défis collectifs</div>
+          </div>
+        </div>
+        <div class="idx-pillar-body">
+          Quiz sur la Vendée, photos de terrain, défis collectifs saisonniers, événements flash. Chaque mission validée rapporte des XP pour toi et ton clan.
+          <a href="missions.php" class="idx-pillar-link">Voir les missions →</a>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
 
 
-<!-- BEAT 3 : CHOISIS TON CLAN ──────────────────────────────── -->
+<!-- BEAT 3 : VICTOR — L'INCENTIVE D'INSCRIPTION ─────────── -->
 <section class="page-section">
   <div class="container">
-    <div class="page-section-head">
-      <div class="page-section-eyebrow">Les 3 clans</div>
-      <h2 class="page-section-title">Lequel est le tien ?</h2>
-      <p class="page-section-sub">Bocage, Littoral, Marais — trois territoires vendéens, trois façons de jouer. Le clan choisi lors de l'inscription ne change pas.</p>
-    </div>
-    <div class="idx-clan-grid">
-      <?php
-      $clan_descs = [
-          'bocage'  => ['desc' => 'Les têtes dures du bocage. Terre, bois, labeur. Ceux qui restent quand les autres partent.', 'hero' => 'Bran le Bocager'],
-          'littoral'=> ['desc' => 'Enfants de la côte, libres et imprévisibles. L\'horizon comme terrain de jeu.', 'hero' => 'Gabin Culsmouilles'],
-          'marais'  => ['desc' => 'Patients et profonds comme leurs canaux. Ils connaissent les chemins que les autres ignorent.', 'hero' => 'Méric l\'Ancien'],
-      ];
-      foreach (['bocage','littoral','marais'] as $_cs):
-          $_cc = $clans[$_cs] ?? [];
-          $_cd = $clan_descs[$_cs];
-          $_mascot = $_cc['mascot'] ?? "mascotte-{$_cs}.png";
-      ?>
-      <div class="idx-clan-card">
-        <div class="idx-clan-header idx-clan-header-<?= $_cs ?>">
-          <img class="idx-clan-masc" src="<?= img($_mascot) ?>" alt="<?= e($_cd['hero']) ?>" loading="lazy">
-          <span class="idx-clan-name"><?= e($_cc['name'] ?? ucfirst($_cs)) ?></span>
-        </div>
-        <div class="idx-clan-body">
-          <div class="idx-clan-title"><?= e($_cd['hero']) ?></div>
-          <div class="idx-clan-desc"><?= e($_cd['desc']) ?></div>
-          <div class="idx-clan-stats">
-            <span>👥 <?= (int)($_cc['members_count'] ?? 0) ?> membres</span>
-            <span>⚡ <?= number_format((int)($_cc['season_score'] ?? 0), 0, ',', '&#8201;') ?> pts</span>
-          </div>
-          <a href="inscription.php?clan=<?= $_cs ?>" class="idx-clan-btn">Rejoindre ce clan →</a>
-        </div>
+    <div class="idx-victor">
+      <div class="idx-victor-content">
+        <span class="idx-victor-tag">📖 Offert à l'inscription</span>
+        <h2 class="idx-victor-title">VICTOR</h2>
+        <p class="idx-victor-desc">
+          VICTOR est l'œuvre littéraire de Zone85 — une plongée dans l'âme secrète de la Vendée. Réservée aux membres, elle est offerte gratuitement à chaque inscription. Pas de boutique. Pas d'achat. Juste la Zone.
+        </p>
+        <a href="inscription.php" class="idx-victor-cta">Rejoindre et recevoir VICTOR →</a>
       </div>
-      <?php endforeach; ?>
+      <div class="idx-victor-visual">📖</div>
     </div>
   </div>
 </section>
 
 
-<!-- BEAT 4 : CTA FINAL ─────────────────────────────────────── -->
+<!-- BEAT 4 : LES INVISIBLES ──────────────────────────────── -->
+<section class="page-section-white">
+  <div class="container">
+    <div class="idx-invisibles">
+      <span class="idx-invisibles-icon">🎭</span>
+      <div class="idx-invisibles-body">
+        <span class="idx-invisibles-tag">Jeu immersif · En développement</span>
+        <div class="idx-invisibles-title">Les Invisibles</div>
+        <p class="idx-invisibles-desc">
+          Ils étaient là avant. Ils reviendront. Un jeu grandeur nature tissé dans l'histoire réelle de la Vendée — missions secrètes, lieux cachés, personnages enfouis. Rejoins la Zone pour être prévenu en premier.
+        </p>
+      </div>
+      <span class="idx-invisibles-badge">Bientôt</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- BEAT 5 : LE TERRAIN DE JEU ─────────────────────────────── -->
+<section class="page-section-navy">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start">
+
+      <!-- Explication du jeu -->
+      <div>
+        <div class="page-section-eyebrow">Le jeu</div>
+        <h2 class="page-section-title" style="color:#fff;margin-bottom:14px">L'environnement qui tisse tout</h2>
+        <p style="font-size:.9rem;color:rgba(255,255,255,.5);line-height:1.7;margin-bottom:28px">
+          Zone85 n'est pas juste un site — c'est un terrain de jeu. Les contenus, les randos, les défis sont reliés par une mécanique communautaire : clans, XP, saisons. Tu joues en vivant la Vendée.
+        </p>
+        <div class="idx-game-steps">
+          <div class="idx-game-step">
+            <div class="idx-game-step-num">Étape 01</div>
+            <span class="idx-game-step-icon">⚔️</span>
+            <div class="idx-game-step-title">Choisis ton clan</div>
+            <div class="idx-game-step-desc">Bocage, Littoral ou Marais. L'appartenance est pour toujours.</div>
+          </div>
+          <div class="idx-game-step">
+            <div class="idx-game-step-num">Étape 02</div>
+            <span class="idx-game-step-icon">🎯</span>
+            <div class="idx-game-step-title">Pars en mission</div>
+            <div class="idx-game-step-desc">Quiz, randos, photos, défis collectifs. Chaque action = XP pour toi et points pour ton clan.</div>
+          </div>
+          <div class="idx-game-step">
+            <div class="idx-game-step-num">Étape 03</div>
+            <span class="idx-game-step-icon">📊</span>
+            <div class="idx-game-step-title">Laisse une trace</div>
+            <div class="idx-game-step-desc">XP personnel permanent. Points de saison. Trophée final pour le clan victorieux.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Course des clans en live -->
+      <div>
+        <div class="page-section-eyebrow">Score de saison</div>
+        <div class="idx-clan-race" style="margin-bottom:16px">
+          <?php
+          $max_race = max(1, array_reduce($clans_sorted_arr, fn($c, $cl) => max($c, $cl['season_score']), 0));
+          foreach ($clans_sorted_arr as $_ri => $_rc):
+              $bar_w = $max_race > 0 ? round(($_rc['season_score'] / $max_race) * 90) : 0;
+              $_rc_slug = $_rc['slug'] ?? '';
+          ?>
+          <div class="idx-clan-race-row">
+            <div style="display:flex;align-items:center;gap:7px">
+              <span style="font-size:1rem"><?= ['🥇','🥈','🥉'][$_ri] ?? '' ?></span>
+              <div>
+                <div style="font-size:.84rem;font-weight:700;color:#fff"><?= e($_rc['name'] ?? ucfirst($_rc_slug)) ?></div>
+                <div style="font-size:.62rem;color:rgba(255,255,255,.35)"><?= (int)$_rc['members_count'] ?> membres</div>
+              </div>
+            </div>
+            <div class="idx-race-bar"><div class="idx-race-fill" style="width:<?= $bar_w ?>%"></div></div>
+            <div style="text-align:right;font-size:.84rem;font-weight:800;color:#fff">
+              <?= number_format((int)$_rc['season_score'], 0, ',', '&#8201;') ?>
+            </div>
+          </div>
+          <?php endforeach; ?>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <a href="clans.php" style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.7);border-radius:7px;padding:9px 16px;font-size:.82rem;font-weight:700;text-decoration:none">
+            Les 3 clans →
+          </a>
+          <a href="communaute.php?tab=classement" style="display:inline-flex;align-items:center;gap:6px;color:rgba(255,255,255,.4);font-size:.8rem;font-weight:700;text-decoration:none;padding:9px 0">
+            🏆 Classement complet →
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- BEAT 6 : CTA FINAL ─────────────────────────────────────── -->
 <section class="page-cta-bloc">
   <div class="container">
     <?php if (!empty($active_season['title'])): ?>
@@ -323,11 +486,11 @@ $_is_guest = empty($_nav_me);
       Saison en cours : <?= e($active_season['title']) ?>
     </div>
     <?php endif; ?>
-    <h2 class="page-cta-title">Prêt à rejoindre la Zone ?</h2>
-    <p class="page-cta-sub">Gratuit. Vendéen. Pour toujours.<br>Ton clan t'attend.</p>
+    <h2 class="page-cta-title">Rejoins Zone85.</h2>
+    <p class="page-cta-sub">Gratuit. Vendéen. Pour toujours.<br>Et tu reçois <strong style="color:#d4af37">VICTOR</strong> dès l'inscription.</p>
     <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
       <a href="inscription.php" class="idx-btn-primary" style="font-size:1.05rem;padding:16px 36px">Créer mon compte →</a>
-      <a href="clans.php" class="idx-btn-secondary" style="font-size:1rem;padding:16px 28px">Voir les clans</a>
+      <a href="concept.php"     class="idx-btn-secondary" style="font-size:1rem;padding:16px 28px">Le concept</a>
     </div>
   </div>
 </section>
