@@ -1,17 +1,42 @@
 <?php
 // ============================================================
-// ZONE 85 — Configuration globale
+// ZONE 85 — Configuration
 // ============================================================
 
-define('SITE_NAME',    'Zone 85 — L\'Esprit Vendée');
-define('SITE_TAGLINE', 'La Vendée qui joue, qui marche, qui enquête et qui se raconte.');
-define('SITE_EMAIL',   'contact@zone85.fr');
+// Environnement
+define('APP_ENV', 'dev'); // 'dev' | 'prod' — passer à 'prod' avant toute mise en ligne
 
-// Chemins assets (relatifs depuis la racine du projet)
+// Outils de diagnostic (uniquement en dev, jamais en prod)
+// Mettre à true uniquement pour une session de debug locale et remettre à false ensuite.
+define('DEV_TOOLS_ALLOWED', false);
+
+// Site
+define('SITE_NAME',    'ZONE85');
+define('SITE_TAGLINE', "La Vendée qui joue, qui marche, qui enquête et qui se raconte.");
+define('SITE_EMAIL',   'contact@zone85.fr');
+define('SITE_URL',     'https://www.zone85.fr'); // sans slash final
+
+// Chemins (utilise __DIR__ pour être robuste)
+define('BASE_PATH',   dirname(__DIR__) . '/');
 define('ASSETS_PATH', 'assets/');
 define('CSS_PATH',    'assets/css/');
 define('JS_PATH',     'assets/js/');
 define('IMG_PATH',    'assets/img/');
+define('UPLOAD_PATH', 'uploads/');
+
+// URL de base — adapter selon l'installation
+// '/'                    si le site est à la racine du domaine
+// '/test/zone85_php/'    si le site est dans un sous-dossier
+define('BASE_URL', '/test/zone85_php/');
+
+// Upload — avatars : 2 Mo max, types image uniquement
+define('UPLOAD_MAX_SIZE',          2 * 1024 * 1024); // 2 Mo (avatars)
+define('ALLOWED_IMAGE_TYPES',      ['image/jpeg', 'image/png', 'image/webp']);
+define('ALLOWED_IMAGE_EXTENSIONS', ['jpg', 'jpeg', 'png', 'webp']);
+
+// Session (futur)
+define('SESSION_NAME',    'zone85_session');
+define('SESSION_TIMEOUT', 3600); // 1h
 
 // Saisons (labels pour l'interface)
 define('SEASONS', [
@@ -20,6 +45,29 @@ define('SEASONS', [
     'saison-des-chemins-creux' => 'Saison des Chemins Creux',
     'saison-des-veillees'      => 'Saison des Veillées',
 ]);
+
+// Base de données (désactivée par défaut — activer quand la base est installée)
+define('DB_ENABLED', true);        // Mettre true après avoir importé schema.sql + seed.sql
+define('DB_HOST',    'localhost');
+define('DB_PORT',    3306);
+define('DB_NAME',    'qg_');
+define('DB_USER',    'AdminQg85');
+define('DB_PASS',    'AdminQg85!'); // Renseigner via variable d'environnement en prod
+define('DB_CHARSET', 'utf8mb4');
+
+// ── Session auto-start ──────────────────────────────────────
+// Démarré ici pour être disponible avant header.php (cookies/CSRF).
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_name('zone85_session');
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path'     => '/',
+        'secure'   => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+    session_start();
+}
 
 // Clans (slugs valides)
 define('CLAN_SLUGS', ['bocage', 'littoral', 'marais']);

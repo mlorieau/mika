@@ -1,0 +1,510 @@
+<?php
+// ============================================================
+// ZONE 85 — Données mockées (fallback développement uniquement)
+// Ces données sont utilisées en dernier recours si la DB est indisponible.
+// En production, toutes les pages chargent leurs données depuis MySQL via
+// les fonctions fetch_* de repositories.php. Ce fichier ne doit jamais
+// être la source principale de données.
+// ============================================================
+
+// ── SEO DEFAULTS ──────────────────────────────────────────────
+$seo_defaults = [
+    'site_name'           => 'ZONE85',
+    'slogan'              => "La Vendée qui joue, qui marche, qui enquête et qui se raconte.",
+    'site_url'            => 'https://www.zone85.fr',
+    'default_title'       => "ZONE85 — La Vendée qui joue, qui marche, qui enquête et qui se raconte.",
+    'default_description' => 'ZONE85 est un terrain de jeu communautaire vendéen où les membres rejoignent un clan, gagnent des XP, participent à des missions et font vivre la Vendée autrement.',
+    'default_og_image'    => 'assets/img/ZONE852025.png',
+    'contact_email'       => 'contact@zone85.fr',
+    'social_profiles'     => [], // compléter quand les profils sont créés
+];
+
+// ── SAISONS ──────────────────────────────────────────────────
+$seasons = [
+    [
+        'id'              => 1,
+        'title'           => 'Saison du Réveil',
+        'slug'            => 'saison-du-reveil',
+        'period'          => 'Mars à mai',
+        'status'          => 'archived',
+        'winner_clan'     => 'littoral',
+        'winner_label'    => 'Clan du Littoral',
+        'contributions'   => 847,
+        'main_mission_id' => null,
+        'main_mission'    => 'La Chasse aux Chemins Oubliés',
+        'end_date'        => '2025-05-31',
+    ],
+    [
+        'id'              => 2,
+        'title'           => 'Camp d\'Été Zone85',
+        'slug'            => 'camp-ete-zone85',
+        'period'          => 'Juin à août',
+        'status'          => 'active',
+        'winner_clan'     => null,
+        'winner_label'    => null,
+        'contributions'   => null,
+        'main_mission_id' => 1,
+        'main_mission'    => 'Le Grand Défi de l\'Été',
+        'end_date'        => '2025-08-31',
+    ],
+    [
+        'id'              => 3,
+        'title'           => 'Saison des Chemins Creux',
+        'slug'            => 'saison-des-chemins-creux',
+        'period'          => 'Septembre à novembre',
+        'status'          => 'upcoming',
+        'winner_clan'     => null,
+        'winner_label'    => null,
+        'contributions'   => null,
+        'main_mission_id' => null,
+        'main_mission'    => null,
+        'end_date'        => '2025-11-30',
+    ],
+    [
+        'id'              => 4,
+        'title'           => 'Saison des Veillées',
+        'slug'            => 'saison-des-veillees',
+        'period'          => 'Décembre à février',
+        'status'          => 'upcoming',
+        'winner_clan'     => null,
+        'winner_label'    => null,
+        'contributions'   => null,
+        'main_mission_id' => null,
+        'main_mission'    => null,
+        'end_date'        => '2026-02-28',
+    ],
+];
+
+// Saison active (calculée)
+$active_season = null;
+foreach ($seasons as $s) {
+    if ($s['status'] === 'active') { $active_season = $s; break; }
+}
+
+// ── CLANS ─────────────────────────────────────────────────────
+// IMPORTANT : utiliser "season_score" pour les clans, "xp_total" pour les membres
+$clans = [
+    'bocage' => [
+        'id'           => 1,
+        'name'         => 'Clan du Bocage',
+        'slug'         => 'bocage',
+        'mascot'       => 'mascotte-bocage.png',
+        'hero_name'    => 'Bran le Bocager',
+        'season_score' => 0,     // Calculé depuis la DB
+        'members_count' => 0,     // Calculé depuis la DB
+        'trophies' => 0,
+        'color'        => '#2a9d5c',
+        'chip_class'   => 'bocage-chip',
+        'chip_sm_class'=> 'bocage-chip-sm',
+        'text_class'   => 'bocage-text',
+        'label'        => '🌳 Bocage',
+        'description'  => 'Ancrés dans les forêts et bocages vendéens, les aventuriers du Bocage tracent leur chemin entre chemins creux et haies centenaires. Discrets, déterminés, ils avancent à leur rythme et ne lâchent jamais.',
+        'race_width' => 0,         // Calculé dynamiquement
+        'podium_rank'  => 3,
+        'podium_id'    => 'p3',
+        'top_members' => [],       // Chargé depuis la DB
+    ],
+
+    'littoral' => [
+        'id'           => 2,
+        'name'         => 'Clan du Littoral',
+        'slug'         => 'littoral',
+        'mascot'       => 'mascotte-littoral.png',
+        'hero_name'    => 'Gabin Culsmouillés',
+        'season_score' => 0,
+        'members_count' => 0,     // Calculé depuis la DB
+        'trophies' => 0,
+        'color'        => '#12314e',
+        'chip_class'   => 'littoral-chip',
+        'chip_sm_class'=> 'littoral-chip-sm',
+        'text_class'   => 'littoral-text',
+        'label'        => '⚓ Littoral',
+        'description'  => 'Enfants des côtes vendéennes, les membres du Littoral ont le sel dans les veines. Curieux, audacieux, ils explorent les rivages, les ports et les îles avec une énergie communicative.',
+        'race_width' => 0,         // Calculé dynamiquement
+        'podium_rank'  => 1,
+        'podium_id'    => 'p1',
+        'top_members' => [],       // Chargé depuis la DB
+    ],
+
+    'marais' => [
+        'id'           => 3,
+        'name'         => 'Clan du Marais',
+        'slug'         => 'marais',
+        'mascot'       => 'mascotte-marais.png',
+        'hero_name'    => 'Méric l\'Ancien',
+        'season_score' => 0,
+        'members_count' => 0,     // Calculé depuis la DB
+        'trophies' => 0,
+        'color'        => '#163756',
+        'chip_class'   => 'marais-chip',
+        'chip_sm_class'=> 'marais-chip-sm',
+        'text_class'   => 'marais-text',
+        'label'        => '🌿 Marais',
+        'description'  => 'Gardiens des marais et des terres humides vendéennes, les membres du Marais avancent avec patience et profondeur. Observateurs nés, ils connaissent les secrets de la Vendée que les autres ne voient pas.',
+        'race_width' => 0,         // Calculé dynamiquement
+        'podium_rank'  => 2,
+        'podium_id'    => 'p2',
+        'top_members' => [],       // Chargé depuis la DB
+    ],
+
+];
+
+// ── JEUX (Games) ─────────────────────────────────────────────
+// Moteur : Game → Mission → Participation → Reward → Progression
+$games = [
+    [
+        'id'           => 1,
+        'title'        => 'Camp d\'Été Zone85',
+        'slug'         => 'camp-ete-zone85',
+        'game_type'    => 'seasonal_collective',
+        'is_paid'      => false,
+        'is_collective'=> true,
+        'season_id'    => 2,
+        'status'       => 'active',
+    ],
+    [
+        'id'           => 2,
+        'title'        => 'Kéto Kolé Tché',
+        'slug'         => 'keto-kole-tche',
+        'game_type'    => 'keto_kole_tche',
+        'is_paid'      => false,
+        'is_collective'=> false,
+        'season_id'    => null,
+        'status'       => 'active',
+    ],
+    [
+        'id'           => 3,
+        'title'        => 'Chasse aux Symboles Cachés',
+        'slug'         => 'chasse-symboles-caches',
+        'game_type'    => 'hidden_hunt',
+        'is_paid'      => false,
+        'is_collective'=> false,
+        'season_id'    => null,
+        'status'       => 'upcoming',
+    ],
+    [
+        // TODO: développer Les Invisibles — paiement + chapitres
+        'id'           => 99,
+        'title'        => 'Les Invisibles',
+        'slug'         => 'les-invisibles',
+        'game_type'    => 'premium_game',
+        'is_paid'      => true,
+        'is_collective'=> false,
+        'season_id'    => null,
+        'status'       => 'coming_soon',
+        'chapters'     => 10,
+        'free_chapters' => 1,
+    ],
+];
+
+// ── MISSIONS ─────────────────────────────────────────────────
+$missions = [
+    [
+        'id'                        => 1,
+        'game_id'                   => 1,
+        'season_id'                 => 2,
+        'title'                     => 'Le Grand Défi de l\'Été',
+        'slug'                      => 'grand-defi-ete',
+        'mission_type'              => 'seasonal_collective',
+        'description'               => 'La grande mission qui fait avancer la Bataille des Clans. Tous les membres contribuent ensemble. Les points vont directement à ton clan.',
+        'status'                    => 'active',
+        'is_collective'             => true,
+        'validation_mode'           => 'hybrid',
+        'requires_answer'           => false,
+        'requires_upload'           => false,
+        'requires_vote'             => false,
+        'requires_code'             => false,
+        'xp_participation'          => 20,
+        'xp_success'                => 100,
+        'clan_points_participation' => 5,
+        'clan_points_success'       => 50,
+        'badge_reward_id'           => null,
+        'start_date'                => '2025-06-01',
+        'end_date'                  => '2025-08-31',
+        'display_in_hall'           => true,
+        'race_progress'             => ['bocage' => 68, 'littoral' => 54, 'marais' => 41],
+    ],
+    [
+        'id'                        => 2,
+        'game_id'                   => null,
+        'season_id'                 => null,
+        'title'                     => 'Quiz du moment',
+        'slug'                      => 'quiz-du-moment',
+        'mission_type'              => 'quiz',
+        'description'               => '5 questions sur la Vendée mystérieuse. Teste tes connaissances vendéennes !',
+        'status'                    => 'active',
+        'is_collective'             => false,
+        'validation_mode'           => 'auto',
+        'requires_answer'           => true,
+        'requires_upload'           => false,
+        'requires_vote'             => false,
+        'requires_code'             => false,
+        'xp_participation'          => 5,
+        'xp_success'                => 10,
+        'clan_points_participation' => 0,
+        'clan_points_success'       => 2,
+        'badge_reward_id'           => null,
+        'start_date'                => null,
+        'end_date'                  => null,
+        'display_in_hall'           => false,
+    ],
+    [
+        'id'                        => 3,
+        'game_id'                   => null,
+        'season_id'                 => null,
+        'title'                     => 'Défi photo — Été Vendée',
+        'slug'                      => 'defi-photo-ete-vendee',
+        'mission_type'              => 'photo_challenge',
+        'description'               => 'Capture un coucher de soleil vendéen. La meilleure photo passe dans le Hall.',
+        'status'                    => 'active',
+        'is_collective'             => false,
+        'validation_mode'           => 'manual',
+        'requires_answer'           => false,
+        'requires_upload'           => true,
+        'requires_vote'             => false,
+        'requires_code'             => false,
+        'xp_participation'          => 10,
+        'xp_success'                => 50,
+        'clan_points_participation' => 1,
+        'clan_points_success'       => 5,
+        'badge_reward_id'           => null,
+        'start_date'                => null,
+        'end_date'                  => '2025-08-31',
+        'display_in_hall'           => true,
+    ],
+    [
+        'id'                        => 4,
+        'game_id'                   => 2,
+        'season_id'                 => null,
+        'title'                     => 'Kéto Kolé Tché #14',
+        'slug'                      => 'ktc-14',
+        'mission_type'              => 'keto_kole_tche',
+        'description'               => 'Objet mystère vendéen — 3 indices disponibles. Propose ton hypothèse.',
+        'status'                    => 'active',
+        'is_collective'             => false,
+        'validation_mode'           => 'manual',
+        'requires_answer'           => true,
+        'requires_upload'           => false,
+        'requires_vote'             => false,
+        'requires_code'             => false,
+        'xp_participation'          => 10,
+        'xp_success'                => 50,
+        'clan_points_participation' => 2,
+        'clan_points_success'       => 10,
+        'badge_reward_id'           => null,
+        'start_date'                => null,
+        'end_date'                  => null,
+        'display_in_hall'           => true,
+    ],
+    [
+        'id'                        => 5,
+        'game_id'                   => null,
+        'season_id'                 => null,
+        'title'                     => 'Météo-mission — Canicule',
+        'slug'                      => 'meteo-canicule',
+        'mission_type'              => 'weather_mission',
+        'description'               => 'Canicule en Vendée : partage ta technique survivaliste estivale.',
+        'status'                    => 'active',
+        'is_collective'             => false,
+        'validation_mode'           => 'auto',
+        'requires_answer'           => true,
+        'requires_upload'           => false,
+        'requires_vote'             => false,
+        'requires_code'             => false,
+        'xp_participation'          => 15,
+        'xp_success'                => 15,
+        'clan_points_participation' => 1,
+        'clan_points_success'       => 1,
+        'badge_reward_id'           => null,
+        'start_date'                => null,
+        'end_date'                  => null,
+        'display_in_hall'           => false,
+    ],
+    [
+        'id'                        => 6,
+        'game_id'                   => null,
+        'season_id'                 => null,
+        'title'                     => 'Avis rando — La Marche des Marais',
+        'slug'                      => 'rando-marche-des-marais',
+        'mission_type'              => 'rando',
+        'description'               => 'La Tranche-sur-Mer · 12 km · 3h30. Donne ton avis ou poste une photo.',
+        'status'                    => 'active',
+        'is_collective'             => false,
+        'validation_mode'           => 'auto',
+        'requires_answer'           => true,
+        'requires_upload'           => false,
+        'requires_vote'             => false,
+        'requires_code'             => false,
+        'xp_participation'          => 15,
+        'xp_success'                => 25,
+        'clan_points_participation' => 2,
+        'clan_points_success'       => 5,
+        'badge_reward_id'           => null,
+        'start_date'                => null,
+        'end_date'                  => null,
+        'display_in_hall'           => false,
+    ],
+    [
+        'id'                        => 7,
+        'game_id'                   => null,
+        'season_id'                 => null,
+        'title'                     => 'Vote de la semaine',
+        'slug'                      => 'vote-semaine',
+        'mission_type'              => 'vote',
+        'description'               => 'Quelle est la meilleure photo vendéenne de la semaine ?',
+        'status'                    => 'active',
+        'is_collective'             => false,
+        'validation_mode'           => 'auto',
+        'requires_answer'           => false,
+        'requires_upload'           => false,
+        'requires_vote'             => true,
+        'requires_code'             => false,
+        'xp_participation'          => 2,
+        'xp_success'                => 2,
+        'clan_points_participation' => 0,
+        'clan_points_success'       => 0,
+        'badge_reward_id'           => null,
+        'start_date'                => null,
+        'end_date'                  => null,
+        'display_in_hall'           => false,
+    ],
+    [
+        'id'                        => 8,
+        'game_id'                   => null,
+        'season_id'                 => null,
+        'title'                     => 'Enquête Village — Qui est ce personnage ?',
+        'slug'                      => 'enquete-village-personnage',
+        'mission_type'              => 'investigation',
+        'description'               => 'Portrait mystère d\'un personnage de l\'histoire vendéenne. Indices disponibles.',
+        'status'                    => 'active',
+        'is_collective'             => false,
+        'validation_mode'           => 'manual',
+        'requires_answer'           => true,
+        'requires_upload'           => false,
+        'requires_vote'             => false,
+        'requires_code'             => false,
+        'xp_participation'          => 10,
+        'xp_success'                => 80,
+        'clan_points_participation' => 2,
+        'clan_points_success'       => 15,
+        'badge_reward_id'           => null,
+        'start_date'                => null,
+        'end_date'                  => null,
+        'display_in_hall'           => true,
+    ],
+    [
+        'id'                        => 9,
+        'game_id'                   => null,
+        'season_id'                 => null,
+        'title'                     => 'Quiz Marais Poitevin',
+        'slug'                      => 'quiz-marais-poitevin',
+        'mission_type'              => 'quiz',
+        'description'               => 'Faune et flore du Marais Poitevin — 5 questions.',
+        'status'                    => 'upcoming',
+        'is_collective'             => false,
+        'validation_mode'           => 'auto',
+        'requires_answer'           => true,
+        'requires_upload'           => false,
+        'requires_vote'             => false,
+        'requires_code'             => false,
+        'xp_participation'          => 5,
+        'xp_success'                => 10,
+        'clan_points_participation' => 0,
+        'clan_points_success'       => 2,
+        'badge_reward_id'           => null,
+        'start_date'                => '2025-09-01',
+        'end_date'                  => null,
+        'display_in_hall'           => false,
+    ],
+];
+
+// ── BADGES ───────────────────────────────────────────────────
+$badges = [
+    ['id' => 1,  'title' => 'Pionnier de la Zone',    'icon' => '🌱', 'description' => 'Inscrit parmi les 500 premiers membres',     'rarity' => 'rare',      'obtained' => true,  'xp_threshold' => null,  'progress' => 100],
+    ['id' => 2,  'title' => 'Quiz Addict',             'icon' => '🧠', 'description' => '10 quiz complétés',                          'rarity' => 'common',    'obtained' => true,  'xp_threshold' => null,  'progress' => 100],
+    ['id' => 3,  'title' => 'Chasseur de Randos',      'icon' => '🥾', 'description' => '5 avis de rando postés',                    'rarity' => 'common',    'obtained' => true,  'xp_threshold' => null,  'progress' => 100],
+    ['id' => 4,  'title' => 'Œil de Faucon',           'icon' => '🦅', 'description' => 'Photo coup de cœur de l\'équipe',           'rarity' => 'epic',      'obtained' => true,  'xp_threshold' => null,  'progress' => 100],
+    ['id' => 5,  'title' => 'Enquêteur du Bocage',     'icon' => '🔍', 'description' => 'Premier Kéto Kolé Tché résolu',             'rarity' => 'uncommon',  'obtained' => true,  'xp_threshold' => null,  'progress' => 100],
+    ['id' => 6,  'title' => 'Fidèle du Littoral',      'icon' => '⚓', 'description' => '3 saisons consécutives actif',              'rarity' => 'rare',      'obtained' => true,  'xp_threshold' => null,  'progress' => 100],
+    ['id' => 7,  'title' => 'Météo-guerrier',          'icon' => '🌤️', 'description' => '10 météo-missions complétées',             'rarity' => 'common',    'obtained' => false, 'xp_threshold' => null,  'progress' => 40],
+    ['id' => 8,  'title' => 'Légende de la Zone',      'icon' => '🏆', 'description' => '10 000 XP à vie atteints',                 'rarity' => 'legendary', 'obtained' => false, 'xp_threshold' => 10000, 'progress' => 34],
+    ['id' => 9,  'title' => 'Passeur de Connaissances','icon' => '📚', 'description' => '20 commentaires postés',                   'rarity' => 'common',    'obtained' => false, 'xp_threshold' => null,  'progress' => 60],
+    ['id' => 10, 'title' => 'Grand Bâtisseur',         'icon' => '🏗️', 'description' => '50 actions complétées',                   'rarity' => 'uncommon',  'obtained' => false, 'xp_threshold' => null,  'progress' => 56],
+];
+
+// ── TROPHÉES DE SAISONS ───────────────────────────────────────
+$season_trophies = [
+    ['season' => 'Saison du Réveil 2025',          'winner_clan' => 'littoral', 'winner_name' => 'Clan du Littoral', 'medal' => '🥇', 'contributions' => 847,  'main_mission' => 'La Chasse aux Chemins Oubliés'],
+    ['season' => 'Camp d\'Été Zone85 2024',         'winner_clan' => 'littoral', 'winner_name' => 'Clan du Littoral', 'medal' => '🥇', 'contributions' => 1043, 'main_mission' => 'Le Tour de l\'Île'],
+    ['season' => 'Saison des Chemins Creux 2024',   'winner_clan' => 'marais',   'winner_name' => 'Clan du Marais',   'medal' => '🥉', 'contributions' => 612,  'main_mission' => 'L\'Inventaire du Bocage'],
+    ['season' => 'Camp d\'Été Zone85 2023',          'winner_clan' => 'bocage',   'winner_name' => 'Clan du Bocage',  'medal' => '🥇', 'contributions' => 788,  'main_mission' => 'La Traversée des Marches'],
+];
+
+// ── PROFIL FICTIF (joueur connecté mock) ─────────────────────
+// TODO: remplacer par les données de session utilisateur authentifié
+$mock_user = [
+    'id'             => 1,
+    'pseudo'         => 'SophieVM',
+    'prenom'         => 'Sophie',
+    'nom'            => 'M.',
+    'clan_slug'      => 'littoral',
+    'level'          => 7,
+    'xp_total'       => 3400,   // XP à vie (permanent, ne repart jamais à 0)
+    'xp_this_season' => 680,    // Contribution à la saison en cours
+    'avatar'         => '🧭',
+    'bio'            => 'Exploratrice littorale et amateure de Kéto Kolé Tché.',
+    'badges_count'   => 6,
+    'missions_done'  => 28,
+    'rank_in_clan'   => 7,
+    'rank_total'     => 438,
+    'joined'         => '2024-03-15',
+];
+
+// ── CLASSEMENT GLOBAL — Top Zonautes ────────────────────────
+// xp_total = XP à vie ; xp_season = contribution saison en cours
+$top_zonautes = [
+    ['rank' => 1, 'pseudo' => 'BrumeDuMarais',    'clan' => 'marais',   'xp_total' => 22140, 'xp_season' => 2890, 'missions' => 52],
+    ['rank' => 2, 'pseudo' => 'DuneRider85',       'clan' => 'littoral', 'xp_total' => 18430, 'xp_season' => 2610, 'missions' => 48],
+    ['rank' => 3, 'pseudo' => 'Forêt_Runner',      'clan' => 'bocage',   'xp_total' => 15820, 'xp_season' => 2340, 'missions' => 44],
+    ['rank' => 4, 'pseudo' => 'RizerieVendéenne',  'clan' => 'marais',   'xp_total' => 14200, 'xp_season' => 2200, 'missions' => 39],
+    ['rank' => 5, 'pseudo' => 'VendéeWave',        'clan' => 'littoral', 'xp_total' => 12600, 'xp_season' => 2180, 'missions' => 36],
+    ['rank' => 6, 'pseudo' => 'Cap_Pineau',        'clan' => 'littoral', 'xp_total' => 11400, 'xp_season' => 1990, 'missions' => 34],
+    ['rank' => 7, 'pseudo' => 'HéronCendré85',     'clan' => 'marais',   'xp_total' => 10800, 'xp_season' => 1980, 'missions' => 31],
+    ['rank' => 8, 'pseudo' => 'VigneronneLB',      'clan' => 'bocage',   'xp_total' =>  9200, 'xp_season' => 1890, 'missions' => 28],
+];
+
+// ── KTC — Dossiers Kéto Kolé Tché ────────────────────────────
+$ktc_cases = [
+    ['id' => 1, 'title' => 'Le tranchet du marais',         'status' => 'resolved', 'solved_by' => 'GabinCM',      'hypotheses' => 23, 'xp_reward' => 30, 'season' => 'Saison des Chemins Creux', 'gradient' => 'linear-gradient(135deg,#12314e,#243d52)'],
+    ['id' => 2, 'title' => 'La serfouette bocagère',         'status' => 'resolved', 'solved_by' => 'MarcelBocat',  'hypotheses' => 31, 'xp_reward' => 30, 'season' => 'Saison du Réveil',         'gradient' => 'linear-gradient(135deg,#2a9d5c,#163756)'],
+    ['id' => 3, 'title' => 'La baratte à beurre vendéenne',  'status' => 'resolved', 'solved_by' => 'ÉlodieMJ',     'hypotheses' => 18, 'xp_reward' => 30, 'season' => 'Camp d\'Été Zone85',       'gradient' => 'linear-gradient(135deg,#ea5649,#12314e)'],
+    ['id' => 4, 'title' => 'Objet mystère vendéen #14',      'status' => 'active',   'solved_by' => null,           'hypotheses' => 7,  'xp_reward' => 30, 'season' => 'Camp d\'Été Zone85',       'gradient' => 'linear-gradient(135deg,#C9962A,#12314e)'],
+];
+
+// ── RANDOS ───────────────────────────────────────────────────
+$randos = [
+    ['id' => 1, 'title' => 'La Marche des Marais',         'location' => 'La Tranche-sur-Mer', 'distance' => '12 km', 'duration' => '3h30', 'elevation' => '+30m',  'difficulty' => 'facile', 'rating' => 4.8, 'reviews' => 28, 'gradient' => 'linear-gradient(135deg,#163756,#2a9d5c)'],
+    ['id' => 2, 'title' => 'Les Chemins Creux du Bocage',  'location' => 'Pouzauges',          'distance' => '18 km', 'duration' => '5h',   'elevation' => '+320m', 'difficulty' => 'moyen',  'rating' => 4.6, 'reviews' => 19, 'gradient' => 'linear-gradient(135deg,#2a9d5c,#C9962A)'],
+    ['id' => 3, 'title' => 'Tour de l\'Île de Noirmoutier','location' => 'Noirmoutier',        'distance' => '25 km', 'duration' => '6h30', 'elevation' => '+15m',  'difficulty' => 'facile', 'rating' => 4.9, 'reviews' => 34, 'gradient' => 'linear-gradient(135deg,#12314e,#163756)'],
+];
+
+// ── PHOTOS DU HALL ────────────────────────────────────────────
+$hall_photos = [
+    ['title' => 'Coucher sur la Baie de l\'Aiguillon', 'author' => 'MarcelBocat',    'likes' => 47, 'category' => 'Paysage',    'gradient' => 'linear-gradient(135deg,#12314e,#2a9d5c)'],
+    ['title' => 'Le moulin de Sallertaine',            'author' => 'ÉlodieMJ',       'likes' => 38, 'category' => 'Patrimoine', 'gradient' => 'linear-gradient(135deg,#C9962A,#ea5649)'],
+    ['title' => 'Héron cendré dans le marais',         'author' => 'SophieVM',       'likes' => 29, 'category' => 'Faune',      'gradient' => 'linear-gradient(135deg,#2a9d5c,#163756)'],
+    ['title' => 'Objet KTC #12 — révélé !',            'author' => 'GabinCM',        'likes' => 52, 'category' => 'KTC',        'gradient' => 'linear-gradient(135deg,#ea5649,#12314e)'],
+    ['title' => 'La forêt de Mervent en été',          'author' => 'ThomasBV',       'likes' => 33, 'category' => 'Rando',      'gradient' => 'linear-gradient(135deg,#2a9d5c,#C9962A)'],
+    ['title' => 'Vieille roue de chariot bocager',     'author' => 'MarcelBocat',    'likes' => 41, 'category' => 'Patrimoine', 'gradient' => 'linear-gradient(135deg,#C9962A,#163756)'],
+    ['title' => 'Coucher soleil Puy du Fou',           'author' => 'PaulineLC',      'likes' => 27, 'category' => 'Paysage',    'gradient' => 'linear-gradient(135deg,#12314e,#ea5649)'],
+    ['title' => 'Tourbière du bocage',                 'author' => 'AntoineDB',      'likes' => 19, 'category' => 'Faune',      'gradient' => 'linear-gradient(135deg,#163756,#12314e)'],
+];
+
+// ── TOP CONTRIBUTEURS (Hall) ──────────────────────────────────
+$hall_contributors = [
+    ['pseudo' => 'MarcelBocat', 'clan_slug' => 'bocage',   'clan_label' => '🌳 Bocage',   'season_pts' => 680, 'avatar' => '🗺️', 'type' => 'Photo'],
+    ['pseudo' => 'GabinCM',     'clan_slug' => 'littoral', 'clan_label' => '⚓ Littoral',  'season_pts' => 612, 'avatar' => '⚓', 'type' => 'KTC'],
+    ['pseudo' => 'ÉlodieMJ',    'clan_slug' => 'marais',   'clan_label' => '🌿 Marais',    'season_pts' => 589, 'avatar' => '🌿', 'type' => 'Rando'],
+    ['pseudo' => 'SophieVM',    'clan_slug' => 'littoral', 'clan_label' => '⚓ Littoral',  'season_pts' => 541, 'avatar' => '🧭', 'type' => 'Quiz'],
+    ['pseudo' => 'ThomasBV',    'clan_slug' => 'bocage',   'clan_label' => '🌳 Bocage',    'season_pts' => 498, 'avatar' => '🔥', 'type' => 'Enquête'],
+];

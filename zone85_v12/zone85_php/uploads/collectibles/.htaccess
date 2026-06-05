@@ -1,0 +1,15 @@
+# Zone85 — Sécurité uploads/collectibles
+Options -Indexes
+Options -ExecCGI
+
+# Interdire exécution de scripts
+<FilesMatch "\.(php|php3|php4|php5|phtml|pl|py|cgi|sh|bash)$">
+  Order Allow,Deny
+  Deny from all
+</FilesMatch>
+
+# Autoriser uniquement les images et GIFs
+<FilesMatch "\.(jpg|jpeg|png|webp|gif)$">
+  Order Allow,Deny
+  Allow from all
+</FilesMatch>

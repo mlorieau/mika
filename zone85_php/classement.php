@@ -1,9 +1,34 @@
 <?php
-$page_title = 'Classement — Zone85';
+$page_title       = 'Classement';
+$page_description = 'Classement de la Bataille des Clans et des meilleurs Zonautes vendéens. Qui mène la danse cette saison ? Découvre ta position dans l\'histoire de la Zone.';
+$page_canonical   = 'https://www.zone85.fr/classement.php';
+$page_robots      = 'index,follow';
+$page_og_image    = 'assets/img/ZONE852025.png';
+$page_schema      = [
+    '@context' => 'https://schema.org',
+    '@type' => 'BreadcrumbList',
+    'itemListElement' => [
+        ['@type'=>'ListItem','position'=>1,'name'=>'Accueil','item'=>'https://www.zone85.fr/'],
+        ['@type'=>'ListItem','position'=>2,'name'=>'Classement','item'=>'https://www.zone85.fr/classement.php'],
+    ],
+];
 $current_page = 'classement';
 require_once 'includes/config.php';
 require_once 'includes/data.php';
 require_once 'includes/functions.php';
+// ── Repository layer ──────────────────────────────────────────
+require_once 'includes/db.php';
+require_once 'includes/repositories.php';
+if (db_enabled()) {
+    $_top_db = fetch_top_members(8);
+    if ($_top_db !== null) $top_zonautes = $_top_db;
+    $_clans_db = fetch_all_clans();
+    if ($_clans_db !== null) $clans = $_clans_db;
+    $_season_db = fetch_active_season();
+    if ($_season_db !== null) $active_season = $_season_db;
+    $_trophies_db = fetch_trophies();
+    if ($_trophies_db !== null) $season_trophies = $_trophies_db;
+}
 $page_styles = '<style>
 /* HERO */
 .classement-hero{background:linear-gradient(160deg,#0d1e2c 0%,#12314e 100%);padding:100px 0 56px;position:relative;overflow:hidden}
@@ -232,7 +257,7 @@ require_once 'includes/nav.php';
             <div class="pz-name"><?= e($z['pseudo']) ?></div>
             <div class="pz-xp"><?= format_xp($z['xp_total']) ?> <small>XP</small></div>
           </div>
-          <div class="pz-body"><span class="pz-clan-tag <?= e($z['clan']) ?>-text"><?= e($clans[array_search($z['clan'], array_column($clans, 'slug'))]['mascot'] ?? '') ?> <?= ucfirst(e($z['clan'])) ?></span></div>
+          <div class="pz-body"><span class="pz-clan-tag <?= e($z['clan']) ?>-text"><?= e($clans[$z['clan']]['mascot'] ?? '') ?> <?= ucfirst(e($z['clan'])) ?></span></div>
         </div>
         <?php endforeach; ?>
       </div>
@@ -255,7 +280,7 @@ require_once 'includes/nav.php';
             <tr>
               <td><?= e($z['rank']) ?></td>
               <td class="rank-name"><?= e($z['pseudo']) ?></td>
-              <td><span class="rank-clan-chip chip-<?= e($z['clan']) ?>"><?= e($clans[array_search($z['clan'], array_column($clans, 'slug'))]['mascot'] ?? '') ?> <?= ucfirst(e($z['clan'])) ?></span></td>
+              <td><span class="rank-clan-chip chip-<?= e($z['clan']) ?>"><?= e($clans[$z['clan']]['mascot'] ?? '') ?> <?= ucfirst(e($z['clan'])) ?></span></td>
               <td class="rank-xp"><?= format_xp($z['xp_total']) ?></td>
               <td><?= format_xp($z['xp_season']) ?></td>
               <td><?= e($z['missions']) ?></td>
@@ -271,15 +296,15 @@ require_once 'includes/nav.php';
       data-panel-group="classement" data-panel-id="par-clan">
 
       <div class="par-clan-tabs" id="par-clan-tabs">
-        <?php foreach ($clans as $idx => $clan): ?>
-        <button class="par-clan-tab<?= $idx === 0 ? ' active' : '' ?>"
+        <?php $_pci = 0; foreach ($clans as $clan): ?>
+        <button class="par-clan-tab<?= $_pci === 0 ? ' active' : '' ?>"
           data-tab-group="par-clan" data-tab-id="<?= e($clan['slug']) ?>-tab"
           onclick="switchTab('par-clan','<?= e($clan['slug']) ?>-tab')"><?= e($clan['mascot']) ?> <?= e($clan['name']) ?></button>
-        <?php endforeach; ?>
+        <?php $_pci++; endforeach; ?>
       </div>
 
-      <?php foreach ($clans as $idx => $clan): ?>
-      <div data-panel-group="par-clan" data-panel-id="<?= e($clan['slug']) ?>-tab" style="display:<?= $idx === 0 ? 'block' : 'none' ?>">
+      <?php $_pci = 0; foreach ($clans as $clan): ?>
+      <div data-panel-group="par-clan" data-panel-id="<?= e($clan['slug']) ?>-tab" style="display:<?= $_pci === 0 ? 'block' : 'none' ?>">
         <p class="rank-section-title">Top Clan <?= e($clan['name']) ?> · XP saison en cours</p>
         <div style="background:rgba(255,255,255,.03);border-radius:var(--radius-lg);overflow:hidden;border:1px solid rgba(255,255,255,.07)">
           <table class="rank-table">
@@ -291,14 +316,14 @@ require_once 'includes/nav.php';
                 <td class="rank-name"><?= e($member['pseudo']) ?></td>
                 <td class="rank-xp"><?= format_xp($member['xp_season']) ?></td>
                 <td><?= format_xp($member['xp_total']) ?></td>
-                <td><?= e($member['missions_month']) ?></td>
+                <td><?= e($member['missions_month'] ?? '-') ?></td>
               </tr>
               <?php endforeach; ?>
             </tbody>
           </table>
         </div>
       </div>
-      <?php endforeach; ?>
+      <?php $_pci++; endforeach; ?>
     </div>
 
     <!-- PANEL 4 — ARCHIVES -->
@@ -313,12 +338,12 @@ require_once 'includes/nav.php';
           <div class="archive-header archive-header-<?= e($trophy['winner_clan']) ?>">
             <span class="archive-trophy-icon">🏆</span>
             <span class="archive-season"><?= e($trophy['season']) ?></span>
-            <span class="archive-winner-name"><?= e($clans[array_search($trophy['winner_clan'], array_column($clans, 'slug'))]['mascot'] ?? '') ?> Clan <?= ucfirst(e($trophy['winner_clan'])) ?></span>
+            <span class="archive-winner-name"><?= e($clans[$trophy['winner_clan']]['mascot'] ?? '') ?> Clan <?= ucfirst(e($trophy['winner_clan'])) ?></span>
           </div>
           <div class="archive-body">
             <div class="archive-scores">
               <div class="archive-score-row winner">
-                <span><?= e($clans[array_search($trophy['winner_clan'], array_column($clans, 'slug'))]['mascot'] ?? '') ?> <?= ucfirst(e($trophy['winner_clan'])) ?></span>
+                <span><?= e($clans[$trophy['winner_clan']]['mascot'] ?? '') ?> <?= ucfirst(e($trophy['winner_clan'])) ?></span>
                 <span><strong><?= e($trophy['winner_name']) ?></strong></span>
               </div>
             </div>

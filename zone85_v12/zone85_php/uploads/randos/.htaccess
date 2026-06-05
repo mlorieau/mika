@@ -1,0 +1,8 @@
+# Zone85 — uploads/randos
+# Ne jamais exécuter de scripts déposés dans les uploads.
+
+<FilesMatch "\.(php[0-9]?|phtml|phar|pl|py|cgi|sh|bash)$">
+    Require all denied
+</FilesMatch>
+
+# Les images et fichiers GPX restent servis comme fichiers statiques.

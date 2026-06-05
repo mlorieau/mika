@@ -1,33 +1,119 @@
 <?php
-$page_title = 'Mon Profil — Zone85';
-$page_description = 'Mon espace personnel Zone85 : progression, badges, activité et contribution au clan.';
+$page_title       = 'Mon Profil';
+$page_description = 'Consulte ta progression, tes badges, ton XP à vie et ta contribution à la Bataille des Clans sur ZONE85.';
+$page_canonical   = 'https://www.zone85.fr/profil.php';
+$page_robots      = 'noindex,follow';
+$page_og_image    = null;
+$page_schema      = null;
 $current_page = 'profil';
 require_once 'includes/config.php';
 require_once 'includes/data.php';
 require_once 'includes/functions.php';
+require_once 'includes/db.php';
+require_once 'includes/repositories.php';
+require_once 'includes/auth.php';
 
-// Mock user data — à remplacer par la session réelle
-$user = [
-    'pseudo'          => 'Sophie M.',
-    'first_name'      => 'Sophie',
-    'initials'        => 'SM',
-    'avatar'          => '🧭',
-    'level'           => 7,
-    'level_name'      => 'Grand Pisteur',
-    'xp_current'      => 3400,
-    'xp_next'         => 4000,
-    'xp_pct'          => 85,
-    'badges_count'    => 6,
-    'participations'  => 14,
-    'clan_slug'       => 'littoral',
-    'clan_label'      => 'Clan du Littoral',
-    'clan_chip_class' => 'littoral-chip-sm',
-    'season_pts'      => 680,
-    'clan_rank'       => 7,
-    'clan_members'    => 438,
-    'clan_score'      => 12840,
-    'clan_place'      => 1,
-];
+$_xp_levels   = [0, 100, 300, 600, 1000, 1500, 2500, 4000, 6000, 9000, 13000, 18000];
+$_level_names = ['','Novice','Éclaireur','Pisteur','Ranger','Garde','Chasseur',
+                 'Grand Pisteur','Vétéran','Légende','Ancêtre','Immortel'];
+$_chip_map    = ['bocage'=>'bocage-chip-sm','littoral'=>'littoral-chip-sm','marais'=>'marais-chip-sm'];
+$_clan_labels = ['bocage'=>'Clan du Bocage','littoral'=>'Clan du Littoral','marais'=>'Clan du Marais'];
+
+$is_guest = !is_logged_in();
+$user     = [];
+
+if (!$is_guest) {
+    $_session     = current_user();
+    $_db_profile  = fetch_user_profile((int)$_session['id']);
+
+    if ($_db_profile) {
+        $_prenom   = $_db_profile['prenom'] ?: $_db_profile['pseudo'];
+        $_nom      = $_db_profile['nom']    ?: '';
+        $_initials = strtoupper(mb_substr($_prenom, 0, 1) . mb_substr($_nom, 0, 1)) ?: '??';
+        $_xp       = (int)$_db_profile['xp_total'];
+        $_lvl      = max(1, min((int)$_db_profile['level'], count($_xp_levels) - 1));
+        $_xp_floor = $_xp_levels[$_lvl - 1] ?? 0;
+        $_xp_ceil  = $_xp_levels[$_lvl]     ?? ($_xp_floor + 5000);
+        $_xp_range = max(1, $_xp_ceil - $_xp_floor);
+        $_xp_pct   = min(100, (int)round(($_xp - $_xp_floor) / $_xp_range * 100));
+
+        $_clan_data = null;
+        if (!empty($_db_profile['clan_slug'])) {
+            $_all_clans = fetch_all_clans();
+            $_clan_data = $_all_clans[$_db_profile['clan_slug']] ?? null;
+        }
+
+        // Avatar : emoji ou chemin fichier upload
+        $_avatar     = $_db_profile['avatar'] ?? '🧭';
+        $_avatar_type = $_db_profile['avatar_type'] ?? 'preset';
+
+        $user = [
+            'id'              => (int)$_db_profile['id'],
+            'pseudo'          => $_db_profile['pseudo'],
+            'first_name'      => $_prenom,
+            'initials'        => $_initials,
+            'avatar'          => $_avatar,
+            'avatar_type'     => $_avatar_type,
+            'level'           => $_lvl,
+            'level_name'      => $_level_names[$_lvl] ?? 'Zonaute',
+            'xp_current'      => $_xp,
+            'xp_next'         => $_xp_ceil,
+            'xp_pct'          => $_xp_pct,
+            'badges_count'    => (int)$_db_profile['badges_count'],
+            'participations'  => (int)$_db_profile['missions_done'],
+            'clan_slug'       => $_db_profile['clan_slug'] ?? '',
+            'clan_label'      => $_clan_labels[$_db_profile['clan_slug'] ?? ''] ?? 'Aucun clan',
+            'clan_chip_class' => $_chip_map[$_db_profile['clan_slug'] ?? ''] ?? '',
+            'season_pts'      => (int)$_db_profile['xp_this_season'],
+            'clan_rank'       => (int)$_db_profile['rank_in_clan'],
+            'clan_members'    => $_clan_data ? (int)$_clan_data['members_count'] : 0,
+            'clan_score'      => $_clan_data ? (int)$_clan_data['season_score']  : 0,
+            'clan_place'      => $_clan_data ? (int)$_clan_data['podium_rank']   : 0,
+            'bio'             => $_db_profile['bio'] ?? '',
+            'joined'          => $_db_profile['joined'] ?? '',
+        ];
+
+        $_user_badges  = fetch_user_badges((int)$_db_profile['id']);
+        if (!empty($_user_badges)) $badges = $_user_badges;
+        $_xp_history   = fetch_user_xp_logs((int)$_db_profile['id'], 10);
+    } else {
+        // DB non disponible — construire depuis session
+        $_prenom   = $_session['pseudo'];
+        $_initials = strtoupper(mb_substr($_session['pseudo'], 0, 2));
+        $_lvl      = max(1, min((int)$_session['level'], count($_xp_levels) - 1));
+        $_xp       = (int)$_session['xp_total'];
+        $_xp_floor = $_xp_levels[$_lvl - 1] ?? 0;
+        $_xp_ceil  = $_xp_levels[$_lvl]     ?? ($_xp_floor + 5000);
+        $_xp_range = max(1, $_xp_ceil - $_xp_floor);
+        $_xp_pct   = min(100, (int)round(($_xp - $_xp_floor) / $_xp_range * 100));
+
+        $user = [
+            'id'              => (int)$_session['id'],
+            'pseudo'          => $_session['pseudo'],
+            'first_name'      => $_prenom,
+            'initials'        => $_initials,
+            'avatar'          => $_session['avatar_key'] ?? '🧭',
+            'avatar_type'     => $_session['avatar_type'] ?? 'preset',
+            'level'           => $_lvl,
+            'level_name'      => $_level_names[$_lvl] ?? 'Zonaute',
+            'xp_current'      => $_xp,
+            'xp_next'         => $_xp_ceil,
+            'xp_pct'          => $_xp_pct,
+            'badges_count'    => 0,
+            'participations'  => 0,
+            'clan_slug'       => $_session['clan_slug'] ?? '',
+            'clan_label'      => $_clan_labels[$_session['clan_slug'] ?? ''] ?? 'Aucun clan',
+            'clan_chip_class' => $_chip_map[$_session['clan_slug'] ?? ''] ?? '',
+            'season_pts'      => 0,
+            'clan_rank'       => 0,
+            'clan_members'    => 0,
+            'clan_score'      => 0,
+            'clan_place'      => 0,
+            'bio'             => '',
+            'joined'          => '',
+        ];
+    }
+}
 
 $page_styles = '<style>
 /* ── PAGE LAYOUT ── */
@@ -189,13 +275,44 @@ require_once 'includes/header.php';
 require_once 'includes/nav.php';
 ?>
 
+<?php if ($is_guest): ?>
+<!-- ── ÉTAT NON CONNECTÉ ─────────────────────────────────── -->
+<div class="profil-page" style="display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 68px)">
+  <div style="max-width:480px;width:100%;padding:0 20px;text-align:center">
+    <div style="width:80px;height:80px;background:var(--navy-dark);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 24px">🛡️</div>
+    <h1 style="font-size:clamp(1.6rem,4vw,2.2rem);font-weight:900;color:var(--navy-dark);letter-spacing:-.5px;margin-bottom:10px">Ton profil t'attend</h1>
+    <p style="font-size:.95rem;color:var(--text-muted);margin-bottom:32px;line-height:1.7">
+      Connecte-toi pour voir ta progression, tes badges et ta contribution à la Bataille des Clans.
+    </p>
+    <div style="display:flex;flex-direction:column;gap:12px;max-width:300px;margin:0 auto">
+      <a href="login.php" class="btn btn-primary btn-lg" style="text-align:center">Se connecter →</a>
+      <a href="inscription.php" class="btn btn-ghost" style="text-align:center">Rejoindre la Zone</a>
+    </div>
+    <p style="margin-top:28px;font-size:.78rem;color:var(--text-muted);font-style:italic">"Je progresse pour moi. Je fais gagner mon clan."</p>
+  </div>
+</div>
+<?php require_once 'includes/footer.php'; ?>
+<?php exit; ?>
+<?php endif; ?>
+
+<?php if (defined('APP_ENV') && APP_ENV === 'dev' && !$is_guest): ?>
+<!-- avatar-debug: type=<?= e($user['avatar_type'] ?? '') ?> file=<?= e($user['avatar'] ?? '') ?> url=<?= e($_profil_avatar_url ?? '') ?> -->
+<?php endif; ?>
+
 <div class="profil-page">
   <div class="profil-layout">
 
     <!-- ── SIDEBAR ── -->
     <aside class="profil-sidebar">
 
-      <div class="sidebar-avatar"><?= e($user['avatar']) ?></div>
+      <?php $_profil_avatar_url = avatar_url($user); ?>
+      <div class="sidebar-avatar" style="<?= ($user['avatar_type'] === 'upload') ? 'padding:0;overflow:hidden' : '' ?>">
+        <?php if (!empty($_profil_avatar_url)): ?>
+          <img src="<?= e($_profil_avatar_url) ?>" alt="<?= e($user['pseudo']) ?>" style="width:100%;height:100%;object-fit:cover">
+        <?php else: ?>
+          <?= e($user['avatar']) ?>
+        <?php endif; ?>
+      </div>
       <div class="sidebar-name"><?= e($user['pseudo']) ?> <span class="level-badge">Niv. <?= e($user['level']) ?></span></div>
       <span class="<?= e($user['clan_chip_class']) ?>"><?= e($user['clan_label']) ?></span>
 
@@ -265,7 +382,13 @@ require_once 'includes/nav.php';
       <div data-panel-group="profil" data-panel-id="apercu" class="profil-panel">
 
         <div class="welcome-card">
-          <div class="welcome-avatar"><?= e($user['avatar']) ?></div>
+          <div class="welcome-avatar" style="<?= ($user['avatar_type'] === 'upload') ? 'padding:0;overflow:hidden' : '' ?>">
+            <?php if (!empty($_profil_avatar_url)): ?>
+              <img src="<?= e($_profil_avatar_url) ?>" alt="" style="width:100%;height:100%;object-fit:cover">
+            <?php else: ?>
+              <?= e($user['avatar']) ?>
+            <?php endif; ?>
+          </div>
           <div class="welcome-text">
             <h2>Bonjour <?= e($user['first_name']) ?> !</h2>
             <p>Je progresse pour moi. Je fais gagner mon clan.</p>
@@ -461,51 +584,26 @@ require_once 'includes/nav.php';
 
         <div class="profil-card">
           <div class="profil-card-title">🏅 Badges obtenus <span style="color:var(--primary);font-size:.9em"><?= e($user['badges_count']) ?></span></div>
+          <?php if (!empty($badges)): ?>
           <div class="badges-grid">
-
+            <?php foreach ($badges as $_b): ?>
             <div class="badge-card">
-              <span class="badge-emoji">🌊</span>
-              <div class="badge-name">Marin d'eau douce</div>
-              <div class="badge-date">Obtenu le 12 juin 2025</div>
-              <span class="badge-xp">+50 XP</span>
+              <span class="badge-emoji"><?= e($_b['icon'] ?? '🏅') ?></span>
+              <div class="badge-name"><?= e($_b['title'] ?? '') ?></div>
+              <?php if (!empty($_b['awarded_at'])): ?>
+              <div class="badge-date">Obtenu le <?= e(date('d/m/Y', strtotime($_b['awarded_at']))) ?></div>
+              <?php endif; ?>
+              <span class="badge-xp" style="font-size:.72rem;color:var(--primary);font-weight:700"><?= e(ucfirst($_b['rarity'] ?? '')) ?></span>
             </div>
-
-            <div class="badge-card">
-              <span class="badge-emoji">📸</span>
-              <div class="badge-name">L'Œil du Littoral</div>
-              <div class="badge-date">Obtenu le 28 juin 2025</div>
-              <span class="badge-xp">+75 XP</span>
-            </div>
-
-            <div class="badge-card">
-              <span class="badge-emoji">🏹</span>
-              <div class="badge-name">Chasseur de primes</div>
-              <div class="badge-date">Obtenu il y a 3 jours</div>
-              <span class="badge-xp">+60 XP</span>
-            </div>
-
-            <div class="badge-card">
-              <span class="badge-emoji">⚡</span>
-              <div class="badge-name">Streak 7 jours</div>
-              <div class="badge-date">Obtenu le 15 mai 2025</div>
-              <span class="badge-xp">+40 XP</span>
-            </div>
-
-            <div class="badge-card">
-              <span class="badge-emoji">🥐</span>
-              <div class="badge-name">Connaisseuse de brioche</div>
-              <div class="badge-date">Obtenu le 3 mars 2025</div>
-              <span class="badge-xp">+30 XP</span>
-            </div>
-
-            <div class="badge-card">
-              <span class="badge-emoji">🗺️</span>
-              <div class="badge-name">Exploratrice du bocage</div>
-              <div class="badge-date">Obtenu le 8 avril 2025</div>
-              <span class="badge-xp">+45 XP</span>
-            </div>
-
+            <?php endforeach; ?>
           </div>
+          <?php else: ?>
+          <div style="text-align:center;padding:32px 20px;color:var(--text-muted)">
+            <div style="font-size:2rem;margin-bottom:8px">🏅</div>
+            <div style="font-size:.88rem;font-weight:600">Aucun badge encore obtenu.</div>
+            <div style="font-size:.78rem;margin-top:4px">Participe aux missions pour débloquer tes premiers badges.</div>
+          </div>
+          <?php endif; ?>
         </div>
 
         <div class="profil-card">
@@ -593,97 +691,44 @@ require_once 'includes/nav.php';
         </div>
 
         <div class="profil-card">
-          <div class="profil-card-title">📋 Historique des actions</div>
-
-          <div class="activity-filter">
-            <button class="activity-filter-btn active" onclick="filterActivity(this,'all')">Tout</button>
-            <button class="activity-filter-btn" onclick="filterActivity(this,'mission')">Missions</button>
-            <button class="activity-filter-btn" onclick="filterActivity(this,'keto')">Kéto Kolé Tché</button>
-            <button class="activity-filter-btn" onclick="filterActivity(this,'badge')">Badges</button>
-            <button class="activity-filter-btn" onclick="filterActivity(this,'quiz')">Quiz</button>
-          </div>
+          <div class="profil-card-title">⚡ Historique XP récent</div>
 
           <div id="activityFeed">
 
-            <div class="feed-item" data-activity-type="mission">
-              <div class="feed-icon">🗺️</div>
+            <?php
+            $_xp_icons = [
+                'registration'         => '🎉',
+                'mission_success'      => '✅',
+                'quiz_success'         => '🎯',
+                'photo_coup_de_coeur'  => '📸',
+                'vote'                 => '🗳️',
+                'rando_review'         => '🥾',
+                'ktc_correct'          => '🔍',
+                'investigation_solved' => '🕵️',
+            ];
+            if (!empty($_xp_history)):
+                foreach ($_xp_history as $_xlog):
+                    $_icon   = $_xp_icons[$_xlog['source_type']] ?? '⚡';
+                    $_label  = e($_xlog['reason'] ?: ucfirst(str_replace('_', ' ', $_xlog['source_type'])));
+                    $_amount = (int)$_xlog['xp_amount'];
+                    $_sign   = $_amount >= 0 ? '+' : '';
+                    $_date   = $_xlog['created_at'] ? date('d/m/Y', strtotime($_xlog['created_at'])) : '';
+            ?>
+            <div class="feed-item">
+              <div class="feed-icon"><?= $_icon ?></div>
               <div class="feed-info">
-                <div class="feed-title">Le Grand Défi de l'Été — avancé à 82 %</div>
-                <div class="feed-meta"><span class="feed-xp">Mission</span> · il y a 1 jour</div>
+                <div class="feed-title"><?= $_label ?></div>
+                <div class="feed-meta"><span class="feed-xp"><?= $_sign . $_amount ?> XP</span><?= $_date ? ' · ' . e($_date) : '' ?></div>
               </div>
             </div>
-
-            <div class="feed-item" data-activity-type="mission">
-              <div class="feed-icon">📸</div>
-              <div class="feed-info">
-                <div class="feed-title">Défi photo Noirmoutier</div>
-                <div class="feed-meta"><span class="feed-xp">+60 XP</span> · Mission · il y a 2 jours</div>
-              </div>
+            <?php endforeach; ?>
+            <?php else: ?>
+            <div style="text-align:center;padding:28px 20px;color:var(--text-muted)">
+              <div style="font-size:1.8rem;margin-bottom:8px">⚡</div>
+              <div style="font-size:.88rem;font-weight:600">Tes premières actions apparaîtront ici.</div>
+              <div style="font-size:.78rem;margin-top:4px">Participe à des missions pour gagner de l'XP.</div>
             </div>
-
-            <div class="feed-item" data-activity-type="badge">
-              <div class="feed-icon">🏹</div>
-              <div class="feed-info">
-                <div class="feed-title">Badge débloqué — Chasseur de primes</div>
-                <div class="feed-meta"><span class="feed-xp">+60 XP</span> · Badge · il y a 3 jours</div>
-              </div>
-            </div>
-
-            <div class="feed-item" data-activity-type="quiz">
-              <div class="feed-icon">🎯</div>
-              <div class="feed-info">
-                <div class="feed-title">Quiz Vendée — score parfait 10/10</div>
-                <div class="feed-meta"><span class="feed-xp">+60 XP</span> · Quiz · il y a 3 jours</div>
-              </div>
-            </div>
-
-            <div class="feed-item" data-activity-type="keto">
-              <div class="feed-icon">🔍</div>
-              <div class="feed-info">
-                <div class="feed-title">Kéto Kolé Tché — moulin de Rairé identifié</div>
-                <div class="feed-meta"><span class="feed-xp">+80 XP</span> · Kéto · il y a 5 jours</div>
-              </div>
-            </div>
-
-            <div class="feed-item" data-activity-type="mission">
-              <div class="feed-icon">🌦️</div>
-              <div class="feed-info">
-                <div class="feed-title">Météo-mission : grande marée de vive-eau</div>
-                <div class="feed-meta"><span class="feed-xp">+30 XP</span> · Mission · il y a 1 semaine</div>
-              </div>
-            </div>
-
-            <div class="feed-item" data-activity-type="mission">
-              <div class="feed-icon">🗳️</div>
-              <div class="feed-info">
-                <div class="feed-title">3 votes communauté validés</div>
-                <div class="feed-meta"><span class="feed-xp">+15 XP</span> · Participation · il y a 1 semaine</div>
-              </div>
-            </div>
-
-            <div class="feed-item" data-activity-type="keto">
-              <div class="feed-icon">🔍</div>
-              <div class="feed-info">
-                <div class="feed-title">Kéto Kolé Tché — château du Puy du Fou</div>
-                <div class="feed-meta"><span class="feed-xp">+90 XP</span> · Kéto · il y a 10 jours</div>
-              </div>
-            </div>
-
-            <div class="feed-item" data-activity-type="quiz">
-              <div class="feed-icon">🧠</div>
-              <div class="feed-info">
-                <div class="feed-title">Quiz Marais Poitevin — 8/10</div>
-                <div class="feed-meta"><span class="feed-xp">+40 XP</span> · Quiz · il y a 12 jours</div>
-              </div>
-            </div>
-
-            <div class="feed-item" data-activity-type="badge">
-              <div class="feed-icon">⚡</div>
-              <div class="feed-info">
-                <div class="feed-title">Badge débloqué — Streak 7 jours</div>
-                <div class="feed-meta"><span class="feed-xp">+40 XP</span> · Badge · il y a 2 semaines</div>
-              </div>
-            </div>
+            <?php endif; ?>
 
           </div><!-- /activityFeed -->
         </div>

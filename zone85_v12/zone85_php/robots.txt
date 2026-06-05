@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+
+# Pages privées / dynamiques à ne pas indexer
+Disallow: /profil.php
+Disallow: /inscription.php
+Disallow: /uploads/
+
+# Assets : autorisés (nécessaires pour le rendu)
+Allow: /assets/
+
+# Futur back-office (non encore créé, préventif)
+Disallow: /admin/
+Disallow: /back-office/
+
+Sitemap: https://www.zone85.fr/sitemap.php

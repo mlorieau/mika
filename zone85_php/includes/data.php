@@ -4,6 +4,18 @@
 // TODO: remplacer par des requêtes MySQL (voir /docs/mysql-model-v1.md)
 // ============================================================
 
+// ── SEO DEFAULTS ──────────────────────────────────────────────
+$seo_defaults = [
+    'site_name'           => 'ZONE85',
+    'slogan'              => "La Vendée qui joue, qui marche, qui enquête et qui se raconte.",
+    'site_url'            => 'https://www.zone85.fr',
+    'default_title'       => "ZONE85 — La Vendée qui joue, qui marche, qui enquête et qui se raconte.",
+    'default_description' => 'ZONE85 est un terrain de jeu communautaire vendéen où les membres rejoignent un clan, gagnent des XP, participent à des missions et font vivre la Vendée autrement.',
+    'default_og_image'    => 'assets/img/ZONE852025.png',
+    'contact_email'       => 'contact@zone85.fr',
+    'social_profiles'     => [], // compléter quand les profils sont créés
+];
+
 // ── SAISONS ──────────────────────────────────────────────────
 $seasons = [
     [
@@ -505,9 +517,9 @@ $hall_photos = [
 
 // ── TOP CONTRIBUTEURS (Hall) ──────────────────────────────────
 $hall_contributors = [
-    ['pseudo' => 'MarcelBocat', 'clan' => 'bocage',   'xp_season' => 680, 'avatar' => '🗺️', 'top_type' => 'Photo'],
-    ['pseudo' => 'GabinCM',     'clan' => 'littoral', 'xp_season' => 612, 'avatar' => '⚓', 'top_type' => 'KTC'],
-    ['pseudo' => 'ÉlodieMJ',    'clan' => 'marais',   'xp_season' => 589, 'avatar' => '🌿', 'top_type' => 'Rando'],
-    ['pseudo' => 'SophieVM',    'clan' => 'littoral', 'xp_season' => 541, 'avatar' => '🧭', 'top_type' => 'Quiz'],
-    ['pseudo' => 'ThomasBV',    'clan' => 'bocage',   'xp_season' => 498, 'avatar' => '🔥', 'top_type' => 'Enquête'],
+    ['pseudo' => 'MarcelBocat', 'clan_slug' => 'bocage',   'clan_label' => '🌳 Bocage',   'season_pts' => 680, 'avatar' => '🗺️', 'type' => 'Photo'],
+    ['pseudo' => 'GabinCM',     'clan_slug' => 'littoral', 'clan_label' => '⚓ Littoral',  'season_pts' => 612, 'avatar' => '⚓', 'type' => 'KTC'],
+    ['pseudo' => 'ÉlodieMJ',    'clan_slug' => 'marais',   'clan_label' => '🌿 Marais',    'season_pts' => 589, 'avatar' => '🌿', 'type' => 'Rando'],
+    ['pseudo' => 'SophieVM',    'clan_slug' => 'littoral', 'clan_label' => '⚓ Littoral',  'season_pts' => 541, 'avatar' => '🧭', 'type' => 'Quiz'],
+    ['pseudo' => 'ThomasBV',    'clan_slug' => 'bocage',   'clan_label' => '🌳 Bocage',    'season_pts' => 498, 'avatar' => '🔥', 'type' => 'Enquête'],
 ];

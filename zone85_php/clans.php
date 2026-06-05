@@ -1,9 +1,30 @@
 <?php
-$page_title = 'Les Clans — Zone85';
+$page_title       = 'Les Clans';
+$page_description = 'Bocage, Littoral, Marais — trois clans vendéens s\'affrontent chaque saison dans la Bataille des Clans. Découvre leur identité et rejoins le tien.';
+$page_canonical   = 'https://www.zone85.fr/clans.php';
+$page_robots      = 'index,follow';
+$page_og_image    = 'assets/img/ZONE852025.png';
+$page_schema      = [
+    '@context' => 'https://schema.org',
+    '@type' => 'BreadcrumbList',
+    'itemListElement' => [
+        ['@type'=>'ListItem','position'=>1,'name'=>'Accueil','item'=>'https://www.zone85.fr/'],
+        ['@type'=>'ListItem','position'=>2,'name'=>'Les Clans','item'=>'https://www.zone85.fr/clans.php'],
+    ],
+];
 $current_page = 'clans';
 require_once 'includes/config.php';
 require_once 'includes/data.php';
 require_once 'includes/functions.php';
+// ── Repository layer ──────────────────────────────────────────
+require_once 'includes/db.php';
+require_once 'includes/repositories.php';
+if (db_enabled()) {
+    $_clans_db = fetch_all_clans();
+    if ($_clans_db !== null) $clans = $_clans_db;
+    $_season_db = fetch_active_season();
+    if ($_season_db !== null) $active_season = $_season_db;
+}
 $page_styles = '<style>/* No page-specific CSS for clans */</style>';
 require_once 'includes/header.php';
 require_once 'includes/nav.php';
@@ -168,7 +189,7 @@ foreach ($clan_sheet_order as $slug):
             <?php foreach ($clan['top_members'] as $i => $member): ?>
             <li>
               <span class="tm-rank"><?= $i + 1 ?></span>
-              <span class="tm-name"><?= e($member['name']) ?></span>
+              <span class="tm-name"><?= e($member['pseudo']) ?></span>
               <span class="tm-xp"><?= format_xp($member['xp_season']) ?></span>
             </li>
             <?php endforeach; ?>
@@ -201,12 +222,12 @@ foreach ($clan_sheet_order as $slug):
     <div class="trophy-grid">
       <?php foreach ($season_trophies as $trophy): ?>
       <div class="trophy-card reveal">
-        <div class="trophy-header <?= e($trophy['winner_slug'] ?? '') ?>">
+        <div class="trophy-header <?= e($trophy['winner_clan'] ?? '') ?>">
           <span class="trophy-season"><?= e($trophy['season']) ?></span>
           <span class="trophy-winner-badge"><?= e($trophy['medal']) ?> Vainqueur</span>
         </div>
         <div class="trophy-body">
-          <div class="trophy-clan <?= e($trophy['winner_slug'] ?? '') ?>-chip-sm"><?= e($trophy['winner_name']) ?></div>
+          <div class="trophy-clan <?= e($trophy['winner_clan'] ?? '') ?>-chip-sm"><?= e($trophy['winner_name']) ?></div>
           <p class="trophy-desc"><?= e($trophy['description'] ?? '') ?></p>
           <div class="trophy-scores">
             <?php if (!empty($trophy['scores'])): ?>

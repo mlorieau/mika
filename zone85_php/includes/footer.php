@@ -1,6 +1,9 @@
 <?php
 // footer.php — Footer partagé + fermeture de la page
 // Variable optionnelle : $page_scripts (string HTML) — JS spécifique à la page
+
+// Fallback : $active_season peut ne pas être défini sur certaines pages
+$footer_active_season = $active_season ?? (function_exists('get_active_season') ? get_active_season() : null);
 ?>
 
 <!-- ============ FOOTER ============ -->
@@ -37,9 +40,9 @@
         </ul>
         <div style="margin-top:20px">
           <div class="footer-col-title">Saison en cours</div>
-          <?php if ($active_season): ?>
-            <div style="font-size:.88rem;color:rgba(255,255,255,.65);font-weight:600"><?= e($active_season['title']) ?></div>
-            <div style="font-size:.75rem;color:var(--primary);font-weight:700;margin-top:4px"><?= e($active_season['main_mission'] ?? '') ?></div>
+          <?php if ($footer_active_season): ?>
+            <div style="font-size:.88rem;color:rgba(255,255,255,.65);font-weight:600"><?= e($footer_active_season['title']) ?></div>
+            <div style="font-size:.75rem;color:var(--primary);font-weight:700;margin-top:4px"><?= e($footer_active_season['main_mission'] ?? '') ?></div>
           <?php endif; ?>
         </div>
       </div>
