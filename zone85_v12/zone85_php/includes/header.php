@@ -96,10 +96,20 @@ if (!defined('SKIP_MAINTENANCE_CHECK')) {
   <link rel="icon" type="image/png" sizes="32x32" href="<?= rtrim(defined('BASE_URL') ? BASE_URL : '/', '/') ?>/assets/img/pwa/icon-96.png">
   <?php endif; ?>
 
+  <!-- Dark mode init (avant CSS pour éviter FOUC) -->
+  <script>
+  (function(){
+    var pref=localStorage.getItem('z85-theme');
+    if(pref==='dark'||(!pref&&window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches)){
+      document.documentElement.setAttribute('data-theme','dark');
+    }
+  })();
+  </script>
+
   <!-- Fonts & CSS -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Syne:wght@700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="<?= CSS_PATH ?>zone85.css">
 
   <?php if (!empty($page_styles)) echo $page_styles . "\n"; ?>

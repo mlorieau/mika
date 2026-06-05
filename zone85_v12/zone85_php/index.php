@@ -76,6 +76,25 @@ if (db_enabled()) {
     }
 }
 
+// Feed communautaire (index widget)
+$index_feed = [];
+if (db_enabled() && function_exists('fetch_community_feed')) {
+    $index_feed = fetch_community_feed(1, 5);
+}
+
+// Stats globales animées
+$index_stats = ['members' => 0, 'missions' => 0, 'xp_total' => 0];
+if (db_enabled()) {
+    try {
+        $pdo = db();
+        if ($pdo) {
+            $index_stats['members']  = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE status='active'")->fetchColumn();
+            $index_stats['missions'] = (int)$pdo->query("SELECT COUNT(*) FROM participations WHERE status IN ('validated','auto_validated')")->fetchColumn();
+            $index_stats['xp_total'] = (int)$pdo->query("SELECT COALESCE(SUM(xp_total),0) FROM users WHERE status='active'")->fetchColumn();
+        }
+    } catch (Exception $e) {}
+}
+
 // Podium : trier par score desc
 $clans_sorted = $clans;
 uasort($clans_sorted, fn($a, $b) => $b['season_score'] <=> $a['season_score']);
@@ -809,6 +828,90 @@ require_once 'includes/nav.php';
   </div>
 </section>
 
+
+<!-- ============================================================
+     SECTION — STATS ANIMÉES + FIL COMMUNAUTÉ
+     ============================================================ -->
+<section style="padding:64px 0;background:var(--beige)">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start" class="reveal">
+
+      <!-- Stats compteurs -->
+      <div>
+        <div class="overline-label">La Zone en chiffres</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px">
+          <?php
+          $stat_defs = [
+            ['val' => $index_stats['members'],  'label' => 'Zonautes',         'icon' => '👥'],
+            ['val' => $index_stats['missions'],  'label' => 'Missions validées', 'icon' => '🎯'],
+            ['val' => $index_stats['xp_total'],  'label' => 'XP distribués',    'icon' => '⚡'],
+          ];
+          foreach ($stat_defs as $i => $st): ?>
+          <div style="background:var(--white);border-radius:var(--radius-lg);padding:20px 16px;text-align:center;border:1.5px solid var(--beige-dark)">
+            <div style="font-size:1.5rem;margin-bottom:6px"><?= $st['icon'] ?></div>
+            <div class="counter-num reveal reveal-delay-<?= $i+1 ?>"
+                 data-target="<?= $st['val'] ?>"
+                 style="font-size:1.5rem;font-weight:900;color:var(--navy-dark);line-height:1">
+              <?= number_format($st['val'], 0, ',', ' ') ?>
+            </div>
+            <div style="font-size:.7rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-top:4px">
+              <?= $st['label'] ?>
+            </div>
+          </div>
+          <?php endforeach; ?>
+        </div>
+      </div>
+
+      <!-- Fil communauté widget -->
+      <div class="reveal reveal-delay-2">
+        <div class="cf-widget">
+          <div class="cf-widget-header">
+            <span class="cf-widget-title">🌍 Fil de la Zone</span>
+            <a href="communaute.php" class="cf-widget-link">Tout voir →</a>
+          </div>
+          <?php if (empty($index_feed)): ?>
+          <div style="padding:24px 20px;text-align:center;font-size:.85rem;color:var(--text-muted)">
+            Le fil est vide pour l'instant. Revenez bientôt !
+          </div>
+          <?php else:
+            $feed_icons = ['mission_new'=>'🎯','mission_complete'=>'✅','badge_unlock'=>'🏅',
+                           'flash_start'=>'⚡','collectible_found'=>'🔍','rando_done'=>'🥾','ktc_win'=>'🥐'];
+            foreach ($index_feed as $fi):
+              $fi_icon = $fi['icon_emoji'] ?: ($feed_icons[$fi['event_type']] ?? '📋');
+          ?>
+          <div class="cf-widget-item">
+            <span class="cf-widget-icon"><?= e($fi_icon) ?></span>
+            <div class="cf-widget-body">
+              <div class="cf-widget-text"><?= e(mb_substr($fi['title'], 0, 60)) ?></div>
+              <div class="cf-widget-meta">
+                <?= $fi['pseudo'] ? e($fi['pseudo']) . ' · ' : '' ?><?= format_date($fi['created_at'], 'short') ?>
+              </div>
+            </div>
+          </div>
+          <?php endforeach; endif; ?>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<script>
+// Anime les compteurs quand visibles
+(function(){
+  if(!window.IntersectionObserver) return;
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(!e.isIntersecting) return;
+      var el = e.target;
+      var target = parseInt(el.dataset.target, 10);
+      if(!isNaN(target)) window.z85AnimateCounter(el, 0, target, 1200);
+      obs.unobserve(el);
+    });
+  },{threshold:.3});
+  document.querySelectorAll('.counter-num[data-target]').forEach(function(el){ obs.observe(el); });
+})();
+</script>
 
 <!-- ============================================================
      SECTION 6 — COMMENT CA MARCHE

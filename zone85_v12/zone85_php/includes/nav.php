@@ -62,6 +62,8 @@ if ($_nav_user) {
         <a href="login.php" style="font-size:.84rem;font-weight:700;color:var(--text-mid);text-decoration:none;white-space:nowrap">Connexion</a>
         <a href="inscription.php" class="nav-btn">Rejoindre</a>
       <?php endif; ?>
+      <button class="dark-mode-toggle" id="dark-toggle" onclick="toggleDarkMode()" title="Changer le thème"
+              aria-label="Basculer mode sombre"></button>
       <div class="hamburger" id="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
     </div>
   </div>
@@ -83,3 +85,81 @@ if ($_nav_user) {
     <a href="trophees.php" style="font-size:.8rem;color:rgba(255,255,255,.45);font-weight:600;border-bottom:none">&#127942; Trophees</a>
   </div>
 </div>
+
+<!-- Toast container -->
+<div id="z85-toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ── Dark mode ── */
+(function(){
+  var html = document.documentElement;
+  var btn  = document.getElementById('dark-toggle');
+  function applyIcon(){
+    var dark = html.getAttribute('data-theme') === 'dark';
+    if(btn) btn.textContent = dark ? '☀️' : '🌙';
+  }
+  applyIcon();
+  window.toggleDarkMode = function(){
+    var isDark = html.getAttribute('data-theme') === 'dark';
+    html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    localStorage.setItem('z85-theme', isDark ? 'light' : 'dark');
+    applyIcon();
+  };
+})();
+
+/* ── Navbar scroll shadow ── */
+(function(){
+  var nb = document.getElementById('navbar');
+  if(!nb) return;
+  window.addEventListener('scroll', function(){
+    nb.classList.toggle('scrolled', window.scrollY > 16);
+  }, {passive:true});
+})();
+
+/* ── Mobile menu ── */
+function toggleMenu(){
+  var m = document.getElementById('mobileMenu');
+  var h = document.getElementById('hamburger');
+  if(!m) return;
+  var open = m.classList.toggle('open');
+  if(h) h.classList.toggle('active', open);
+}
+
+/* ── Toast global ── */
+window.z85Toast = function(msg, type, duration){
+  var el = document.getElementById('z85-toast');
+  if(!el) return;
+  el.textContent = msg;
+  el.className = (type === 'success' ? 'show success' : type === 'error' ? 'show error' : 'show');
+  clearTimeout(el._t);
+  el._t = setTimeout(function(){ el.className = ''; }, duration || 3000);
+};
+
+/* ── Scroll-to-reveal ── */
+(function(){
+  if(!window.IntersectionObserver) return;
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); }
+    });
+  },{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(function(el){ obs.observe(el); });
+  // Re-run after potential dynamic content
+  document.addEventListener('DOMContentLoaded', function(){
+    document.querySelectorAll('.reveal:not(.visible)').forEach(function(el){ obs.observe(el); });
+  });
+})();
+
+/* ── Counter animation ── */
+window.z85AnimateCounter = function(el, from, to, duration){
+  if(!el) return;
+  var start = performance.now();
+  function step(now){
+    var pct = Math.min(1,(now-start)/duration);
+    var ease = 1-Math.pow(1-pct,3);
+    el.textContent = Math.round(from + (to-from)*ease).toLocaleString('fr-FR');
+    if(pct < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+};
+</script>
