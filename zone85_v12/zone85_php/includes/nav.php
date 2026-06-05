@@ -35,9 +35,9 @@ $_mega_sections = [
         'emoji' => '🛡️',
         'links' => [
             ['file' => 'clans.php',      'label' => 'Les Clans',       'desc' => 'Bocage · Littoral · Marais',  'icon' => '⚔️'],
-            ['file' => 'zonautes.php',   'label' => 'Zonautes',        'desc' => 'Annuaire des joueurs',        'icon' => '👥'],
-            ['file' => 'communaute.php', 'label' => 'Fil de la Zone',  'desc' => 'Activité en temps réel',      'icon' => '🌍'],
-            ['file' => 'classement.php', 'label' => 'Classement',      'desc' => 'Top 50 Zonautes',             'icon' => '📊'],
+            ['file' => 'communaute.php',              'label' => 'Fil de la Zone',  'desc' => 'Activité en temps réel',      'icon' => '🌍'],
+            ['file' => 'communaute.php?tab=zonautes', 'label' => 'Zonautes',        'desc' => 'Annuaire des joueurs',        'icon' => '👥'],
+            ['file' => 'communaute.php?tab=classement','label' => 'Classement',     'desc' => 'Top 50 Zonautes',             'icon' => '📊'],
         ],
     ],
 ];
@@ -85,7 +85,7 @@ if (isset($active_season) && !empty($active_season['title'])) {
 
     <!-- Droite : classement, cloche, avatar, connexion -->
     <div class="nav-right">
-      <a href="classement.php" class="nav-classement<?= ($_cp === 'classement') ? ' active' : '' ?>" title="Classement">
+      <a href="communaute.php?tab=classement" class="nav-classement<?= ($_cp === 'communaute') ? ' active' : '' ?>" title="Classement">
         🏆 <span class="nav-classement-label">Classement</span>
       </a>
       <?php if ($_nav_user): ?>
@@ -188,9 +188,9 @@ if (isset($active_season) && !empty($active_season['title'])) {
   <div class="mmenu-section">
     <div class="mmenu-section-label">🛡️ Communauté</div>
     <a href="clans.php">⚔️ Les Clans</a>
-    <a href="zonautes.php">👥 Zonautes</a>
     <a href="communaute.php">🌍 Fil de la Zone</a>
-    <a href="classement.php">📊 Classement</a>
+    <a href="communaute.php?tab=zonautes">👥 Zonautes</a>
+    <a href="communaute.php?tab=classement">📊 Classement</a>
   </div>
 
   <div class="mmenu-section" style="border-top:1px solid rgba(0,0,0,.08)">

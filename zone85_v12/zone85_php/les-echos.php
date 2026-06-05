@@ -174,20 +174,7 @@ $page_styles = '<style>
    LES ÉCHOS DE LA ZONE — CSS V11
 ============================================================ */
 
-/* HERO */
-.echos-hero {
-  background: linear-gradient(160deg, #0c1e2e 0%, #12314e 55%, #163756 100%);
-  padding: 110px 0 72px;
-  position: relative;
-  overflow: hidden;
-}
-.echos-hero::before {
-  content: \'\';
-  position: absolute;
-  inset: 0;
-  background: url("data:image/svg+xml,%3Csvg width=\'80\' height=\'80\' viewBox=\'0 0 80 80\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.02\'%3E%3Crect x=\'0\' y=\'0\' width=\'4\' height=\'4\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-  pointer-events: none;
-}
+/* HERO — fond/padding depuis zone85.css (.echos-hero) */
 .echos-hero::after {
   content: \'\';
   position: absolute;

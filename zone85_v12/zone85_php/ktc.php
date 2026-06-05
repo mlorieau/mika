@@ -170,13 +170,12 @@ $page_styles = '<style>
 /* ============================================================
    KTC V12 — Mobile-first, éditorial
 ============================================================ */
+/* KTC hero — fond noir spécifique (identité mystère), padding depuis zone85.css */
 .ktc-hero {
   background:
     radial-gradient(circle at 80% 15%, rgba(50,10,10,.55), transparent 35%),
     radial-gradient(circle at 12% 88%, rgba(18,49,78,.6), transparent 38%),
     linear-gradient(160deg, #0a0a0a 0%, #150800 45%, #0d0508 100%);
-  padding: 100px 0 64px;
-  position: relative; overflow: hidden;
 }
 .ktc-hero::before {
   content: "🥐";
