@@ -162,20 +162,7 @@ $page_styles = '<style>
    Mobile-first
 ============================================================ */
 
-/* HERO */
-.missions-hero {
-  background: linear-gradient(160deg, #0d1e2c 0%, #12314e 55%, #163756 100%);
-  padding: 110px 0 64px;
-  position: relative;
-  overflow: hidden;
-}
-.missions-hero::before {
-  content: \'\';
-  position: absolute;
-  inset: 0;
-  background: url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.02\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-  pointer-events: none;
-}
+/* HERO — fond/padding depuis zone85.css (.missions-hero) */
 .missions-hero-inner { position: relative; z-index: 1; }
 .missions-hero .hero-eyebrow {
   display: inline-block;

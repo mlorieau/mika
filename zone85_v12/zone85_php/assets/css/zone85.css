@@ -738,3 +738,160 @@ ul{list-style:none}
 body,#navbar,.mobile-menu,.profil-card,.ev-card,.race-card,.cf-widget{
   transition:background-color .25s ease,border-color .25s ease,color .25s ease
 }
+
+/* ============================================================
+   DESIGN SYSTEM — Template partagé V13
+   Utilisé par toutes les pages pour une cohérence visuelle.
+   Les classes .page-* remplacent les héros ad hoc.
+============================================================ */
+
+/* ── Hero base unifié ── */
+/* Toutes les pages utilisent ce fond dark navy identique.
+   Chaque page n'override que ce qui lui est propre. */
+.page-hero,
+.missions-hero,.clans-hero,.zonautes-hero,.hall-hero,
+.trophees-hero,.echos-hero,.randos-hero,.ktc-hero,.ev-hero{
+  background:linear-gradient(155deg,#060e16 0%,#0c1e2e 55%,#0e2540 100%);
+  padding:120px 0 72px;
+  position:relative;overflow:hidden
+}
+.page-hero::before,
+.missions-hero::before,.clans-hero::before,.zonautes-hero::before,.hall-hero::before,
+.trophees-hero::before,.echos-hero::before,.randos-hero::before,.ktc-hero::before,.ev-hero::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 70% 50% at 50% -5%,rgba(234,86,73,.08) 0%,transparent 65%)
+}
+.page-hero-inner{position:relative;z-index:1;max-width:700px}
+
+/* ── Typographie hero ── */
+.page-eyebrow{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(234,86,73,.1);border:1px solid rgba(234,86,73,.22);
+  color:#f5a99f;font-size:.67rem;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;
+  padding:5px 16px;border-radius:4px;margin-bottom:20px
+}
+.page-h1{
+  font-size:clamp(2rem,4.5vw,3.2rem);font-weight:900;
+  color:#fff;letter-spacing:-1.5px;line-height:1.1;margin-bottom:14px
+}
+.page-h1 em{color:var(--primary);font-style:normal}
+.page-sub{
+  font-size:clamp(.92rem,1.8vw,1.05rem);color:rgba(255,255,255,.52);
+  line-height:1.75;max-width:540px;margin-bottom:32px
+}
+.page-hero-ctas{display:flex;gap:12px;flex-wrap:wrap}
+
+/* ── Sections standard ── */
+.page-section{padding:72px 0;background:var(--beige)}
+.page-section-white{padding:72px 0;background:var(--white)}
+.page-section-navy{
+  padding:72px 0;
+  background:linear-gradient(155deg,#060e16,#0c1e2e)
+}
+.page-section-head{text-align:center;margin-bottom:48px}
+.page-section-eyebrow{
+  font-size:.67rem;font-weight:800;text-transform:uppercase;
+  letter-spacing:.13em;color:var(--primary);margin-bottom:10px
+}
+.page-section-title{
+  font-size:clamp(1.6rem,3vw,2.4rem);font-weight:900;
+  color:var(--text);letter-spacing:-.5px;line-height:1.15
+}
+.page-section-sub{
+  font-size:.95rem;color:var(--text-muted);
+  max-width:500px;margin:10px auto 0;line-height:1.7
+}
+/* titres sur fond navy */
+.page-section-navy .page-section-title{color:#fff}
+.page-section-navy .page-section-sub{color:rgba(255,255,255,.48)}
+.page-section-navy .page-section-eyebrow{color:#f5a99f}
+
+/* ── Card standard ── */
+.page-card{
+  background:var(--white);border-radius:var(--radius-lg);
+  border:1.5px solid var(--beige-dark);overflow:hidden;
+  transition:transform var(--transition),box-shadow var(--transition)
+}
+.page-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
+.page-card-header{padding:20px 22px;border-bottom:1px solid var(--beige-dark)}
+.page-card-body{padding:20px 22px}
+.page-card-footer{
+  padding:14px 22px;border-top:1px solid var(--beige-dark);
+  background:var(--beige);display:flex;align-items:center;justify-content:flex-end
+}
+
+/* ── Tabs standard ── */
+.page-tab-bar{
+  display:flex;gap:3px;padding:4px;
+  background:var(--beige-dark);border-radius:8px;
+  width:fit-content;margin-bottom:32px
+}
+.page-tab-btn{
+  padding:8px 20px;border-radius:5px;
+  font-size:.84rem;font-weight:700;border:none;
+  background:transparent;color:var(--text-muted);cursor:pointer;
+  transition:all var(--transition);font-family:'Inter',sans-serif;
+  text-decoration:none;display:inline-flex;align-items:center;gap:5px;white-space:nowrap
+}
+.page-tab-btn:hover{color:var(--text);background:rgba(255,255,255,.5)}
+.page-tab-btn.active{
+  background:var(--white);color:var(--primary);
+  box-shadow:0 1px 4px rgba(0,0,0,.1)
+}
+
+/* ── Badge / stat inline ── */
+.page-stat-row{
+  display:flex;background:var(--beige);border-radius:var(--radius);overflow:hidden
+}
+.page-stat{flex:1;text-align:center;padding:14px 8px;position:relative}
+.page-stat+.page-stat::before{
+  content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);
+  height:22px;width:1px;background:var(--beige-dark)
+}
+.page-stat-val{font-size:1.1rem;font-weight:900;color:var(--text);line-height:1;display:block}
+.page-stat-lbl{font-size:.62rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;margin-top:3px;display:block}
+
+/* ── Empty state ── */
+.page-empty{text-align:center;padding:48px 24px;color:var(--text-muted)}
+.page-empty-icon{font-size:2.4rem;margin-bottom:12px}
+.page-empty-text{font-size:.9rem;font-weight:600}
+
+/* ── CTA bloc global ── */
+.page-cta-bloc{
+  text-align:center;padding:64px 24px;
+  background:linear-gradient(155deg,#060e16,#0c1e2e)
+}
+.page-cta-title{font-size:clamp(1.6rem,3vw,2.4rem);font-weight:900;color:#fff;margin-bottom:10px;letter-spacing:-.5px}
+.page-cta-sub{font-size:.95rem;color:rgba(255,255,255,.5);margin-bottom:32px;line-height:1.7}
+
+/* ── Step numéroté ── */
+.page-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.page-step{
+  background:var(--white);border-radius:var(--radius-lg);padding:28px 24px;
+  border:1.5px solid var(--beige-dark);position:relative
+}
+.page-step-num{
+  font-size:.6rem;font-weight:800;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--text-muted);margin-bottom:16px
+}
+.page-step-icon{font-size:2rem;margin-bottom:10px;display:block}
+.page-step-title{font-size:1rem;font-weight:800;color:var(--text);margin-bottom:6px}
+.page-step-desc{font-size:.83rem;color:var(--text-muted);line-height:1.6}
+
+/* ── Responsive page template ── */
+@media(max-width:900px){
+  .page-hero,.missions-hero,.clans-hero,.zonautes-hero,.hall-hero,
+  .trophees-hero,.echos-hero,.randos-hero,.ktc-hero,.ev-hero{
+    padding:100px 0 60px
+  }
+  .page-steps{grid-template-columns:1fr}
+  .page-section,.page-section-white,.page-section-navy{padding:52px 0}
+}
+@media(max-width:640px){
+  .page-hero,.missions-hero,.clans-hero,.zonautes-hero,.hall-hero,
+  .trophees-hero,.echos-hero,.randos-hero,.ktc-hero,.ev-hero{
+    padding:88px 0 48px
+  }
+  .page-tab-bar{width:100%;overflow-x:auto}
+}

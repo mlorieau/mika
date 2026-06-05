@@ -82,20 +82,8 @@ $archived_seasons = array_filter($seasons, fn($s) => $s['status'] === 'archived'
 $page_styles = '<style>
 /* ── CLANS V11 — CSS complet ──────────────────────────────── */
 
-/* HERO */
-.clans-hero{
-  background:linear-gradient(160deg,#06101a 0%,#0d1e2c 60%,#12314e 100%);
-  padding:110px 0 70px;
-  position:relative;
-  overflow:hidden;
-  text-align:center;
-}
-.clans-hero::before{
-  content:"";
-  position:absolute;inset:0;
-  background:url("data:image/svg+xml,%3Csvg width=\'80\' height=\'80\' viewBox=\'0 0 80 80\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.018\'%3E%3Cpath d=\'M0 0h80v80H0z\'/%3E%3C/g%3E%3C/svg%3E");
-  pointer-events:none;
-}
+/* HERO — fond/padding depuis zone85.css (.clans-hero) */
+.clans-hero{text-align:center}
 .clans-hero-inner{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 24px;}
 .clans-hero .overline-label{
   font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
