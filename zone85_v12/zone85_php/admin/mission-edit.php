@@ -179,6 +179,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $s2 = $pdo->prepare("SELECT * FROM missions WHERE id = :id LIMIT 1");
                     $s2->execute([':id' => $new_id]);
                     $mission = $s2->fetch() ?: null;
+                    // Fil communautaire — nouvelle mission active
+                    if ($status === 'active' && function_exists('push_community_feed')) {
+                        push_community_feed('mission_new', [
+                            'mission_id' => $new_id,
+                            'title'      => 'Nouvelle mission : ' . mb_substr($title, 0, 60),
+                            'icon_emoji' => '🎯',
+                            'link_url'   => '../mission.php?id=' . $new_id,
+                        ]);
+                    }
                     // Redirect pour changer l'URL
                     header('Location: mission-edit.php?id=' . $new_id . '&ok=created');
                     exit;

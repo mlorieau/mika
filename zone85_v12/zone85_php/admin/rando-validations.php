@@ -49,6 +49,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
                     }
                 }
                 $pdo->commit();
+                // Notification + fil communautaire
+                if (function_exists('push_notification')) {
+                    push_notification((int)$row['uid'], 'mission_validated',
+                        'Rando validée : ' . mb_substr($row['rando_title'] ?? 'Randonnée', 0, 60) . ' (+25 XP)',
+                        ['link_url' => '../randos.php']
+                    );
+                }
+                if (function_exists('push_community_feed')) {
+                    push_community_feed('rando_done', [
+                        'user_id'    => (int)$row['uid'],
+                        'title'      => ($row['pseudo'] ?? 'Zonaute') . ' a terminé : ' . mb_substr($row['rando_title'] ?? 'Randonnée', 0, 60),
+                        'icon_emoji' => '🥾',
+                        'link_url'   => '../randos.php',
+                    ]);
+                }
                 $flash = 'Rando validée : +25 XP attribués.';
             } elseif ($action === 'reject') {
                 $note = safe_input($_POST['admin_note'] ?? '', 500);

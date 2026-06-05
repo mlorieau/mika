@@ -96,16 +96,6 @@ if (!defined('SKIP_MAINTENANCE_CHECK')) {
   <link rel="icon" type="image/png" sizes="32x32" href="<?= rtrim(defined('BASE_URL') ? BASE_URL : '/', '/') ?>/assets/img/pwa/icon-96.png">
   <?php endif; ?>
 
-  <!-- Dark mode init (avant CSS pour éviter FOUC) -->
-  <script>
-  (function(){
-    var pref=localStorage.getItem('z85-theme');
-    if(pref==='dark'||(!pref&&window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches)){
-      document.documentElement.setAttribute('data-theme','dark');
-    }
-  })();
-  </script>
-
   <!-- Fonts & CSS -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

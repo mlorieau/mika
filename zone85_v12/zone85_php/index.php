@@ -132,7 +132,7 @@ $page_styles = '<style>
   min-height:100svh;
   background:linear-gradient(160deg,#060e16 0%,#0c1e2e 40%,#12314e 100%);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:100px 20px 0;position:relative;overflow:hidden
+  padding:100px 20px 56px;position:relative;overflow:hidden
 }
 #hero::before{
   content:"";position:absolute;inset:0;
@@ -232,8 +232,9 @@ $page_styles = '<style>
 
 /* ── SECTION SAISON ── */
 #s-saison{
-  background:linear-gradient(160deg,#0c1e2e 0%,#12314e 100%);
-  padding:80px 0
+  background:linear-gradient(160deg,#071422 0%,#0e2540 100%);
+  border-top:3px solid rgba(234,86,73,.35);
+  padding:88px 0 80px
 }
 .saison-wrapper{
   display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start

@@ -62,8 +62,6 @@ if ($_nav_user) {
         <a href="login.php" style="font-size:.84rem;font-weight:700;color:var(--text-mid);text-decoration:none;white-space:nowrap">Connexion</a>
         <a href="inscription.php" class="nav-btn">Rejoindre</a>
       <?php endif; ?>
-      <button class="dark-mode-toggle" id="dark-toggle" onclick="toggleDarkMode()" title="Changer le thème"
-              aria-label="Basculer mode sombre"></button>
       <div class="hamburger" id="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
     </div>
   </div>
@@ -90,23 +88,6 @@ if ($_nav_user) {
 <div id="z85-toast" role="status" aria-live="polite"></div>
 
 <script>
-/* ── Dark mode ── */
-(function(){
-  var html = document.documentElement;
-  var btn  = document.getElementById('dark-toggle');
-  function applyIcon(){
-    var dark = html.getAttribute('data-theme') === 'dark';
-    if(btn) btn.textContent = dark ? '☀️' : '🌙';
-  }
-  applyIcon();
-  window.toggleDarkMode = function(){
-    var isDark = html.getAttribute('data-theme') === 'dark';
-    html.setAttribute('data-theme', isDark ? 'light' : 'dark');
-    localStorage.setItem('z85-theme', isDark ? 'light' : 'dark');
-    applyIcon();
-  };
-})();
-
 /* ── Navbar scroll shadow ── */
 (function(){
   var nb = document.getElementById('navbar');

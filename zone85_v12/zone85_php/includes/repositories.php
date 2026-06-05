@@ -1135,7 +1135,7 @@ function admin_validate_participation(int $participation_id, int $admin_user_id)
         // 1. Charger la participation + mission + user en une requÃªte
         $s = $pdo->prepare("
             SELECT p.*, m.xp_success, m.clan_points_success, m.title AS mission_title,
-                   u.clan_id, u.xp_total, u.level
+                   u.clan_id, u.xp_total, u.level, u.pseudo
             FROM participations p
             JOIN missions m ON m.id = p.mission_id
             JOIN users    u ON u.id = p.user_id
@@ -1216,6 +1216,25 @@ function admin_validate_participation(int $participation_id, int $admin_user_id)
         }
 
         $pdo->commit();
+
+        // Notification + fil communautaire (hors transaction — ne bloque pas si table absente)
+        if (function_exists('push_notification')) {
+            $xp_str = $xp_success > 0 ? ' (+' . $xp_success . ' XP)' : '';
+            push_notification($user_id, 'mission_validated',
+                'Mission validée : ' . mb_substr($row['mission_title'], 0, 60) . $xp_str,
+                ['link_url' => 'missions.php', 'mission_id' => (int)$row['mission_id']]
+            );
+        }
+        if (function_exists('push_community_feed')) {
+            push_community_feed('mission_complete', [
+                'user_id'    => $user_id,
+                'clan_id'    => $clan_id ?: null,
+                'mission_id' => (int)$row['mission_id'],
+                'title'      => ($row['pseudo'] ?? 'Zonaute') . ' a validé : ' . mb_substr($row['mission_title'], 0, 60),
+                'icon_emoji' => '✅',
+                'link_url'   => 'mission.php?id=' . (int)$row['mission_id'],
+            ]);
+        }
 
         return ['ok' => true, 'error' => null, 'xp_awarded' => $xp_success, 'clan_pts' => $clan_pts];
 
