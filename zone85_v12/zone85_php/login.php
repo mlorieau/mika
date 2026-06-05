@@ -120,6 +120,7 @@ require_once 'includes/nav.php';
       <div class="login-sep">ou</div>
 
       <div class="login-links">
+        <span><a href="forgot-password.php">Mot de passe oublié ?</a></span>
         <span>Pas encore de compte ? <a href="inscription.php">Rejoindre la Zone →</a></span>
       </div>
 

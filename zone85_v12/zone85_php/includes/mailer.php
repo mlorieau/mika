@@ -180,6 +180,18 @@ function _build_fallback_html(string $subject, array $vars, string $template_slu
             '<p>Salut <strong>' . $pseudo . '</strong>,</p>' .
             '<p>Ton compte Zone85 est activé. Rejoins ton clan et commence à gagner des XP !</p>' .
             '<a href="' . $site_url . '/missions.php" style="display:inline-block;background:#ea5649;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:800;margin-top:16px">Voir les missions →</a>',
+        'email_verification' =>
+            '<h2 style="margin:0 0 16px;color:#0c1e2e">Confirme ton adresse email</h2>' .
+            '<p>Salut <strong>' . $pseudo . '</strong>,</p>' .
+            '<p>Clique sur le bouton ci-dessous pour confirmer ton adresse email et activer pleinement ton compte Zone85.</p>' .
+            '<a href="' . htmlspecialchars($vars['verify_url'] ?? '#', ENT_QUOTES) . '" style="display:inline-block;background:#ea5649;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:800;margin-top:16px">Confirmer mon email →</a>' .
+            '<p style="margin-top:16px;font-size:.8rem;color:#9ca3af">Ce lien est valable 48h. S\'il ne fonctionne pas, copie-colle l\'URL dans ton navigateur.</p>',
+        'password_reset' =>
+            '<h2 style="margin:0 0 16px;color:#0c1e2e">Réinitialisation de ton mot de passe</h2>' .
+            '<p>Salut <strong>' . $pseudo . '</strong>,</p>' .
+            '<p>Tu as demandé à réinitialiser ton mot de passe. Clique sur le bouton ci-dessous :</p>' .
+            '<a href="' . htmlspecialchars($vars['reset_url'] ?? '#', ENT_QUOTES) . '" style="display:inline-block;background:#ea5649;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:800;margin-top:16px">Réinitialiser mon mot de passe →</a>' .
+            '<p style="margin-top:16px;font-size:.8rem;color:#9ca3af">Ce lien est valable <strong>1 heure</strong>. Si tu n\'es pas à l\'origine de cette demande, ignore cet email.</p>',
         'badge_unlock' =>
             '<h2 style="margin:0 0 16px;color:#0c1e2e">🏅 Nouveau badge débloqué !</h2>' .
             '<p>Félicitations <strong>' . $pseudo . '</strong> !</p>' .
@@ -189,6 +201,12 @@ function _build_fallback_html(string $subject, array $vars, string $template_slu
             '<p>Salut <strong>' . $pseudo . '</strong>,</p>' .
             '<p>Une nouvelle mission vient d\'être publiée : <strong>' . htmlspecialchars($vars['mission_title'] ?? '', ENT_QUOTES) . '</strong>.</p>' .
             '<a href="' . $site_url . '/missions.php" style="display:inline-block;background:#ea5649;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:800;margin-top:16px">Voir la mission →</a>',
+        'mission_validated' =>
+            '<h2 style="margin:0 0 16px;color:#0c1e2e">✅ Participation validée !</h2>' .
+            '<p>Salut <strong>' . $pseudo . '</strong>,</p>' .
+            '<p>Ta participation à <strong>' . htmlspecialchars($vars['mission_title'] ?? '', ENT_QUOTES) . '</strong> a été validée.' .
+            (!empty($vars['xp_awarded']) ? ' Tu gagnes <strong>+' . (int)$vars['xp_awarded'] . ' XP</strong> !' : '') . '</p>' .
+            '<a href="' . $site_url . '/profil.php" style="display:inline-block;background:#ea5649;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:800;margin-top:16px">Voir mon profil →</a>',
         'delete_requested' =>
             '<h2 style="margin:0 0 16px;color:#0c1e2e">Demande de suppression reçue</h2>' .
             '<p>Nous avons bien reçu ta demande de suppression de compte.</p>' .

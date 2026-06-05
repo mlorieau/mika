@@ -84,6 +84,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_GET['action'] ?? '') === 'regist
         exit;
     }
 
+    // Envoi email de vérification
+    $pdo_reg = db();
+    if ($pdo_reg) {
+        try {
+            $verify_token = bin2hex(random_bytes(32));
+            $pdo_reg->prepare("UPDATE users SET email_verify_token=:t WHERE id=:id")
+                ->execute([':t' => $verify_token, ':id' => (int)$result['user_id']]);
+
+            $base_url  = defined('SITE_URL') ? SITE_URL : 'https://www.zone85.fr';
+            $base_path = defined('BASE_URL') ? rtrim(BASE_URL, '/') : '';
+            $verify_url = $base_url . $base_path . '/verify-email.php?token=' . urlencode($verify_token);
+
+            require_once 'includes/mailer.php';
+            send_email($email, 'Confirmez votre adresse email — Zone85', 'email_verification', [
+                'pseudo'     => $pseudo,
+                'verify_url' => $verify_url,
+            ], $pseudo);
+        } catch (Throwable $e) {
+            error_log('[inscription email_verify] ' . $e->getMessage());
+            // Non bloquant : l'inscription est réussie même si l'email échoue
+        }
+    }
+
     // Auto-connexion après inscription
     $new_user = find_user_by_id($result['user_id']);
     if ($new_user) {
