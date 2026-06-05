@@ -116,7 +116,7 @@ require_once 'includes/nav.php';
       <p class="bv-cta-sub">La Zone t'attend. Explore les missions, les randos et les événements flash pour grimper dans le classement.</p>
       <a href="missions.php" class="bv-cta-primary">Voir les missions →</a>
       <a href="profil.php" class="bv-cta-secondary">Mon profil</a>
-      <a href="classement.php" class="bv-cta-secondary">Classement</a>
+      <a href="communaute.php?tab=classement" class="bv-cta-secondary">Classement</a>
     </div>
 
     <p style="text-align:center;margin-top:24px;font-size:.78rem;color:var(--text-muted);font-style:italic">

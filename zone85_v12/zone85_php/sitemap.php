@@ -11,7 +11,7 @@ $pages = [
     ['loc' => '/concept.php',        'priority' => '0.9', 'changefreq' => 'monthly', 'lastmod' => $today],
     ['loc' => '/clans.php',          'priority' => '0.9', 'changefreq' => 'weekly',  'lastmod' => $today],
     ['loc' => '/missions.php',       'priority' => '0.9', 'changefreq' => 'daily',   'lastmod' => $today],
-    ['loc' => '/classement.php',     'priority' => '0.8', 'changefreq' => 'daily',   'lastmod' => $today],
+    ['loc' => '/communaute.php',      'priority' => '0.8', 'changefreq' => 'daily',   'lastmod' => $today],
     ['loc' => '/hall.php',           'priority' => '0.8', 'changefreq' => 'weekly',  'lastmod' => $today],
     ['loc' => '/contact.php',        'priority' => '0.5', 'changefreq' => 'yearly',  'lastmod' => $today],
     ['loc' => '/mentions-legales.php','priority'=> '0.3', 'changefreq' => 'yearly',  'lastmod' => $today],

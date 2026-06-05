@@ -82,9 +82,8 @@ require_once 'includes/nav.php';
 ?>
 
 <style>
-/* ── Hero ── */
-.ev-hero{background:linear-gradient(135deg,#0c1e2e 0%,#163756 60%,#12314e 100%);padding:80px 0 56px;text-align:center;position:relative;overflow:hidden}
-.ev-hero::before{content:'⚡';position:absolute;top:-20px;right:10%;font-size:12rem;opacity:.04;pointer-events:none}
+/* .ev-hero — fond/padding depuis zone85.css */
+.ev-hero{text-align:center}
 .ev-hero-label{font-size:.68rem;font-weight:900;letter-spacing:.22em;text-transform:uppercase;color:var(--primary);display:block;margin-bottom:12px}
 .ev-hero-title{font-size:clamp(2rem,5vw,3.2rem);font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1.1;margin-bottom:16px}
 .ev-hero-sub{font-size:1rem;color:rgba(255,255,255,.6);max-width:480px;margin:0 auto 32px;line-height:1.6}

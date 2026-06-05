@@ -502,7 +502,7 @@ require_once 'includes/header.php';
   <div class="pp-404-icon">🗺️</div>
   <div class="pp-404-title">Passeport introuvable</div>
   <div class="pp-404-sub">Ce membre n'existe pas ou son compte n'est plus actif.</div>
-  <a href="classement.php" class="pp-btn pp-btn-missions" style="display:inline-flex;margin-bottom:10px">Voir le classement</a>
+  <a href="communaute.php?tab=classement" class="pp-btn pp-btn-missions" style="display:inline-flex;margin-bottom:10px">Voir le classement</a>
   <br>
   <a href="inscription.php" class="pp-btn pp-btn-join" style="display:inline-flex;margin-top:8px">Rejoindre la Zone →</a>
 </div>

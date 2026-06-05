@@ -328,17 +328,8 @@ $page_styles = '<style>
    RANDO FICHE — CSS V12
 ============================================================ */
 
-/* HERO */
-.rando-hero {
-  padding: 110px 0 64px;
-  position: relative; overflow: hidden;
-  background: ' . $sec_grad . ';
-}
-.rando-hero::before {
-  content: \'\'; position: absolute; inset: 0;
-  background: url("data:image/svg+xml,%3Csvg width=\'80\' height=\'80\' viewBox=\'0 0 80 80\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.02\'%3E%3Crect x=\'0\' y=\'0\' width=\'4\' height=\'4\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-  pointer-events: none;
-}
+/* HERO — position depuis zone85.css, fond spécifique par secteur */
+.rando-hero { padding:120px 0 72px; background: ' . $sec_grad . '; }
 .rando-hero-cover {
   position: absolute; inset: 0;
   width: 100%; height: 100%; object-fit: cover;

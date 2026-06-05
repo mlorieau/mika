@@ -157,19 +157,8 @@ $page_styles = '<style>
   min-height: 100vh;
   background: var(--beige);
 }
-.mission-detail-hero {
-  background: linear-gradient(160deg,#0d1e2c 0%,#12314e 55%,#163756 100%);
-  padding: 60px 0 48px;
-  position: relative;
-  overflow: hidden;
-}
-.mission-detail-hero::before {
-  content: \'\';
-  position: absolute;
-  inset: 0;
-  background: url("data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' viewBox=\'0 0 40 40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.02\'%3E%3Cpath d=\'M20 20v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4z\'/%3E%3C/g%3E%3C/svg%3E");
-  pointer-events: none;
-}
+/* .mission-detail-hero — fond depuis zone85.css, padding réduit pour page détail */
+.mission-detail-hero { padding: 80px 0 56px; }
 .mission-detail-hero-inner { position: relative; z-index: 1; }
 .mission-breadcrumb {
   font-size: .75rem;

@@ -568,7 +568,7 @@ require_once 'includes/nav.php';
     <p>Bocage, Littoral ou Marais &mdash; quel territoire vous ressemble&nbsp;?</p>
     <div class="cta-btns">
       <a href="inscription.php" class="btn btn-primary btn-lg">Choisir mon clan</a>
-      <a href="zonautes.php" class="btn btn-outline-white">Voir les Zonautes</a>
+      <a href="communaute.php?tab=zonautes" class="btn btn-outline-white">Voir les Zonautes</a>
     </div>
   </div>
 </section>

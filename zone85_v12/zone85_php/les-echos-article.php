@@ -122,16 +122,8 @@ $page_styles = '<style>
    ARTICLE INDIVIDUEL — CSS
 ============================================================ */
 
-/* HERO ARTICLE */
-.article-hero {
-  padding: 100px 0 60px;
-  position: relative; overflow: hidden;
-}
-.article-hero::before {
-  content: \'\'; position: absolute; inset: 0;
-  background: url("data:image/svg+xml,%3Csvg width=\'80\' height=\'80\' viewBox=\'0 0 80 80\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.02\'%3E%3Crect x=\'0\' y=\'0\' width=\'4\' height=\'4\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-  pointer-events: none;
-}
+/* HERO ARTICLE — position depuis zone85.css, fond via inline style rubrique */
+.article-hero { padding: 120px 0 72px; }
 .article-hero-inner { position: relative; z-index: 1; }
 .article-rubrique-badge {
   display: inline-flex; align-items: center; gap: 6px;

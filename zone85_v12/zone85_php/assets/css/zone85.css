@@ -750,14 +750,18 @@ body,#navbar,.mobile-menu,.profil-card,.ev-card,.race-card,.cf-widget{
    Chaque page n'override que ce qui lui est propre. */
 .page-hero,
 .missions-hero,.clans-hero,.zonautes-hero,.hall-hero,
-.trophees-hero,.echos-hero,.randos-hero,.ktc-hero,.ev-hero{
+.trophees-hero,.echos-hero,.randos-hero,.ktc-hero,.ev-hero,
+.mission-detail-hero{
   background:linear-gradient(155deg,#060e16 0%,#0c1e2e 55%,#0e2540 100%);
   padding:120px 0 72px;
   position:relative;overflow:hidden
 }
+/* Position de base pour héros à fond dynamique */
+.article-hero,.rando-hero{position:relative;overflow:hidden}
 .page-hero::before,
 .missions-hero::before,.clans-hero::before,.zonautes-hero::before,.hall-hero::before,
-.trophees-hero::before,.echos-hero::before,.randos-hero::before,.ktc-hero::before,.ev-hero::before{
+.trophees-hero::before,.echos-hero::before,.randos-hero::before,.ktc-hero::before,.ev-hero::before,
+.mission-detail-hero::before{
   content:"";position:absolute;inset:0;pointer-events:none;
   background:radial-gradient(ellipse 70% 50% at 50% -5%,rgba(234,86,73,.08) 0%,transparent 65%)
 }

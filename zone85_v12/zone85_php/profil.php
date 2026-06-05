@@ -516,7 +516,7 @@ require_once 'includes/nav.php';
 
       <!-- Axe 3 : Score total du clan -->
       <?php $_clan_total = (int)($user['clan_score'] ?? 0); ?>
-      <div class="sidebar-axe sidebar-axe-total" onclick="location.href='classement.php'" role="button" tabindex="0" title="Voir le classement">
+      <div class="sidebar-axe sidebar-axe-total" onclick="location.href='communaute.php?tab=classement'" role="button" tabindex="0" title="Voir le classement">
         <div class="sidebar-axe-label">🏆 Score de mon clan</div>
         <div class="sidebar-axe-val sidebar-axe-val-total"><?= number_format($_clan_total, 0, ',', ' ') ?> pts</div>
         <div class="sidebar-axe-sub"><?= e($user['clan_label']) ?> — saison en cours</div>
@@ -805,7 +805,7 @@ require_once 'includes/nav.php';
           <div class="profil-card-title">🗓 Progression cette saison</div>
           <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
             <span style="font-size:1.6rem;font-weight:900;color:var(--navy-dark)"><?= number_format($_szn_xp, 0, ',', ' ') ?> <span style="font-size:.85rem;font-weight:600;color:var(--text-muted)">XP saison</span></span>
-            <a href="classement.php" style="font-size:.78rem;font-weight:700;color:var(--primary);text-decoration:none">Voir classement →</a>
+            <a href="communaute.php?tab=classement" style="font-size:.78rem;font-weight:700;color:var(--primary);text-decoration:none">Voir classement →</a>
           </div>
           <!-- Barre XP saison vers prochain niveau -->
           <div style="background:var(--beige-dark);border-radius:20px;height:10px;overflow:hidden;margin-bottom:6px">

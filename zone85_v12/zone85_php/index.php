@@ -398,7 +398,7 @@ $_avatar_url = function_exists('avatar_url') ? avatar_url($_nav_me) : '';
       <!-- Actions rapides -->
       <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0">
         <a href="profil.php"     class="idx-btn-primary" style="font-size:.84rem;padding:9px 18px">Mon Profil →</a>
-        <a href="classement.php" class="idx-btn-secondary" style="font-size:.84rem;padding:9px 18px">🏆 Classement</a>
+        <a href="communaute.php?tab=classement" class="idx-btn-secondary" style="font-size:.84rem;padding:9px 18px">🏆 Classement</a>
       </div>
 
     </div>
@@ -497,7 +497,7 @@ $_avatar_url = function_exists('avatar_url') ? avatar_url($_nav_me) : '';
           </div>
           <?php endforeach; ?>
         </div>
-        <a href="classement.php" style="display:inline-flex;align-items:center;gap:6px;margin-top:14px;color:rgba(255,255,255,.5);font-size:.8rem;font-weight:700;text-decoration:none">
+        <a href="communaute.php?tab=classement" style="display:inline-flex;align-items:center;gap:6px;margin-top:14px;color:rgba(255,255,255,.5);font-size:.8rem;font-weight:700;text-decoration:none">
           🏆 Classement complet des Zonautes →
         </a>
       </div>
