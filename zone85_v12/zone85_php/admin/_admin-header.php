@@ -254,6 +254,7 @@ $_adm_css   = $_adm_base . '/assets/css/zone85.css';
     $adm_sections = [
       'CONTENUS' => [
         ['echos.php',         'echos',         '📰 Échos'],
+        ['meteo.php',         'meteo',         '🌦️ Météo'],
         ['randos.php',        'randos',         '🥾 Randos'],
         ['ktc-episodes.php',  'ktc-episodes',  '🥐 KTC'],
         ['missions.php',      'missions',      '🎯 Missions'],
@@ -268,6 +269,7 @@ $_adm_css   = $_adm_base . '/assets/css/zone85.css';
       ],
       'SYSTÈME' => [
         ['events.php',  'events',  '⚡ Flash'],
+        ['media.php',   'media',   '🗂️ Médias'],
         ['settings.php','settings','⚙️ Paramètres'],
       ],
     ];
