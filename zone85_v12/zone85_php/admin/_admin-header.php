@@ -11,6 +11,7 @@ $_adm_nav = [
     ['dashboard.php', 'dashboard', '⊞', 'Dashboard'],
   ],
   'CONTENUS' => [
+    ['pages.php',              'pages',              '📄', 'Pages CMS'],
     ['echos.php',              'echos',              '📰', 'Échos'],
     ['meteo.php',              'meteo',              '🌦️', 'Météo'],
     ['randos.php',             'randos',             '🥾', 'Randos'],
