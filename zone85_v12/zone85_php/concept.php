@@ -218,7 +218,7 @@ require_once 'includes/nav.php';
         </div>
         <div class="cp-pillar-body">
           <p class="cp-pillar-desc">Un livre téléchargeable réservé aux membres de Zone85. Une histoire vendéenne — personnages, territoire, mémoire. Votre première récompense pour avoir rejoint la Zone.</p>
-          <a href="profil.php" class="cp-pillar-link">Télécharger VICTOR →</a>
+          <a href="victor.php" class="cp-pillar-link">Accéder à VICTOR →</a>
         </div>
       </div>
 
@@ -248,8 +248,8 @@ require_once 'includes/nav.php';
       <div class="cp-victor-text">
         <div class="cp-eyebrow" style="color:#d4a43a">Réservé aux membres</div>
         <h3>VICTOR, le livre de la Zone</h3>
-        <p>Un livre à télécharger librement — pour ceux qui ont rejoint la Zone. C'est votre première récompense, et un avant-goût de ce que Zone85 produit quand le jeu devient récit.</p>
-        <a href="inscription.php" class="cp-victor-cta">Rejoindre pour télécharger →</a>
+        <p>Un PDF réservé aux membres de Zone85. L'inscription déverrouille le téléchargement — chaque accès est comptabilisé pour suivre l'audience. Un avant-goût de ce que Zone85 produit quand le jeu devient récit.</p>
+        <a href="victor.php" class="cp-victor-cta">Accéder à VICTOR →</a>
       </div>
       <div class="cp-victor-visual">📖</div>
     </div>
@@ -407,7 +407,7 @@ require_once 'includes/nav.php';
       <?php
       $faqs = [
           ['q'=>"C'est quoi VICTOR ?",
-           'a'=>"VICTOR est un livre téléchargeable réservé aux membres de Zone85. Une histoire vendéenne — personnages, territoire, mémoire. En rejoignant la Zone, tu le reçois gratuitement. C'est aussi un avant-goût de ce que Zone85 produit au-delà du jeu."],
+           'a'=>"VICTOR est un livre PDF réservé aux membres de Zone85. Une histoire vendéenne — personnages, territoire, mémoire. L'inscription déverrouille le téléchargement. C'est aussi un avant-goût de ce que Zone85 produit au-delà du jeu."],
           ['q'=>"C'est quoi Les Invisibles ?",
            'a'=>"Les Invisibles est le prochain jeu immersif de Zone85. Une enquête ancrée dans la Vendée réelle — des lieux, des indices, des personnages à découvrir sur le terrain. Plus d'infos bientôt pour les membres."],
           ['q'=>"C'est quoi Les Échos de la Zone ?",
@@ -445,8 +445,8 @@ require_once 'includes/nav.php';
   <div class="container">
     <div style="display:grid;grid-template-columns:1fr auto;gap:48px;align-items:center;position:relative;z-index:1">
       <div>
-        <h2 style="font-size:clamp(1.6rem,3vw,2.2rem);font-weight:900;color:#fff;margin-bottom:10px;letter-spacing:-.5px">Rejoins Zone85 — et reçois VICTOR.</h2>
-        <p style="color:rgba(255,255,255,.78);font-size:.93rem;line-height:1.65;max-width:500px">Choisis ton clan, commence à contribuer, télécharge VICTOR. La Vendée t'attend — avec ses chemins, ses histoires et ses mystères.</p>
+        <h2 style="font-size:clamp(1.6rem,3vw,2.2rem);font-weight:900;color:#fff;margin-bottom:10px;letter-spacing:-.5px">Rejoins Zone85 — et déverrouille VICTOR.</h2>
+        <p style="color:rgba(255,255,255,.78);font-size:.93rem;line-height:1.65;max-width:500px">Choisis ton clan, commence à contribuer, télécharge VICTOR en PDF. La Vendée t'attend — avec ses chemins, ses histoires et ses mystères.</p>
       </div>
       <div style="flex-shrink:0">
         <a href="<?= page_url('inscription') ?>" class="btn-white">Rejoindre la Zone →</a>

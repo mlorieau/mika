@@ -324,8 +324,8 @@ $_is_guest = empty($_nav_me);
           </div>
         </div>
         <div class="idx-pillar-body">
-          VICTOR est le livre offert à tous les membres de Zone85. Une œuvre vendéenne, en téléchargement libre, réservée à la communauté.
-          <a href="inscription.php" class="idx-pillar-link" style="color:#b8860b">Rejoindre pour recevoir VICTOR →</a>
+          Un livre PDF vendéen, réservé aux membres. L'inscription déverrouille le téléchargement — et chaque téléchargement compte.
+          <a href="victor.php" class="idx-pillar-link" style="color:#b8860b">Accéder à VICTOR →</a>
         </div>
       </div>
 
@@ -372,12 +372,12 @@ $_is_guest = empty($_nav_me);
   <div class="container">
     <div class="idx-victor">
       <div class="idx-victor-content">
-        <span class="idx-victor-tag">📖 Offert à l'inscription</span>
+        <span class="idx-victor-tag">📖 Réservé aux membres · PDF gratuit</span>
         <h2 class="idx-victor-title">VICTOR</h2>
         <p class="idx-victor-desc">
-          VICTOR est l'œuvre littéraire de Zone85 — une plongée dans l'âme secrète de la Vendée. Réservée aux membres, elle est offerte gratuitement à chaque inscription. Pas de boutique. Pas d'achat. Juste la Zone.
+          VICTOR est l'œuvre littéraire de Zone85 — une plongée dans l'âme secrète de la Vendée. Réservé aux membres, le PDF est disponible en téléchargement dès ton inscription. Pas de boutique. Pas d'achat. Juste la Zone.
         </p>
-        <a href="inscription.php" class="idx-victor-cta">Rejoindre et recevoir VICTOR →</a>
+        <a href="victor.php" class="idx-victor-cta">Rejoindre et accéder à VICTOR →</a>
       </div>
       <div class="idx-victor-visual">📖</div>
     </div>
@@ -487,7 +487,7 @@ $_is_guest = empty($_nav_me);
     </div>
     <?php endif; ?>
     <h2 class="page-cta-title">Rejoins Zone85.</h2>
-    <p class="page-cta-sub">Gratuit. Vendéen. Pour toujours.<br>Et tu reçois <strong style="color:#d4af37">VICTOR</strong> dès l'inscription.</p>
+    <p class="page-cta-sub">Gratuit. Vendéen. Pour toujours.<br>Et ton compte déverrouille <strong style="color:#d4af37">VICTOR</strong> en PDF.</p>
     <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
       <a href="inscription.php" class="idx-btn-primary" style="font-size:1.05rem;padding:16px 36px">Créer mon compte →</a>
       <a href="concept.php"     class="idx-btn-secondary" style="font-size:1rem;padding:16px 28px">Le concept</a>
