@@ -25,7 +25,7 @@ require_once 'includes/functions.php';
 require_once 'includes/db.php';
 
 // ── État connexion ─────────────────────────────────────────────
-$is_logged_in = !empty($_SESSION['user_id']) || !empty($_SESSION['pseudo']);
+$is_logged_in = !empty($_SESSION['user']['id']);
 
 // ── Rubriques définitives ──────────────────────────────────────
 $rubriques_valides = ['les-invisibles','deux-minutes','les-ovnis','actualite','chemins','evenements'];
@@ -157,14 +157,14 @@ if (db_enabled()) {
 
 // ── Articles lus par l'utilisateur connecté ───────────────────
 $read_ids = [];
-if ($is_logged_in && !empty($_SESSION['user_id']) && db_enabled()) {
+if ($is_logged_in && db_enabled()) {
     $pdo_r = db();
     if ($pdo_r) {
         try {
             $stmt_r = $pdo_r->prepare(
                 'SELECT article_id FROM article_reads WHERE user_id = :u'
             );
-            $stmt_r->execute([':u' => (int)$_SESSION['user_id']]);
+            $stmt_r->execute([':u' => (int)$_SESSION['user']['id']]);
             $read_ids = array_map('intval', array_column(
                 $stmt_r->fetchAll(PDO::FETCH_ASSOC), 'article_id'
             ));

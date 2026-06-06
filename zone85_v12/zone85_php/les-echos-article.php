@@ -87,8 +87,8 @@ if (!empty($article['published_at'])) {
 }
 
 // ── Auth ──────────────────────────────────────────────────────
-$is_logged_in = !empty($_SESSION['user_id']) || !empty($_SESSION['pseudo']);
-$user_id      = (int)($_SESSION['user_id'] ?? 0);
+$is_logged_in = !empty($_SESSION['user']['id']);
+$user_id      = (int)($_SESSION['user']['id'] ?? 0);
 $base_url     = defined('BASE_URL') ? rtrim(BASE_URL, '/') : '';
 
 // ── Galerie ───────────────────────────────────────────────────
@@ -376,15 +376,29 @@ $page_styles = '<style>
 }
 .ac-submit:hover { opacity:.88; }
 .ac-xp-badge {
-  display:inline-block; background:#fef3c7; color:#92400e;
-  font-size:.72rem; font-weight:800; padding:3px 10px; border-radius:20px;
+  display:inline-flex; align-items:center; gap:4px;
+  background:#fef3c7; color:#92400e;
+  font-size:.72rem; font-weight:800; padding:4px 12px; border-radius:20px;
+  border:1px solid #f6d860;
 }
+.ac-form-intro {
+  font-size:.85rem; color:#6b7f96; line-height:1.6;
+  margin-bottom:16px; padding:10px 14px;
+  background:#f7f9fc; border-left:3px solid #C9962A; border-radius:0 8px 8px 0;
+}
+.ac-form-intro strong { color:#0c1e2e; }
 
 .ac-login-prompt {
-  background:#fff; border-radius:12px; padding:24px;
+  background:#fff; border-radius:12px; padding:28px 24px;
   text-align:center; border:1.5px dashed #d6dde6; margin-bottom:32px;
 }
-.ac-login-prompt p { font-size:.9rem; color:#6b7f96; margin-bottom:14px; }
+.ac-login-prompt .ac-lp-xp {
+  display:inline-flex; align-items:center; gap:6px;
+  background:#fef3c7; color:#92400e; font-size:.8rem; font-weight:800;
+  padding:5px 14px; border-radius:20px; border:1px solid #f6d860;
+  margin-bottom:12px;
+}
+.ac-login-prompt p { font-size:.9rem; color:#6b7f96; margin-bottom:16px; }
 .ac-login-link {
   display:inline-flex; align-items:center; gap:6px;
   background:#0c1e2e; color:#fff; padding:10px 20px;
@@ -661,6 +675,11 @@ require_once 'includes/nav.php';
     <?php if ($is_logged_in): ?>
     <!-- Formulaire commentaire -->
     <div class="ac-form">
+      <p class="ac-form-intro">
+        💬 Réagis à cet article — ton premier commentaire sur cet écho
+        te rapporte <strong>+5 XP</strong> !
+        Les points d'expérience font progresser ton rang dans la Zone85.
+      </p>
       <label class="ac-form-label" for="comment_body">Ton commentaire</label>
       <form method="post" action="les-echos-article.php?slug=<?= urlencode($article['slug'] ?? '') ?>#commentaires">
         <?= csrf_field() ?>
@@ -670,7 +689,7 @@ require_once 'includes/nav.php';
         <div class="ac-form-footer">
           <span class="ac-counter" id="comment_counter">0 / 1000</span>
           <div style="display:flex;align-items:center;gap:12px">
-            <span class="ac-xp-badge">+5 XP premier commentaire</span>
+            <span class="ac-xp-badge">&#x2B50; +5 XP premier commentaire</span>
             <button type="submit" class="ac-submit">Publier →</button>
           </div>
         </div>
@@ -678,7 +697,9 @@ require_once 'includes/nav.php';
     </div>
     <?php else: ?>
     <div class="ac-login-prompt">
-      <p>Connecte-toi pour commenter cet article et gagner des points d'expérience.</p>
+      <div class="ac-lp-xp">&#x2B50; +5 XP pour commenter</div>
+      <p>Connecte-toi pour laisser un commentaire et gagner des<br>
+         <strong>points d'expérience</strong> qui font progresser ton rang dans la Zone85 !</p>
       <a href="login.php?redirect=<?= urlencode('les-echos-article.php?slug='.($article['slug']??'')) ?>#commentaires"
          class="ac-login-link">
         🔑 Se connecter
