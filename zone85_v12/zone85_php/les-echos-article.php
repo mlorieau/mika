@@ -53,28 +53,39 @@ $current_page     = 'les-echos';
 
 // ── Données de rubrique ────────────────────────────────────────
 $rubrique_labels = [
-    'ovnis'        => 'OVNIS Zone85',
-    'deux-minutes' => "T'as deux minutes\xc2\xa0?",
-    'chez-nous'    => "Chez nous on ne dit pas\xe2\x80\xa6",
-    'chemins'      => 'Sur les chemins',
-    'communaute'   => 'Communaut\xc3\xa9',
-    'archives'     => 'Archives',
+    'les-invisibles' => 'Les Invisibles',
+    'deux-minutes'   => "T'as deux minutes\xc2\xa0?",
+    'les-ovnis'      => 'Les OVNIS de la Zone85',
+    'actualite'      => 'Actualité',
+    'chemins'        => 'Sur les Chemins',
+    'evenements'     => 'Événements',
+    // anciens slugs (rétrocompatibilité données existantes)
+    'ovnis'      => 'Les OVNIS de la Zone85',
+    'chez-nous'  => 'Les Invisibles',
+    'communaute' => 'Actualité',
+    'archives'   => 'Actualité',
 ];
 $rubrique_colors = [
-    'ovnis'        => '#ea5649',
-    'deux-minutes' => '#12314e',
-    'chez-nous'    => '#2a9d5c',
-    'chemins'      => '#b8831a',
-    'communaute'   => '#9b59b6',
-    'archives'     => '#6b7f96',
+    'les-invisibles' => '#ea5649',
+    'deux-minutes'   => '#12314e',
+    'les-ovnis'      => '#1a7adc',
+    'actualite'      => '#2a9d5c',
+    'chemins'        => '#b8831a',
+    'evenements'     => '#9b59b6',
+    'ovnis'      => '#1a7adc', 'chez-nous' => '#ea5649',
+    'communaute' => '#2a9d5c', 'archives'  => '#6b7f96',
 ];
 $rubrique_gradients = [
-    'ovnis'        => 'linear-gradient(135deg, #ea5649 0%, #12314e 100%)',
-    'deux-minutes' => 'linear-gradient(135deg, #C9962A 0%, #12314e 100%)',
-    'chez-nous'    => 'linear-gradient(135deg, #2a9d5c 0%, #163756 100%)',
-    'chemins'      => 'linear-gradient(135deg, #b8831a 0%, #12314e 100%)',
-    'communaute'   => 'linear-gradient(135deg, #9b59b6 0%, #12314e 100%)',
-    'archives'     => 'linear-gradient(135deg, #6b7f96 0%, #333 100%)',
+    'les-invisibles' => 'linear-gradient(135deg, #ea5649 0%, #12314e 100%)',
+    'deux-minutes'   => 'linear-gradient(135deg, #c9962a 0%, #12314e 100%)',
+    'les-ovnis'      => 'linear-gradient(135deg, #1a7adc 0%, #0c1e2e 100%)',
+    'actualite'      => 'linear-gradient(135deg, #2a9d5c 0%, #163756 100%)',
+    'chemins'        => 'linear-gradient(135deg, #b8831a 0%, #12314e 100%)',
+    'evenements'     => 'linear-gradient(135deg, #9b59b6 0%, #12314e 100%)',
+    'ovnis'      => 'linear-gradient(135deg, #1a7adc 0%, #0c1e2e 100%)',
+    'chez-nous'  => 'linear-gradient(135deg, #ea5649 0%, #12314e 100%)',
+    'communaute' => 'linear-gradient(135deg, #2a9d5c 0%, #163756 100%)',
+    'archives'   => 'linear-gradient(135deg, #6b7f96 0%, #333 100%)',
 ];
 
 $rub        = $article['rubrique'] ?? 'ovnis';
@@ -268,17 +279,39 @@ $page_styles = '<style>
 }
 .article-cta-btn:hover { opacity: .88; }
 
+/* GALERIE */
+.article-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+  margin: 28px 0;
+}
+.article-gallery a { display: block; border-radius: 8px; overflow: hidden; }
+.article-gallery img {
+  width: 100%; height: 140px;
+  object-fit: cover; display: block;
+  transition: transform .2s, opacity .2s;
+}
+.article-gallery a:hover img { transform: scale(1.04); opacity: .9; }
+
+/* VIDÉO YOUTUBE */
+.article-video-wrap {
+  position: relative; aspect-ratio: 16/9;
+  margin: 28px 0; border-radius: 12px; overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,.15);
+}
+.article-video-wrap iframe { width: 100%; height: 100%; border: none; }
+
 /* RESPONSIVE */
 @media (max-width: 960px) {
-  .article-layout-inner {
-    grid-template-columns: 1fr;
-  }
+  .article-layout-inner { grid-template-columns: 1fr; }
   .article-body-inner { padding: 24px; }
 }
 @media (max-width: 600px) {
   .article-hero { padding: 80px 0 44px; }
   .article-hero h1 { font-size: 1.7rem; }
   .article-layout { padding: 32px 0 52px; }
+  .article-gallery { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
 }
 </style>';
 
@@ -362,15 +395,45 @@ require_once 'includes/nav.php';
           <div class="article-body-content">
             <?php
               $body = $article['body'] ?? '';
-              // Si le body ne contient pas de balises HTML, on applique nl2br
               if ($body !== '' && strip_tags($body) === $body) {
                   echo nl2br(htmlspecialchars($body, ENT_QUOTES, 'UTF-8'));
               } else {
-                  // Body HTML stocké en base — on fait confiance à l'admin
                   echo $body;
               }
             ?>
           </div>
+
+          <?php
+          // ── Galerie photo ────────────────────────────────
+          $gallery_imgs = json_decode($article['gallery'] ?? '[]', true);
+          if (is_array($gallery_imgs) && count($gallery_imgs) > 0):
+              $base = defined('BASE_URL') ? rtrim(BASE_URL, '/') : '';
+          ?>
+          <div class="article-gallery">
+            <?php foreach ($gallery_imgs as $img):
+                $img_src = htmlspecialchars($img, ENT_QUOTES, 'UTF-8');
+                $img_url = (strpos($img, 'http') === 0) ? $img_src : $base . '/' . $img_src;
+            ?>
+              <a href="<?= $img_url ?>" target="_blank" rel="noopener">
+                <img src="<?= $img_url ?>" alt="Photo" loading="lazy">
+              </a>
+            <?php endforeach; ?>
+          </div>
+          <?php endif; ?>
+
+          <?php
+          // ── Vidéo YouTube ────────────────────────────────
+          $video_url = $article['video_url'] ?? '';
+          if ($video_url) {
+              preg_match('/(?:v=|youtu\.be\/|embed\/)([a-zA-Z0-9_\-]{11})/', $video_url, $yt_m);
+              if (!empty($yt_m[1])):
+          ?>
+          <div class="article-video-wrap">
+            <iframe src="https://www.youtube.com/embed/<?= e($yt_m[1]) ?>"
+                    allowfullscreen loading="lazy"
+                    title="Vidéo <?= e($article['title']) ?>"></iframe>
+          </div>
+          <?php endif; } ?>
 
           <!-- Pied d'article -->
           <div style="

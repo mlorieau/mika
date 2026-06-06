@@ -27,39 +27,39 @@ require_once 'includes/db.php';
 // ── État connexion ─────────────────────────────────────────────
 $is_logged_in = !empty($_SESSION['user_id']) || !empty($_SESSION['pseudo']);
 
-// ── Rubriques ──────────────────────────────────────────────────
-$rubriques_valides = ['ovnis', 'deux-minutes', 'chez-nous', 'chemins', 'communaute', 'archives'];
+// ── Rubriques définitives ──────────────────────────────────────
+$rubriques_valides = ['les-invisibles','deux-minutes','les-ovnis','actualite','chemins','evenements'];
 $rubrique_labels   = [
-    'ovnis'        => 'OVNIS Zone85',
-    'deux-minutes' => "T'as deux minutes\xc2\xa0?",
-    'chez-nous'    => "Chez nous on ne dit pas\xe2\x80\xa6",
-    'chemins'      => 'Sur les chemins',
-    'communaute'   => 'Communaut\xc3\xa9',
-    'archives'     => 'Archives',
+    'les-invisibles' => 'Les Invisibles',
+    'deux-minutes'   => "T'as deux minutes\xc2\xa0?",
+    'les-ovnis'      => 'Les OVNIS de la Zone85',
+    'actualite'      => 'Actualité',
+    'chemins'        => 'Sur les Chemins',
+    'evenements'     => 'Événements',
 ];
 $rubrique_colors   = [
-    'ovnis'        => '#ea5649',
-    'deux-minutes' => '#12314e',
-    'chez-nous'    => '#2a9d5c',
-    'chemins'      => '#b8831a',
-    'communaute'   => '#9b59b6',
-    'archives'     => '#6b7f96',
+    'les-invisibles' => '#ea5649',
+    'deux-minutes'   => '#12314e',
+    'les-ovnis'      => '#1a7adc',
+    'actualite'      => '#2a9d5c',
+    'chemins'        => '#b8831a',
+    'evenements'     => '#9b59b6',
 ];
 $rubrique_gradients = [
-    'ovnis'        => 'linear-gradient(135deg, #ea5649 0%, #12314e 100%)',
-    'deux-minutes' => 'linear-gradient(135deg, #C9962A 0%, #12314e 100%)',
-    'chez-nous'    => 'linear-gradient(135deg, #2a9d5c 0%, #163756 100%)',
-    'chemins'      => 'linear-gradient(135deg, #b8831a 0%, #12314e 100%)',
-    'communaute'   => 'linear-gradient(135deg, #9b59b6 0%, #12314e 100%)',
-    'archives'     => 'linear-gradient(135deg, #6b7f96 0%, #333 100%)',
+    'les-invisibles' => 'linear-gradient(135deg, #ea5649 0%, #12314e 100%)',
+    'deux-minutes'   => 'linear-gradient(135deg, #c9962a 0%, #12314e 100%)',
+    'les-ovnis'      => 'linear-gradient(135deg, #1a7adc 0%, #0c1e2e 100%)',
+    'actualite'      => 'linear-gradient(135deg, #2a9d5c 0%, #163756 100%)',
+    'chemins'        => 'linear-gradient(135deg, #b8831a 0%, #12314e 100%)',
+    'evenements'     => 'linear-gradient(135deg, #9b59b6 0%, #12314e 100%)',
 ];
 $rubrique_emojis = [
-    'ovnis'        => '&#x1F6F8;',
-    'deux-minutes' => '&#x23F1;',
-    'chez-nous'    => '&#x1F5E3;',
-    'chemins'      => '&#x1F97E;',
-    'communaute'   => '&#x1F465;',
-    'archives'     => '&#x1F4DC;',
+    'les-invisibles' => '&#x1F441;',
+    'deux-minutes'   => '&#x23F1;',
+    'les-ovnis'      => '&#x1F6F8;',
+    'actualite'      => '&#x1F4F0;',
+    'chemins'        => '&#x1F97E;',
+    'evenements'     => '&#x26A1;',
 ];
 
 // ── Rubrique active ────────────────────────────────────────────
@@ -73,7 +73,7 @@ $_articles_statiques = [
     [
         'id'          => 0,
         'slug'        => '',
-        'rubrique'    => 'ovnis',
+        'rubrique'    => 'les-ovnis',
         'title'       => 'La mogette : objet de tous les mystères',
         'excerpt'     => "La mogette vendéenne n'est pas qu'un haricot. C'est un symbole, une identité, un jeu de piste que la Zone se propose de décrypter mission après mission.",
         'author_name' => 'Équipe Zone85',
@@ -103,9 +103,9 @@ $_articles_statiques = [
     [
         'id'          => 0,
         'slug'        => '',
-        'rubrique'    => 'chez-nous',
-        'title'       => 'Chez nous on ne dit pas "dépêchons-nous"',
-        'excerpt'     => '"On va pas se faire prier" — le vendéen a ses propres formules pour exprimer l\'urgence, le refus, la surprise.',
+        'rubrique'    => 'les-invisibles',
+        'title'       => 'Les visages qu\'on ne voit pas',
+        'excerpt'     => 'Dans la Zone85, certains membres construisent en silence. Portraits de ceux qui avancent dans l\'ombre et font la force du territoire.',
         'author_name' => 'Équipe Zone85',
         'published_at'=> null,
         'cover_image' => null,
@@ -113,7 +113,7 @@ $_articles_statiques = [
     [
         'id'          => 0,
         'slug'        => '',
-        'rubrique'    => 'communaute',
+        'rubrique'    => 'actualite',
         'title'       => 'Les premiers clans prennent position',
         'excerpt'     => 'Bocage, Littoral, Marais : les trois territoires de la Zone se préparent. Qui seront les premiers à planter leur drapeau ?',
         'author_name' => 'Équipe Zone85',
@@ -123,7 +123,7 @@ $_articles_statiques = [
     [
         'id'          => 0,
         'slug'        => '',
-        'rubrique'    => 'archives',
+        'rubrique'    => 'evenements',
         'title'       => 'Bilan de la saison zéro : les bases sont posées',
         'excerpt'     => "Avant le grand lancement, une saison de préparation. Retour sur les tests et les surprises qui ont façonné la Zone.",
         'author_name' => 'Équipe Zone85',
