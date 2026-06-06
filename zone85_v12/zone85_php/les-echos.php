@@ -155,6 +155,25 @@ if (db_enabled()) {
     }
 }
 
+// ── Articles lus par l'utilisateur connecté ───────────────────
+$read_ids = [];
+if ($is_logged_in && !empty($_SESSION['user_id']) && db_enabled()) {
+    $pdo_r = db();
+    if ($pdo_r) {
+        try {
+            $stmt_r = $pdo_r->prepare(
+                'SELECT article_id FROM article_reads WHERE user_id = :u'
+            );
+            $stmt_r->execute([':u' => (int)$_SESSION['user_id']]);
+            $read_ids = array_map('intval', array_column(
+                $stmt_r->fetchAll(PDO::FETCH_ASSOC), 'article_id'
+            ));
+        } catch (PDOException $e) {
+            // Table absente — badge ignoré silencieusement
+        }
+    }
+}
+
 // Fallback si DB vide
 if (empty($articles_db)) {
     if ($rubrique_active !== 'all') {
@@ -351,6 +370,16 @@ $page_styles = '<style>
 .echos-note-text a { color: var(--primary, #ea5649); font-weight: 700; text-decoration: none; }
 .echos-note-text a:hover { text-decoration: underline; }
 
+/* BADGE "DÉJÀ LU" */
+.echos-card-read {
+  position: absolute; top: 14px; right: 14px; z-index: 2;
+  font-size: .62rem; font-weight: 900;
+  letter-spacing: .06em; text-transform: uppercase;
+  color: #fff; background: rgba(42,157,92,.9);
+  border-radius: 20px; padding: 4px 10px;
+  backdrop-filter: blur(4px);
+}
+
 /* RESPONSIVE */
 @media (max-width: 900px) {
   .echos-grid { grid-template-columns: repeat(2, 1fr); }
@@ -464,6 +493,9 @@ require_once 'includes/nav.php';
               <span class="echos-card-rubrique-badge">
                 <?= htmlspecialchars($label, ENT_QUOTES, 'UTF-8') ?>
               </span>
+              <?php if (!empty($art['id']) && in_array((int)$art['id'], $read_ids, true)): ?>
+                <span class="echos-card-read">&#x2713; Lu</span>
+              <?php endif; ?>
             </div>
             <div class="echos-card-body">
               <h3 class="echos-card-title">
