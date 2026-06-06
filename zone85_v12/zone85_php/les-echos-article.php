@@ -86,6 +86,9 @@ if (!empty($article['published_at'])) {
     }
 }
 
+// ── Temps de lecture estimé ───────────────────────────────────
+$read_time = max(1, (int)round(str_word_count(strip_tags($article['body'] ?? '')) / 200));
+
 // ── Auth ──────────────────────────────────────────────────────
 $is_logged_in = !empty($_SESSION['user']['id']);
 $user_id      = (int)($_SESSION['user']['id'] ?? 0);
@@ -217,6 +220,14 @@ $comment_count = count($comments);
 $share_url   = $base_url . '/les-echos-article.php?slug=' . urlencode($article['slug'] ?? '');
 $share_title = htmlspecialchars($article['title'], ENT_QUOTES, 'UTF-8');
 
+// ── Style hero (cover image ou dégradé rubrique) ─────────────
+if (!empty($article['cover_image'])) {
+    $cover_esc  = htmlspecialchars($article['cover_image'], ENT_QUOTES, 'UTF-8');
+    $hero_style = 'background-image:linear-gradient(to bottom,rgba(12,30,46,.5) 0%,rgba(12,30,46,.82) 100%),url(' . $cover_esc . ');background-size:cover;background-position:center top;';
+} else {
+    $hero_style = 'background:' . $rub_grad . ';';
+}
+
 // ── Méta SEO ─────────────────────────────────────────────────
 $page_title       = $article['title'] . ' — Les Échos Zone85';
 $page_description = $article['excerpt'] ?? '';
@@ -227,7 +238,7 @@ $current_page     = 'les-echos';
 
 // ── Styles ────────────────────────────────────────────────────
 $page_styles = '<style>
-.article-hero { padding: 120px 0 72px; }
+.article-hero { padding: 120px 0 72px; background-color: #0c1e2e; }
 .article-hero-inner { position: relative; z-index: 1; }
 .article-rubrique-badge {
   display: inline-flex; align-items: center; gap: 6px;
@@ -292,6 +303,7 @@ $page_styles = '<style>
 .article-video-wrap iframe { width:100%; height:100%; border:none; }
 
 /* SIDEBAR */
+.article-sidebar { position: sticky; top: 24px; }
 .article-sidebar-card {
   background:#fff; border-radius:14px;
   box-shadow:0 2px 10px rgba(0,0,0,.06);
@@ -472,7 +484,7 @@ require_once 'includes/nav.php';
 ?>
 
 <!-- ── HERO ─────────────────────────────────────────────────── -->
-<section class="article-hero" style="background:<?= $rub_grad ?>">
+<section class="article-hero" style="<?= $hero_style ?>">
   <div class="container article-hero-inner">
     <span class="article-rubrique-badge" style="background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.2)">
       <?= e($rub_label) ?>
@@ -485,6 +497,7 @@ require_once 'includes/nav.php';
       <?php if ($date_fmt): ?>
         <span>📅 <?= $date_fmt ?></span>
       <?php endif; ?>
+      <span>⏱ <?= $read_time ?> min de lecture</span>
       <?php if ($comment_count > 0): ?>
         <span>💬 <?= $comment_count ?> commentaire<?= $comment_count > 1 ? 's' : '' ?></span>
       <?php endif; ?>
@@ -527,13 +540,6 @@ require_once 'includes/nav.php';
 
       <!-- Corps principal -->
       <div class="article-body-wrap">
-        <?php if (!empty($article['cover_image'])): ?>
-          <img class="article-cover"
-               src="<?= e($article['cover_image']) ?>"
-               alt="<?= e($article['title']) ?>"
-               loading="lazy">
-        <?php endif; ?>
-
         <div class="article-body-inner">
           <!-- Contenu — l'accroche n'est pas répétée ici -->
           <div class="article-body-content">
@@ -563,7 +569,13 @@ require_once 'includes/nav.php';
               <?php if ($date_fmt): ?> &mdash; <?= $date_fmt ?><?php endif; ?>
             </div>
             <a href="#commentaires" style="font-size:.82rem;font-weight:700;color:#ea5649;text-decoration:none">
-              💬 <?= $comment_count ?> commentaire<?= $comment_count !== 1 ? 's' : '' ?> →
+              💬 <?php if ($comment_count > 0): ?>
+                <?= $comment_count ?> commentaire<?= $comment_count > 1 ? 's' : '' ?> →
+              <?php elseif ($is_logged_in): ?>
+                Sois le premier à réagir →
+              <?php else: ?>
+                Laisser un commentaire →
+              <?php endif; ?>
             </a>
           </div>
         </div>
