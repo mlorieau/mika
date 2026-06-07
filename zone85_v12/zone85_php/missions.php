@@ -164,6 +164,24 @@ $page_styles = '<style>
 
 /* HERO — fond/padding depuis zone85.css (.missions-hero) */
 .missions-hero-inner { position: relative; z-index: 1; }
+.mh-split { display: grid; grid-template-columns: 1fr 360px; gap: 56px; align-items: center; position: relative; z-index: 1; }
+@media(max-width:900px){ .mh-split { grid-template-columns: 1fr; } .mh-visual { display: none; } }
+.mh-visual-card {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 20px;
+  padding: 28px 26px;
+  backdrop-filter: blur(8px);
+}
+.mh-visual-card-title {
+  font-size: .62rem; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .14em; color: rgba(255,255,255,.4); margin-bottom: 16px;
+}
+.mh-stat { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.07); }
+.mh-stat:last-child { border-bottom: none; padding-bottom: 0; }
+.mh-stat-icon { font-size: 1.1rem; width: 28px; text-align: center; flex-shrink: 0; }
+.mh-stat-label { font-size: .78rem; color: rgba(255,255,255,.45); font-weight: 600; }
+.mh-stat-val { font-size: .92rem; font-weight: 900; color: #fff; margin-top: 1px; }
 .missions-hero .hero-eyebrow {
   display: inline-block;
   font-size: .7rem;
@@ -802,14 +820,71 @@ require_once 'includes/nav.php';
 <!-- HERO -->
 <section class="missions-hero">
   <div class="container missions-hero-inner">
-    <?php if (!empty($active_season)): ?>
-    <span class="hero-eyebrow"><?= e($active_season['title']) ?> · Saison en cours</span>
-    <?php endif; ?>
-    <h1>Missions &amp; Actions</h1>
-    <p class="hero-phrase">Je progresse pour moi. Je fais gagner mon clan.</p>
-    <div class="hero-mode-pills">
-      <span class="mode-pill mode-pill-perso">⚡ Mode Personnel — XP à vie</span>
-      <span class="mode-pill mode-pill-collectif">🛡️ Mode Collectif — Score de saison</span>
+    <div class="mh-split">
+
+      <!-- Colonne texte -->
+      <div class="mh-text">
+        <?php if (!empty($active_season)): ?>
+        <span class="hero-eyebrow"><?= e($active_season['title']) ?> · Saison en cours</span>
+        <?php endif; ?>
+        <h1>Missions &amp; Actions</h1>
+        <p class="hero-phrase">Je progresse pour moi. Je fais gagner mon clan.</p>
+        <div class="hero-mode-pills">
+          <span class="mode-pill mode-pill-perso">⚡ Mode Personnel — XP à vie</span>
+          <span class="mode-pill mode-pill-collectif">🛡️ Mode Collectif — Score de saison</span>
+        </div>
+      </div>
+
+      <!-- Colonne visuelle : carte saison -->
+      <div class="mh-visual">
+        <div class="mh-visual-card">
+          <div class="mh-visual-card-title">🗓️ Cette saison</div>
+          <?php
+          $mh_mission_count = count($missions_list ?? []);
+          $mh_xp_total = array_sum(array_map(fn($m)=>(int)($m['xp_participation']??0)+(int)($m['xp_success']??0), $missions_list ?? []));
+          $mh_days = 0;
+          if (!empty($active_season['end_date'])) {
+              $mh_days = max(0, (int)ceil((strtotime($active_season['end_date']) - time()) / 86400));
+          }
+          $mh_season_label = $active_season['title'] ?? 'Saison en cours';
+          ?>
+          <div class="mh-stat">
+            <div class="mh-stat-icon">🎯</div>
+            <div>
+              <div class="mh-stat-label">Missions disponibles</div>
+              <div class="mh-stat-val"><?= $mh_mission_count ?> mission<?= $mh_mission_count > 1 ? 's' : '' ?></div>
+            </div>
+          </div>
+          <?php if ($mh_xp_total > 0): ?>
+          <div class="mh-stat">
+            <div class="mh-stat-icon">⚡</div>
+            <div>
+              <div class="mh-stat-label">XP max disponibles</div>
+              <div class="mh-stat-val">+<?= number_format($mh_xp_total) ?> XP</div>
+            </div>
+          </div>
+          <?php endif; ?>
+          <?php if ($grand_defi): ?>
+          <div class="mh-stat">
+            <div class="mh-stat-icon">🏆</div>
+            <div>
+              <div class="mh-stat-label">Grand Défi en cours</div>
+              <div class="mh-stat-val" style="font-size:.82rem;line-height:1.3"><?= e(mb_substr($grand_defi['title'],0,40)) ?><?= mb_strlen($grand_defi['title'])>40?'…':'' ?></div>
+            </div>
+          </div>
+          <?php endif; ?>
+          <?php if ($mh_days > 0): ?>
+          <div class="mh-stat">
+            <div class="mh-stat-icon">⏳</div>
+            <div>
+              <div class="mh-stat-label">Fin de saison dans</div>
+              <div class="mh-stat-val"><?= $mh_days ?> jour<?= $mh_days>1?'s':'' ?></div>
+            </div>
+          </div>
+          <?php endif; ?>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>

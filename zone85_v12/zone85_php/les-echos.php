@@ -204,6 +204,8 @@ $page_styles = '<style>
   pointer-events: none;
 }
 .echos-hero-inner { position: relative; z-index: 1; }
+.echos-hero-split { display: grid; grid-template-columns: 1fr 340px; gap: 56px; align-items: center; }
+@media(max-width:900px){ .echos-hero-split { grid-template-columns: 1fr; } .echos-hero-visual { display: none; } }
 .echos-hero-badge {
   display: inline-block;
   font-size: .68rem; font-weight: 900; letter-spacing: .18em;
@@ -220,8 +222,18 @@ $page_styles = '<style>
 .echos-hero h1 span { color: #C9962A; }
 .echos-hero .hero-sub {
   font-size: 1.05rem; color: rgba(255,255,255,.6);
-  max-width: 540px; line-height: 1.75;
+  line-height: 1.75;
 }
+.echos-rub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.echos-rub-chip {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.09);
+  border-radius: 10px; padding: 10px 12px;
+  text-decoration: none; transition: background .15s;
+}
+.echos-rub-chip:hover { background: rgba(255,255,255,.1); }
+.echos-rub-chip-icon { font-size: 1.1rem; }
+.echos-rub-chip-label { font-size: .72rem; font-weight: 700; color: rgba(255,255,255,.7); line-height: 1.25; }
 
 /* TABS RUBRIQUES */
 .echos-tabs-bar {
@@ -399,9 +411,45 @@ require_once 'includes/nav.php';
 <!-- ===================== HERO ===================== -->
 <section class="echos-hero">
   <div class="container echos-hero-inner">
-    <span class="echos-hero-badge">MAGAZINE COMMUNAUTAIRE</span>
-    <h1>LES <span>&Eacute;CHOS</span><br>DE LA ZONE</h1>
-    <p class="hero-sub">Histoires, curiosit&eacute;s et nouvelles du territoire vend&eacute;en.</p>
+    <div class="echos-hero-split">
+
+      <!-- Colonne texte -->
+      <div>
+        <span class="echos-hero-badge">Magazine communautaire</span>
+        <h1>LES <span>&Eacute;CHOS</span><br>DE LA ZONE</h1>
+        <p class="hero-sub">Histoires, curiosités et nouvelles du territoire vendéen — courts, humains, locaux.</p>
+      </div>
+
+      <!-- Colonne visuelle : rubriques -->
+      <div class="echos-hero-visual">
+        <div style="font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:rgba(255,255,255,.35);margin-bottom:12px">Nos rubriques</div>
+        <div class="echos-rub-grid">
+          <?php
+          $rub_hero_icons = [
+              'les-invisibles' => '🎭',
+              'deux-minutes'   => '⏱️',
+              'les-ovnis'      => '🛸',
+              'actualite'      => '📰',
+              'chemins'        => '🥾',
+              'evenements'     => '⚡',
+          ];
+          foreach ($rubrique_labels as $slug => $label):
+          ?>
+          <a href="les-echos.php?rubrique=<?= urlencode($slug) ?>" class="echos-rub-chip">
+            <span class="echos-rub-chip-icon"><?= $rub_hero_icons[$slug] ?? '📌' ?></span>
+            <span class="echos-rub-chip-label"><?= e($label) ?></span>
+          </a>
+          <?php endforeach; ?>
+        </div>
+        <?php $total_articles = count($articles_db); ?>
+        <?php if ($total_articles > 0): ?>
+        <div style="margin-top:14px;font-size:.76rem;color:rgba(255,255,255,.3);font-weight:600">
+          <?= $total_articles ?> article<?= $total_articles > 1 ? 's' : '' ?> disponible<?= $total_articles > 1 ? 's' : '' ?>
+        </div>
+        <?php endif; ?>
+      </div>
+
+    </div>
   </div>
 </section>
 

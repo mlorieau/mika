@@ -417,12 +417,15 @@ ul{list-style:none}
 /* PAGE HERO (concept, hall, etc.) */
 .page-hero{background:var(--beige-light);padding:120px 0 72px;border-bottom:1px solid var(--beige-dark)}
 .page-hero.dark{background:linear-gradient(160deg,#0d1e2c 0%,#12314e 100%)}
-.page-hero-inner{max-width:700px}
+.page-hero-inner{max-width:620px}
+.page-hero-split{display:grid;grid-template-columns:1fr 380px;gap:56px;align-items:center}
+.page-hero-split .page-hero-inner{max-width:none}
 .page-hero .overline-label{color:var(--primary);margin-bottom:12px}
 .page-hero h1{font-size:clamp(2rem,5vw,3.2rem);font-weight:900;letter-spacing:-1.5px;line-height:1.1;margin-bottom:18px;color:var(--text)}
 .page-hero.dark h1{color:#fff}
 .page-hero p{font-size:1.05rem;color:var(--text-mid);line-height:1.7;max-width:540px;margin-bottom:32px}
 .page-hero.dark p{color:rgba(255,255,255,.65)}
+@media(max-width:900px){.page-hero-split{grid-template-columns:1fr}.page-hero-split .page-hero-visual{display:none}}
 
 /* CTA INNER */
 .cta-inner{display:flex;align-items:center;justify-content:space-between;gap:32px;width:100%;position:relative;z-index:1;flex-wrap:wrap}
@@ -765,7 +768,7 @@ body,#navbar,.mobile-menu,.profil-card,.ev-card,.race-card,.cf-widget{
   content:"";position:absolute;inset:0;pointer-events:none;
   background:radial-gradient(ellipse 70% 50% at 50% -5%,rgba(234,86,73,.08) 0%,transparent 65%)
 }
-.page-hero-inner{position:relative;z-index:1;max-width:700px}
+.page-hero-inner{position:relative;z-index:1}
 
 /* ── Typographie hero ── */
 .page-eyebrow{

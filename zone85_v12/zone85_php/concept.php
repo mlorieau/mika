@@ -161,11 +161,47 @@ require_once 'includes/nav.php';
 <!-- ── HERO ─────────────────────────────────────────────────── -->
 <section class="page-hero dark">
   <div class="container">
-    <div class="page-hero-inner">
-      <div class="page-eyebrow">Le Concept</div>
-      <h1 class="page-h1">Zone85 — pourquoi, comment, pour qui.</h1>
-      <p class="page-sub">Ce que c'est vraiment. Ce que ce n'est pas. Et pourquoi vous allez y rester.</p>
-      <p style="margin-top:24px;font-size:1.05rem;font-style:italic;color:rgba(255,255,255,.75);border-left:3px solid var(--primary);padding-left:16px;line-height:1.55">La Zone51 a ses extraterrestres.<br>Zone85 a ses extraordinaires.</p>
+    <div class="page-hero-split">
+
+      <!-- Colonne texte -->
+      <div class="page-hero-inner">
+        <div class="page-eyebrow">Le Concept</div>
+        <h1 class="page-h1">Zone85 — pourquoi, comment, pour qui.</h1>
+        <p class="page-sub">Ce que c'est vraiment. Ce que ce n'est pas. Et pourquoi vous allez y rester.</p>
+        <p style="margin-top:24px;font-size:1rem;font-style:italic;color:rgba(255,255,255,.7);border-left:3px solid var(--primary);padding-left:16px;line-height:1.55">La Zone51 a ses extraterrestres.<br>Zone85 a ses extraordinaires.</p>
+      </div>
+
+      <!-- Colonne visuelle : chiffres clés -->
+      <div class="page-hero-visual">
+        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:28px 24px">
+          <div style="font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:rgba(255,255,255,.35);margin-bottom:18px">Zone85 en chiffres</div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;align-items:center;gap:14px">
+              <div style="font-size:1.8rem;font-weight:900;color:#ea5649;min-width:48px;text-align:right">10+</div>
+              <div style="font-size:.82rem;color:rgba(255,255,255,.6);line-height:1.35">Ans de Vendée<br>racontée &amp; vécue</div>
+            </div>
+            <div style="height:1px;background:rgba(255,255,255,.07)"></div>
+            <div style="display:flex;align-items:center;gap:14px">
+              <div style="font-size:1.8rem;font-weight:900;color:#ea5649;min-width:48px;text-align:right">3</div>
+              <div style="font-size:.82rem;color:rgba(255,255,255,.6);line-height:1.35">Clans — Bocage,<br>Littoral, Marais</div>
+            </div>
+            <div style="height:1px;background:rgba(255,255,255,.07)"></div>
+            <div style="display:flex;align-items:center;gap:14px">
+              <div style="font-size:1.8rem;font-weight:900;color:#ea5649;min-width:48px;text-align:right">6</div>
+              <div style="font-size:.82rem;color:rgba(255,255,255,.6);line-height:1.35">Formats de contenu<br>exclusifs</div>
+            </div>
+            <div style="height:1px;background:rgba(255,255,255,.07)"></div>
+            <div style="display:flex;align-items:center;gap:14px">
+              <div style="font-size:1.8rem;font-weight:900;color:#f5a99f;min-width:48px;text-align:right">1</div>
+              <div style="font-size:.82rem;color:rgba(255,255,255,.6);line-height:1.35">Livre offert à<br>l'inscription — VICTOR</div>
+            </div>
+          </div>
+          <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.07)">
+            <a href="inscription.php" style="display:block;background:#ea5649;color:#fff;text-align:center;padding:11px 20px;border-radius:8px;font-size:.84rem;font-weight:800;text-decoration:none">Rejoindre la Zone →</a>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>

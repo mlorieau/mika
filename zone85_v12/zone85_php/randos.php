@@ -218,6 +218,8 @@ $page_styles = '<style>
   pointer-events: none;
 }
 .randos-hero-inner { position: relative; z-index: 1; }
+.rh-split { display: grid; grid-template-columns: 1fr 320px; gap: 56px; align-items: center; }
+@media(max-width:900px){ .rh-split { grid-template-columns: 1fr; } .rh-visual { display: none; } }
 .randos-hero-badge {
   display: inline-block;
   font-size: .68rem; font-weight: 900; letter-spacing: .18em;
@@ -234,8 +236,16 @@ $page_styles = '<style>
 .randos-hero h1 span { color: #2a9d5c; }
 .randos-hero .hero-sub {
   font-size: 1.05rem; color: rgba(255,255,255,.6);
-  max-width: 540px; line-height: 1.75;
+  line-height: 1.75;
 }
+.rh-stat-card {
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+  border-radius: 18px; padding: 22px 20px; display: flex; flex-direction: column; gap: 12px;
+}
+.rh-stat-item { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,.07); }
+.rh-stat-item:last-child { border-bottom: none; padding-bottom: 0; }
+.rh-stat-num { font-size: 1.7rem; font-weight: 900; color: #2a9d5c; min-width: 44px; text-align: right; }
+.rh-stat-txt { font-size: .8rem; color: rgba(255,255,255,.55); line-height: 1.3; }
 
 /* FILTRES — V12.10 redesign */
 .randos-filters-bar {
@@ -691,9 +701,54 @@ require_once 'includes/nav.php';
 <!-- ===================== HERO ===================== -->
 <section class="randos-hero">
   <div class="container randos-hero-inner">
-    <span class="randos-hero-badge">&#x1F97E; RANDOZONE</span>
-    <h1>RANDONN&Eacute;ES<br><span>ZONE85</span></h1>
-    <p class="hero-sub">La Vend&eacute;e &agrave; pied. Du bocage au littoral.</p>
+    <div class="rh-split">
+
+      <!-- Colonne texte -->
+      <div>
+        <span class="randos-hero-badge">🥾 RandoZone</span>
+        <h1>RANDONN&Eacute;ES<br><span>ZONE85</span></h1>
+        <p class="hero-sub">La Vendée à pied. Du bocage au littoral, des chemins commentés par la communauté.</p>
+      </div>
+
+      <!-- Colonne visuelle : stats randos -->
+      <div class="rh-visual">
+        <?php
+        $rh_total   = count($randos ?? []);
+        $rh_diffs   = ['Facile'=>0,'Moyen'=>0,'Difficile'=>0];
+        foreach (($randos ?? []) as $r) {
+            $d = $r['difficulty'] ?? '';
+            if (isset($rh_diffs[$d])) $rh_diffs[$d]++;
+        }
+        $rh_regions = count(array_unique(array_filter(array_column($randos ?? [], 'region'))));
+        ?>
+        <div class="rh-stat-card">
+          <div style="font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:rgba(255,255,255,.35);margin-bottom:4px">Sur les sentiers</div>
+          <div class="rh-stat-item">
+            <div class="rh-stat-num"><?= $rh_total ?: '?' ?></div>
+            <div class="rh-stat-txt">Randonnée<?= $rh_total>1?'s':'' ?> répertoriée<?= $rh_total>1?'s':'' ?></div>
+          </div>
+          <?php if ($rh_diffs['Facile'] > 0): ?>
+          <div class="rh-stat-item">
+            <div class="rh-stat-num" style="font-size:1.1rem;color:#2a9d5c">🟢 <?= $rh_diffs['Facile'] ?></div>
+            <div class="rh-stat-txt">Facile<?= $rh_diffs['Facile']>1?'s':'' ?> — idéal pour commencer</div>
+          </div>
+          <?php endif; ?>
+          <?php if ($rh_diffs['Moyen'] > 0): ?>
+          <div class="rh-stat-item">
+            <div class="rh-stat-num" style="font-size:1.1rem;color:#C9962A">🟡 <?= $rh_diffs['Moyen'] ?></div>
+            <div class="rh-stat-txt">Moyen<?= $rh_diffs['Moyen']>1?'s':'' ?> — pour les habitués</div>
+          </div>
+          <?php endif; ?>
+          <?php if ($rh_diffs['Difficile'] > 0): ?>
+          <div class="rh-stat-item">
+            <div class="rh-stat-num" style="font-size:1.1rem;color:#ea5649">🔴 <?= $rh_diffs['Difficile'] ?></div>
+            <div class="rh-stat-txt">Difficile<?= $rh_diffs['Difficile']>1?'s':'' ?> — pour les courageux</div>
+          </div>
+          <?php endif; ?>
+        </div>
+      </div>
+
+    </div>
   </div>
 </section>
 
