@@ -183,7 +183,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $is_logged_in && $user_id > 0 && $p
                 $xp_earned = 0;
                 if ($existing === 0) {
                     // 5 XP pour le premier commentaire sur cet article
-                    $pdo_main->prepare("UPDATE users SET xp = xp + 5 WHERE id=:id")
+                    $pdo_main->prepare("UPDATE users SET xp_total = xp_total + 5 WHERE id=:id")
                         ->execute([':id' => $user_id]);
                     $xp_earned = 5;
                 }
