@@ -262,20 +262,9 @@ $user_badges_list  = [];
 $all_badges_list   = [];
 $awarded_badge_ids = [];
 try {
-    $user_badges_list = $pdo->prepare("
-        SELECT ub.badge_id, ub.awarded_at, ub.source_type, ub.awarded_by,
-               b.title, b.description, b.icon_emoji, b.rarity,
-               adm.pseudo AS awarded_by_pseudo
-        FROM user_badges ub
-        JOIN badges b ON b.id = ub.badge_id
-        LEFT JOIN users adm ON adm.id = ub.awarded_by
-        WHERE ub.user_id = :id
-        ORDER BY ub.awarded_at DESC
-    ")->execute([':id' => $uid]) ? [] : [];
-
-    $stmt2 = $pdo->prepare("
-        SELECT ub.badge_id, ub.awarded_at, ub.source_type, ub.awarded_by,
-               b.title, b.description, b.icon_emoji, b.rarity,
+    $stmt_ub = $pdo->prepare("
+        SELECT ub.badge_id, ub.awarded_at, ub.source_type,
+               b.title, b.icon_emoji, b.rarity,
                adm.pseudo AS awarded_by_pseudo
         FROM user_badges ub
         JOIN badges b ON b.id = ub.badge_id
@@ -283,11 +272,10 @@ try {
         WHERE ub.user_id = :id
         ORDER BY ub.awarded_at DESC
     ");
-    $stmt2->execute([':id' => $uid]);
-    $user_badges_list = $stmt2->fetchAll();
+    $stmt_ub->execute([':id' => $uid]);
+    $user_badges_list  = $stmt_ub->fetchAll();
     $awarded_badge_ids = array_column($user_badges_list, 'badge_id');
-
-    $all_badges_list = $pdo->query("SELECT id, title, icon_emoji, rarity FROM badges ORDER BY title")->fetchAll();
+    $all_badges_list   = $pdo->query("SELECT id, title, icon_emoji, rarity FROM badges ORDER BY title")->fetchAll();
 } catch (PDOException $e) {}
 
 $level     = get_user_level_from_xp((int)$user['xp_total']);
