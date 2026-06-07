@@ -191,8 +191,9 @@ if (!$is_guest) {
 
         $_user_badges       = fetch_user_badges((int)$_db_profile['id']);
         if (!empty($_user_badges)) $badges = $_user_badges;
-        $_xp_history        = fetch_user_xp_logs((int)$_db_profile['id'], 10);
+        $_xp_history          = fetch_user_xp_logs((int)$_db_profile['id'], 10);
         $_user_participations = fetch_user_participations((int)$_db_profile['id'], 5);
+        $_activity_feed       = function_exists('fetch_user_activity_feed') ? fetch_user_activity_feed((int)$_db_profile['id'], 10) : [];
         $_user_hidden_hunts = function_exists('fetch_user_hidden_hunts') ? fetch_user_hidden_hunts((int)$_db_profile['id']) : [];
         // V11 — Passeport (chargé en lazy dans le panneau passeport)
     } else {
@@ -636,44 +637,65 @@ require_once 'includes/nav.php';
           </div>
         </div>
 
+        <!-- Feed activité unifié -->
         <div class="profil-card">
-          <div class="profil-card-title">🗺️ Dernières participations</div>
+          <div class="profil-card-title">⚡ Activité récente</div>
 
           <?php
-          $_part_type_icons = [
+          $_feed_icons = [
+              // feed_type → icône par défaut
+              'rando'   => '🥾',
+              'comment' => '💬',
+              // mission_type icons (feed_sub pour les missions)
               'seasonal_collective' => '🏆', 'quiz' => '🧠', 'vote' => '🗳️',
-              'photo_challenge' => '📸', 'keto_kole_tche' => '🥐', 'rando' => '🥾',
+              'photo_challenge' => '📸', 'keto_kole_tche' => '🥐',
               'weather_mission' => '🌤️', 'investigation' => '🔍',
               'hidden_hunt' => '🗝️', 'premium_game' => '⭐',
+              // source_type icons (feed_sub pour les xp_events)
+              'registration' => '🎉', 'badge' => '🏅', 'admin' => '✨',
+              'article_comment' => '💬', 'rando_review' => '🥾',
+              'mission_participation' => '⚡', 'mission_success' => '✅',
+              'ktc_correct' => '🔍', 'hidden_hunt_completion' => '🗝️',
           ];
-          $_part_status_labels = [
-              'auto_validated' => ['label' => 'Validé', 'color' => '#1a7a42'],
-              'validated'      => ['label' => 'Validé', 'color' => '#1a7a42'],
-              'pending'        => ['label' => 'En attente', 'color' => '#0369a1'],
-              'rejected'       => ['label' => 'Refusé', 'color' => 'var(--primary)'],
+          $_feed_status = [
+              'auto_validated' => ['Validé',     '#1a7a42'],
+              'validated'      => ['Validé',     '#1a7a42'],
+              'pending'        => ['En attente', '#0369a1'],
+              'rejected'       => ['Refusé',     '#c0392b'],
+              'stamped'        => ['Stampé',     '#6b7f96'],
+              'pending_proof'  => ['Preuve en attente', '#8a6020'],
+              'rewarded'       => ['Récompensé', '#1a7a42'],
           ];
-          if (!empty($_user_participations)):
-              foreach ($_user_participations as $_part):
-                  $_picon  = $_part_type_icons[$_part['mission_type']] ?? '📌';
-                  $_pst    = $_part_status_labels[$_part['status']] ?? ['label' => $_part['status'], 'color' => 'var(--text-muted)'];
-                  $_pdate  = $_part['created_at'] ? date('d/m/Y', strtotime($_part['created_at'])) : '';
-                  $_pxp    = (int)$_part['xp_awarded'];
+          if (!empty($_activity_feed)):
+              foreach ($_activity_feed as $_ev):
+                  $_ev_type  = $_ev['feed_type'];
+                  $_ev_sub   = $_ev['feed_sub'] ?? '';
+                  $_ev_icon  = $_feed_icons[$_ev_sub] ?? $_feed_icons[$_ev_type] ?? '⚡';
+                  $_ev_title = e(mb_strimwidth($_ev['feed_title'] ?? '—', 0, 60, '…'));
+                  $_ev_xp    = (int)($_ev['feed_xp'] ?? 0);
+                  $_ev_date  = $_ev['feed_date'] ? date('d/m/Y', strtotime($_ev['feed_date'])) : '';
+                  $_ev_st    = $_feed_status[$_ev['feed_status'] ?? ''] ?? null;
           ?>
-          <div class="mission-item">
-            <div class="mission-icon"><?= $_picon ?></div>
-            <div class="mission-info">
-              <div class="mission-name"><?= e($_part['mission_title'] ?? 'Mission') ?></div>
-              <div class="mission-sub" style="color:<?= e($_pst['color']) ?>"><?= e($_pst['label']) ?><?= $_pdate ? ' · ' . e($_pdate) : '' ?></div>
+          <div class="feed-item">
+            <div class="feed-icon"><?= $_ev_icon ?></div>
+            <div class="feed-info">
+              <div class="feed-title"><?= $_ev_title ?></div>
+              <div class="feed-meta">
+                <?php if ($_ev_st): ?>
+                <span style="color:<?= $_ev_st[1] ?>;font-weight:700;font-size:.72rem"><?= $_ev_st[0] ?></span>
+                <?php endif; ?>
+                <?php if ($_ev_xp !== 0): ?>
+                <span class="feed-xp"><?= $_ev_xp > 0 ? '+' : '' ?><?= $_ev_xp ?> XP</span>
+                <?php endif; ?>
+                <?= $_ev_date ? ' · ' . e($_ev_date) : '' ?>
+              </div>
             </div>
-            <?php if ($_pxp > 0): ?>
-            <div class="mission-xp">+<?= $_pxp ?> XP</div>
-            <?php endif; ?>
           </div>
           <?php endforeach; ?>
           <?php else: ?>
           <div style="text-align:center;padding:24px 16px;color:var(--text-muted)">
-            <div style="font-size:1.8rem;margin-bottom:8px">🗺️</div>
-            <div style="font-size:.88rem;font-weight:600">Tes premières participations apparaîtront ici.</div>
+            <div style="font-size:1.8rem;margin-bottom:8px">⚡</div>
+            <div style="font-size:.88rem;font-weight:600">Tes premières activités apparaîtront ici.</div>
             <div style="font-size:.78rem;margin-top:6px">
               <a href="missions.php" style="color:var(--primary);font-weight:700;text-decoration:none">Voir les missions disponibles →</a>
             </div>
@@ -724,52 +746,6 @@ require_once 'includes/nav.php';
           <?php endif; ?>
         </div>
         <?php endif; ?>
-
-        <div class="profil-card">
-          <div class="profil-card-title">⚡ Dernières actions</div>
-
-          <?php
-          $_xp_icons_apercu = [
-              'registration'            => '🎉',
-              'mission_participation'   => '⚡',
-              'mission_success'         => '✅',
-              'quiz_success'            => '🎯',
-              'photo_coup_de_coeur'     => '📸',
-              'vote'                    => '🗳️',
-              'rando_review'            => '🥾',
-              'ktc_correct'             => '🔍',
-              'investigation_solved'    => '🕵️',
-              'hidden_hunt_completion'  => '🗝️',
-          ];
-          if (!empty($_xp_history)):
-              foreach (array_slice($_xp_history, 0, 5) as $_xlog):
-                  $_icon_a  = $_xp_icons_apercu[$_xlog['source_type']] ?? '⚡';
-                  $_label_a = e($_xlog['reason'] ?: ucfirst(str_replace('_', ' ', $_xlog['source_type'])));
-                  $_amt_a   = (int)$_xlog['xp_amount'];
-                  $_sign_a  = $_amt_a >= 0 ? '+' : '';
-                  $_date_a  = $_xlog['created_at'] ? date('d/m/Y', strtotime($_xlog['created_at'])) : '';
-          ?>
-          <div class="feed-item">
-            <div class="feed-icon"><?= $_icon_a ?></div>
-            <div class="feed-info">
-              <div class="feed-title"><?= $_label_a ?></div>
-              <div class="feed-meta">
-                <span class="feed-xp"><?= $_sign_a . $_amt_a ?> XP</span>
-                <?= $_date_a ? ' · ' . e($_date_a) : '' ?>
-              </div>
-            </div>
-          </div>
-          <?php endforeach; ?>
-          <?php else: ?>
-          <div style="text-align:center;padding:24px 16px;color:var(--text-muted)">
-            <div style="font-size:1.8rem;margin-bottom:8px">⚡</div>
-            <div style="font-size:.88rem;font-weight:600">Tes premières actions apparaîtront ici.</div>
-            <div style="font-size:.78rem;margin-top:6px">
-              <a href="missions.php" style="color:var(--primary);font-weight:700;text-decoration:none">Participer à une mission →</a>
-            </div>
-          </div>
-          <?php endif; ?>
-        </div>
 
         <div class="profil-cta">
           <div class="profil-cta-text">

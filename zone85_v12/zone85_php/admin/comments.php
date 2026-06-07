@@ -76,6 +76,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
                         ->execute([':id' => $c['user_id']]);
                     $pdo->prepare("UPDATE article_comments SET xp_awarded=1 WHERE id=:id")
                         ->execute([':id' => $id]);
+                    $pdo->prepare("INSERT INTO xp_logs (user_id, source_type, source_id, xp_amount, reason) VALUES (:uid,'article_comment',:sid,5,'Commentaire Les Échos')")
+                        ->execute([':uid' => $c['user_id'], ':sid' => $id]);
                     $flash = ['type' => 'ok', 'msg' => '+5 XP attribués à l\'auteur.'];
                 } else {
                     $flash = ['type' => 'warn', 'msg' => 'XP déjà attribués pour ce commentaire.'];
@@ -91,6 +93,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
                         ->execute([':id' => $c['user_id']]);
                     $pdo->prepare("UPDATE article_comments SET xp_awarded=0 WHERE id=:id")
                         ->execute([':id' => $id]);
+                    $pdo->prepare("INSERT INTO xp_logs (user_id, source_type, source_id, xp_amount, reason) VALUES (:uid,'article_comment',:sid,-5,'XP commentaire retiré (admin)')")
+                        ->execute([':uid' => $c['user_id'], ':sid' => $id]);
                     $flash = ['type' => 'ok', 'msg' => '−5 XP retirés à l\'auteur.'];
                 } else {
                     $flash = ['type' => 'warn', 'msg' => 'Aucun XP à retirer pour ce commentaire.'];
@@ -106,11 +110,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
                         $pdo->prepare("UPDATE article_comments SET status='hidden' WHERE id IN ($ph)")->execute($ids);
                         $flash = ['type' => 'ok', 'msg' => count($ids) . ' commentaire(s) masqué(s).'];
                     } elseif ($action === 'bulk_delete') {
-                        $rows = $pdo->prepare("SELECT user_id FROM article_comments WHERE id IN ($ph) AND xp_awarded=1");
+                        $rows = $pdo->prepare("SELECT id, user_id FROM article_comments WHERE id IN ($ph) AND xp_awarded=1");
                         $rows->execute($ids);
                         foreach ($rows->fetchAll() as $r) {
                             $pdo->prepare("UPDATE users SET xp_total = GREATEST(0, xp_total - 5) WHERE id=:id")
                                 ->execute([':id' => $r['user_id']]);
+                            $pdo->prepare("INSERT INTO xp_logs (user_id, source_type, source_id, xp_amount, reason) VALUES (:uid,'article_comment',:sid,-5,'XP commentaire retiré (suppression admin)')")
+                                ->execute([':uid' => $r['user_id'], ':sid' => $r['id']]);
                         }
                         $pdo->prepare("DELETE FROM article_comments WHERE id IN ($ph)")->execute($ids);
                         $flash = ['type' => 'ok', 'msg' => count($ids) . ' commentaire(s) supprimé(s).'];
@@ -123,6 +129,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
                                 ->execute([':id' => $r['user_id']]);
                             $pdo->prepare("UPDATE article_comments SET xp_awarded=1 WHERE id=:id")
                                 ->execute([':id' => $r['id']]);
+                            $pdo->prepare("INSERT INTO xp_logs (user_id, source_type, source_id, xp_amount, reason) VALUES (:uid,'article_comment',:sid,5,'Commentaire Les Échos')")
+                                ->execute([':uid' => $r['user_id'], ':sid' => $r['id']]);
                             $done++;
                         }
                         $flash = ['type' => 'ok', 'msg' => "+5 XP attribués à {$done} auteur(s)."];

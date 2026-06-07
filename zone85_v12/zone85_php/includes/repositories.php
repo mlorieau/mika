@@ -821,6 +821,81 @@ function fetch_user_xp_logs(int $userId, int $limit = 10): array {
     }
 }
 
+
+
+// ── Feed d'activité unifié ────────────────────────────────────────
+
+/**
+ * Retourne les N derniers événements d'activité d'un user, toutes sources confondues.
+ */
+function fetch_user_activity_feed(int $userId, int $limit = 10): array {
+    $pdo = db();
+    if (!$pdo) return [];
+    $items = [];
+
+    try {
+        // Missions participées
+        $s = $pdo->prepare("
+            SELECT 'mission' AS feed_type, p.created_at AS feed_date,
+                   m.title AS feed_title, m.mission_type AS feed_sub,
+                   p.xp_awarded AS feed_xp, p.status AS feed_status
+            FROM participations p
+            JOIN missions m ON m.id = p.mission_id
+            WHERE p.user_id = :id
+            ORDER BY p.created_at DESC LIMIT 8
+        ");
+        $s->execute([':id' => $userId]);
+        $items = array_merge($items, $s->fetchAll());
+
+        // Randos (toutes, pas seulement validées)
+        $s = $pdo->prepare("
+            SELECT 'rando' AS feed_type, rp.done_at AS feed_date,
+                   r.title AS feed_title, 'rando' AS feed_sub,
+                   rp.xp_awarded AS feed_xp, rp.status AS feed_status
+            FROM rando_participations rp
+            JOIN randos r ON r.id = rp.rando_id
+            WHERE rp.user_id = :id
+            ORDER BY rp.done_at DESC LIMIT 5
+        ");
+        $s->execute([':id' => $userId]);
+        $items = array_merge($items, $s->fetchAll());
+
+        // Commentaires Échos ayant reçu des XP
+        $s = $pdo->prepare("
+            SELECT 'comment' AS feed_type, ac.created_at AS feed_date,
+                   a.title AS feed_title, 'comment' AS feed_sub,
+                   5 AS feed_xp, 'rewarded' AS feed_status
+            FROM article_comments ac
+            JOIN articles a ON a.id = ac.article_id
+            WHERE ac.user_id = :id AND ac.xp_awarded = 1
+            ORDER BY ac.created_at DESC LIMIT 5
+        ");
+        $s->execute([':id' => $userId]);
+        $items = array_merge($items, $s->fetchAll());
+
+        // XP divers (badges, admin, inscription…) — sources non couvertes ci-dessus
+        $s = $pdo->prepare("
+            SELECT 'xp_event' AS feed_type, xl.created_at AS feed_date,
+                   COALESCE(xl.reason, xl.source_type) AS feed_title,
+                   xl.source_type AS feed_sub,
+                   xl.xp_amount AS feed_xp, NULL AS feed_status
+            FROM xp_logs xl
+            WHERE xl.user_id = :id
+              AND xl.source_type NOT IN ('mission','article_comment','rando','rando_review')
+            ORDER BY xl.created_at DESC LIMIT 5
+        ");
+        $s->execute([':id' => $userId]);
+        $items = array_merge($items, $s->fetchAll());
+
+    } catch (PDOException $e) {
+        error_log('[ZONE85] fetch_user_activity_feed : ' . $e->getMessage());
+    }
+
+    // Tri chronologique décroissant puis troncature
+    usort($items, fn($a, $b) => strcmp($b['feed_date'] ?? '', $a['feed_date'] ?? ''));
+    return array_slice($items, 0, $limit);
+}
+
 // â”€â”€ Moteur de participation V1 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /**
