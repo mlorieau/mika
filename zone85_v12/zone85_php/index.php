@@ -182,6 +182,15 @@ $page_styles = '<style>
 .idx-flash-badge{display:inline-flex;align-items:center;gap:6px;background:#ea5649;color:#fff;font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:4px 12px;border-radius:4px}
 .idx-flash-dot{width:6px;height:6px;background:#fff;border-radius:50%;animation:blink .9s infinite}
 
+/* Barre membre */
+.idx-member-bar{background:#fff;border-bottom:2px solid rgba(234,86,73,.2);padding:9px 0}
+.idx-member-bar-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.idx-member-bar-avatar{width:30px;height:30px;border-radius:7px;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:800;color:#fff;overflow:hidden;flex-shrink:0}
+.idx-member-bar-name{font-size:.84rem;font-weight:700;color:#0c1e2e}
+.idx-member-bar-stats{font-size:.74rem;color:#6b7f96;font-weight:600}
+.idx-member-bar a{font-size:.78rem;font-weight:700;color:var(--primary);text-decoration:none;white-space:nowrap}
+.idx-member-bar a:hover{text-decoration:underline}
+
 /* Responsive */
 @media(max-width:900px){
   .idx-hero{padding:96px 20px 0}
@@ -207,17 +216,50 @@ require_once 'includes/header.php';
 require_once 'includes/nav.php';
 
 // ── Données post-nav ─────────────────────────────────────────
-$_nav_me = isset($_nav_user) ? $_nav_user : $_me;
+$_nav_me   = isset($_nav_user) ? $_nav_user : $_me;
 $_is_guest = empty($_nav_me);
+
+// Données membre (disponibles pour toute la page)
+$_me_pseudo  = $_nav_me['pseudo']   ?? 'Zonaute';
+$_me_xp      = (int)($_nav_me['xp_total'] ?? 0);
+$_me_level   = (int)($_nav_me['level']    ?? 1);
+$_me_clan    = $_nav_me['clan']     ?? null;
+$_clan_data  = $_me_clan ? ($clans[$_me_clan] ?? null) : null;
+$_avatar_url = !$_is_guest && function_exists('avatar_url') ? avatar_url($_nav_me) : '';
+if (!function_exists('_idx_xp_to_level')) {
+    function _idx_xp_to_level(int $lvl): int { return (int)(100 * ($lvl ** 1.55)); }
+}
+$_xp_prev = _idx_xp_to_level($_me_level);
+$_xp_next = _idx_xp_to_level($_me_level + 1);
+$_xp_pct  = $_xp_next > $_xp_prev
+    ? min(100, round(($_me_xp - $_xp_prev) / ($_xp_next - $_xp_prev) * 100))
+    : 100;
 ?>
 
-<?php if ($_is_guest): ?>
-<!-- ================================================================
-     VISITEUR — Parcours éditorial en 7 beats
-     Beat 1 : Hero  |  Beat 2 : L'Iceberg  |  Beat 3 : Vraiment
-     Beat 4 : Simple  |  Beat 5 : Victor  |  Beat 6 : CTA
-     Beat 7 : Pour les connaisseurs
-================================================================ -->
+<?php if (!$_is_guest): ?>
+<!-- Barre de bienvenue membre ─────────────────────────────── -->
+<div class="idx-member-bar">
+  <div class="container idx-member-bar-inner">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="idx-member-bar-avatar"<?= ($_nav_me['avatar_type'] ?? '') === 'upload' ? ' style="padding:0"' : '' ?>>
+        <?php if (!empty($_avatar_url)): ?>
+          <img src="<?= e($_avatar_url) ?>" alt="<?= e($_me_pseudo) ?>" style="width:100%;height:100%;object-fit:cover">
+        <?php else: ?>
+          <?= e($_nav_me['avatar_key'] ?? strtoupper(mb_substr($_me_pseudo, 0, 2))) ?>
+        <?php endif; ?>
+      </div>
+      <div>
+        <div class="idx-member-bar-name">Bienvenue, <?= e($_me_pseudo) ?> 👋</div>
+        <div class="idx-member-bar-stats">⚡ Niv.&nbsp;<?= $_me_level ?> &nbsp;·&nbsp; <?= number_format($_me_xp, 0, ',', '&#8201;') ?>&nbsp;XP</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+      <a href="missions.php">🎯 Mes missions</a>
+      <a href="profil.php">Mon profil →</a>
+    </div>
+  </div>
+</div>
+<?php endif; ?>
 
 <!-- BEAT 1 : HERO ─────────────────────────────────────────── -->
 <section class="idx-hero">
@@ -235,8 +277,13 @@ $_is_guest = empty($_nav_me);
     </p>
 
     <div class="idx-ctas">
-      <a href="inscription.php" class="idx-btn-primary">Rejoindre la Zone →</a>
-      <a href="concept.php"     class="idx-btn-secondary">Comprendre le concept</a>
+      <?php if ($_is_guest): ?>
+        <a href="inscription.php" class="idx-btn-primary">Rejoindre la Zone →</a>
+        <a href="concept.php"     class="idx-btn-secondary">Comprendre le concept</a>
+      <?php else: ?>
+        <a href="missions.php" class="idx-btn-primary">🎯 Voir mes missions →</a>
+        <a href="les-echos.php" class="idx-btn-secondary">📰 Les Échos</a>
+      <?php endif; ?>
     </div>
 
     <!-- Mascottes — atmosphère des 3 clans -->
@@ -404,7 +451,9 @@ $_is_guest = empty($_nav_me);
         <p class="idx-victor-desc">
           VICTOR est l'œuvre littéraire de Zone85 — une plongée dans l'âme secrète de la Vendée. Réservé aux membres, le PDF est disponible en téléchargement dès ton inscription. Pas de boutique. Pas d'achat. Juste la Zone.
         </p>
-        <a href="victor.php" class="idx-victor-cta">Rejoindre et accéder à VICTOR →</a>
+        <a href="victor.php" class="idx-victor-cta">
+          <?= $_is_guest ? 'Rejoindre et accéder à VICTOR →' : '📖 Accéder à VICTOR →' ?>
+        </a>
       </div>
       <div class="idx-victor-visual">📖</div>
     </div>
@@ -415,12 +464,24 @@ $_is_guest = empty($_nav_me);
 <!-- BEAT 6 : CTA FINAL ─────────────────────────────────────── -->
 <section class="page-cta-bloc">
   <div class="container">
+    <?php if ($_is_guest): ?>
     <h2 class="page-cta-title">Rejoins Zone85.</h2>
     <p class="page-cta-sub">Gratuit. Vendéen. Pour toujours.<br>Ton compte déverrouille <strong style="color:#d4af37">VICTOR</strong> en PDF.</p>
     <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
       <a href="inscription.php" class="idx-btn-primary" style="font-size:1.05rem;padding:16px 36px">Créer mon compte →</a>
       <a href="concept.php"     class="idx-btn-secondary" style="font-size:1rem;padding:16px 28px">Le concept</a>
     </div>
+    <?php else: ?>
+    <h2 class="page-cta-title">Content de te revoir, <?= e($_me_pseudo) ?> !</h2>
+    <p class="page-cta-sub">
+      Niveau&nbsp;<?= $_me_level ?> &mdash; <?= number_format($_me_xp, 0, ',', '&#8201;') ?>&nbsp;XP.<br>
+      Continue sur ta lancée et fais grimper ton clan !
+    </p>
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+      <a href="missions.php" class="idx-btn-primary" style="font-size:1.05rem;padding:16px 36px">🎯 Voir mes missions →</a>
+      <a href="communaute.php?tab=classement" class="idx-btn-secondary" style="font-size:1rem;padding:16px 28px">🏆 Classement</a>
+    </div>
+    <?php endif; ?>
   </div>
 </section>
 
@@ -476,210 +537,6 @@ $_is_guest = empty($_nav_me);
 </section>
 
 
-<?php else: ?>
-<!-- ================================================================
-     MEMBRE CONNECTÉ — Dashboard personnalisé
-     Zone 1 : Greeting  |  Zone 2 : Missions  |  Zone 3 : Course  |  Zone 4 : Fil
-================================================================ -->
-
-<?php
-// Données utilisateur pour le dashboard
-$_me_xp    = (int)($_nav_me['xp_total'] ?? 0);
-$_me_level = (int)($_nav_me['level']    ?? 1);
-$_me_clan  = $_nav_me['clan']           ?? null;
-$_me_pseudo= $_nav_me['pseudo']         ?? 'Zonaute';
-$_clan_data= $_me_clan ? ($clans[$_me_clan] ?? null) : null;
-
-// XP progress vers prochain niveau
-function _idx_xp_to_level(int $lvl): int {
-    return (int)(100 * ($lvl ** 1.55));
-}
-$_xp_prev = _idx_xp_to_level($_me_level);
-$_xp_next = _idx_xp_to_level($_me_level + 1);
-$_xp_pct  = $_xp_next > $_xp_prev
-    ? min(100, round(($_me_xp - $_xp_prev) / ($_xp_next - $_xp_prev) * 100))
-    : 100;
-
-// Avatar
-$_avatar_url = function_exists('avatar_url') ? avatar_url($_nav_me) : '';
-?>
-
-<!-- ZONE 1 : GREETING ──────────────────────────────────────── -->
-<section class="idx-dash-hero">
-  <div class="container">
-    <div class="idx-dash-greeting">
-
-      <!-- Avatar -->
-      <div class="idx-dash-avatar"<?= ($_nav_me['avatar_type'] ?? '') === 'upload' ? ' style="padding:0"' : '' ?>>
-        <?php if (!empty($_avatar_url)): ?>
-          <img src="<?= e($_avatar_url) ?>" alt="<?= e($_me_pseudo) ?>" style="width:100%;height:100%;object-fit:cover">
-        <?php else: ?>
-          <?= e($_nav_me['avatar_key'] ?? strtoupper(mb_substr($_me_pseudo, 0, 2))) ?>
-        <?php endif; ?>
-      </div>
-
-      <div style="flex:1;min-width:0">
-        <div class="idx-dash-name">Bienvenue, <?= e($_me_pseudo) ?> 👋</div>
-        <div class="idx-dash-meta">
-          <span class="idx-dash-badge">⚡ Niveau <?= $_me_level ?></span>
-          <span class="idx-dash-badge"><?= number_format($_me_xp, 0, ',', '&#8201;') ?> XP</span>
-          <?php if ($_clan_data): ?>
-          <span class="idx-dash-badge">⚔️ <?= e($_clan_data['name'] ?? ucfirst($_me_clan)) ?></span>
-          <?php endif; ?>
-        </div>
-        <div class="idx-xp-row">
-          <div class="idx-xp-label">
-            <span>XP vers Niv. <?= $_me_level + 1 ?></span>
-            <span><?= $_xp_pct ?>%</span>
-          </div>
-          <div class="idx-xp-track">
-            <div class="idx-xp-fill" style="width:<?= $_xp_pct ?>%"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Actions rapides -->
-      <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0">
-        <a href="profil.php"     class="idx-btn-primary" style="font-size:.84rem;padding:9px 18px">Mon Profil →</a>
-        <a href="communaute.php?tab=classement" class="idx-btn-secondary" style="font-size:.84rem;padding:9px 18px">🏆 Classement</a>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-
-<!-- ZONE 2 : MISSIONS ACTIVES ──────────────────────────────── -->
-<section class="page-section">
-  <div class="container">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:12px">
-      <div>
-        <div class="page-section-eyebrow">Missions</div>
-        <h2 class="page-section-title" style="margin-bottom:0">Défis disponibles</h2>
-      </div>
-      <?php if (!empty($flash_mission)): ?>
-      <a href="missions.php?type=flash" style="text-decoration:none">
-        <span class="idx-flash-badge"><span class="idx-flash-dot"></span> FLASH — <?= e(mb_substr($flash_mission['title'] ?? '', 0, 28)) ?></span>
-      </a>
-      <?php endif; ?>
-      <a href="missions.php" style="font-size:.84rem;font-weight:700;color:var(--primary);text-decoration:none">Toutes les missions →</a>
-    </div>
-
-    <?php if (!empty($dash_missions)): ?>
-    <div class="idx-mission-grid">
-      <?php foreach ($dash_missions as $_dm):
-          $_dt   = $_dm['mission_type'] ?? 'default';
-          $_dico = $_mtype_icons[$_dt] ?? $_mtype_icons['default'];
-      ?>
-      <a href="mission.php?id=<?= (int)$_dm['id'] ?>" class="idx-mission-card">
-        <span class="idx-mission-icon"><?= $_dico ?></span>
-        <div class="idx-mission-title"><?= e($_dm['title'] ?? 'Mission') ?></div>
-        <div class="idx-mission-footer">
-          <span class="idx-mission-xp">+<?= (int)($_dm['xp_success'] ?? $_dm['xp_reward'] ?? 0) ?> XP</span>
-          <span class="idx-mission-badge">Actif</span>
-        </div>
-      </a>
-      <?php endforeach; ?>
-    </div>
-    <?php else: ?>
-    <div class="page-empty">
-      <div class="page-empty-icon">🎯</div>
-      <div class="page-empty-text">Prochaines missions bientôt — surveille la Zone !</div>
-    </div>
-    <?php endif; ?>
-  </div>
-</section>
-
-
-<!-- ZONE 3 : COURSE DES CLANS ──────────────────────────────── -->
-<section class="page-section-navy">
-  <div class="container">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start">
-
-      <!-- Saison en cours -->
-      <div>
-        <div class="page-section-eyebrow">Saison en cours</div>
-        <?php if (!empty($active_season['title'])): ?>
-        <h2 class="page-section-title" style="margin-bottom:12px;color:#fff"><?= e($active_season['title']) ?></h2>
-        <?php if (!empty($active_season['main_mission'])): ?>
-        <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-left:3px solid #ea5649;border-radius:0 8px 8px 0;padding:14px 18px;margin-bottom:20px">
-          <div style="font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.3);margin-bottom:4px">Mission principale</div>
-          <div style="font-size:.92rem;font-weight:700;color:#fff"><?= e($active_season['main_mission']) ?></div>
-        </div>
-        <?php endif; ?>
-        <?php else: ?>
-        <h2 class="page-section-title" style="color:#fff;margin-bottom:12px">Saison en cours</h2>
-        <?php endif; ?>
-        <a href="missions.php" style="display:inline-flex;align-items:center;gap:7px;color:rgba(255,255,255,.55);font-size:.88rem;font-weight:600;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.15);padding-bottom:2px">
-          Voir toutes les missions →
-        </a>
-      </div>
-
-      <!-- Course des clans -->
-      <div>
-        <div class="page-section-eyebrow">Score de saison</div>
-        <div class="idx-clan-race">
-          <?php
-          $max_race = max(1, array_reduce($clans_sorted_arr, fn($c, $cl) => max($c, $cl['season_score']), 0));
-          foreach ($clans_sorted_arr as $_ri => $_rc):
-              $bar_w = $max_race > 0 ? round(($_rc['season_score'] / $max_race) * 90) : 0;
-              $_rc_slug = $_rc['slug'] ?? '';
-          ?>
-          <div class="idx-clan-race-row">
-            <div style="display:flex;align-items:center;gap:7px">
-              <span style="font-size:1rem"><?= ['🥇','🥈','🥉'][$_ri] ?? '' ?></span>
-              <div>
-                <div style="font-size:.84rem;font-weight:700;color:#fff"><?= e($_rc['name'] ?? ucfirst($_rc_slug)) ?></div>
-                <div style="font-size:.62rem;color:rgba(255,255,255,.35)"><?= (int)$_rc['members_count'] ?> membres</div>
-              </div>
-            </div>
-            <div class="idx-race-bar"><div class="idx-race-fill" style="width:<?= $bar_w ?>%"></div></div>
-            <div style="text-align:right;font-size:.84rem;font-weight:800;color:#fff">
-              <?= number_format((int)$_rc['season_score'], 0, ',', '&#8201;') ?>
-            </div>
-          </div>
-          <?php endforeach; ?>
-        </div>
-        <a href="communaute.php?tab=classement" style="display:inline-flex;align-items:center;gap:6px;margin-top:14px;color:rgba(255,255,255,.5);font-size:.8rem;font-weight:700;text-decoration:none">
-          🏆 Classement complet des Zonautes →
-        </a>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-
-<!-- ZONE 4 : FIL DE LA ZONE ────────────────────────────────── -->
-<?php if (!empty($dash_feed)): ?>
-<section class="page-section-white">
-  <div class="container">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px">
-      <div>
-        <div class="page-section-eyebrow">Communauté</div>
-        <h2 class="page-section-title" style="margin-bottom:0">Fil de la Zone</h2>
-      </div>
-      <a href="communaute.php" style="font-size:.84rem;font-weight:700;color:var(--primary);text-decoration:none">Tout voir →</a>
-    </div>
-    <?php
-    $feed_icons = ['mission_new'=>'🎯','mission_complete'=>'✅','badge_unlock'=>'🏅',
-                   'flash_start'=>'⚡','collectible_found'=>'🔍','rando_done'=>'🥾','ktc_win'=>'🥐'];
-    foreach ($dash_feed as $_fi):
-        $_fi_ico = $_fi['icon_emoji'] ?: ($feed_icons[$_fi['event_type']] ?? '📋');
-    ?>
-    <div class="idx-feed-item">
-      <span class="idx-feed-icon"><?= e($_fi_ico) ?></span>
-      <div style="flex:1;min-width:0">
-        <div class="idx-feed-text"><?= e(mb_substr($_fi['title'], 0, 80)) ?></div>
-        <div class="idx-feed-meta"><?= $_fi['pseudo'] ? e($_fi['pseudo']) . ' · ' : '' ?><?= function_exists('format_date') ? format_date($_fi['created_at'], 'short') : substr($_fi['created_at'], 0, 10) ?></div>
-      </div>
-    </div>
-    <?php endforeach; ?>
-  </div>
-</section>
-<?php endif; ?>
-
-<?php endif; // fin split guest/member ?>
 
 <?php
 if (function_exists('render_hidden_collectibles')) render_hidden_collectibles('index');
