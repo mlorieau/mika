@@ -51,7 +51,7 @@ require_once '_admin-header.php';
 <div class="adm-page-header">
   <div>
     <h1 class="adm-page-title">Pages CMS</h1>
-    <p class="adm-page-sub">Gérez les pages statiques du site.</p>
+    <p class="adm-page-sub">Gérez les pages statiques du site — y compris <strong>index</strong> et <strong>concept</strong> dont les métadonnées sont éditables ici.</p>
   </div>
   <div class="adm-page-actions">
     <a href="page-edit.php" class="btn-adm btn-adm-primary">+ Nouvelle page</a>
@@ -132,7 +132,13 @@ require_once '_admin-header.php';
             <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
               <a href="page-edit.php?id=<?= (int)$p['id'] ?>"
                  class="btn-adm btn-adm-ghost btn-adm-sm">Modifier →</a>
-              <a href="<?= e(rtrim(BASE_URL, '/')) ?>/page.php?slug=<?= urlencode($p['slug']) ?>"
+              <?php
+              $special = ['index' => 'index.php', 'concept' => 'concept.php'];
+              $preview_url = isset($special[$p['slug']])
+                  ? e(rtrim(BASE_URL, '/')) . '/' . $special[$p['slug']]
+                  : e(rtrim(BASE_URL, '/')) . '/page.php?slug=' . urlencode($p['slug']);
+              ?>
+              <a href="<?= $preview_url ?>"
                  target="_blank" rel="noopener"
                  class="btn-adm btn-adm-ghost btn-adm-sm">Prévisualiser ↗</a>
               <form method="POST" style="display:inline"

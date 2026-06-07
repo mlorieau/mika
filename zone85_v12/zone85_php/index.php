@@ -1,23 +1,4 @@
 <?php
-$page_title       = 'Zone85 — La Vendée vécue, racontée et jouée';
-$page_description = 'Les Échos de terrain, les Randos vendéennes, VICTOR le livre, Les Invisibles — dans un jeu communautaire pour la Vendée. Rejoins les Zonautes.';
-$page_canonical   = 'https://www.zone85.fr/index.php';
-$page_robots      = 'index,follow';
-$page_og_title    = 'Zone85 — La Vendée vécue, racontée et jouée';
-$page_og_description = 'Les Échos, les Randos, VICTOR le livre, Les Invisibles — et un jeu communautaire qui tisse le tout. Rejoins la Zone.';
-$page_og_image    = 'assets/img/ZONE852025.png';
-$page_schema = [
-    '@context' => 'https://schema.org',
-    '@type'    => 'WebSite',
-    'name'     => 'ZONE85',
-    'url'      => 'https://www.zone85.fr',
-    'description' => 'Plateforme communautaire vendéenne : articles, randonnées, livre VICTOR, jeu Les Invisibles et Bataille des Clans.',
-    'potentialAction' => [
-        '@type'       => 'SearchAction',
-        'target'      => 'https://www.zone85.fr/missions.php?q={search_term_string}',
-        'query-input' => 'required name=search_term_string',
-    ],
-];
 $current_page = 'index';
 
 require_once 'includes/config.php';
@@ -25,6 +6,69 @@ require_once 'includes/data.php';
 require_once 'includes/functions.php';
 require_once 'includes/db.php';
 require_once 'includes/repositories.php';
+
+// ── Métadonnées depuis la DB (Sprint 3) ──────────────────────
+$_idx_defaults = [
+    'title'          => 'Zone85 — La Vendée vécue, racontée et jouée',
+    'meta_desc'      => 'Les Échos de terrain, les Randos vendéennes, VICTOR le livre, Les Invisibles — dans un jeu communautaire pour la Vendée. Rejoins les Zonautes.',
+    'og_title'       => 'Zone85 — La Vendée vécue, racontée et jouée',
+    'og_desc'        => 'Les Échos, les Randos, VICTOR le livre, Les Invisibles — et un jeu communautaire qui tisse le tout. Rejoins la Zone.',
+    'og_image'       => 'assets/img/ZONE852025.png',
+    'canonical'      => 'https://www.zone85.fr/',
+    'robots'         => 'index,follow',
+];
+if (db_enabled()) {
+    try {
+        $_pdo_idx = db();
+        $_pdo_idx->exec("CREATE TABLE IF NOT EXISTS pages (
+            id INT AUTO_INCREMENT PRIMARY KEY, slug VARCHAR(120) NOT NULL UNIQUE,
+            title VARCHAR(255) NOT NULL DEFAULT '', meta_title VARCHAR(255) DEFAULT NULL,
+            meta_description TEXT DEFAULT NULL, hero_title VARCHAR(255) DEFAULT NULL,
+            hero_subtitle TEXT DEFAULT NULL, hero_image VARCHAR(512) DEFAULT NULL,
+            content_blocks JSON DEFAULT NULL, status ENUM('published','draft') NOT NULL DEFAULT 'draft',
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            INDEX idx_slug(slug), INDEX idx_status(status)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+        // Seed default entry if missing
+        $_pdo_idx->prepare("INSERT IGNORE INTO pages (slug, title, meta_title, meta_description, hero_image, status)
+            VALUES ('index', :t, :mt, :md, :img, 'published')")
+            ->execute([':t'=>$_idx_defaults['title'],':mt'=>$_idx_defaults['og_title'],
+                       ':md'=>$_idx_defaults['meta_desc'],':img'=>$_idx_defaults['og_image']]);
+
+        $_meta_row = $_pdo_idx->prepare("SELECT * FROM pages WHERE slug='index' LIMIT 1");
+        $_meta_row->execute();
+        $_meta_row = $_meta_row->fetch();
+        if ($_meta_row) {
+            if (!empty($_meta_row['meta_title']))       $_idx_defaults['title']    = $_meta_row['meta_title'];
+            if (!empty($_meta_row['meta_description'])) $_idx_defaults['meta_desc']= $_meta_row['meta_description'];
+            if (!empty($_meta_row['meta_title']))       $_idx_defaults['og_title'] = $_meta_row['meta_title'];
+            if (!empty($_meta_row['meta_description'])) $_idx_defaults['og_desc']  = $_meta_row['meta_description'];
+            if (!empty($_meta_row['hero_image']))       $_idx_defaults['og_image'] = $_meta_row['hero_image'];
+        }
+    } catch (PDOException $e) {}
+}
+
+$page_title          = $_idx_defaults['title'];
+$page_description    = $_idx_defaults['meta_desc'];
+$page_canonical      = $_idx_defaults['canonical'];
+$page_robots         = $_idx_defaults['robots'];
+$page_og_title       = $_idx_defaults['og_title'];
+$page_og_description = $_idx_defaults['og_desc'];
+$page_og_image       = $_idx_defaults['og_image'];
+$page_schema = [
+    '@context' => 'https://schema.org',
+    '@type'    => 'WebSite',
+    'name'     => 'ZONE85',
+    'url'      => 'https://www.zone85.fr',
+    'description' => $page_description,
+    'potentialAction' => [
+        '@type'       => 'SearchAction',
+        'target'      => 'https://www.zone85.fr/missions.php?q={search_term_string}',
+        'query-input' => 'required name=search_term_string',
+    ],
+];
 
 // ── Détection utilisateur ────────────────────────────────────
 $_is_guest = !(session_status() === PHP_SESSION_ACTIVE && !empty($_SESSION['user']));

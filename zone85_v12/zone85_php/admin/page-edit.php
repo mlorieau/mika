@@ -365,6 +365,27 @@ require_once '_admin-header.php';
         </div>
       </div>
 
+      <!-- Card — Analyse SEO -->
+      <div class="adm-card">
+        <p class="adm-card-title" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <span>🔍 Analyse SEO</span>
+          <span id="pe-seo-score" style="font-size:.8rem;font-weight:900;padding:4px 12px;border-radius:20px;background:#e8e2db;color:#6b7f96">—</span>
+        </p>
+        <div id="pe-seo-checklist" style="display:flex;flex-direction:column;gap:7px">
+          <p style="font-size:.8rem;color:#6b7f96;font-style:italic;margin:0">Remplir les champs pour lancer l'analyse…</p>
+        </div>
+        <div style="margin-top:14px;padding-top:12px;border-top:1px solid #f0ece7">
+          <button type="button" id="pe-ps-btn" onclick="peRunPageSpeed()"
+                  style="width:100%;padding:7px 14px;border-radius:7px;border:1.5px solid #d0cbc5;background:#fff;cursor:pointer;font-size:.78rem;font-weight:700;color:#0c1e2e;transition:background .12s">
+            ⚡ Tester PageSpeed
+          </button>
+          <div id="pe-ps-result" style="margin-top:10px"></div>
+        </div>
+        <div style="margin-top:10px">
+          <a href="seo.php" style="font-size:.74rem;color:#6b7f96;font-weight:600">Vue d'ensemble SEO →</a>
+        </div>
+      </div>
+
     </div><!-- /.right -->
 
   </div><!-- /.pe-layout -->
@@ -647,6 +668,124 @@ const BlockEditor = (function () {
 
 // Initialise with current page data
 BlockEditor.init('<?= $blocks_for_js ?>');
+</script>
+
+<!-- ── SEO Live Panel JS ──────────────────────────────────── -->
+<script>
+(function(){
+    var _peSeoTimer = null;
+
+    function _peSeoItem(status, label, detail) {
+        var c = {green:'#1a7a42', orange:'#8a6020', red:'#c0392b'};
+        var b = {green:'rgba(42,157,92,.1)', orange:'rgba(201,150,42,.09)', red:'rgba(234,86,73,.08)'};
+        var ico = {green:'✓', orange:'⚠', red:'✕'};
+        return '<div style="display:flex;align-items:flex-start;gap:9px;padding:7px 10px;border-radius:7px;background:'+b[status]+'">'
+             + '<span style="width:17px;height:17px;border-radius:50%;background:'+c[status]+';color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:900;flex-shrink:0;margin-top:1px">'+ico[status]+'</span>'
+             + '<div><div style="font-size:.82rem;font-weight:700;color:#0f1e2d">'+label+'</div>'
+             + '<div style="font-size:.74rem;color:#6b7f96;margin-top:1px">'+detail+'</div></div></div>';
+    }
+
+    function peSEO() {
+        var metaTitle = (document.querySelector('[name="meta_title"]') || {value:''}).value;
+        var pageTitle = (document.querySelector('[name="title"]')      || {value:''}).value;
+        var metaDesc  = (document.querySelector('[name="meta_description"]') || {value:''}).value;
+        var slug      = (document.querySelector('[name="slug"]')       || {value:''}).value;
+        var heroImg   = (document.querySelector('[name="hero_image"]') || {value:''}).value;
+
+        var effectiveTitle = metaTitle || pageTitle;
+        var items   = [];
+        var statuses = [];
+
+        // 1. Titre SEO
+        var tl = effectiveTitle.length;
+        var ts = tl >= 50 && tl <= 60 ? 'green' : (tl >= 30 && tl <= 70 ? 'orange' : 'red');
+        items.push(_peSeoItem(ts, 'Titre SEO', tl + ' caractères (idéal 50–60)' + (metaTitle ? ' — meta_title utilisé' : ' — titre page utilisé')));
+        statuses.push(ts);
+
+        // 2. Meta description
+        var dl = metaDesc.length;
+        var ds = dl >= 120 && dl <= 158 ? 'green' : (dl >= 60 && dl <= 200 ? 'orange' : 'red');
+        items.push(_peSeoItem(ds, 'Meta description', dl + ' caractères (idéal 120–158)'));
+        statuses.push(ds);
+
+        // 3. Slug
+        var ss = (slug.length > 0 && slug.length <= 60) ? 'green' : (slug.length > 60 ? 'orange' : 'red');
+        items.push(_peSeoItem(ss, 'URL Slug', slug.length > 0 ? '"'+slug+'" ('+slug.length+' chars)' : 'Slug manquant'));
+        statuses.push(ss);
+
+        // 4. Image hero (og:image)
+        var hs = heroImg.length > 0 ? 'green' : 'orange';
+        items.push(_peSeoItem(hs, 'Image hero (og:image)', heroImg.length > 0 ? 'Présente' : 'Absente — recommandé pour les partages'));
+        statuses.push(hs);
+
+        // Score
+        var pts = {green:2, orange:1, red:0};
+        var total = statuses.reduce(function(s,st){ return s + pts[st]; }, 0);
+        var pct   = Math.round(total / (statuses.length * 2) * 100);
+        var scoreColor = pct >= 80 ? '#1a7a42' : (pct >= 50 ? '#8a6020' : '#c0392b');
+        var scoreBg    = pct >= 80 ? 'rgba(42,157,92,.12)' : (pct >= 50 ? 'rgba(201,150,42,.12)' : 'rgba(234,86,73,.1)');
+
+        var badge = document.getElementById('pe-seo-score');
+        if (badge) { badge.textContent = pct+'%'; badge.style.background = scoreBg; badge.style.color = scoreColor; }
+        var cl = document.getElementById('pe-seo-checklist');
+        if (cl) cl.innerHTML = items.join('');
+    }
+
+    function debounceSEO(){ clearTimeout(_peSeoTimer); _peSeoTimer = setTimeout(peSEO, 400); }
+
+    document.addEventListener('DOMContentLoaded', function(){
+        peSEO();
+        ['meta_title','title','meta_description','slug','hero_image'].forEach(function(n){
+            var el = document.querySelector('[name="'+n+'"]');
+            if(el) el.addEventListener('input', debounceSEO);
+        });
+    });
+
+    window.peRunPageSpeed = function() {
+        var btn = document.getElementById('pe-ps-btn');
+        var res = document.getElementById('pe-ps-result');
+        var slug = (document.querySelector('[name="slug"]') || {value:''}).value;
+        if (!slug) { alert('Renseigne d\'abord le slug de la page.'); return; }
+
+        var pageUrl = window.location.protocol + '//' + window.location.host + '/page.php?slug=' + encodeURIComponent(slug);
+        btn.textContent = '⏳ Analyse…';
+        btn.disabled = true;
+        res.innerHTML = '<p style="font-size:.78rem;color:#6b7f96;margin:0">Interrogation de Google PageSpeed Insights…</p>';
+
+        fetch('ajax/pagespeed.php?url=' + encodeURIComponent(pageUrl))
+            .then(function(r){ return r.json(); })
+            .then(function(d){
+                btn.textContent = '⚡ Tester PageSpeed';
+                btn.disabled = false;
+                if (d.error) { res.innerHTML = '<p style="font-size:.78rem;color:#c0392b;margin:0">Erreur : '+d.error+'</p>'; return; }
+                res.innerHTML = _peRenderPS(d);
+            })
+            .catch(function(){
+                btn.textContent = '⚡ Tester PageSpeed';
+                btn.disabled = false;
+                res.innerHTML = '<p style="font-size:.78rem;color:#c0392b;margin:0">Erreur réseau.</p>';
+            });
+    };
+
+    function _peRenderPS(d) {
+        function sc(s){ return s>=90?'#1a7a42':s>=50?'#8a6020':'#c0392b'; }
+        function sb(s){ return s>=90?'rgba(42,157,92,.1)':s>=50?'rgba(201,150,42,.1)':'rgba(234,86,73,.08)'; }
+        var m = Math.round((d.mobile||0)*100), dsk = Math.round((d.desktop||0)*100);
+        var h = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'
+              + '<div style="background:'+sb(m)+';border-radius:8px;padding:10px;text-align:center"><div style="font-size:1.4rem;font-weight:900;color:'+sc(m)+'">'+m+'</div><div style="font-size:.68rem;font-weight:700;color:#6b7f96;margin-top:2px">📱 Mobile</div></div>'
+              + '<div style="background:'+sb(dsk)+';border-radius:8px;padding:10px;text-align:center"><div style="font-size:1.4rem;font-weight:900;color:'+sc(dsk)+'">'+dsk+'</div><div style="font-size:.68rem;font-weight:700;color:#6b7f96;margin-top:2px">🖥 Desktop</div></div>'
+              + '</div>';
+        if (d.cwv && Object.keys(d.cwv).length > 0) {
+            var labels = {lcp:'LCP',cls:'CLS',fcp:'FCP',ttfb:'TTFB',inp:'INP'};
+            h += '<div style="font-size:.72rem;font-weight:700;color:#6b7f96;margin-bottom:5px">Core Web Vitals</div><div style="display:flex;flex-direction:column;gap:3px">';
+            Object.keys(d.cwv).forEach(function(k){
+                h += '<div style="display:flex;justify-content:space-between;font-size:.75rem;padding:4px 8px;background:#f8f4ef;border-radius:5px"><span style="color:#3d5166;font-weight:600">'+(labels[k]||k)+'</span><span style="font-weight:700">'+d.cwv[k]+'</span></div>';
+            });
+            h += '</div>';
+        }
+        return h;
+    }
+})();
 </script>
 
 <?php require_once '_admin-footer.php'; ?>

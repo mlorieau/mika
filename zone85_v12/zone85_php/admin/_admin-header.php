@@ -29,6 +29,7 @@ $_adm_nav = [
   ],
   'STATISTIQUES' => [
     ['victor.php',  'victor',  '📖', 'VICTOR — Téléchargements'],
+    ['seo.php',     'seo',     '🔍', 'SEO — Vue d\'ensemble'],
   ],
   'SYSTÈME' => [
     ['collectibles.php', 'collectibles', '🔍', 'Collectibles'],

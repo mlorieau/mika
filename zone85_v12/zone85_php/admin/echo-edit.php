@@ -372,6 +372,135 @@ document.getElementById('echo_form').addEventListener('submit',function(){
 // Style Quill dans l'interface admin
 var qlEl = document.querySelector('.ql-container');
 if(qlEl){ qlEl.style.minHeight = '300px'; qlEl.style.fontSize = '1rem'; qlEl.style.fontFamily = 'Inter, sans-serif'; }
+
+// ── Analyse SEO en direct ──────────────────────────────────────
+var _seoTimer = null;
+
+function _seoItem(status, label, detail) {
+    var c = {green:'#1a7a42', orange:'#8a6020', red:'#c0392b'};
+    var b = {green:'rgba(42,157,92,.1)', orange:'rgba(201,150,42,.09)', red:'rgba(234,86,73,.08)'};
+    var i = {green:'✓', orange:'⚠', red:'✕'};
+    return '<div style="display:flex;align-items:flex-start;gap:9px;padding:7px 10px;border-radius:7px;background:'+b[status]+'">'
+         + '<span style="width:17px;height:17px;border-radius:50%;background:'+c[status]+';color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:900;flex-shrink:0;margin-top:1px">'+i[status]+'</span>'
+         + '<div><div style="font-size:.82rem;font-weight:700;color:#0f1e2d">'+label+'</div>'
+         + '<div style="font-size:.74rem;color:#6b7f96;margin-top:1px">'+detail+'</div></div></div>';
+}
+
+function runSEO() {
+    var title   = (document.getElementById('f_title')   || {value:''}).value;
+    var slug    = (document.getElementById('f_slug')    || {value:''}).value;
+    var excerpt = (document.getElementById('f_excerpt') || {value:''}).value;
+    var cover   = (document.getElementById('f_cover')   || {value:''}).value;
+    var body    = quill ? quill.root.innerHTML : '';
+
+    var items   = [];
+    var statuses = [];
+
+    // 1. Titre
+    var tl = title.length;
+    var ts = tl >= 50 && tl <= 60 ? 'green' : (tl >= 30 && tl <= 70 ? 'orange' : 'red');
+    items.push(_seoItem(ts, 'Titre de l\'article', tl + ' caractères — idéal 50–60'));
+    statuses.push(ts);
+
+    // 2. Meta description (extrait)
+    var el = excerpt.length;
+    var es = el >= 120 && el <= 158 ? 'green' : (el >= 60 && el <= 200 ? 'orange' : 'red');
+    items.push(_seoItem(es, 'Meta description (extrait)', el + ' caractères — idéal 120–158'));
+    statuses.push(es);
+
+    // 3. Slug
+    var ss = (slug.length > 0 && slug.length <= 60) ? 'green' : (slug.length > 60 ? 'orange' : 'red');
+    items.push(_seoItem(ss, 'URL Slug', slug.length > 0 ? '"'+slug+'" ('+slug.length+' chars)' : 'Slug manquant'));
+    statuses.push(ss);
+
+    // 4. Image couverture (og:image)
+    var cs = cover.length > 0 ? 'green' : 'orange';
+    items.push(_seoItem(cs, 'Image de couverture', cover.length > 0 ? 'Présente — og:image défini' : 'Absente — recommandé pour les partages'));
+    statuses.push(cs);
+
+    // 5. H2 dans le corps
+    var h2 = (body.match(/<h2[^>]*>/gi) || []).length;
+    var wordCount = body.replace(/<[^>]+>/g,'').trim().split(/\s+/).filter(Boolean).length;
+    var hs = h2 >= 2 ? 'green' : (h2 === 1 ? 'orange' : (wordCount > 300 ? 'red' : 'orange'));
+    items.push(_seoItem(hs, 'Sous-titres H2 dans le corps', h2 > 0 ? h2+' H2 trouvé(s)' : 'Aucun H2 — structurer le contenu'));
+    statuses.push(hs);
+
+    // 6. Alts images dans le corps
+    var imgs = body.match(/<img[^>]*>/gi) || [];
+    var withAlt = imgs.filter(function(im){ return /alt=["'][^"']+["']/i.test(im); }).length;
+    var as2 = imgs.length === 0 ? 'green' : (withAlt === imgs.length ? 'green' : (withAlt > 0 ? 'orange' : 'red'));
+    items.push(_seoItem(as2, 'Textes alternatifs images', imgs.length === 0 ? 'Aucune image (OK)' : withAlt+'/'+imgs.length+' images avec alt'));
+    statuses.push(as2);
+
+    // Score
+    var pts = {green:2, orange:1, red:0};
+    var total = statuses.reduce(function(s,st){ return s + pts[st]; }, 0);
+    var pct   = Math.round(total / (statuses.length * 2) * 100);
+    var scoreColor = pct >= 80 ? '#1a7a42' : (pct >= 50 ? '#8a6020' : '#c0392b');
+    var scoreBg    = pct >= 80 ? 'rgba(42,157,92,.12)' : (pct >= 50 ? 'rgba(201,150,42,.12)' : 'rgba(234,86,73,.1)');
+
+    var badge = document.getElementById('seo-score-badge');
+    badge.textContent  = pct+'%';
+    badge.style.background = scoreBg;
+    badge.style.color  = scoreColor;
+    document.getElementById('seo-checklist').innerHTML = items.join('');
+}
+
+// Init + live listeners
+(function(){
+    setTimeout(runSEO, 200);
+    ['f_title','f_slug','f_excerpt','f_cover'].forEach(function(id){
+        var el = document.getElementById(id);
+        if(el) el.addEventListener('input', function(){ clearTimeout(_seoTimer); _seoTimer = setTimeout(runSEO, 400); });
+    });
+    if(quill) quill.on('text-change', function(){ clearTimeout(_seoTimer); _seoTimer = setTimeout(runSEO, 600); });
+})();
+
+// ── PageSpeed ─────────────────────────────────────────────────
+function runPageSpeed() {
+    var btn  = document.getElementById('pagespeed-btn');
+    var res  = document.getElementById('pagespeed-result');
+    var slug = (document.getElementById('f_slug') || {value:''}).value;
+    if (!slug) { alert('Renseigne d\'abord le slug de l\'article.'); return; }
+
+    var pageUrl = window.location.protocol + '//' + window.location.host + '/les-echos-article.php?slug=' + encodeURIComponent(slug);
+    btn.textContent = '⏳ Analyse…';
+    btn.disabled = true;
+    res.innerHTML = '<p style="font-size:.78rem;color:#6b7f96;margin:0">Interrogation de Google PageSpeed Insights…</p>';
+
+    fetch({$base_url_js} + '/admin/ajax/pagespeed.php?url=' + encodeURIComponent(pageUrl))
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+            btn.textContent = '⚡ Tester PageSpeed';
+            btn.disabled = false;
+            if (d.error) { res.innerHTML = '<p style="font-size:.78rem;color:#c0392b;margin:0">Erreur : ' + d.error + '</p>'; return; }
+            res.innerHTML = _renderPS(d);
+        })
+        .catch(function(){
+            btn.textContent = '⚡ Tester PageSpeed';
+            btn.disabled = false;
+            res.innerHTML = '<p style="font-size:.78rem;color:#c0392b;margin:0">Erreur réseau.</p>';
+        });
+}
+
+function _renderPS(d) {
+    function sc(s){ return s>=90?'#1a7a42':s>=50?'#8a6020':'#c0392b'; }
+    function sb(s){ return s>=90?'rgba(42,157,92,.1)':s>=50?'rgba(201,150,42,.1)':'rgba(234,86,73,.08)'; }
+    var m = Math.round((d.mobile||0)*100), dsk = Math.round((d.desktop||0)*100);
+    var h = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'
+          + '<div style="background:'+sb(m)+';border-radius:8px;padding:10px;text-align:center"><div style="font-size:1.4rem;font-weight:900;color:'+sc(m)+'">'+m+'</div><div style="font-size:.68rem;font-weight:700;color:#6b7f96;margin-top:2px">📱 Mobile</div></div>'
+          + '<div style="background:'+sb(dsk)+';border-radius:8px;padding:10px;text-align:center"><div style="font-size:1.4rem;font-weight:900;color:'+sc(dsk)+'">'+dsk+'</div><div style="font-size:.68rem;font-weight:700;color:#6b7f96;margin-top:2px">🖥 Desktop</div></div>'
+          + '</div>';
+    if (d.cwv && Object.keys(d.cwv).length > 0) {
+        var labels = {lcp:'LCP',cls:'CLS',fcp:'FCP',ttfb:'TTFB',inp:'INP'};
+        h += '<div style="font-size:.72rem;font-weight:700;color:#6b7f96;margin-bottom:5px">Core Web Vitals</div><div style="display:flex;flex-direction:column;gap:3px">';
+        Object.keys(d.cwv).forEach(function(k){
+            h += '<div style="display:flex;justify-content:space-between;font-size:.75rem;padding:4px 8px;background:#f8f4ef;border-radius:5px"><span style="color:#3d5166;font-weight:600">'+(labels[k]||k)+'</span><span style="font-weight:700">'+d.cwv[k]+'</span></div>';
+        });
+        h += '</div>';
+    }
+    return h;
+}
 </script>
 SCRIPTS;
 
@@ -582,6 +711,25 @@ require_once __DIR__ . '/_admin-header.php';
         <span class="adm-hint">Vide = date actuelle à la publication.</span>
       </div>
     </div>
+  </div>
+
+  <!-- ── Analyse SEO ──────────────────────────────────────── -->
+  <div class="adm-card" id="seo-panel">
+    <p class="adm-card-title" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <span>🔍 Analyse SEO en direct</span>
+      <span id="seo-score-badge" style="font-size:.8rem;font-weight:900;padding:4px 14px;border-radius:20px;background:#e8e2db;color:#6b7f96">—</span>
+    </p>
+    <div id="seo-checklist" style="display:flex;flex-direction:column;gap:7px">
+      <p style="font-size:.82rem;color:#6b7f96;font-style:italic">Chargement de l'analyse…</p>
+    </div>
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid #f0ece7;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <button type="button" id="pagespeed-btn" onclick="runPageSpeed()"
+              style="padding:7px 14px;border-radius:7px;border:1.5px solid #d0cbc5;background:#fff;cursor:pointer;font-size:.78rem;font-weight:700;color:#0c1e2e;transition:background .12s">
+        ⚡ Tester PageSpeed
+      </button>
+      <a href="seo.php" style="font-size:.76rem;color:#6b7f96;font-weight:600">Vue d'ensemble SEO →</a>
+    </div>
+    <div id="pagespeed-result" style="margin-top:12px"></div>
   </div>
 
   <!-- ── Actions ───────────────────────────────────────────── -->

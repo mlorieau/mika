@@ -1,9 +1,42 @@
 <?php
-$page_title       = 'Le Concept — Zone85';
-$page_description = 'Zone85 : ce que c\'est vraiment, pourquoi créer un compte, ce que sont les clans, et comment l\'installer en un clic sur votre téléphone.';
-$page_canonical   = 'https://www.zone85.fr/concept.php';
-$page_robots      = 'index,follow';
-$page_og_image    = 'assets/img/ZONE852025.png';
+$current_page = 'concept';
+require_once 'includes/config.php';
+require_once 'includes/data.php';
+require_once 'includes/functions.php';
+require_once 'includes/db.php';
+
+// ── Métadonnées depuis la DB (Sprint 3) ──────────────────────
+$_cpt_defaults = [
+    'title'     => 'Le Concept — Zone85',
+    'meta_desc' => 'Zone85 : ce que c\'est vraiment, pourquoi créer un compte, ce que sont les clans, et comment l\'installer en un clic sur votre téléphone.',
+    'og_image'  => 'assets/img/ZONE852025.png',
+    'canonical' => 'https://www.zone85.fr/concept.php',
+    'robots'    => 'index,follow',
+];
+if (function_exists('db_enabled') && db_enabled()) {
+    try {
+        $_pdo_cpt = db();
+        $_pdo_cpt->prepare("INSERT IGNORE INTO pages (slug, title, meta_title, meta_description, hero_image, status)
+            VALUES ('concept', :t, :mt, :md, :img, 'published')")
+            ->execute([':t'=>'Concept Zone85',':mt'=>$_cpt_defaults['title'],
+                       ':md'=>$_cpt_defaults['meta_desc'],':img'=>$_cpt_defaults['og_image']]);
+
+        $_cpt_row = $_pdo_cpt->prepare("SELECT * FROM pages WHERE slug='concept' LIMIT 1");
+        $_cpt_row->execute();
+        $_cpt_row = $_cpt_row->fetch();
+        if ($_cpt_row) {
+            if (!empty($_cpt_row['meta_title']))       $_cpt_defaults['title']    = $_cpt_row['meta_title'];
+            if (!empty($_cpt_row['meta_description'])) $_cpt_defaults['meta_desc']= $_cpt_row['meta_description'];
+            if (!empty($_cpt_row['hero_image']))       $_cpt_defaults['og_image'] = $_cpt_row['hero_image'];
+        }
+    } catch (PDOException $e) {}
+}
+
+$page_title       = $_cpt_defaults['title'];
+$page_description = $_cpt_defaults['meta_desc'];
+$page_canonical   = $_cpt_defaults['canonical'];
+$page_robots      = $_cpt_defaults['robots'];
+$page_og_image    = $_cpt_defaults['og_image'];
 $page_schema      = [
     '@context' => 'https://schema.org',
     '@type' => 'BreadcrumbList',
@@ -12,10 +45,6 @@ $page_schema      = [
         ['@type'=>'ListItem','position'=>2,'name'=>'Le Concept','item'=>'https://www.zone85.fr/concept.php'],
     ],
 ];
-$current_page = 'concept';
-require_once 'includes/config.php';
-require_once 'includes/data.php';
-require_once 'includes/functions.php';
 
 $page_styles = '<style>
 
@@ -87,8 +116,8 @@ $page_styles = '<style>
 .cp-pillar-header-echos{background:linear-gradient(135deg,#1a1a2e,#12314e)}
 .cp-pillar-header-randos{background:linear-gradient(135deg,#1a3d1a,#12314e)}
 .cp-pillar-header-ktc{background:linear-gradient(135deg,#2b1a0a,#12314e)}
-.cp-pillar-header-victor{background:linear-gradient(135deg,#1a1500,#3a2a00)}
-.cp-pillar-header-invisibles{background:linear-gradient(135deg,#0e0514,#1a0a2e)}
+.cp-pillar-header-victor{background:linear-gradient(135deg,#0c1e2e,#12314e)}
+.cp-pillar-header-invisibles{background:linear-gradient(135deg,#0a1628,#111e30)}
 .cp-pillar-header-missions{background:linear-gradient(135deg,#1a0010,#2e0a1a)}
 .cp-pillar-icon{font-size:2.2rem;line-height:1;margin-bottom:12px;display:block}
 .cp-pillar-name{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:rgba(255,255,255,.5);margin-bottom:6px}
@@ -136,6 +165,7 @@ require_once 'includes/nav.php';
       <div class="page-eyebrow">Le Concept</div>
       <h1 class="page-h1">Zone85 — pourquoi, comment, pour qui.</h1>
       <p class="page-sub">Ce que c'est vraiment. Ce que ce n'est pas. Et pourquoi vous allez y rester.</p>
+      <p style="margin-top:24px;font-size:1.05rem;font-style:italic;color:rgba(255,255,255,.75);border-left:3px solid var(--primary);padding-left:16px;line-height:1.55">La Zone51 a ses extraterrestres.<br>Zone85 a ses extraordinaires.</p>
     </div>
   </div>
 </section>
