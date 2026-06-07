@@ -4,6 +4,7 @@
 
 // Liens directs toujours visibles dans la barre
 $_nav_direct = [
+    ['slug' => 'concept',  'label' => 'Concept',  'file' => 'concept.php'],
     ['slug' => 'missions', 'label' => 'Missions', 'file' => 'missions.php'],
     ['slug' => 'clans',    'label' => 'Clans',    'file' => 'clans.php'],
 ];

@@ -130,7 +130,7 @@ require_once 'includes/nav.php';
 ?>
 
 <!-- ── HERO ─────────────────────────────────────────────────── -->
-<section class="page-hero">
+<section class="page-hero dark">
   <div class="container">
     <div class="page-hero-inner">
       <div class="page-eyebrow">Le Concept</div>
@@ -211,7 +211,6 @@ require_once 'includes/nav.php';
         <p class="cp-reason-desc">Le prochain jeu immersif de Zone85 s'ancre dans la Vendée réelle. Les membres seront les premiers prévenus — et les premiers à jouer.</p>
       </div>
     </div>
-    <p class="cp-free-note">Et c'est <strong>entièrement gratuit</strong>. Toujours.</p>
   </div>
 </section>
 
@@ -291,7 +290,7 @@ require_once 'includes/nav.php';
   <div class="container">
     <div class="cp-head">
       <div class="cp-eyebrow">Ce qu'on fait sur Zone85</div>
-      <h2 class="cp-title">Cinq façons de vivre la Vendée</h2>
+      <h2 class="cp-title">Six façons de vivre la Vendée</h2>
       <p class="cp-sub">Le contenu est la raison d'être. Le jeu est l'ambiance. Voici ce que Zone85 produit, rassemble et fait vivre.</p>
     </div>
     <div class="cp-pillars">
@@ -381,6 +380,144 @@ require_once 'includes/nav.php';
 </section>
 
 
+
+<!-- ── SECTION HISTOIRE ──────────────────────────────────────── -->
+<section class="page-section-white">
+  <div class="container">
+    <div class="cp-head" style="max-width:720px">
+      <div class="cp-eyebrow">L'histoire</div>
+      <h2 class="cp-title">Comment tout a commencé</h2>
+      <p class="cp-sub">Dix ans de Vendée partagée, construite brique à brique par des gens qui la vivent vraiment.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:0;max-width:680px">
+
+      <div style="display:grid;grid-template-columns:80px 1fr;gap:0 28px;padding-bottom:40px;position:relative">
+        <div style="text-align:right">
+          <div style="font-size:1.2rem;font-weight:900;color:var(--primary);line-height:1">2015</div>
+          <div style="font-size:.7rem;color:var(--text-muted);font-weight:600;margin-top:4px">Le début</div>
+        </div>
+        <div style="border-left:2px solid var(--beige-dark);padding-left:28px;padding-bottom:8px">
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--primary);position:absolute;left:80px;transform:translate(-3px,6px)"></div>
+          <h3 style="font-size:.97rem;font-weight:800;color:var(--text);margin-bottom:8px">Le premier projet</h3>
+          <p style="font-size:.88rem;color:var(--text-muted);line-height:1.72">Tout commence avec une idée simple : parler de la Vendée comme on la vit, pas comme on la présente dans les brochures. Audrey et Mickaël posent les premières briques d'un site vivant, décalé, ancré dans le quotidien vendéen.</p>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:80px 1fr;gap:0 28px;padding-bottom:40px;position:relative">
+        <div style="text-align:right">
+          <div style="font-size:1.2rem;font-weight:900;color:var(--primary);line-height:1">2018</div>
+          <div style="font-size:.7rem;color:var(--text-muted);font-weight:600;margin-top:4px">La communauté</div>
+        </div>
+        <div style="border-left:2px solid var(--beige-dark);padding-left:28px;padding-bottom:8px">
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--primary);position:absolute;left:80px;transform:translate(-3px,6px)"></div>
+          <h3 style="font-size:.97rem;font-weight:800;color:var(--text);margin-bottom:8px">La communauté prend forme</h3>
+          <p style="font-size:.88rem;color:var(--text-muted);line-height:1.72">Les lecteurs deviennent acteurs. Les premiers Zonautes rejoignent la Zone, participent aux enquêtes, commentent les rubriques. La Bataille des Clans naît de ce besoin de jeu collectif : Bocage, Littoral ou Marais — chacun défend ses couleurs.</p>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:80px 1fr;gap:0 28px;padding-bottom:40px;position:relative">
+        <div style="text-align:right">
+          <div style="font-size:1.2rem;font-weight:900;color:var(--primary);line-height:1">2021</div>
+          <div style="font-size:.7rem;color:var(--text-muted);font-weight:600;margin-top:4px">Le terrain</div>
+        </div>
+        <div style="border-left:2px solid var(--beige-dark);padding-left:28px;padding-bottom:8px">
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--primary);position:absolute;left:80px;transform:translate(-3px,6px)"></div>
+          <h3 style="font-size:.97rem;font-weight:800;color:var(--text);margin-bottom:8px">RandoZone &amp; les aventures du terrain</h3>
+          <p style="font-size:.88rem;color:var(--text-muted);line-height:1.72">La Vendée se parcourt à pied. RandoZone naît pour raconter les sentiers, les chemins de halage, les panoramas côtiers et les forêts du bocage. Les Zonautes partagent leurs itinéraires, leurs photos, leurs coups de cœur.</p>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:80px 1fr;gap:0 28px;position:relative">
+        <div style="text-align:right">
+          <div style="font-size:1.2rem;font-weight:900;color:var(--primary);line-height:1">2024</div>
+          <div style="font-size:.7rem;color:var(--text-muted);font-weight:600;margin-top:4px">L'équipe</div>
+        </div>
+        <div style="border-left:2px solid var(--beige-dark);padding-left:28px">
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--primary);position:absolute;left:80px;transform:translate(-3px,6px)"></div>
+          <h3 style="font-size:.97rem;font-weight:800;color:var(--text);margin-bottom:8px">Jessica rejoint l'équipe</h3>
+          <p style="font-size:.88rem;color:var(--text-muted);line-height:1.72">L'aventure s'agrandit. Jessica apporte son regard, sa plume et son énergie à la Zone. L'équipe à trois têtes se retrousse les manches pour la prochaine décennie.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ── SECTION PHILOSOPHIE ───────────────────────────────────── -->
+<section class="page-section" style="background:var(--beige)">
+  <div class="container">
+    <div class="cp-head" style="text-align:center">
+      <div class="cp-eyebrow">Notre philosophie</div>
+      <h2 class="cp-title">On voulait parler de la Vendée comme on la vit</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:20px;max-width:800px;margin:0 auto">
+
+      <div style="background:#fff;border-radius:14px;padding:28px 24px;border:1.5px solid var(--beige-dark)">
+        <div style="font-size:1.6rem;margin-bottom:12px">❤️</div>
+        <div style="font-size:.97rem;font-weight:800;color:var(--text);margin-bottom:8px">Avec passion</div>
+        <p style="font-size:.86rem;color:var(--text-muted);line-height:1.65">Zone85 n'est pas un média. C'est un projet de cœur, fait par des gens qui aiment vraiment leur département.</p>
+      </div>
+
+      <div style="background:#fff;border-radius:14px;padding:28px 24px;border:1.5px solid var(--beige-dark)">
+        <div style="font-size:1.6rem;margin-bottom:12px">😄</div>
+        <div style="font-size:.97rem;font-weight:800;color:var(--text);margin-bottom:8px">Avec humour</div>
+        <p style="font-size:.86rem;color:var(--text-muted);line-height:1.65">La Vendée se prend au sérieux mais sait rire d'elle-même. On cultive cet équilibre : fierté et autodérision.</p>
+      </div>
+
+      <div style="background:#fff;border-radius:14px;padding:28px 24px;border:1.5px solid var(--beige-dark)">
+        <div style="font-size:1.6rem;margin-bottom:12px">🛡️</div>
+        <div style="font-size:.97rem;font-weight:800;color:var(--text);margin-bottom:8px">En communauté</div>
+        <p style="font-size:.86rem;color:var(--text-muted);line-height:1.65">La Zone vit grâce aux Zonautes. Chaque profil, chaque participation, chaque échange nourrit le projet.</p>
+      </div>
+
+      <div style="background:#fff;border-radius:14px;padding:28px 24px;border:1.5px solid var(--beige-dark)">
+        <div style="font-size:1.6rem;margin-bottom:12px">🎯</div>
+        <div style="font-size:.97rem;font-weight:800;color:var(--text);margin-bottom:8px">Sans chichis</div>
+        <p style="font-size:.86rem;color:var(--text-muted);line-height:1.65">Pas de jargon, pas de discours institutionnel. On parle vendéen, on pense local, on publie ce qu'on aime.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ── SECTION CODE DE LA ZONE ───────────────────────────────── -->
+<section class="cp-section-navy">
+  <div class="container">
+    <div class="cp-head" style="text-align:center;margin-bottom:40px">
+      <div class="cp-eyebrow">Le code de la Zone</div>
+      <h2 class="cp-title">7 règles pour vivre la Zone</h2>
+      <p class="cp-sub" style="margin:0 auto;text-align:center">Avant de rejoindre ton clan, prends deux minutes pour comprendre l'esprit maison : ici, on joue, on chambre, on partage, mais on garde toujours le cœur vendéen au bon endroit.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;max-width:860px;margin:0 auto">
+
+      <?php
+      $zone_rules = [
+          ['num'=>1,'icon'=>'🥐','rule'=>'Arpenter la Zone85 sans brioche pur beurre tu ne devras.','desc'=>'On débarque doucement, on observe, on comprend les rubriques, les clans et les codes. La Zone85, ça se savoure comme une bonne gâche : pas en courant, pas en écrasant les autres.'],
+          ['num'=>2,'icon'=>'☀️','rule'=>'Du soleil sur la plage, tes fesses tu protégeras.','desc'=>'On peut rire, taquiner, sortir les tongs et parler météo, mais on garde le bon sens vendéen : prudence, respect et pas de fanfaronnade inutile.'],
+          ['num'=>3,'icon'=>'💨','rule'=>'Au Mont des Alouettes, la force du vent tu combattras.','desc'=>'Les défis ne se gagnent pas toujours du premier coup. Ici, on insiste, on cherche, on recommence. Un vrai Zonaute ne lâche pas au premier coup de vent.'],
+          ['num'=>4,'icon'=>'🫘','rule'=>'D\'une mogette ingérée, le gaz tu maîtriseras.','desc'=>"L'humour est bienvenu, le bazar non. On accepte la rigolade, le patois, les blagues de comptoir, mais on évite de polluer les échanges."],
+          ['num'=>5,'icon'=>'🥨','rule'=>'Galocher après le préfou, tu éviteras.','desc'=>'On garde une ambiance propre. Pas de lourdeur, pas de drague chelou, pas d\'insistance. La Zone85 doit rester un endroit où tout le monde se sent bien.'],
+          ['num'=>6,'icon'=>'🌊','rule'=>'Les vagues de l\'Atlantique, tu affronteras.','desc'=>'Il y aura des énigmes, des jeux, des classements et des surprises. On participe avec panache, fair-play et un peu de sel dans les veines.'],
+          ['num'=>7,'icon'=>'❤️','rule'=>'Dans ton cœur, Vendéen tu seras.','desc'=>"Que tu sois du Littoral, du Bocage, du Marais ou d'ailleurs, l'essentiel est là : aimer la Vendée, la faire vivre, la partager et respecter ceux qui la racontent avec toi."],
+      ];
+      foreach ($zone_rules as $r):
+      ?>
+      <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:20px 22px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <span style="font-size:1.1rem"><?= $r['icon'] ?></span>
+          <span style="font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.35)">Leçon <?= $r['num'] ?></span>
+        </div>
+        <p style="font-size:.88rem;font-weight:700;color:#fff;line-height:1.45;margin-bottom:8px;font-style:italic">&ldquo;<?= e($r['rule']) ?>&rdquo;</p>
+        <p style="font-size:.82rem;color:rgba(255,255,255,.5);line-height:1.65"><?= e($r['desc']) ?></p>
+      </div>
+      <?php endforeach; ?>
+
+    </div>
+  </div>
+</section>
+
 <!-- ── SECTION 6 : FAQ ─────────────────────────────────────── -->
 <section class="cp-section-navy">
   <div class="container">
@@ -401,8 +538,8 @@ require_once 'includes/nav.php';
            'a' => "Non. La Bataille des Clans est une émulation amicale entre trois identités vendéennes — pas une guerre. Choisir son clan, c'est comme choisir sa région de cœur : on peut aimer les trois, et se sentir profondément appartenir à l'une. Le créateur de Zone85 aime \"voir tout le monde avancer\"."],
           ['q' => "C'est quoi Les Invisibles ?",
            'a' => "Les Invisibles est le prochain jeu immersif de Zone85. Une aventure ancrée dans la Vendée réelle — des lieux, des indices, des personnages à découvrir sur le terrain. Les membres seront les premiers prévenus. Plus d'infos bientôt."],
-          ['q' => "C'est vraiment gratuit ?",
-           'a' => "Oui, entièrement. Rejoindre la Zone, accéder à VICTOR, participer aux missions, lire les Échos, marcher les randos, jouer au KTC — tout est gratuit. Zone85 est une initiative pour faire vivre l'Esprit Vendée."],
+          ['q' => "Faut-il payer pour participer ?",
+           'a' => "L'inscription sur Zone85 est gratuite. L'accès aux Échos, aux randos, au KTC et aux missions de base est ouvert à tous les membres. Certains jeux à venir — comme Les Invisibles — seront en accès payant. Zone85 est une initiative pour faire vivre l'Esprit Vendée, et certains projets demandent un financement pour exister."],
           ['q' => "Faut-il habiter en Vendée ?",
            'a' => "Non. Zone85 accueille les Vendéens de souche, de cœur et d'adoption. Si la Vendée t'appelle — ou si tu y habites et que tu veux la vivre autrement — tu as ta place dans la Zone."],
           ['q' => "En quoi c'est différent de Facebook ?",
@@ -423,16 +560,16 @@ require_once 'includes/nav.php';
 
 
 <!-- ── CTA FINAL ────────────────────────────────────────────── -->
-<section style="background:var(--primary);padding:80px 0;position:relative;overflow:hidden">
-  <div style="position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:rgba(255,255,255,.06);pointer-events:none"></div>
+<section style="background:linear-gradient(155deg,#0c1e2e,#12314e);padding:80px 0;position:relative;overflow:hidden">
+  <div style="position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:rgba(234,86,73,.06);pointer-events:none"></div>
   <div class="container">
     <div style="display:grid;grid-template-columns:1fr auto;gap:48px;align-items:center;position:relative;z-index:1">
       <div>
         <h2 style="font-size:clamp(1.6rem,3vw,2.2rem);font-weight:900;color:#fff;margin-bottom:10px;letter-spacing:-.5px">Rejoins Zone85 — déverrouille VICTOR.</h2>
-        <p style="color:rgba(255,255,255,.78);font-size:.93rem;line-height:1.65;max-width:500px">Gratuit. Vendéen. Un clic sur votre téléphone.</p>
+        <p style="color:rgba(255,255,255,.65);font-size:.93rem;line-height:1.65;max-width:500px">Vendéen. Communautaire. Une aventure à vivre.</p>
       </div>
       <div style="flex-shrink:0">
-        <a href="<?= page_url('inscription') ?>" class="btn-white">Créer mon compte →</a>
+        <a href="<?= page_url('inscription') ?>" class="btn btn-primary">Créer mon compte →</a>
       </div>
     </div>
   </div>
