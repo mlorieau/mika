@@ -113,11 +113,19 @@ if (!defined('SKIP_MAINTENANCE_CHECK')) {
 
   <!-- Analytics -->
   <?php
-  $_ga4_id    = defined('GA4_MEASUREMENT_ID') ? GA4_MEASUREMENT_ID : '';
-  $_matomo_url = defined('MATOMO_URL') ? MATOMO_URL : '';
-  $_matomo_id  = defined('MATOMO_SITE_ID') ? (int)MATOMO_SITE_ID : 0;
+  // Priorité : DB (admin settings) → constante PHP → vide
+  $_ga4_enabled  = function_exists('get_setting') ? get_setting('ga4_enabled', false) : (defined('GA4_ENABLED') && GA4_ENABLED);
+  $_ga4_id       = function_exists('get_setting') ? get_setting('ga4_measurement_id', '') : (defined('GA4_MEASUREMENT_ID') ? GA4_MEASUREMENT_ID : '');
+  $_matomo_on    = function_exists('get_setting') ? get_setting('matomo_enabled', false) : false;
+  $_matomo_url   = function_exists('get_setting') ? get_setting('matomo_url', '') : (defined('MATOMO_URL') ? MATOMO_URL : '');
+  $_matomo_id    = function_exists('get_setting') ? (int)get_setting('matomo_site_id', 0) : (defined('MATOMO_SITE_ID') ? (int)MATOMO_SITE_ID : 0);
+  // GSC verification
+  $_gsc_token    = function_exists('get_setting') ? get_setting('google_search_console_verification', '') : '';
   ?>
-  <?php if (!empty($_ga4_id)): ?>
+  <?php if (!empty($_gsc_token)): ?>
+  <meta name="google-site-verification" content="<?= htmlspecialchars($_gsc_token, ENT_QUOTES, 'UTF-8') ?>">
+  <?php endif; ?>
+  <?php if ($_ga4_enabled && !empty($_ga4_id) && str_starts_with($_ga4_id, 'G-')): ?>
   <script async src="https://www.googletagmanager.com/gtag/js?id=<?= htmlspecialchars($_ga4_id, ENT_QUOTES) ?>"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -126,7 +134,7 @@ if (!defined('SKIP_MAINTENANCE_CHECK')) {
     gtag('config', '<?= htmlspecialchars($_ga4_id, ENT_QUOTES) ?>', { anonymize_ip: true });
     window.Zone85Analytics = { engine: 'ga4', id: '<?= htmlspecialchars($_ga4_id, ENT_QUOTES) ?>' };
   </script>
-  <?php elseif (!empty($_matomo_url) && $_matomo_id > 0): ?>
+  <?php elseif ($_matomo_on && !empty($_matomo_url) && $_matomo_id > 0): ?>
   <script>
     var _paq = window._paq = window._paq || [];
     _paq.push(['trackPageView']); _paq.push(['enableLinkTracking']);
@@ -140,10 +148,9 @@ if (!defined('SKIP_MAINTENANCE_CHECK')) {
   </script>
   <?php else: ?>
   <script>
-    // Analytics non configuré — stub pour les événements
     window.Zone85Analytics = {
       engine: 'none',
-      track: function(event, params) { console.debug('[Analytics]', event, params || {}); }
+      track: function(e, p) { console.debug('[Analytics]', e, p || {}); }
     };
   </script>
   <?php endif; ?>

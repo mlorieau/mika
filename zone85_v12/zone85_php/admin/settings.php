@@ -343,6 +343,7 @@ input[type="color"].sett-input { padding: 4px 8px; height: 42px; cursor: pointer
           <?php
           $ga4_val = get_setting('ga4_measurement_id', '');
           $mat_url = get_setting('matomo_url', '');
+          $gsc_tok = get_setting('google_search_console_verification', '');
           ?>
           <div style="margin-top:20px;padding:14px 18px;background:#f8f4ef;border-radius:10px;display:flex;gap:12px;flex-wrap:wrap">
             <span class="sett-status <?= !empty($ga4_val) ? 'sett-status-ok' : 'sett-status-off' ?>">
@@ -350,6 +351,9 @@ input[type="color"].sett-input { padding: 4px 8px; height: 42px; cursor: pointer
             </span>
             <span class="sett-status <?= !empty($mat_url) ? 'sett-status-ok' : 'sett-status-off' ?>">
               📈 Matomo : <?= !empty($mat_url) ? 'Configuré' : 'Non configuré' ?>
+            </span>
+            <span class="sett-status <?= !empty($gsc_tok) ? 'sett-status-ok' : 'sett-status-off' ?>">
+              🔍 Google Search Console : <?= !empty($gsc_tok) ? 'Vérifié' : 'Non configuré' ?>
             </span>
           </div>
           <?php endif; ?>
@@ -396,15 +400,24 @@ input[type="color"].sett-input { padding: 4px 8px; height: 42px; cursor: pointer
 
       <?php if ($cat_key === 'analytics'): ?>
       <div class="adm-card" style="background:rgba(42,157,92,.04);border:1px solid rgba(42,157,92,.15)">
-        <div class="adm-card-title" style="color:#1a7a42">📖 Guide Analytics</div>
+        <div class="adm-card-title" style="color:#1a7a42">📖 Guide Analytics &amp; GSC</div>
         <p style="font-size:.84rem;color:#0f1e2d;line-height:1.7;margin:0 0 10px">
           <strong>GA4</strong> : Créer une propriété sur <a href="https://analytics.google.com" target="_blank" style="color:#ea5649">analytics.google.com</a>,
           copier l'ID de mesure (G-XXXXXXXXXX).<br>
           <strong>Matomo</strong> : Alternative self-hosted. Renseigner l'URL et l'ID du site.<br>
-          <strong>Note</strong> : Un seul outil actif à la fois. GA4 est prioritaire si configuré.
+          <strong>Google Search Console</strong> : Dans GSC → Paramètres → Vérification → Balise HTML.
+          Copier uniquement la valeur du <code>content="..."</code> (pas toute la balise).<br>
+          <strong>Note</strong> : Un seul outil analytics actif à la fois. GA4 est prioritaire si configuré.
         </p>
-        <div style="font-size:.78rem;color:#1a7a42;background:rgba(42,157,92,.08);padding:10px 14px;border-radius:7px">
+        <div style="font-size:.78rem;color:#1a7a42;background:rgba(42,157,92,.08);padding:10px 14px;border-radius:7px;margin-bottom:10px">
           Les événements Zone85 trackés : signup, login, mission_start, mission_complete, collectible_found, badge_unlock, pwa_install.
+        </div>
+        <?php
+        $gsc_site_url = rtrim(get_setting('site_url', defined('SITE_URL') ? SITE_URL : ''), '/');
+        ?>
+        <div style="font-size:.78rem;color:#0369a1;background:rgba(14,165,233,.06);padding:10px 14px;border-radius:7px">
+          🗺️ Sitemap disponible à : <code><?= htmlspecialchars($gsc_site_url, ENT_QUOTES, 'UTF-8') ?>/sitemap.php</code>
+          — À soumettre dans Google Search Console → Sitemaps.
         </div>
       </div>
       <?php endif; ?>
