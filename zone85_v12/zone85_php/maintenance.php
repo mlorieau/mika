@@ -44,6 +44,11 @@ header('Retry-After: 3600');
   </p>
   <span class="badge">Retour imminent</span>
   <div class="footer">© 2025 Zone85 — L'Esprit Vendée</div>
+  <div style="margin-top:24px">
+    <a href="login.php?redirect=admin/dashboard.php"
+       style="font-size:.72rem;color:rgba(255,255,255,.2);text-decoration:none"
+       title="Accès administrateur">·</a>
+  </div>
 </div>
 </body>
 </html>

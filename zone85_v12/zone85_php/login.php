@@ -79,6 +79,8 @@ $page_styles = '<style>
 .login-links a{color:var(--primary);font-weight:700;text-decoration:underline}
 .login-tagline{text-align:center;margin-top:24px;font-size:.78rem;color:var(--text-muted);font-style:italic;line-height:1.5}
 </style>';
+// Login accessible même en mode maintenance (l'admin doit pouvoir se connecter)
+define('SKIP_MAINTENANCE_CHECK', true);
 require_once 'includes/header.php';
 require_once 'includes/nav.php';
 ?>
