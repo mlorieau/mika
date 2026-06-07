@@ -26,6 +26,7 @@ require_once 'includes/db.php';
 
 // ── État connexion ─────────────────────────────────────────────
 $is_logged_in = !empty($_SESSION['user_id']) || !empty($_SESSION['pseudo']);
+$current_uid  = $is_logged_in ? (int)($_SESSION['user_id'] ?? 0) : 0;
 
 // ── Validation des filtres ─────────────────────────────────────
 // V12.13 : filtres compacts multi-sélection.
@@ -185,8 +186,12 @@ if (db_enabled()) {
                 }
             }
 
+            $user_rp_subq = $current_uid > 0
+                ? ", (SELECT status FROM rando_participations WHERE rando_id = r.id AND user_id = {$current_uid} LIMIT 1) AS user_rp_status"
+                : ", NULL AS user_rp_status";
             $sql = "SELECT r.*,
                     (SELECT COUNT(*) FROM rando_participations rp WHERE rp.rando_id = r.id) AS nb_completions
+                    {$user_rp_subq}
                     FROM randos r
                     WHERE " . implode(' AND ', $where) . "
                     ORDER BY r.published_at DESC, r.id DESC";
@@ -421,6 +426,19 @@ $page_styles = '<style>
   text-decoration: none;
 }
 .rando-card-cta:hover { color: #1d7a47; }
+
+/* BADGE PARTICIPATION UTILISATEUR */
+.rando-card-done-badge {
+  position: absolute; bottom: 10px; right: 10px;
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: .7rem; font-weight: 900; color: #fff;
+  padding: 4px 10px; border-radius: 999px;
+  letter-spacing: .02em;
+  box-shadow: 0 2px 8px rgba(0,0,0,.22);
+}
+.rando-card-done-stamped   { background: rgba(18,49,78,.82); }
+.rando-card-done-pending   { background: rgba(233,149,26,.9); }
+.rando-card-done-validated { background: rgba(42,157,92,.92); }
 
 /* EMPTY STATE */
 .randos-empty {
@@ -966,6 +984,15 @@ require_once 'includes/nav.php';
               <?php if (!empty($r['gpx_file']) || !empty($r['gpx_url'])): ?>
               <span class="rando-card-gpx-badge">&#x1F5FA; GPX</span>
               <?php endif; ?>
+              <?php
+                $urp = $r['user_rp_status'] ?? null;
+                if ($urp === 'validated'): ?>
+                  <span class="rando-card-done-badge rando-card-done-validated">&#x1F3C6; +25 XP</span>
+                <?php elseif ($urp === 'pending'): ?>
+                  <span class="rando-card-done-badge rando-card-done-pending">&#x23F3; En validation</span>
+                <?php elseif ($urp): ?>
+                  <span class="rando-card-done-badge rando-card-done-stamped">&#x2713; Tamponnée</span>
+                <?php endif; ?>
             </a>
             <div class="rando-card-body">
               <h3 class="rando-card-title">

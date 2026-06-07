@@ -725,6 +725,32 @@ $page_styles = '<style>
 .rando-proof-input{width:100%;font-size:.78rem;margin-bottom:10px}
 .rando-proof-btn{width:100%;border:0;border-radius:10px;background:#0c1e2e;color:#fff;font-weight:900;padding:11px 12px;cursor:pointer}
 .rando-proof-btn:hover{opacity:.92}
+/* Modal info participation (règles) */
+.rando-info-modal{position:fixed;inset:0;z-index:99997;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(12,30,46,.6);backdrop-filter:blur(5px)}
+.rando-info-modal.is-open{display:flex}
+.rando-info-card{width:min(520px,96vw);background:#fff;border-radius:22px;box-shadow:0 28px 80px rgba(0,0,0,.28);overflow:hidden}
+.rando-info-head{padding:22px 24px 16px;background:linear-gradient(135deg,#0c1e2e,#163756);display:flex;align-items:flex-start;gap:14px}
+.rando-info-emoji{font-size:2rem;flex-shrink:0;margin-top:2px}
+.rando-info-head h3{margin:0;font-size:1.15rem;font-weight:900;color:#fff;line-height:1.25}
+.rando-info-head p{margin:6px 0 0;font-size:.82rem;color:rgba(255,255,255,.62);line-height:1.4}
+.rando-info-close{margin-left:auto;flex-shrink:0;border:0;background:rgba(255,255,255,.12);color:#fff;width:34px;height:34px;border-radius:999px;font-size:1.3rem;cursor:pointer;font-weight:900;transition:background .15s}
+.rando-info-close:hover{background:rgba(255,255,255,.22)}
+.rando-info-body{padding:18px 20px;display:flex;flex-direction:column;gap:12px}
+.rando-info-option{display:flex;align-items:flex-start;gap:14px;background:#f8f4ef;border-radius:14px;padding:14px 16px;border:1.5px solid transparent}
+.rando-info-option-highlight{background:#fff7ed;border-color:rgba(42,157,92,.25)}
+.rando-info-opt-icon{font-size:1.6rem;flex-shrink:0;margin-top:2px}
+.rando-info-option strong{display:block;font-size:.9rem;font-weight:900;color:#0c1e2e;margin-bottom:4px}
+.rando-info-option p{margin:0;font-size:.8rem;color:#4b6074;line-height:1.55}
+.rando-info-xp-pill{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:900;padding:3px 10px;border-radius:999px;margin-top:2px}
+.rando-info-xp-0{background:#e8edf2;color:#6b7f96}
+.rando-info-xp-25{background:rgba(42,157,92,.15);color:#1a7a42}
+.rando-info-footer{padding:12px 20px 20px;display:flex;gap:10px}
+.rando-info-btn-secondary{flex:1;border:1.5px solid #e0d8d0;background:#fff;color:#6b7f96;font-size:.82rem;font-weight:700;padding:11px 12px;border-radius:10px;cursor:pointer;transition:background .15s}
+.rando-info-btn-secondary:hover{background:#f3eee9}
+.rando-info-btn-primary{flex:1;border:0;background:#2a9d5c;color:#fff;font-size:.85rem;font-weight:900;padding:12px 14px;border-radius:10px;cursor:pointer;box-shadow:0 6px 18px rgba(42,157,92,.28);transition:transform .15s,opacity .15s}
+.rando-info-btn-primary:hover{transform:translateY(-1px);opacity:.92}
+@media(max-width:480px){.rando-info-footer{flex-direction:column}}
+
 .rando-proof-modal{position:fixed;inset:0;z-index:99998;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(12,30,46,.56);backdrop-filter:blur(4px)}
 .rando-proof-modal.is-open{display:flex}
 .rando-proof-card{width:min(560px,94vw);background:#fff;border-radius:22px;box-shadow:0 28px 90px rgba(0,0,0,.24);overflow:hidden}
@@ -1502,5 +1528,76 @@ require_once 'includes/nav.php';
   });
 })();
 </script>
+
+<?php if ($is_logged_in && $user_rando_status !== 'validated'): ?>
+<!-- Modal information règles de participation -->
+<div id="randoInfoModal" class="rando-info-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="randoInfoTitle">
+  <div class="rando-info-card">
+    <div class="rando-info-head">
+      <span class="rando-info-emoji">&#x1F97E;</span>
+      <div>
+        <h3 id="randoInfoTitle">Comment valider cette randonnée ?</h3>
+        <p>Deux façons de la marquer dans votre Passeport Vendéen.</p>
+      </div>
+      <button class="rando-info-close" id="closeRandoInfo" aria-label="Fermer">&#xD7;</button>
+    </div>
+    <div class="rando-info-body">
+      <div class="rando-info-option">
+        <div class="rando-info-opt-icon">&#x1F97E;</div>
+        <div>
+          <strong>Tamponner gratuitement</strong>
+          <p>Marquez cette rando comme réalisée dans votre Passeport Vendéen. Aucun justificatif requis, aucun point XP.</p>
+        </div>
+        <span class="rando-info-xp-pill rando-info-xp-0">0 XP</span>
+      </div>
+      <div class="rando-info-option rando-info-option-highlight">
+        <div class="rando-info-opt-icon">&#x1F4F8;</div>
+        <div>
+          <strong>Débloquer les +25 XP</strong>
+          <p>Prenez-vous en photo devant le <strong>Trésor du parcours</strong>, ajoutez un avis et envoyez. L'équipe Zone85 valide ensuite vos points.</p>
+        </div>
+        <span class="rando-info-xp-pill rando-info-xp-25">+25 XP</span>
+      </div>
+    </div>
+    <div class="rando-info-footer">
+      <button id="closeRandoInfoBtn" class="rando-info-btn-secondary">Juste tamponner</button>
+      <button id="goProofFormBtn" class="rando-info-btn-primary">Je veux les +25 XP &#x2192;</button>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  var modal = document.getElementById('randoInfoModal');
+  if (!modal) return;
+  var key = 'rando_info_seen_<?= (int)$rando['id'] ?>';
+  if (!sessionStorage.getItem(key)) {
+    setTimeout(function(){
+      modal.classList.add('is-open');
+      modal.setAttribute('aria-hidden', 'false');
+    }, 700);
+  }
+  function closeInfoModal() {
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+    sessionStorage.setItem(key, '1');
+  }
+  var btnClose  = document.getElementById('closeRandoInfo');
+  var btnStamp  = document.getElementById('closeRandoInfoBtn');
+  var btnProof  = document.getElementById('goProofFormBtn');
+  if (btnClose) btnClose.addEventListener('click', closeInfoModal);
+  if (btnStamp) btnStamp.addEventListener('click', closeInfoModal);
+  if (btnProof) btnProof.addEventListener('click', function(){
+    closeInfoModal();
+    var openProof = document.getElementById('openProofModal');
+    if (openProof) {
+      openProof.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(function(){ openProof.click(); }, 400);
+    }
+  });
+  modal.addEventListener('click', function(ev){ if (ev.target === modal) closeInfoModal(); });
+  document.addEventListener('keydown', function(ev){ if (ev.key === 'Escape') closeInfoModal(); });
+})();
+</script>
+<?php endif; ?>
 
 <?php require_once 'includes/footer.php'; ?>
