@@ -80,6 +80,22 @@ if (db_enabled()) {
                     $cs->execute([':id' => $profil['id']]);
                     $stats['communes_count'] = (int)$cs->fetchColumn();
                 } catch (PDOException $e2) {}
+
+                // Tampons individuels pour la grille visuelle
+                $rando_stamps = [];
+                try {
+                    $rsp = $pdo->prepare("
+                        SELECT rp.status, rp.done_at, rp.validated_at,
+                               r.title, r.slug, r.secteur, r.distance_km, r.commune, r.cover_image
+                        FROM rando_participations rp
+                        JOIN randos r ON r.id = rp.rando_id
+                        WHERE rp.user_id = :uid AND rp.status IN ('stamped','pending','validated')
+                        ORDER BY COALESCE(rp.validated_at, rp.done_at) DESC
+                        LIMIT 40
+                    ");
+                    $rsp->execute([':uid' => $profil['id']]);
+                    $rando_stamps = $rsp->fetchAll();
+                } catch (PDOException $e2) {}
             }
         } catch (PDOException $e) {
             // Silencieux — profil reste null
@@ -487,6 +503,15 @@ $page_styles = <<<CSS
   .pp-btn { flex: 1; }
   .pp-btn-fb { flex: none; width: 100%; }
 }
+
+.pp-stamps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.pp-stamp-card{display:flex;flex-direction:column;background:#fff;border-radius:10px;padding:10px 8px 8px;text-decoration:none;position:relative;overflow:hidden;transition:transform .15s;border:1px solid rgba(0,0,0,.07)}
+.pp-stamp-card:hover{transform:translateY(-2px)}
+.pp-stamp-status{position:absolute;top:7px;right:7px;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.6rem;color:#fff;font-weight:900}
+.pp-stamp-title{font-size:.68rem;font-weight:800;color:#0c1e2e;line-height:1.3;margin-bottom:4px;padding-right:20px}
+.pp-stamp-dist{font-size:.6rem;color:#6b7f96;font-weight:700}
+.pp-stamp-date{font-size:.58rem;color:#aaa;margin-top:2px}
+@media(max-width:380px){.pp-stamps-grid{grid-template-columns:repeat(2,1fr)}}
 </style>
 CSS;
 
@@ -600,6 +625,25 @@ require_once 'includes/header.php';
         <span>Marais : <?= (int)$stats['marais_randos'] ?></span>
         <span>Littoral : <?= (int)$stats['littoral_randos'] ?></span>
       </div>
+      <?php if (!empty($rando_stamps)): ?>
+      <div class="pp-stamps-grid">
+        <?php foreach ($rando_stamps as $stamp):
+          $sec_colors = ['bocage'=>'#2a9d5c','littoral'=>'#12314e','marais'=>'#8b6914','plaine'=>'#6b7f96'];
+          $col = $sec_colors[$stamp['secteur']] ?? '#12314e';
+          $status_map = ['validated'=>['🏆','#2a9d5c'],'pending'=>['⏳','#e9951a'],'stamped'=>['✓','#12314e']];
+          [$sico, $scol] = $status_map[$stamp['status']] ?? ['✓','#12314e'];
+          $date = !empty($stamp['validated_at']) ? substr($stamp['validated_at'],0,10) : substr($stamp['done_at'],0,10);
+          $dist = $stamp['distance_km'] ? number_format((float)$stamp['distance_km'],1,',',' ').' km' : '';
+        ?>
+        <a href="rando.php?slug=<?= urlencode($stamp['slug']) ?>" class="pp-stamp-card" style="border-top:3px solid <?= $col ?>">
+          <div class="pp-stamp-status" style="background:<?= $scol ?>"><?= $sico ?></div>
+          <div class="pp-stamp-title"><?= htmlspecialchars(mb_substr($stamp['title'],0,28), ENT_QUOTES,'UTF-8') ?><?= mb_strlen($stamp['title'])>28?'…':'' ?></div>
+          <?php if ($dist): ?><div class="pp-stamp-dist"><?= htmlspecialchars($dist,ENT_QUOTES,'UTF-8') ?></div><?php endif; ?>
+          <div class="pp-stamp-date"><?= htmlspecialchars($date,ENT_QUOTES,'UTF-8') ?></div>
+        </a>
+        <?php endforeach; ?>
+      </div>
+      <?php endif; ?>
     </div>
 
     <!-- Badges -->

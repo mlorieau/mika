@@ -143,6 +143,28 @@ if ($_tab === 'classement') {
             error_log('[communaute classement] '.$e->getMessage());
         }
     }
+
+    // Classement des clans (saison active)
+    $clan_rankings = [];
+    if ($pdo) {
+        try {
+            $cr = $pdo->prepare("
+                SELECT c.id, c.name, c.slug, c.color_primary, c.emoji,
+                       COALESCE(SUM(csl.points), 0) AS season_points,
+                       COUNT(DISTINCT csl.user_id) AS active_members
+                FROM clans c
+                LEFT JOIN clan_score_logs csl ON csl.clan_id = c.id
+                    AND (:season_id = 0 OR csl.season_id = :season_id2)
+                GROUP BY c.id
+                ORDER BY season_points DESC
+            ");
+            $sid = $sr ? (int)$sr['id'] : 0;
+            $cr->execute([':season_id' => $sid, ':season_id2' => $sid]);
+            $clan_rankings = $cr->fetchAll();
+            foreach ($clan_rankings as $i => &$cr_row) { $cr_row['rank'] = $i + 1; }
+            unset($cr_row);
+        } catch (PDOException $e) {}
+    }
 }
 
 // ── ZONAUTES ─────────────────────────────────────────────────
@@ -611,6 +633,30 @@ require_once 'includes/nav.php';
     <div style="text-align:center;margin-top:28px">
       <a href="inscription.php" style="display:inline-block;padding:12px 28px;background:var(--primary);color:#fff;border-radius:var(--radius);font-weight:800;text-decoration:none;font-size:.92rem">Rejoindre la Zone →</a>
       <p style="margin-top:12px;font-size:.82rem;color:var(--text-muted)">Inscris-toi pour apparaître dans le classement.</p>
+    </div>
+    <?php endif; ?>
+
+    <?php if (!empty($clan_rankings)): ?>
+    <h3 style="font-size:1rem;font-weight:900;color:#0c1e2e;margin:32px 0 14px">🛡 Classement des clans — Saison en cours</h3>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <?php foreach ($clan_rankings as $cr_row):
+        $clan_colors = ['bocage'=>'#2a9d5c','littoral'=>'#12314e','marais'=>'#8b6914','plaine'=>'#6b7f96'];
+        $bg = $clan_colors[$cr_row['slug']] ?? ($cr_row['color_primary'] ?? '#12314e');
+        $medal = ['🥇','🥈','🥉'][$cr_row['rank']-1] ?? ('#' . $cr_row['rank']);
+      ?>
+      <div style="background:#fff;border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:14px;border:1.5px solid rgba(0,0,0,.07)">
+        <span style="font-size:1.4rem;min-width:32px"><?= $medal ?></span>
+        <span style="display:inline-block;width:12px;height:36px;border-radius:4px;background:<?= $bg ?>;flex-shrink:0"></span>
+        <div style="flex:1">
+          <div style="font-size:.95rem;font-weight:900;color:#0c1e2e"><?= e($cr_row['emoji'] ?? '') ?> <?= e($cr_row['name']) ?></div>
+          <div style="font-size:.72rem;color:#6b7f96"><?= (int)$cr_row['active_members'] ?> membre<?= $cr_row['active_members']>1?'s':'' ?> actif<?= $cr_row['active_members']>1?'s':'' ?></div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:1.3rem;font-weight:900;color:<?= $bg ?>"><?= number_format((int)$cr_row['season_points']) ?></div>
+          <div style="font-size:.68rem;color:#aaa">pts saison</div>
+        </div>
+      </div>
+      <?php endforeach; ?>
     </div>
     <?php endif; ?>
 

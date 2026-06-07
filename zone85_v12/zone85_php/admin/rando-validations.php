@@ -52,8 +52,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
                 // Notification + fil communautaire
                 if (function_exists('push_notification')) {
                     push_notification((int)$row['uid'], 'mission_validated',
-                        'Rando validée : ' . mb_substr($row['rando_title'] ?? 'Randonnée', 0, 60) . ' (+25 XP)',
-                        ['link_url' => '../randos.php']
+                        'Rando validée : ' . mb_substr($row['rando_title'] ?? 'Randonnée', 0, 60) . ' · +25 XP',
+                        ['icon_emoji' => '🥾', 'link_url' => 'rando.php?slug=' . ($row['slug'] ?? '')]
                     );
                 }
                 if (function_exists('push_community_feed')) {

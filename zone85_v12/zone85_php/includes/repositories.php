@@ -1001,6 +1001,9 @@ function award_xp(int $userId, int $amount, string $sourceType, ?int $sourceId, 
             VALUES (:uid, :st, :sid, :amt, :reason)
         ")->execute([':uid' => $userId, ':st' => $sourceType, ':sid' => $sourceId,
                      ':amt' => $amount,  ':reason' => $reason]);
+        $oldRow = $pdo->prepare("SELECT level FROM users WHERE id = :uid LIMIT 1");
+        $oldRow->execute([':uid' => $userId]);
+        $oldLevel = (int)($oldRow->fetchColumn() ?: 1);
         $pdo->prepare("UPDATE users SET xp_total = xp_total + :amt WHERE id = :uid")
             ->execute([':amt' => $amount, ':uid' => $userId]);
         $row = $pdo->prepare("SELECT xp_total FROM users WHERE id = :uid LIMIT 1");
@@ -1010,6 +1013,18 @@ function award_xp(int $userId, int $amount, string $sourceType, ?int $sourceId, 
         $pdo->prepare("UPDATE users SET level = :lvl WHERE id = :uid")
             ->execute([':lvl' => $newLevel, ':uid' => $userId]);
         $pdo->commit();
+        // Level-up notification (non-blocking, after commit)
+        if ($newLevel > $oldLevel && function_exists('push_notification')) {
+            $lvlName = function_exists('get_level_name') ? get_level_name($newLevel) : 'Niveau ' . $newLevel;
+            push_notification($userId, 'level_up',
+                'Niveau ' . $newLevel . ' atteint — ' . $lvlName . ' !',
+                ['link_url' => 'profil.php']
+            );
+        }
+        // Check auto-badge conditions after XP change (non-blocking)
+        if (function_exists('check_and_award_badges')) {
+            check_and_award_badges($userId);
+        }
         return true;
     } catch (Throwable $e) {
         if ($pdo->inTransaction()) $pdo->rollBack();
@@ -1291,6 +1306,9 @@ function admin_validate_participation(int $participation_id, int $admin_user_id)
         }
 
         $pdo->commit();
+
+        // Auto-badge check after participation validated (non-blocking)
+        check_and_award_badges($user_id);
 
         // Notification + fil communautaire (hors transaction — ne bloque pas si table absente)
         if (function_exists('push_notification')) {
@@ -2145,5 +2163,144 @@ function fetch_user_xp_season(int $user_id): int {
         return (int)$stmt->fetchColumn();
     } catch (PDOException $e) {
         return 0;
+    }
+}
+
+// ── Auto-badge attribution engine ──────────────────────────────
+
+/**
+ * Vérifie et attribue automatiquement les badges débloqués par un utilisateur.
+ * Appelée après chaque gain de XP ou validation de participation.
+ * Entièrement silencieuse sur erreur — ne doit jamais bloquer la page appelante.
+ *
+ * @param  int   $userId
+ * @return array Tableau des lignes de badges nouvellement attribués
+ */
+function check_and_award_badges(int $userId): array {
+    if ($userId <= 0) return [];
+    $pdo = db();
+    if (!$pdo) return [];
+
+    try {
+        // -- 1. Charger tous les badges auto-éligibles (non-manual, non-special, non-hidden)
+        $stmtBadges = $pdo->prepare(
+            "SELECT * FROM badges
+              WHERE condition_type NOT IN ('manual','special')
+                AND is_hidden = 0"
+        );
+        $stmtBadges->execute();
+        $badges = $stmtBadges->fetchAll(PDO::FETCH_ASSOC);
+        if (empty($badges)) return [];
+
+        // -- 2. Badges déjà obtenus par l'utilisateur
+        $stmtEarned = $pdo->prepare(
+            "SELECT badge_id FROM user_badges WHERE user_id = :uid"
+        );
+        $stmtEarned->execute([':uid' => $userId]);
+        $earnedIds = array_flip($stmtEarned->fetchAll(PDO::FETCH_COLUMN));
+
+        // -- 3. Données utilisateur nécessaires aux vérifications
+        $stmtUser = $pdo->prepare(
+            "SELECT xp_total FROM users WHERE id = :uid LIMIT 1"
+        );
+        $stmtUser->execute([':uid' => $userId]);
+        $userRow = $stmtUser->fetch(PDO::FETCH_ASSOC);
+        if (!$userRow) return [];
+        $userXp = (int)$userRow['xp_total'];
+
+        // Saison active (peut être null)
+        $activeSeason = _active_season_row();
+
+        // -- 4. Évaluer chaque badge non encore obtenu
+        $newlyAwarded = [];
+
+        foreach ($badges as $badge) {
+            $badgeId   = (int)$badge['id'];
+            $condType  = $badge['condition_type'];
+            $condValue = (int)$badge['condition_value'];
+
+            // Ignorer les badges déjà obtenus
+            if (isset($earnedIds[$badgeId])) continue;
+
+            $unlocked = false;
+
+            switch ($condType) {
+                case 'xp_threshold':
+                    $unlocked = ($userXp >= $condValue);
+                    break;
+
+                case 'mission_success':
+                    $stmtP = $pdo->prepare(
+                        "SELECT COUNT(*) FROM participations
+                          WHERE user_id = :uid
+                            AND status IN ('validated','auto_validated')"
+                    );
+                    $stmtP->execute([':uid' => $userId]);
+                    $unlocked = ((int)$stmtP->fetchColumn() >= $condValue);
+                    break;
+
+                case 'rando_validated':
+                    $stmtR = $pdo->prepare(
+                        "SELECT COUNT(*) FROM rando_participations
+                          WHERE user_id = :uid
+                            AND status = 'validated'"
+                    );
+                    $stmtR->execute([':uid' => $userId]);
+                    $unlocked = ((int)$stmtR->fetchColumn() >= $condValue);
+                    break;
+
+                case 'season':
+                    if ($activeSeason) {
+                        $stmtS = $pdo->prepare(
+                            "SELECT COUNT(*) FROM participations
+                              WHERE user_id = :uid
+                                AND status IN ('validated','auto_validated')
+                                AND season_id = :sid"
+                        );
+                        $stmtS->execute([':uid' => $userId, ':sid' => (int)$activeSeason['id']]);
+                        $unlocked = ((int)$stmtS->fetchColumn() >= 1);
+                    }
+                    break;
+
+                default:
+                    // Type non géré → on ignore silencieusement
+                    break;
+            }
+
+            if (!$unlocked) continue;
+
+            // -- 5. Attribuer le badge (INSERT IGNORE pour éviter les doublons)
+            $stmtIns = $pdo->prepare(
+                "INSERT IGNORE INTO user_badges
+                    (user_id, badge_id, source_type, awarded_by, awarded_at)
+                 VALUES (:uid, :bid, 'auto', NULL, NOW())"
+            );
+            $stmtIns->execute([':uid' => $userId, ':bid' => $badgeId]);
+
+            // Ne notifier que si une ligne a vraiment été insérée
+            if ($stmtIns->rowCount() > 0) {
+                $newlyAwarded[] = $badge;
+
+                // -- 6. Notification in-app (non-bloquante)
+                if (function_exists('push_notification')) {
+                    push_notification(
+                        $userId,
+                        'badge_unlock',
+                        'Badge débloqué : ' . $badge['title'],
+                        [
+                            'link_url'   => 'profil.php',
+                            'icon_emoji' => $badge['icon_emoji'] ?? '🏅',
+                        ]
+                    );
+                }
+            }
+        }
+
+        return $newlyAwarded;
+
+    } catch (Throwable $e) {
+        // Entièrement silencieux — ne doit jamais interrompre la page appelante
+        error_log('[ZONE85] check_and_award_badges : ' . $e->getMessage());
+        return [];
     }
 }
