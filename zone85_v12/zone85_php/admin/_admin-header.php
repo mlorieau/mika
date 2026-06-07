@@ -6,6 +6,18 @@ $_adm_base  = defined('BASE_URL') ? rtrim(BASE_URL, '/') : '';
 $_adm_css   = $_adm_base . '/assets/css/zone85.css';
 $_adm_cur   = $admin_current ?? '';
 
+// Compteurs de notifications pour le menu (requêtes légères)
+$_adm_badges = ['contact' => 0, 'emails' => 0, 'participations' => 0, 'rando-validations' => 0];
+try {
+    $_adm_pdo = db();
+    if ($_adm_pdo) {
+        $_adm_badges['contact']           = (int)$_adm_pdo->query("SELECT COUNT(*) FROM contact_messages WHERE status='new'")->fetchColumn();
+        $_adm_badges['emails']            = (int)$_adm_pdo->query("SELECT COUNT(*) FROM email_queue WHERE status='failed'")->fetchColumn();
+        $_adm_badges['participations']    = (int)$_adm_pdo->query("SELECT COUNT(*) FROM participations WHERE status='pending'")->fetchColumn();
+        $_adm_badges['rando-validations'] = (int)$_adm_pdo->query("SELECT COUNT(*) FROM rando_participations WHERE status='pending_proof'")->fetchColumn();
+    }
+} catch (Throwable $e) {}
+
 $_adm_nav = [
   '' => [
     ['dashboard.php', 'dashboard', '⊞', 'Dashboard'],
@@ -356,6 +368,12 @@ $_adm_nav = [
       <a href="<?= $_f ?>" class="adm-sidenav-link<?= $_adm_cur === $_slug ? ' active' : '' ?>">
         <span class="adm-sn-icon"><?= $_ico ?></span>
         <?= htmlspecialchars($_lbl) ?>
+        <?php if (!empty($_adm_badges[$_slug])): ?>
+        <span style="margin-left:auto;background:#ea5649;color:#fff;border-radius:999px;
+                     font-size:.6rem;font-weight:800;padding:1px 6px;line-height:1.6;flex-shrink:0">
+          <?= (int)$_adm_badges[$_slug] ?>
+        </span>
+        <?php endif; ?>
       </a>
       <?php endforeach; ?>
     </div>
