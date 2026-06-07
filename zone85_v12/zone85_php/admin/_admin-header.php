@@ -32,9 +32,10 @@ $_adm_nav = [
     ['seo.php',     'seo',     '🔍', 'SEO — Vue d\'ensemble'],
   ],
   'SYSTÈME' => [
-    ['collectibles.php', 'collectibles', '🔍', 'Collectibles'],
-    ['media.php',        'media',        '🗂️', 'Médias'],
-    ['settings.php',     'settings',     '⚙️', 'Paramètres'],
+    ['collectibles.php',  'collectibles',  '🔍', 'Collectibles'],
+    ['media.php',         'media',         '🗂️', 'Médias'],
+    ['pwa-settings.php',  'pwa-settings',  '📱', 'PWA — Icônes'],
+    ['settings.php',      'settings',      '⚙️', 'Paramètres'],
   ],
 ];
 ?>

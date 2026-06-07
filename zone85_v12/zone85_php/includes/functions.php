@@ -579,6 +579,7 @@ function safe_fetch(callable $callback, $fallback = []) {
 function upload_editorial_image(array $file, string $subdir = 'randos'): array {
     $max_size      = 5 * 1024 * 1024; // 5 Mo
     $allowed_types = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
+    $max_dim       = defined('UPLOAD_MAX_DIM') ? UPLOAD_MAX_DIM : 4000;
 
     if ($file['error'] !== UPLOAD_ERR_OK) {
         $msg = match($file['error']) {
@@ -593,15 +594,33 @@ function upload_editorial_image(array $file, string $subdir = 'randos'): array {
         return ['ok' => false, 'error' => 'Fichier trop lourd (max 5 Mo).'];
     }
 
+    // Vérification MIME réelle (contenu, pas l'extension déclarée)
     $finfo = new finfo(FILEINFO_MIME_TYPE);
     $mime  = $finfo->file($file['tmp_name']);
     if (!array_key_exists($mime, $allowed_types)) {
-        return ['ok' => false, 'error' => 'Type non autorise. Utilisez jpg, png ou webp.'];
+        return ['ok' => false, 'error' => 'Type non autorisé. Utilisez jpg, png ou webp.'];
+    }
+
+    // Vérification que c'est bien une image réelle (anti-polyglot)
+    $img_info = @getimagesize($file['tmp_name']);
+    if (!$img_info) {
+        return ['ok' => false, 'error' => 'Fichier image invalide ou corrompu.'];
+    }
+
+    // Contrôle des dimensions (anti-DoS image "bombe")
+    if ($img_info[0] > $max_dim || $img_info[1] > $max_dim) {
+        return ['ok' => false, 'error' => "Dimensions trop grandes (max {$max_dim}×{$max_dim} px)."];
     }
 
     $upload_dir = (defined('BASE_PATH') ? BASE_PATH : dirname(__DIR__) . '/') . 'uploads/' . $subdir . '/';
     if (!is_dir($upload_dir)) {
         mkdir($upload_dir, 0755, true);
+    }
+
+    // Créer .htaccess de protection si manquant dans ce sous-dossier
+    $htaccess = $upload_dir . '.htaccess';
+    if (!file_exists($htaccess)) {
+        file_put_contents($htaccess, _upload_htaccess_content());
     }
 
     $ext      = $allowed_types[$mime];
@@ -613,6 +632,47 @@ function upload_editorial_image(array $file, string $subdir = 'randos'): array {
     }
 
     return ['ok' => true, 'path' => normalize_media_path('uploads/' . $subdir . '/' . $filename)];
+}
+
+/** Contenu .htaccess de protection pour les dossiers uploads */
+function _upload_htaccess_content(): string {
+    return <<<'HTACCESS'
+# Sécurité dossier uploads
+Options -Indexes
+
+# Désactive PHP (mod_php)
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+    php_flag engine off
+</IfModule>
+
+# Bloque l'exécution de scripts
+<FilesMatch "\.(php[0-9]?|phtml|pl|py|cgi|sh|bash)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order Deny,Allow
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Images autorisées explicitement
+<FilesMatch "\.(jpg|jpeg|png|webp)$">
+    <IfModule mod_authz_core.c>
+        Require all granted
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order Allow,Deny
+        Allow from all
+    </IfModule>
+</FilesMatch>
+HTACCESS;
 }
 
 

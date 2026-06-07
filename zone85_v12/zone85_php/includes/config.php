@@ -41,8 +41,9 @@ define('JS_PATH',     'assets/js/');
 define('IMG_PATH',    'assets/img/');
 define('UPLOAD_PATH', 'uploads/');
 
-// URL de base — '/' si la racine du domaine, '/sous-dossier/' sinon
-define('BASE_URL', '/test/zone85_php/');
+// URL de base — '/' en prod, '/sous-dossier/' si installé dans un sous-dossier.
+// Surcharger via BASE_URL=/test/zone85_php/ dans .env pour le dev local.
+define('BASE_URL', _env('BASE_URL', '/'));
 
 // ── Upload ─────────────────────────────────────────────────
 define('UPLOAD_MAX_SIZE',          2 * 1024 * 1024);                     // 2 Mo (avatars)
@@ -69,9 +70,9 @@ define('SEASONS', [
 define('DB_ENABLED', _env('DB_ENABLED', 'true') !== 'false');
 define('DB_HOST',    _env('DB_HOST',    'localhost'));
 define('DB_PORT',    (int)_env('DB_PORT', '3306'));
-define('DB_NAME',    _env('DB_NAME',    'qg_'));
-define('DB_USER',    _env('DB_USER',    'AdminQg85'));
-define('DB_PASS',    _env('DB_PASS',    'AdminQg85!')); // TOUJOURS via .env en prod
+define('DB_NAME',    _env('DB_NAME',    ''));   // Définir DB_NAME dans .env
+define('DB_USER',    _env('DB_USER',    ''));   // Définir DB_USER dans .env
+define('DB_PASS',    _env('DB_PASS',    ''));   // Définir DB_PASS dans .env — ne jamais mettre en dur
 define('DB_CHARSET', 'utf8mb4');
 
 // ── Session auto-start ─────────────────────────────────────

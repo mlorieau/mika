@@ -84,7 +84,7 @@ if (!defined('SKIP_MAINTENANCE_CHECK')) {
 
   <!-- PWA Manifest & icons -->
   <?php if (!defined('PWA_ENABLED') || PWA_ENABLED): ?>
-  <link rel="manifest" href="<?= rtrim(defined('BASE_URL') ? BASE_URL : '/', '/') ?>/manifest.json">
+  <link rel="manifest" href="<?= rtrim(defined('BASE_URL') ? BASE_URL : '/', '/') ?>/manifest.php">
   <meta name="theme-color" content="<?= defined('PWA_THEME_COLOR') ? PWA_THEME_COLOR : '#0c1e2e' ?>">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">

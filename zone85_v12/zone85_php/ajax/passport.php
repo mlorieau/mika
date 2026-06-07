@@ -6,6 +6,10 @@
 // UTF-8 sans BOM
 // ============================================================
 
+// ENDPOINT PUBLIC INTENTIONNEL — retourne uniquement des données publiques du joueur
+// (pseudo, clan, niveau, XP, badges visibles, avatar). Aucune donnée sensible exposée.
+// Protégé par rate-limiting (60 req/min/IP) et validation entier sur user_id.
+
 // ── Headers ──────────────────────────────────────────────────
 header('Content-Type: application/json; charset=UTF-8');
 header('X-Content-Type-Options: nosniff');

@@ -5,7 +5,7 @@
 
 'use strict';
 
-const SW_VERSION   = 'zone85-v10.0';
+const SW_VERSION   = 'zone85-v12.0';
 const CACHE_STATIC = SW_VERSION + '-static';
 const CACHE_PAGES  = SW_VERSION + '-pages';
 
