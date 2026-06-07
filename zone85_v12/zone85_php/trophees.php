@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $page_title       = 'Trophéothèque — Zone85';
 $page_description = 'Découvre l\'histoire des saisons Zone85 et les clans qui ont remporté les trophées. La Trophéothèque, mémoire de la Bataille des Clans.';
 $page_canonical   = 'https://www.zone85.fr/trophees.php';

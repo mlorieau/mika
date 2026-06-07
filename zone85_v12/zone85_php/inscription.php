@@ -1,11 +1,13 @@
-﻿<?php
+<?php
 // ── Handler AJAX inscription ──────────────────────────────────
 // Traité avant tout output HTML.
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_GET['action'] ?? '') === 'register') {
+    ob_start(); // absorbe tout output parasite (BOM, notices) avant le JSON
     require_once 'includes/config.php';
     require_once 'includes/db.php';
     require_once 'includes/functions.php';
     require_once 'includes/auth.php';
+    ob_clean(); // vide le buffer avant d'envoyer la réponse JSON
     header('Content-Type: application/json; charset=UTF-8');
 
     // Rate limiting : 5 créations de compte par IP sur 30 minutes

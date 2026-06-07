@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // ============================================================
 // ZONE 85 — Mailer V10
 // Abstraction email : Brevo API (si configuré) ou mail() PHP.

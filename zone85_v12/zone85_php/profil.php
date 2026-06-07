@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $page_title       = 'Mon Profil';
 $page_description = 'Consulte ta progression, tes badges, ton XP à vie et ta contribution à la Bataille des Clans sur ZONE85.';
 $page_canonical   = 'https://www.zone85.fr/profil.php';

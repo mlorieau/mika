@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $page_title       = 'Hall de la Zone';
 $page_description = 'Le Hall de la Zone conserve la memoire vivante de la communaute vendeenne : top contributeurs, galerie des moments, archives de saisons et KTC resolus.';
 $page_canonical   = 'https://www.zone85.fr/hall.php';

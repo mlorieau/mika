@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // ============================================================
 // ZONE 85 â€” Repositories (lecture donnÃ©es)
 // Retourne null si DB non disponible â†’ fallback sur data.php
