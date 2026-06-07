@@ -50,7 +50,7 @@
 
   window.addEventListener('appinstalled', function () {
     setDismissed();
-    trackInstall('installed');
+    trackInstall('installed_event');
     hideModal();
   });
 
@@ -204,7 +204,7 @@
           p.userChoice.then(function (r) {
             if (r.outcome === 'accepted') {
               setDismissed();
-              trackInstall('accepted');
+              trackInstall('prompt_accepted');
               hideModal();
             } else {
               _prompt = p; // remettre si refusé

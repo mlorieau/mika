@@ -103,6 +103,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 } elseif (!@getimagesize($f['tmp_name'])) {
                     $flash = ['type' => 'err', 'msg' => 'Fichier image invalide ou corrompu.'];
                 } else {
+                    // Créer le dossier PWA si absent
+                    if (!is_dir($pwa_dir)) {
+                        mkdir($pwa_dir, 0755, true);
+                    }
                     // Stocker la source
                     $ext_map = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
                     $src_file = $pwa_dir . 'source-upload.' . ($ext_map[$mime] ?? 'png');

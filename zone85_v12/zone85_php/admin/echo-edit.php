@@ -63,29 +63,7 @@ if ($pdo) {
     } catch (PDOException $e) {}
 }
 
-// ── Gestion upload couverture ─────────────────────────────────
-function handle_cover_upload(): ?string
-{
-    if (empty($_FILES['cover_file']['tmp_name'])) return null;
-    if ($_FILES['cover_file']['error'] !== UPLOAD_ERR_OK) return null;
-
-    $ext = strtolower(pathinfo($_FILES['cover_file']['name'], PATHINFO_EXTENSION));
-    if (!in_array($ext, ALLOWED_IMAGE_EXTENSIONS, true)) return null;
-
-    $mime = mime_content_type($_FILES['cover_file']['tmp_name']);
-    if (!in_array($mime, ALLOWED_IMAGE_TYPES, true)) return null;
-
-    if ($_FILES['cover_file']['size'] > UPLOAD_MAX_SIZE_MEDIA) return null;
-
-    $dir = BASE_PATH . 'uploads/echos/';
-    if (!is_dir($dir)) mkdir($dir, 0755, true);
-
-    $filename = 'cover_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
-    if (move_uploaded_file($_FILES['cover_file']['tmp_name'], $dir . $filename)) {
-        return 'uploads/echos/' . $filename;
-    }
-    return null;
-}
+// handle_cover_upload() supprimé — remplacé par upload_editorial_image('echos') ci-dessous
 
 // ── Traitement POST ────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
@@ -109,7 +87,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
         $f_season_id = !empty($_POST['season_id']) ? (int)$_POST['season_id'] : null;
 
         // Cover upload (écrase l'URL si un fichier est fourni)
-        $uploaded_cover = handle_cover_upload();
+        $uploaded_cover = null;
+        if (!empty($_FILES['cover_file']['tmp_name']) && ($_FILES['cover_file']['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK) {
+            $_cover_r = upload_editorial_image($_FILES['cover_file'], 'echos');
+            if ($_cover_r['ok']) $uploaded_cover = $_cover_r['path'];
+        }
         if ($uploaded_cover !== null) $f_cover = $uploaded_cover;
 
         // Nettoyage slug

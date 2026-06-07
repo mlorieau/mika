@@ -1737,12 +1737,33 @@ function upload_collectible_media(array $file, string $type = 'object'): array {
     $finfo = new finfo(FILEINFO_MIME_TYPE);
     $mime  = $finfo->file($file['tmp_name']);
     if (!array_key_exists($mime, $allowed)) {
-        return ['ok'=>false, 'error'=>'Type non autorisÃ©. Utilisez jpg, png, webp ou gif.'];
+        return ['ok'=>false, 'error'=>'Type non autorisé. Utilisez jpg, png, webp ou gif.'];
+    }
+
+    // Vérification image réelle + dimensions max (non appliqué aux GIF animés)
+    if ($mime !== 'image/gif') {
+        $img_info = @getimagesize($file['tmp_name']);
+        if (!$img_info) {
+            return ['ok'=>false, 'error'=>'Fichier image invalide ou corrompu.'];
+        }
+        $max_dim = defined('UPLOAD_MAX_DIM') ? UPLOAD_MAX_DIM : 4000;
+        if ($img_info[0] > $max_dim || $img_info[1] > $max_dim) {
+            return ['ok'=>false, 'error'=>"Dimensions trop grandes (max {$max_dim}×{$max_dim} px)."];
+        }
     }
 
     $upload_dir = defined('BASE_PATH') ? BASE_PATH . 'uploads/collectibles/' : dirname(__DIR__) . '/uploads/collectibles/';
     if (!is_dir($upload_dir)) {
         mkdir($upload_dir, 0755, true);
+    }
+
+    // Créer .htaccess de protection si absent
+    $htaccess = $upload_dir . '.htaccess';
+    if (!file_exists($htaccess)) {
+        $ht_content = function_exists('_upload_htaccess_content')
+            ? _upload_htaccess_content()
+            : "Options -Indexes\n<FilesMatch \"\\.(php[0-9]?|phtml|pl|py|cgi|sh|bash)$\">\n<IfModule mod_authz_core.c>\nRequire all denied\n</IfModule>\n</FilesMatch>\n";
+        @file_put_contents($htaccess, $ht_content);
     }
 
     $ext      = $allowed[$mime];
