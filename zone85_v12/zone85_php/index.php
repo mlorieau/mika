@@ -1,6 +1,6 @@
 <?php
 $page_title       = 'Zone85 — La Vendée vécue, racontée et jouée';
-$page_description = 'Les Échos de terrain, les Randos vendéennes, VICTOR le livre, Les Invisibles — dans un jeu communautaire pour la Vendée. Rejoins Zone85, c\'est gratuit.';
+$page_description = 'Les Échos de terrain, les Randos vendéennes, VICTOR le livre, Les Invisibles — dans un jeu communautaire pour la Vendée. Rejoins les Zonautes.';
 $page_canonical   = 'https://www.zone85.fr/index.php';
 $page_robots      = 'index,follow';
 $page_og_title    = 'Zone85 — La Vendée vécue, racontée et jouée';
@@ -103,14 +103,14 @@ $page_styles = '<style>
 .idx-masc-label{margin-top:10px;font-size:.7rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.65);background:rgba(255,255,255,.08);padding:5px 16px;border-radius:20px;border:1px solid rgba(255,255,255,.12);white-space:nowrap}
 
 /* VICTOR block */
-.idx-victor{background:linear-gradient(135deg,#1a1200,#2d2000);border-radius:16px;overflow:hidden;display:grid;grid-template-columns:1fr auto}
+.idx-victor{background:linear-gradient(135deg,#0c1e2e,#12314e);border-radius:16px;overflow:hidden;display:grid;grid-template-columns:1fr auto;border:1px solid rgba(255,255,255,.08)}
 .idx-victor-content{padding:40px 36px}
-.idx-victor-tag{font-size:.62rem;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:#d4af37;margin-bottom:14px;display:block}
+.idx-victor-tag{font-size:.62rem;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:#f5a99f;margin-bottom:14px;display:block}
 .idx-victor-title{font-size:1.8rem;font-weight:900;color:#fff;margin-bottom:12px;line-height:1.2}
 .idx-victor-desc{font-size:.9rem;color:rgba(255,255,255,.6);line-height:1.7;margin-bottom:24px}
-.idx-victor-cta{display:inline-flex;align-items:center;gap:8px;background:#d4af37;color:#1a1200;padding:12px 24px;border-radius:7px;font-weight:800;font-size:.9rem;text-decoration:none;transition:background .2s}
-.idx-victor-cta:hover{background:#c9a430}
-.idx-victor-visual{background:rgba(212,175,55,.06);display:flex;align-items:center;justify-content:center;padding:36px 40px;border-left:1px solid rgba(212,175,55,.12);font-size:7rem;line-height:1}
+.idx-victor-cta{display:inline-flex;align-items:center;gap:8px;background:#ea5649;color:#fff;padding:12px 24px;border-radius:7px;font-weight:800;font-size:.9rem;text-decoration:none;transition:opacity .2s}
+.idx-victor-cta:hover{opacity:.88}
+.idx-victor-visual{background:rgba(234,86,73,.06);display:flex;align-items:center;justify-content:center;padding:36px 40px;border-left:1px solid rgba(234,86,73,.12);font-size:7rem;line-height:1}
 
 /* Clan race */
 .idx-clan-race{background:rgba(255,255,255,.04);border-radius:12px;padding:20px;border:1px solid rgba(255,255,255,.08)}
@@ -446,7 +446,7 @@ $_xp_pct  = $_xp_next > $_xp_prev
   <div class="container">
     <div class="idx-victor">
       <div class="idx-victor-content">
-        <span class="idx-victor-tag">📖 Réservé aux membres · PDF gratuit</span>
+        <span class="idx-victor-tag">📖 Réservé aux membres · PDF inclus</span>
         <h2 class="idx-victor-title">VICTOR</h2>
         <p class="idx-victor-desc">
           VICTOR est l'œuvre littéraire de Zone85 — une plongée dans l'âme secrète de la Vendée. Réservé aux membres, le PDF est disponible en téléchargement dès ton inscription. Pas de boutique. Pas d'achat. Juste la Zone.
@@ -461,80 +461,8 @@ $_xp_pct  = $_xp_next > $_xp_prev
 </section>
 
 
-<!-- BEAT 6 : CTA FINAL ─────────────────────────────────────── -->
-<section class="page-cta-bloc">
-  <div class="container">
-    <?php if ($_is_guest): ?>
-    <h2 class="page-cta-title">Rejoins Zone85.</h2>
-    <p class="page-cta-sub">Gratuit. Vendéen. Pour toujours.<br>Ton compte déverrouille <strong style="color:#d4af37">VICTOR</strong> en PDF.</p>
-    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
-      <a href="inscription.php" class="idx-btn-primary" style="font-size:1.05rem;padding:16px 36px">Créer mon compte →</a>
-      <a href="concept.php"     class="idx-btn-secondary" style="font-size:1rem;padding:16px 28px">Le concept</a>
-    </div>
-    <?php else: ?>
-    <h2 class="page-cta-title">Content de te revoir, <?= e($_me_pseudo) ?> !</h2>
-    <p class="page-cta-sub">
-      Niveau&nbsp;<?= $_me_level ?> &mdash; <?= number_format($_me_xp, 0, ',', '&#8201;') ?>&nbsp;XP.<br>
-      Continue sur ta lancée et fais grimper ton clan !
-    </p>
-    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
-      <a href="missions.php" class="idx-btn-primary" style="font-size:1.05rem;padding:16px 36px">🎯 Voir mes missions →</a>
-      <a href="communaute.php?tab=classement" class="idx-btn-secondary" style="font-size:1rem;padding:16px 28px">🏆 Classement</a>
-    </div>
-    <?php endif; ?>
-  </div>
-</section>
 
 
-<!-- BEAT 7 : POUR LES CONNAISSEURS ────────────────────────── -->
-<section class="page-section-white">
-  <div class="container">
-    <div class="idx-connaisseurs-grid">
-
-      <!-- Texte + liens -->
-      <div>
-        <div class="page-section-eyebrow">Déjà dans la Zone ?</div>
-        <h2 class="page-section-title">La Bataille des Clans</h2>
-        <p class="page-section-sub" style="margin-bottom:24px">Bocage, Littoral ou Marais — le score de saison en temps réel.</p>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <a href="clans.php" style="display:inline-flex;align-items:center;gap:6px;background:var(--navy-dark);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.8);border-radius:7px;padding:9px 16px;font-size:.82rem;font-weight:700;text-decoration:none">
-            Les 3 clans →
-          </a>
-          <a href="communaute.php?tab=classement" style="display:inline-flex;align-items:center;gap:6px;color:var(--primary);font-size:.82rem;font-weight:700;text-decoration:none;padding:9px 0">
-            🏆 Classement complet →
-          </a>
-        </div>
-      </div>
-
-      <!-- Widget clan race -->
-      <div>
-        <div class="idx-clan-race">
-          <?php
-          $max_race = max(1, array_reduce($clans_sorted_arr, fn($c, $cl) => max($c, $cl['season_score']), 0));
-          foreach ($clans_sorted_arr as $_ri => $_rc):
-              $bar_w = $max_race > 0 ? round(($_rc['season_score'] / $max_race) * 90) : 0;
-              $_rc_slug = $_rc['slug'] ?? '';
-          ?>
-          <div class="idx-clan-race-row">
-            <div style="display:flex;align-items:center;gap:7px">
-              <span style="font-size:1rem"><?= ['🥇','🥈','🥉'][$_ri] ?? '' ?></span>
-              <div>
-                <div style="font-size:.84rem;font-weight:700;color:#fff"><?= e($_rc['name'] ?? ucfirst($_rc_slug)) ?></div>
-                <div style="font-size:.62rem;color:rgba(255,255,255,.35)"><?= (int)$_rc['members_count'] ?> membres</div>
-              </div>
-            </div>
-            <div class="idx-race-bar"><div class="idx-race-fill" style="width:<?= $bar_w ?>%"></div></div>
-            <div style="text-align:right;font-size:.84rem;font-weight:800;color:#fff">
-              <?= number_format((int)$_rc['season_score'], 0, ',', '&#8201;') ?>
-            </div>
-          </div>
-          <?php endforeach; ?>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
 
 
 
