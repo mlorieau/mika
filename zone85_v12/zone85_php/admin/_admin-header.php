@@ -38,6 +38,7 @@ $_adm_nav = [
     ['users.php',   'users',   '👥', 'Membres'],
     ['clans.php',   'clans',   '🛡', 'Clans'],
     ['badges.php',  'badges',  '🏅', 'Badges'],
+    ['levels.php',  'levels',  '🎖', 'Niveaux XP'],
     ['seasons.php', 'seasons', '🗓', 'Saisons'],
   ],
   'STATISTIQUES' => [

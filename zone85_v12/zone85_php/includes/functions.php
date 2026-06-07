@@ -243,20 +243,47 @@ function get_top_members_by_clan(string $clan_slug): array {
  * Retourne un entier entre 1 et 10.
  */
 function get_user_level_from_xp(int $xp): int {
-    $thresholds = [0, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 20000];
+    static $thresholds = null;
+    if ($thresholds === null) {
+        $thresholds = [0, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 20000];
+        if (function_exists('db')) {
+            try {
+                $pdo = db();
+                if ($pdo) {
+                    $rows = $pdo->query("SELECT xp_required FROM xp_levels ORDER BY level ASC")->fetchAll(PDO::FETCH_COLUMN);
+                    if (count($rows) >= 10) $thresholds = array_map('intval', $rows);
+                }
+            } catch (Throwable $e) { /* fallback */ }
+        }
+    }
     $level = 1;
     foreach ($thresholds as $i => $t) {
         if ($xp >= $t) $level = $i + 1;
     }
-    return min($level, 10);
+    return min($level, count($thresholds));
 }
 
 /**
  * Retourne le nom du niveau pour un niveau donné.
  */
 function get_level_name(int $level): string {
-    $names = ['', 'Novice', 'Explorateur', 'Aventurier', 'Expert', 'Gardien',
-              'Légende', 'Grand Pisteur', 'Vétéran', 'Ancêtre', 'Immortel'];
+    static $names = null;
+    if ($names === null) {
+        $names = ['', 'Novice', 'Explorateur', 'Aventurier', 'Expert', 'Gardien',
+                  'Légende', 'Grand Pisteur', 'Vétéran', 'Ancêtre', 'Immortel'];
+        if (function_exists('db')) {
+            try {
+                $pdo = db();
+                if ($pdo) {
+                    $rows = $pdo->query("SELECT level, name FROM xp_levels ORDER BY level ASC")->fetchAll();
+                    if (count($rows) >= 10) {
+                        $names = [''];
+                        foreach ($rows as $r) $names[(int)$r['level']] = $r['name'];
+                    }
+                }
+            } catch (Throwable $e) { /* fallback */ }
+        }
+    }
     return $names[$level] ?? 'Immortel';
 }
 

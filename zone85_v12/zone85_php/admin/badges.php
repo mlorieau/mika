@@ -18,11 +18,11 @@ $flash  = null;          // ['type' => 'ok|err', 'msg' => '...']
 
 // ── Constantes d'affichage ────────────────────────────────────
 $rarity_colors = [
-    'common'    => ['bg' => '#6b7f96', 'label' => 'Common'],
-    'uncommon'  => ['bg' => '#2a9d5c', 'label' => 'Uncommon'],
+    'common'    => ['bg' => '#6b7f96', 'label' => 'Commun'],
+    'uncommon'  => ['bg' => '#2a9d5c', 'label' => 'Peu commun'],
     'rare'      => ['bg' => '#12314e', 'label' => 'Rare'],
-    'epic'      => ['bg' => '#9b59b6', 'label' => 'Epic'],
-    'legendary' => ['bg' => '#C9962A', 'label' => 'Legendary'],
+    'epic'      => ['bg' => '#9b59b6', 'label' => 'Épique'],
+    'legendary' => ['bg' => '#C9962A', 'label' => 'Légendaire'],
 ];
 $categories = ['exploration','clan','saison','meteo','rando','culture','invisible','general'];
 $condition_types = [
