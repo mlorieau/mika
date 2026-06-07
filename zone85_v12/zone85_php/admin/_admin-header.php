@@ -20,6 +20,7 @@ $_adm_nav = [
     ['missions.php',           'missions',           '🎯', 'Missions'],
     ['participations.php',     'participations',     '👀', 'Participations'],
     ['events.php',             'events',             '⚡', 'Flash events'],
+    ['comments.php',           'comments',           '💬', 'Modération cmmt'],
   ],
   'COMMUNAUTÉ' => [
     ['users.php',   'users',   '👥', 'Membres'],
