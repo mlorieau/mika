@@ -343,6 +343,29 @@ $page_styles = '<style>
   justify-content: center;
   gap: 10px;
 }
+/* Modal info XP mission */
+.mission-info-modal{position:fixed;inset:0;z-index:99997;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(12,30,46,.6);backdrop-filter:blur(5px)}
+.mission-info-modal.is-open{display:flex}
+.mission-info-card{width:min(500px,96vw);background:#fff;border-radius:20px;box-shadow:0 28px 80px rgba(0,0,0,.28);overflow:hidden}
+.mission-info-head{padding:20px 22px 14px;background:linear-gradient(135deg,var(--navy-dark,#0c1e2e),#1a3456);display:flex;align-items:flex-start;gap:12px}
+.mission-info-head-icon{font-size:1.8rem;flex-shrink:0;margin-top:2px}
+.mission-info-head h3{margin:0;font-size:1.05rem;font-weight:900;color:#fff;line-height:1.25}
+.mission-info-head p{margin:5px 0 0;font-size:.8rem;color:rgba(255,255,255,.6);line-height:1.4}
+.mission-info-head-close{margin-left:auto;flex-shrink:0;border:0;background:rgba(255,255,255,.12);color:#fff;width:32px;height:32px;border-radius:999px;font-size:1.2rem;cursor:pointer;font-weight:900}
+.mission-info-head-close:hover{background:rgba(255,255,255,.22)}
+.mission-info-body{padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+.mission-info-row{display:flex;align-items:flex-start;gap:12px;background:#f8f4ef;border-radius:12px;padding:12px 14px}
+.mission-info-row-hl{background:#f0faf4;border:1.5px solid rgba(42,157,92,.2)}
+.mission-info-row-icon{font-size:1.4rem;flex-shrink:0;margin-top:1px}
+.mission-info-row strong{display:block;font-size:.88rem;font-weight:900;color:#0c1e2e;margin-bottom:3px}
+.mission-info-row p{margin:0;font-size:.78rem;color:#4b6074;line-height:1.5}
+.mission-info-xp{flex-shrink:0;margin-top:2px;padding:3px 9px;border-radius:999px;font-size:.7rem;font-weight:900}
+.mission-info-xp-auto{background:rgba(42,157,92,.15);color:#1a7a42}
+.mission-info-xp-pending{background:rgba(233,149,26,.18);color:#9a5800}
+.mission-info-footer{padding:10px 20px 18px;display:flex;gap:10px}
+.mission-info-btn-ok{flex:1;border:0;background:var(--primary,#ea5649);color:#fff;font-size:.88rem;font-weight:900;padding:12px;border-radius:10px;cursor:pointer;box-shadow:0 6px 18px rgba(234,86,73,.25);transition:opacity .15s}
+.mission-info-btn-ok:hover{opacity:.9}
+@media(max-width:480px){.mission-info-footer{flex-direction:column}}
 
 /* ── CTA NON CONNECTÉ ── */
 .login-cta-card {
@@ -925,7 +948,86 @@ if (in_array($mission['mission_type'], ['quiz','vote']) && db_enabled()) {
 <?php
 render_hidden_collectibles('mission');
 
+// Modal info participation (non-connecté ou déjà participé → pas affiché)
+if ($is_logged_in && !$already_participated): ?>
+<div id="missionInfoModal" class="mission-info-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="missionInfoTitle">
+  <div class="mission-info-card">
+    <div class="mission-info-head">
+      <span class="mission-info-head-icon">&#x1F3AF;</span>
+      <div>
+        <h3 id="missionInfoTitle">Comment gagner des XP sur cette mission ?</h3>
+        <p><?= e($mission['title']) ?></p>
+      </div>
+      <button class="mission-info-head-close" id="closeMissionInfo" aria-label="Fermer">&#xD7;</button>
+    </div>
+    <div class="mission-info-body">
+      <?php if ($xp_part > 0): ?>
+      <div class="mission-info-row <?= ($mission['validation_mode'] === 'auto') ? '' : 'mission-info-row-hl' ?>">
+        <div class="mission-info-row-icon">&#x26A1;</div>
+        <div>
+          <strong>XP de participation</strong>
+          <p><?php if ($mission['validation_mode'] === 'auto'): ?>
+            Attribués <strong>automatiquement</strong> dès l'envoi de ta participation.
+          <?php else: ?>
+            Attribués <strong>après validation</strong> par l'équipe Zone85 (24–48&thinsp;h).
+          <?php endif; ?></p>
+        </div>
+        <span class="mission-info-xp <?= ($mission['validation_mode'] === 'auto') ? 'mission-info-xp-auto' : 'mission-info-xp-pending' ?>">
+          +<?= $xp_part ?>&thinsp;XP
+        </span>
+      </div>
+      <?php endif; ?>
+      <?php if ($xp_success > 0): ?>
+      <div class="mission-info-row mission-info-row-hl">
+        <div class="mission-info-row-icon">&#x1F3C6;</div>
+        <div>
+          <strong>Bonus réussite</strong>
+          <p>Si ta réponse est retenue comme correcte, tu empoches un bonus supplémentaire.</p>
+        </div>
+        <span class="mission-info-xp mission-info-xp-auto">+<?= $xp_success ?>&thinsp;XP</span>
+      </div>
+      <?php endif; ?>
+      <?php if ($clan_pts > 0): ?>
+      <div class="mission-info-row">
+        <div class="mission-info-row-icon">&#x1F6E1;</div>
+        <div>
+          <strong>Points clan</strong>
+          <p>Ta participation rapporte aussi des points à ton clan pour le classement de saison.</p>
+        </div>
+        <span class="mission-info-xp mission-info-xp-auto">+<?= $clan_pts ?>&thinsp;pts</span>
+      </div>
+      <?php endif; ?>
+    </div>
+    <div class="mission-info-footer">
+      <button id="closeMissionInfoBtn" class="mission-info-btn-ok" style="background:#4b6074">Fermer</button>
+      <button id="goParticipateBtn" class="mission-info-btn-ok">Participer &#x2192;</button>
+    </div>
+  </div>
+</div>
+<?php endif; ?>
+<?php
+
 $page_scripts = '<script>
+' . ($is_logged_in && !$already_participated ? '
+(function(){
+  var modal = document.getElementById("missionInfoModal");
+  if (!modal) return;
+  var key = "mission_info_seen_' . (int)$mission_id . '";
+  if (!sessionStorage.getItem(key)) {
+    setTimeout(function(){ modal.classList.add("is-open"); modal.setAttribute("aria-hidden","false"); }, 600);
+  }
+  function closeModal(){ modal.classList.remove("is-open"); modal.setAttribute("aria-hidden","true"); sessionStorage.setItem(key,"1"); }
+  document.getElementById("closeMissionInfo") && document.getElementById("closeMissionInfo").addEventListener("click", closeModal);
+  document.getElementById("closeMissionInfoBtn") && document.getElementById("closeMissionInfoBtn").addEventListener("click", closeModal);
+  document.getElementById("goParticipateBtn") && document.getElementById("goParticipateBtn").addEventListener("click", function(){
+    closeModal();
+    var f = document.getElementById("participate-form");
+    if (f) { f.scrollIntoView({behavior:"smooth",block:"center"}); }
+  });
+  modal.addEventListener("click", function(ev){ if(ev.target===modal) closeModal(); });
+  document.addEventListener("keydown", function(ev){ if(ev.key==="Escape") closeModal(); });
+})();
+' : '') . '
 document.getElementById("participate-form") && document.getElementById("participate-form").addEventListener("submit", function(e) {
   var btn = document.getElementById("participate-btn");
   if (btn) {

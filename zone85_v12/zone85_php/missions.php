@@ -29,12 +29,23 @@ if (db_enabled()) {
     if ($_badges_db !== null) $badges = $_badges_db;
 }
 
-// IDs des missions déjà faites par l'utilisateur connecté
-$_participated_ids = [];
+// Participations de l'utilisateur connecté (id → status)
+$_participated_ids      = [];
+$_user_mission_statuses = [];
 if (db_enabled() && is_logged_in()) {
     $_nav_sess = current_user();
     if ($_nav_sess) {
-        $_participated_ids = fetch_user_participated_mission_ids((int)$_nav_sess['id']);
+        $_ms_pdo = db();
+        if ($_ms_pdo) {
+            try {
+                $_ms_stmt = $_ms_pdo->prepare("SELECT mission_id, status FROM participations WHERE user_id = :id");
+                $_ms_stmt->execute([':id' => (int)$_nav_sess['id']]);
+                foreach ($_ms_stmt->fetchAll() as $_ms_row) {
+                    $_participated_ids[] = (int)$_ms_row['mission_id'];
+                    $_user_mission_statuses[(int)$_ms_row['mission_id']] = $_ms_row['status'];
+                }
+            } catch (PDOException $_ms_e) { /* silent */ }
+        }
     }
 }
 
@@ -592,12 +603,16 @@ $page_styles = '<style>
   gap: 5px;
   font-size: .65rem;
   font-weight: 800;
-  background: rgba(42,157,92,.1);
+  background: rgba(42,157,92,.12);
   color: #1a7a42;
   padding: 4px 10px;
   border-radius: 5px;
   letter-spacing: .04em;
 }
+.mission-badge-validated  { background: rgba(42,157,92,.18); color: #1a7a42; }
+.mission-badge-auto       { background: rgba(42,157,92,.12); color: #1a7a42; }
+.mission-badge-pending    { background: rgba(233,149,26,.15); color: #9a5800; }
+.mission-badge-rejected   { background: rgba(107,127,150,.12); color: #4b6074; }
 .mission-title {
   font-size: 1rem;
   font-weight: 900;
@@ -1043,16 +1058,25 @@ require_once 'includes/nav.php';
           $status_class = mission_status_class($mission['status']);
           $status_label = mission_status_label($mission['status']);
           $cta_label    = $cta_labels[$mission['mission_type']] ?? 'Voir';
-          $xp_display   = '+' . (int)$mission['xp_participation'] . ' XP';
-          $participated = in_array((int)$mission['id'], $_participated_ids);
-          $delay        = $i > 0 ? ' style="transition-delay:' . round($i * 0.04, 2) . 's"' : '';
+          $xp_display      = '+' . (int)$mission['xp_participation'] . ' XP';
+          $participated    = in_array((int)$mission['id'], $_participated_ids);
+          $part_status     = $_user_mission_statuses[(int)$mission['id']] ?? null;
+          $delay           = $i > 0 ? ' style="transition-delay:' . round($i * 0.04, 2) . 's"' : '';
       ?>
       <div class="mission-card reveal" data-type="<?= e($filter_type) ?>"<?= $delay ?>>
         <div class="mission-card-header">
           <div class="mission-card-header-top">
             <span class="mission-type-tag tag-<?= e($tag_class) ?>"><?= $icon ?> <?= e(mission_type_label($mission['mission_type'])) ?></span>
             <?php if ($participated): ?>
-            <span class="mission-already-badge">✓ Déjà participé</span>
+              <?php if ($part_status === 'validated' || $part_status === 'auto_validated'): ?>
+                <span class="mission-already-badge mission-badge-validated">&#x2713; +<?= (int)$mission['xp_participation'] ?>&thinsp;XP</span>
+              <?php elseif ($part_status === 'rejected'): ?>
+                <span class="mission-already-badge mission-badge-rejected">&#x2715; Non retenue</span>
+              <?php elseif ($part_status === 'pending'): ?>
+                <span class="mission-already-badge mission-badge-pending">&#x23F3; En attente</span>
+              <?php else: ?>
+                <span class="mission-already-badge mission-badge-auto">&#x2713; Participé</span>
+              <?php endif; ?>
             <?php endif; ?>
           </div>
           <div class="mission-title"><?= e($mission['title']) ?></div>

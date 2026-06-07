@@ -211,6 +211,12 @@ $page_styles = '<style>
 }
 .ktc-flash-ok  { background: rgba(42,140,64,.1);  border: 1px solid rgba(42,140,64,.25);  color: #1a5c28; }
 .ktc-flash-err { background: rgba(201,64,48,.08); border: 1px solid rgba(201,64,48,.22);  color: #8a1a10; }
+/* Badge "déjà participé" KTC */
+.ktc-done-badge{display:flex;align-items:center;gap:12px;background:rgba(42,140,64,.1);border:1.5px solid rgba(42,140,64,.25);border-radius:12px;padding:13px 16px;margin-bottom:14px}
+.ktc-done-badge-icon{font-size:1.4rem;flex-shrink:0}
+.ktc-done-badge-text{flex:1}
+.ktc-done-badge-label{font-size:.78rem;font-weight:900;color:#1a5c28;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px}
+.ktc-done-badge-value{font-size:.88rem;color:#1a5c28;font-weight:700;line-height:1.4}
 
 /* Photos */
 .ktc-photos { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 28px; }
@@ -557,9 +563,12 @@ function _ktc_fmt_date(?string $d): string {
             <div class="ktc-prop-form-title">💬 Quelle est votre théorie ?</div>
             <div class="ktc-prop-form-hint">Selon vous, c'est quoi cet objet ? Proposez votre réponse — elle sera dévoilée à la révélation.</div>
             <?php if ($user_prop): ?>
-              <div class="ktc-prop-existing">
-                <span class="ktc-prop-existing-label">Votre proposition :</span>
-                <?= e($user_prop['proposition']) ?>
+              <div class="ktc-done-badge">
+                <div class="ktc-done-badge-icon">&#x1F4AC;</div>
+                <div class="ktc-done-badge-text">
+                  <div class="ktc-done-badge-label">&#x2713; Proposition envoyée</div>
+                  <div class="ktc-done-badge-value"><?= e($user_prop['proposition']) ?></div>
+                </div>
               </div>
             <?php elseif ($is_logged): ?>
               <form method="post">
@@ -590,9 +599,12 @@ function _ktc_fmt_date(?string $d): string {
               <?= e($episode['vote_question'] ?: 'Selon vous, cet objet est…') ?>
             </div>
             <?php if ($user_vote): ?>
-              <div class="ktc-vote-already">
-                ✓ Vous avez voté : <strong><?= e($user_vote['vote_choice']) ?></strong><br>
-                <span style="font-size:.78rem;color:#3d7a4a;font-weight:400">Rendez-vous à la révélation pour connaître la réponse !</span>
+              <div class="ktc-done-badge">
+                <div class="ktc-done-badge-icon">&#x1F5F3;&#xFE0F;</div>
+                <div class="ktc-done-badge-text">
+                  <div class="ktc-done-badge-label">&#x2713; Vous avez voté</div>
+                  <div class="ktc-done-badge-value"><?= e($user_vote['vote_choice']) ?> — Rendez-vous à la révélation !</div>
+                </div>
               </div>
             <?php elseif ($is_logged): ?>
               <form method="post">
