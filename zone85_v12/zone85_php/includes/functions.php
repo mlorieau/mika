@@ -510,7 +510,7 @@ function set_security_headers(): void {
     header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
 
     $analytics_scripts = 'https://www.googletagmanager.com https://www.google-analytics.com https://ssl.google-analytics.com';
-    $analytics_connect = 'https://www.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net https://www.googletagmanager.com';
+    $analytics_connect = 'https://www.google-analytics.com https://*.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net https://www.googletagmanager.com https://region1.analytics.google.com https://region1.google.com';
     $analytics_img     = 'https://www.google-analytics.com https://www.googletagmanager.com';
 
     $csp = implode('; ', [
