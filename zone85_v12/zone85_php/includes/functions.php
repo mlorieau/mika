@@ -508,9 +508,24 @@ function set_security_headers(): void {
     header('X-Frame-Options: SAMEORIGIN');
     header('Referrer-Policy: strict-origin-when-cross-origin');
     header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
-    // upgrade-insecure-requests : force HTTPS sur toutes les sous-ressources
-    // unsafe-inline conservé le temps de migrer les inline styles/scripts vers fichiers externes
-    header("Content-Security-Policy: upgrade-insecure-requests; default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://unpkg.com; img-src 'self' data: blob: https://unpkg.com https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://www.zone85.fr https://zone85.fr; connect-src 'self' https://unpkg.com https://*.tile.openstreetmap.org https://tile.openstreetmap.org; frame-ancestors 'self'; base-uri 'self'; form-action 'self';");
+
+    $analytics_scripts = 'https://www.googletagmanager.com https://www.google-analytics.com https://ssl.google-analytics.com';
+    $analytics_connect = 'https://www.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net https://www.googletagmanager.com';
+    $analytics_img     = 'https://www.google-analytics.com https://www.googletagmanager.com';
+
+    $csp = implode('; ', [
+        "upgrade-insecure-requests",
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-inline' https://unpkg.com {$analytics_scripts}",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com",
+        "font-src 'self' https://fonts.gstatic.com",
+        "img-src 'self' data: blob: https://unpkg.com https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://www.zone85.fr https://zone85.fr {$analytics_img}",
+        "connect-src 'self' https://unpkg.com https://*.tile.openstreetmap.org https://tile.openstreetmap.org {$analytics_connect}",
+        "frame-ancestors 'self'",
+        "base-uri 'self'",
+        "form-action 'self'",
+    ]);
+    header("Content-Security-Policy: {$csp}");
 }
 
 /**
