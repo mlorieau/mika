@@ -176,6 +176,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
+        // ── Attribuer un badge ─────────────────────────────────
+        elseif ($action === 'award_badge') {
+            $bid = (int)($_POST['badge_id'] ?? 0);
+            if ($bid > 0) {
+                try {
+                    $pdo->prepare("INSERT IGNORE INTO user_badges (user_id, badge_id, source_type, awarded_by, awarded_at)
+                        VALUES (:uid, :bid, 'admin', :by, NOW())")
+                        ->execute([':uid' => $uid, ':bid' => $bid, ':by' => $me]);
+                    $flash = ['type' => 'ok', 'msg' => 'Badge attribué.'];
+                } catch (PDOException $e) {
+                    $flash = ['type' => 'err', 'msg' => 'Erreur lors de l\'attribution.'];
+                }
+            }
+        }
+
+        // ── Révoquer un badge ──────────────────────────────────
+        elseif ($action === 'revoke_badge') {
+            $bid = (int)($_POST['badge_id'] ?? 0);
+            if ($bid > 0) {
+                try {
+                    $pdo->prepare("DELETE FROM user_badges WHERE user_id=:uid AND badge_id=:bid")
+                        ->execute([':uid' => $uid, ':bid' => $bid]);
+                    $flash = ['type' => 'ok', 'msg' => 'Badge révoqué.'];
+                } catch (PDOException $e) {
+                    $flash = ['type' => 'err', 'msg' => 'Erreur lors de la révocation.'];
+                }
+            }
+        }
+
         // ── Suppression définitive ────────────────────────────
         elseif ($action === 'hard_delete' && $uid !== $me) {
             try {
@@ -215,10 +244,50 @@ if (!$user) {
 // Stats du membre
 $stats = ['comments' => 0, 'randos' => 0, 'missions' => 0, 'badges' => 0];
 try {
-    $stats['comments'] = (int)$pdo->prepare("SELECT COUNT(*) FROM article_comments WHERE user_id=:id")->execute([':id'=>$uid]) ? $pdo->query("SELECT COUNT(*) FROM article_comments WHERE user_id={$uid}")->fetchColumn() : 0;
-    $stats['randos']   = (int)$pdo->query("SELECT COUNT(*) FROM rando_participations WHERE user_id={$uid}")->fetchColumn();
-    $stats['missions'] = (int)$pdo->query("SELECT COUNT(*) FROM participations WHERE user_id={$uid}")->fetchColumn();
-    $stats['badges']   = (int)$pdo->query("SELECT COUNT(*) FROM user_badges WHERE user_id={$uid}")->fetchColumn();
+    $stat_queries = [
+        'comments' => "SELECT COUNT(*) FROM article_comments WHERE user_id=:id",
+        'randos'   => "SELECT COUNT(*) FROM rando_participations WHERE user_id=:id",
+        'missions' => "SELECT COUNT(*) FROM participations WHERE user_id=:id",
+        'badges'   => "SELECT COUNT(*) FROM user_badges WHERE user_id=:id",
+    ];
+    foreach ($stat_queries as $key => $sql) {
+        $sq = $pdo->prepare($sql);
+        $sq->execute([':id' => $uid]);
+        $stats[$key] = (int)$sq->fetchColumn();
+    }
+} catch (PDOException $e) {}
+
+// Badges du membre
+$user_badges_list  = [];
+$all_badges_list   = [];
+$awarded_badge_ids = [];
+try {
+    $user_badges_list = $pdo->prepare("
+        SELECT ub.badge_id, ub.awarded_at, ub.source_type, ub.awarded_by,
+               b.title, b.description, b.icon_emoji, b.rarity,
+               adm.pseudo AS awarded_by_pseudo
+        FROM user_badges ub
+        JOIN badges b ON b.id = ub.badge_id
+        LEFT JOIN users adm ON adm.id = ub.awarded_by
+        WHERE ub.user_id = :id
+        ORDER BY ub.awarded_at DESC
+    ")->execute([':id' => $uid]) ? [] : [];
+
+    $stmt2 = $pdo->prepare("
+        SELECT ub.badge_id, ub.awarded_at, ub.source_type, ub.awarded_by,
+               b.title, b.description, b.icon_emoji, b.rarity,
+               adm.pseudo AS awarded_by_pseudo
+        FROM user_badges ub
+        JOIN badges b ON b.id = ub.badge_id
+        LEFT JOIN users adm ON adm.id = ub.awarded_by
+        WHERE ub.user_id = :id
+        ORDER BY ub.awarded_at DESC
+    ");
+    $stmt2->execute([':id' => $uid]);
+    $user_badges_list = $stmt2->fetchAll();
+    $awarded_badge_ids = array_column($user_badges_list, 'badge_id');
+
+    $all_badges_list = $pdo->query("SELECT id, title, icon_emoji, rarity FROM badges ORDER BY title")->fetchAll();
 } catch (PDOException $e) {}
 
 $level     = get_user_level_from_xp((int)$user['xp_total']);
@@ -595,6 +664,62 @@ require_once '_admin-header.php';
   </div>
 
 </div><!-- /grid -->
+
+<!-- ─────────────────────────────────────────────────────────── -->
+<!-- Section Badges -->
+<!-- ─────────────────────────────────────────────────────────── -->
+<div class="ue-section" style="margin-bottom:20px">
+  <div class="ue-section-title">🏅 Badges (<?= count($user_badges_list) ?>)</div>
+
+  <?php if (empty($user_badges_list)): ?>
+  <p style="font-size:.83rem;color:#9aadbc;margin:0">Aucun badge débloqué.</p>
+  <?php else: ?>
+  <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px">
+    <?php foreach ($user_badges_list as $b):
+      $rarity_colors = ['common'=>'#6b7f96','uncommon'=>'#1a7a42','rare'=>'#0369a1','epic'=>'#6b2fa0','legendary'=>'#c0392b'];
+      $rc = $rarity_colors[$b['rarity'] ?? 'common'] ?? '#6b7f96';
+    ?>
+    <div style="display:flex;align-items:center;gap:8px;background:#f8f4ef;border-radius:10px;padding:9px 13px;
+                border:1.5px solid #e8e4df;min-width:0">
+      <span style="font-size:1.4rem"><?= $b['icon_emoji'] ?: '🏅' ?></span>
+      <div style="min-width:0">
+        <div style="font-size:.8rem;font-weight:800;color:#0c1e2e"><?= e($b['title']) ?></div>
+        <div style="font-size:.67rem;color:<?= $rc ?>;font-weight:700;text-transform:uppercase;letter-spacing:.06em"><?= $b['rarity'] ?? 'common' ?></div>
+        <div style="font-size:.67rem;color:#9aadbc"><?= date('d/m/Y', strtotime($b['awarded_at'])) ?>
+          <?= $b['source_type'] === 'admin' ? ' · <em>Admin</em>' : '' ?></div>
+      </div>
+      <form method="POST" action="user-edit.php?id=<?= $uid ?>" style="margin:0;margin-left:auto"
+            onsubmit="return confirm('Révoquer le badge « <?= e(addslashes($b['title'])) ?> » ?')">
+        <?= csrf_field() ?>
+        <input type="hidden" name="action" value="revoke_badge">
+        <input type="hidden" name="badge_id" value="<?= (int)$b['badge_id'] ?>">
+        <button type="submit" class="ue-btn ue-btn-danger ue-btn-sm" title="Révoquer" style="padding:4px 8px;font-size:.7rem">✕</button>
+      </form>
+    </div>
+    <?php endforeach; ?>
+  </div>
+  <?php endif; ?>
+
+  <!-- Attribution manuelle -->
+  <?php $available = array_filter($all_badges_list, fn($b) => !in_array($b['id'], $awarded_badge_ids)); ?>
+  <?php if (!empty($available)): ?>
+  <form method="POST" action="user-edit.php?id=<?= $uid ?>" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding-top:14px;border-top:1px solid #f0ece7">
+    <?= csrf_field() ?>
+    <input type="hidden" name="action" value="award_badge">
+    <select name="badge_id" class="ue-input ue-select" style="flex:1;min-width:200px;max-width:360px">
+      <option value="">— Choisir un badge à attribuer —</option>
+      <?php foreach ($available as $b): ?>
+      <option value="<?= $b['id'] ?>"><?= $b['icon_emoji'] ?: '🏅' ?> <?= e($b['title']) ?></option>
+      <?php endforeach; ?>
+    </select>
+    <button type="submit" class="ue-btn ue-btn-ok ue-btn-sm">🏅 Attribuer</button>
+  </form>
+  <?php else: ?>
+  <p style="font-size:.78rem;color:#9aadbc;margin:14px 0 0;padding-top:14px;border-top:1px solid #f0ece7">
+    Tous les badges disponibles ont été attribués.
+  </p>
+  <?php endif; ?>
+</div>
 
 <!-- ─────────────────────────────────────────────────────────── -->
 <!-- Zone Danger -->

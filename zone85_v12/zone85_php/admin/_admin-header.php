@@ -29,8 +29,13 @@ $_adm_nav = [
     ['seasons.php', 'seasons', '🗓', 'Saisons'],
   ],
   'STATISTIQUES' => [
-    ['victor.php',  'victor',  '📖', 'VICTOR — Téléchargements'],
-    ['seo.php',     'seo',     '🔍', 'SEO — Vue d\'ensemble'],
+    ['victor.php',   'victor',   '📖', 'VICTOR — Téléchargements'],
+    ['seo.php',      'seo',      '🔍', 'SEO — Vue d\'ensemble'],
+    ['xp-logs.php',  'xp-logs',  '⭐', 'Audit XP'],
+  ],
+  'OUTILS' => [
+    ['contact.php',  'contact',  '✉️', 'Messages contact'],
+    ['emails.php',   'emails',   '📤', 'File d\'emails'],
   ],
   'SYSTÈME' => [
     ['collectibles.php',  'collectibles',  '🔍', 'Collectibles'],
