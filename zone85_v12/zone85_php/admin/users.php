@@ -1,7 +1,8 @@
 <?php
 // ============================================================
-// admin/users.php — Gestion Utilisateurs V10
+// admin/users.php — Gestion Utilisateurs
 // ============================================================
+define('SKIP_MAINTENANCE_CHECK', true);
 require_once '../includes/config.php';
 require_once '../includes/functions.php';
 require_once '../includes/db.php';
@@ -16,8 +17,13 @@ $admin_page_title = 'Utilisateurs';
 
 $pdo = db();
 
-// ── Actions POST ──────────────────────────────────────────────
+// Flash depuis user-edit (après suppression)
 $flash = null;
+if (($_GET['flash'] ?? '') === 'deleted') {
+    $flash = ['type' => 'ok', 'msg' => 'Compte supprimé définitivement.'];
+}
+
+// ── Actions POST ──────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
     if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
         $flash = ['type' => 'err', 'msg' => 'Jeton CSRF invalide.'];
@@ -114,7 +120,7 @@ if ($pdo) {
                    u.role, u.status, u.xp_total, u.level,
                    u.newsletter_optin, u.avatar_type, u.avatar_config, u.avatar_file,
                    u.created_at, u.last_login_at, u.pwa_installed_at,
-                   u.delete_requested_at,
+                   u.delete_requested_at, u.email_verified_at, u.accepted_cgu_at,
                    c.name AS clan_name, c.slug AS clan_slug
             FROM users u
             LEFT JOIN clans c ON c.id = u.clan_id
@@ -137,14 +143,14 @@ require_once '_admin-header.php';
 
 <div class="adm-page-header">
   <div>
-    <h1 class="adm-page-title">Utilisateurs</h1>
+    <h1 class="adm-page-title">👥 Membres</h1>
     <p class="adm-page-sub"><?= number_format($total, 0, ',', ' ') ?> membre<?= $total > 1 ? 's' : '' ?> trouvé<?= $total > 1 ? 's' : '' ?></p>
   </div>
 </div>
 
 <?php if ($flash): ?>
-<div class="adm-flash adm-flash-<?= $flash['type'] === 'ok' ? 'ok' : 'err' ?>">
-  <?= $flash['type'] === 'ok' ? '✅' : '❌' ?> <?= e($flash['msg']) ?>
+<div class="adm-flash adm-flash-<?= $flash['type'] === 'ok' ? 'ok' : ($flash['type'] === 'warn' ? 'warn' : 'err') ?>">
+  <?= $flash['type'] === 'ok' ? '✅' : ($flash['type'] === 'warn' ? '⚠️' : '❌') ?> <?= e($flash['msg']) ?>
 </div>
 <?php endif; ?>
 
@@ -197,7 +203,7 @@ require_once '_admin-header.php';
   <th>XP</th>
   <th>Inscription</th>
   <th>Dernière co.</th>
-  <th>PWA</th>
+  <th style="text-align:center" title="Newsletter · RGPD · PWA">📬 RGPD</th>
   <th>Actions</th>
 </tr>
 </thead>
@@ -265,22 +271,29 @@ require_once '_admin-header.php';
     <?= $u['last_login_at'] ? date('d/m/Y', strtotime($u['last_login_at'])) : '—' ?>
   </td>
 
-  <!-- PWA -->
-  <td style="text-align:center">
-    <?= !empty($u['pwa_installed_at']) ? '<span title="PWA installée" style="font-size:1rem">📱</span>' : '—' ?>
+  <!-- Newsletter · RGPD · PWA -->
+  <td style="text-align:center;white-space:nowrap">
+    <span title="Newsletter <?= $u['newsletter_optin'] ? 'inscrit' : 'non inscrit' ?>" style="font-size:1.05rem;opacity:<?= $u['newsletter_optin'] ? '1' : '.25' ?>">📧</span>
+    <span title="CGU <?= $u['accepted_cgu_at'] ? 'acceptées' : 'non acceptées' ?>" style="font-size:1.05rem;opacity:<?= $u['accepted_cgu_at'] ? '1' : '.25' ?>">⚖️</span>
+    <span title="Email <?= $u['email_verified_at'] ? 'vérifié' : 'non vérifié' ?>" style="font-size:1.05rem;opacity:<?= $u['email_verified_at'] ? '1' : '.25' ?>">✉️</span>
+    <?php if (!empty($u['pwa_installed_at'])): ?>
+    <span title="PWA installée" style="font-size:1.05rem">📱</span>
+    <?php endif; ?>
+    <?php if (!empty($u['delete_requested_at'])): ?>
+    <br><span style="font-size:.64rem;font-weight:800;color:#c0392b;background:rgba(192,57,43,.1);padding:1px 5px;border-radius:4px">🗑 À supprimer</span>
+    <?php endif; ?>
   </td>
 
   <!-- Actions -->
   <td>
     <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+      <a href="user-edit.php?id=<?= (int)$u['id'] ?>"
+         class="btn-adm btn-adm-ghost btn-adm-sm" title="Modifier le profil">✏️ Modifier</a>
+
       <a href="../profil.php?id=<?= (int)$u['id'] ?>" target="_blank"
-         class="btn-adm btn-adm-ghost btn-adm-sm" title="Voir profil">👁</a>
+         class="btn-adm btn-adm-ghost btn-adm-sm" title="Voir profil public">👁</a>
 
-      <button class="btn-adm btn-adm-ghost btn-adm-sm"
-        onclick="openRoleModal(<?= (int)$u['id'] ?>, '<?= e($u['pseudo']) ?>', '<?= e($u['role']) ?>')"
-        title="Changer rôle">🔑 Rôle</button>
-
-      <?php if ($u['status'] === 'active'): ?>
+      <?php if ($u['status'] === 'active' && (int)$u['id'] !== (int)(current_user()['id'] ?? 0)): ?>
       <form method="POST" action="users.php" style="display:inline" onsubmit="return confirm('Suspendre <?= e(addslashes($u['pseudo'])) ?> ?')">
         <?= csrf_field() ?>
         <input type="hidden" name="action" value="suspend">
