@@ -14,9 +14,28 @@ require_once 'includes/repositories.php';
 require_once 'includes/auth.php';
 
 // Seuils V10.2 — synchronises avec get_user_level_from_xp()
-$_xp_levels   = [0, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 20000];
-$_level_names = ['','Novice','Explorateur','Aventurier','Expert','Gardien','Légende',
-                 'Grand Pisteur','Vétéran','Ancêtre','Immortel'];
+// Load from xp_levels table, fallback to hardcoded defaults
+$_xp_levels = [0, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 20000];
+$_level_names = ['','Novice','Explorateur','Aventurier','Expert','Gardien','Légende','Grand Pisteur','Vétéran','Ancêtre','Immortel'];
+$_level_colors = ['','#6b7f96','#2a9d5c','#12314e','#0c6291','#9b59b6','#C9962A','#ea5649','#8b1a1a','#1a1a2e','#0c1e2e'];
+$_level_emojis = ['','🌱','🧭','🏕️','⚡','🛡️','🌟','🗺️','🔥','💎','👑'];
+try {
+    $_lv_pdo = db();
+    if ($_lv_pdo) {
+        $_lv_rows = $_lv_pdo->query("SELECT level, name, xp_required, color, emoji FROM xp_levels ORDER BY level ASC")->fetchAll();
+        if (count($_lv_rows) >= 10) {
+            $_xp_levels = [0];
+            foreach ($_lv_rows as $_lv_r) {
+                $_xp_levels[(int)$_lv_r['level']] = (int)$_lv_r['xp_required'];
+                $_level_names[(int)$_lv_r['level']] = $_lv_r['name'];
+                $_level_colors[(int)$_lv_r['level']] = $_lv_r['color'];
+                $_level_emojis[(int)$_lv_r['level']] = $_lv_r['emoji'];
+            }
+            // rebuild indexed array for xp_levels (0-indexed for existing code compatibility)
+            $_xp_levels = array_values(array_map(fn($r) => (int)$r['xp_required'], $_lv_rows));
+        }
+    }
+} catch (Throwable $_lv_e) { /* fallback stays */ }
 $_chip_map    = ['bocage'=>'bocage-chip-sm','littoral'=>'littoral-chip-sm','marais'=>'marais-chip-sm'];
 $_clan_labels = ['bocage'=>'Clan du Bocage','littoral'=>'Clan du Littoral','marais'=>'Clan du Marais'];
 
@@ -191,7 +210,7 @@ if (!$is_guest) {
 
         $_user_badges       = fetch_user_badges((int)$_db_profile['id']);
         if (!empty($_user_badges)) $badges = $_user_badges;
-        $_xp_history          = fetch_user_xp_logs((int)$_db_profile['id'], 10);
+        $_xp_history          = fetch_user_xp_logs((int)$_db_profile['id'], 30);
         $_user_participations = fetch_user_participations((int)$_db_profile['id'], 5);
         $_activity_feed       = function_exists('fetch_user_activity_feed') ? fetch_user_activity_feed((int)$_db_profile['id'], 10) : [];
         $_user_hidden_hunts = function_exists('fetch_user_hidden_hunts') ? fetch_user_hidden_hunts((int)$_db_profile['id']) : [];
@@ -766,6 +785,51 @@ require_once 'includes/nav.php';
       ══════════════════════════════ -->
       <div data-panel-group="profil" data-panel-id="progression" class="profil-panel" style="display:none">
 
+        <!-- Level hero card -->
+        <?php
+        $_hero_lv    = (int)$user['level'];
+        $_hero_color = $_level_colors[$_hero_lv] ?? '#6b7f96';
+        $_hero_emoji = $_level_emojis[$_hero_lv] ?? '⭐';
+        $_hero_name  = $_level_names[$_hero_lv] ?? 'Niveau ' . $_hero_lv;
+        $_hero_xp    = (int)$user['xp_current'];
+        $_hero_floor = $_xp_levels[$_hero_lv - 1] ?? 0;
+        $_hero_ceil  = $_xp_levels[$_hero_lv]     ?? ($_hero_floor + 5000);
+        $_hero_range = max(1, $_hero_ceil - $_hero_floor);
+        $_hero_pct   = min(100, (int)round(($_hero_xp - $_hero_floor) / $_hero_range * 100));
+        $_hero_left  = max(0, $_hero_ceil - $_hero_xp);
+        $_next_emoji = $_level_emojis[$_hero_lv + 1] ?? '';
+        $_next_name  = $_level_names[$_hero_lv + 1]  ?? '';
+        ?>
+        <div style="background:<?= e($_hero_color) ?>;border-radius:var(--radius-lg);padding:28px;margin-bottom:20px;position:relative;overflow:hidden">
+          <div style="position:absolute;top:-30px;right:-30px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.07)"></div>
+          <div style="position:absolute;bottom:-20px;left:60px;width:100px;height:100px;border-radius:50%;background:rgba(0,0,0,.08)"></div>
+          <div style="position:relative;z-index:1">
+            <div style="font-size:.65rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:10px">Mon niveau actuel</div>
+            <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;flex-wrap:wrap">
+              <div style="width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:2.4rem;flex-shrink:0;border:3px solid rgba(255,255,255,.25)"><?= e($_hero_emoji) ?></div>
+              <div>
+                <div style="font-size:.75rem;font-weight:800;color:rgba(255,255,255,.6);letter-spacing:.05em;text-transform:uppercase">Niveau <?= $_hero_lv ?></div>
+                <div style="font-size:1.8rem;font-weight:900;color:#fff;letter-spacing:-.5px;line-height:1"><?= e($_hero_name) ?></div>
+                <div style="font-size:.82rem;color:rgba(255,255,255,.6);margin-top:4px;font-weight:600"><?= number_format($_hero_xp, 0, ',', ' ') ?> XP à vie</div>
+              </div>
+            </div>
+            <!-- Progress bar to next level -->
+            <?php if ($_hero_lv < 10): ?>
+            <div style="margin-bottom:10px">
+              <div style="background:rgba(0,0,0,.25);border-radius:20px;height:12px;overflow:hidden;margin-bottom:8px">
+                <div style="width:<?= $_hero_pct ?>%;height:100%;background:rgba(255,255,255,.5);border-radius:20px;transition:width .8s cubic-bezier(.22,1,.36,1)"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:.75rem;font-weight:700;color:rgba(255,255,255,.7)">
+                <span><?= $_hero_pct ?>% vers <?= e($_next_emoji) ?> <?= e($_next_name) ?></span>
+                <span><?= number_format($_hero_left, 0, ',', ' ') ?> XP manquants</span>
+              </div>
+            </div>
+            <?php else: ?>
+            <div style="font-size:.9rem;font-weight:800;color:rgba(255,255,255,.9)">👑 Niveau maximum atteint !</div>
+            <?php endif; ?>
+          </div>
+        </div>
+
         <!-- Progression saisonnière -->
         <?php if (isset($_xp_season)): ?>
         <?php
@@ -903,7 +967,10 @@ require_once 'includes/nav.php';
 
         <div class="profil-card">
           <div class="profil-card-title">🏅 Badges obtenus <span style="color:var(--primary);font-size:.9em"><?= e($user['badges_count']) ?></span></div>
-          <?php if (!empty($badges)): ?>
+          <?php if (!empty($badges)):
+          $_rarity_fr = ['common'=>'Commun','uncommon'=>'Peu commun','rare'=>'Rare','epic'=>'Épique','legendary'=>'Légendaire'];
+          $_rarity_colors_badge = ['common'=>'#6b7f96','uncommon'=>'#2a9d5c','rare'=>'#12314e','epic'=>'#9b59b6','legendary'=>'#C9962A'];
+          ?>
           <div class="badges-grid">
             <?php foreach ($badges as $_b): ?>
             <div class="badge-card">
@@ -912,7 +979,7 @@ require_once 'includes/nav.php';
               <?php if (!empty($_b['awarded_at'])): ?>
               <div class="badge-date">Obtenu le <?= e(date('d/m/Y', strtotime($_b['awarded_at']))) ?></div>
               <?php endif; ?>
-              <span class="badge-xp" style="font-size:.72rem;color:var(--primary);font-weight:700"><?= e(ucfirst($_b['rarity'] ?? '')) ?></span>
+              <span class="badge-xp" style="font-size:.72rem;font-weight:700;color:<?= e($_rarity_colors_badge[$_b['rarity'] ?? 'common'] ?? '#6b7f96') ?>;background:<?= e($_rarity_colors_badge[$_b['rarity'] ?? 'common'] ?? '#6b7f96') ?>18;padding:2px 8px;border-radius:3px"><?= e($_rarity_fr[$_b['rarity'] ?? ''] ?? ucfirst($_b['rarity'] ?? '')) ?></span>
             </div>
             <?php endforeach; ?>
           </div>
@@ -925,44 +992,81 @@ require_once 'includes/nav.php';
           <?php endif; ?>
         </div>
 
+        <?php
+        // Fetch all non-hidden, non-special badges for "locked" display
+        $_all_badges_for_lock = [];
+        $_locked_badges = [];
+        $_lock_pdo = db();
+        if ($_lock_pdo) {
+            try {
+                $_lock_stmt = $_lock_pdo->prepare("
+                    SELECT b.id, b.title, b.icon, b.rarity, b.condition_type, b.condition_value, b.description
+                    FROM badges b
+                    WHERE b.is_hidden = 0 AND b.is_special = 0
+                    ORDER BY b.rarity DESC, b.condition_value ASC
+                ");
+                $_lock_stmt->execute();
+                $_all_badges_raw = $_lock_stmt->fetchAll();
+                $_earned_ids = array_column($badges ?? [], 'id');
+                // User stats for progress
+                $_u_xp      = (int)$user['xp_current'];
+                $_u_missions = (int)$user['participations'];
+                // Count validated randos
+                $_u_randos = 0;
+                try {
+                    $_rc = $_lock_pdo->prepare("SELECT COUNT(*) FROM rando_participations WHERE user_id=:id AND status='validated'");
+                    $_rc->execute([':id' => $user['id']]);
+                    $_u_randos = (int)$_rc->fetchColumn();
+                } catch (Throwable $_re) {}
+
+                foreach ($_all_badges_raw as $_ab) {
+                    if (in_array($_ab['id'], $_earned_ids)) continue;
+                    // Compute progress
+                    $_ab_prog = 0;
+                    $_ab_val  = (int)($_ab['condition_value'] ?? 0);
+                    if ($_ab_val > 0) {
+                        if ($_ab['condition_type'] === 'xp_threshold')    $_ab_prog = min(100, round($_u_xp / $_ab_val * 100));
+                        if ($_ab['condition_type'] === 'mission_success') $_ab_prog = min(100, round($_u_missions / $_ab_val * 100));
+                        if ($_ab['condition_type'] === 'rando_validated') $_ab_prog = min(100, round($_u_randos / $_ab_val * 100));
+                    }
+                    $_ab['_prog'] = (int)$_ab_prog;
+                    $_ab['_val']  = $_ab_val;
+                    $_ab['_user_val'] = match($_ab['condition_type']) {
+                        'xp_threshold'    => $_u_xp,
+                        'mission_success' => $_u_missions,
+                        'rando_validated' => $_u_randos,
+                        default => 0,
+                    };
+                    $_locked_badges[] = $_ab;
+                }
+            } catch (Throwable $_le) {}
+        }
+        $_rarity_colors_badge = $_rarity_colors_badge ?? ['common'=>'#6b7f96','uncommon'=>'#2a9d5c','rare'=>'#12314e','epic'=>'#9b59b6','legendary'=>'#C9962A'];
+        $_rarity_fr = $_rarity_fr ?? ['common'=>'Commun','uncommon'=>'Peu commun','rare'=>'Rare','epic'=>'Épique','legendary'=>'Légendaire'];
+        $_cond_labels = ['xp_threshold'=>'XP requis','mission_success'=>'Missions validées','rando_validated'=>'Randos validées','season'=>'Participation saison'];
+        ?>
+        <?php if (!empty($_locked_badges)): ?>
         <div class="profil-card">
-          <div class="profil-card-title">🔒 Badges à débloquer</div>
+          <div class="profil-card-title">🔒 Badges à débloquer <span style="font-size:.82em;color:var(--text-muted)"><?= count($_locked_badges) ?></span></div>
           <div class="badges-grid">
-
-            <div class="badge-card locked">
-              <span class="badge-emoji">🏆</span>
-              <div class="badge-name">Champion de saison</div>
-              <div class="badge-lock">🔒 Gagner 1 trophée</div>
-              <div class="badge-prog">0 / 1 trophée</div>
-              <div class="badge-prog-track"><div class="badge-prog-fill" style="width:0%"></div></div>
+            <?php foreach (array_slice($_locked_badges, 0, 12) as $_lb):
+              $_lb_color = $_rarity_colors_badge[$_lb['rarity'] ?? 'common'] ?? '#6b7f96';
+            ?>
+            <div class="badge-card locked" style="border-top:3px solid <?= e($_lb_color) ?>20;position:relative">
+              <span class="badge-emoji"><?= e($_lb['icon'] ?? '🔒') ?></span>
+              <div class="badge-name"><?= e($_lb['title']) ?></div>
+              <div class="badge-lock" style="color:<?= e($_lb_color) ?>;font-size:.7rem;font-weight:700;margin:3px 0"><?= e($_rarity_fr[$_lb['rarity'] ?? ''] ?? ucfirst($_lb['rarity'] ?? '')) ?></div>
+              <?php if ($_lb['_val'] > 0 && in_array($_lb['condition_type'], ['xp_threshold','mission_success','rando_validated'])): ?>
+              <div class="badge-prog"><?= number_format($_lb['_user_val'], 0, ',', ' ') ?> / <?= number_format($_lb['_val'], 0, ',', ' ') ?> <?= e($_cond_labels[$_lb['condition_type']] ?? '') ?></div>
+              <div class="badge-prog-track"><div class="badge-prog-fill" style="width:<?= $_lb['_prog'] ?>%;background:<?= e($_lb_color) ?>"></div></div>
+              <?php elseif ($_lb['condition_type'] === 'season'): ?>
+              <div class="badge-prog">Participer à une saison</div>
+              <?php endif; ?>
             </div>
-
-            <div class="badge-card locked">
-              <span class="badge-emoji">⚔️</span>
-              <div class="badge-name">Gardien Légendaire</div>
-              <div class="badge-lock">🔒 Atteindre le niveau max</div>
-              <div class="badge-prog">Niv. <?= e($user['level']) ?> / 12</div>
-              <div class="badge-prog-track"><div class="badge-prog-fill" style="width:58%"></div></div>
-            </div>
-
-            <div class="badge-card locked">
-              <span class="badge-emoji">🌿</span>
-              <div class="badge-name">Sage des canaux</div>
-              <div class="badge-lock">🔒 20 missions Kéto</div>
-              <div class="badge-prog">2 / 20 missions</div>
-              <div class="badge-prog-track"><div class="badge-prog-fill" style="width:10%"></div></div>
-            </div>
-
-            <div class="badge-card locked">
-              <span class="badge-emoji">🦅</span>
-              <div class="badge-name">Aigle du bocage</div>
-              <div class="badge-lock">🔒 100 contributions</div>
-              <div class="badge-prog"><?= e($user['participations']) ?> / 100 contributions</div>
-              <div class="badge-prog-track"><div class="badge-prog-fill" style="width:<?= e($user['participations']) ?>%"></div></div>
-            </div>
-
+            <?php endforeach; ?>
           </div>
         </div>
+        <?php endif; ?>
 
       </div><!-- /panel badges -->
 
