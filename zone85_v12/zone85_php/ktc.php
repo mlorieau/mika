@@ -8,6 +8,7 @@ require_once 'includes/config.php';
 require_once 'includes/functions.php';
 require_once 'includes/db.php';
 require_once 'includes/auth.php';
+require_once 'includes/repositories.php';
 
 // ── Session ───────────────────────────────────────────────────
 $is_logged = function_exists('is_logged_in') ? is_logged_in() : (!empty($_SESSION['user_id']));
@@ -73,14 +74,26 @@ try {
             }
         }
 
-        // Épisodes passés (révélés + archivés)
-        $exclude = $episode ? ' AND id != ' . (int)$episode['id'] : '';
+        // Bibliothèque KTC — tous les épisodes révélés / archivés
+        $exclude = $episode ? ' AND e.id != ' . (int)$episode['id'] : '';
         $past_eps = $pdo->query("
-            SELECT id, title, slug, date_revelation, object_name, object_hidden
-            FROM ktc_episodes
-            WHERE status IN ('revealed','archived') {$exclude}
-            ORDER BY id DESC LIMIT 6
+            SELECT e.id, e.title, e.slug, e.date_revelation, e.object_name, e.object_hidden,
+                   e.person_name, e.xp_reward,
+                   (SELECT kp.file_path FROM ktc_episode_photos kp
+                    WHERE kp.episode_id = e.id
+                    ORDER BY kp.sort_order ASC, kp.id ASC LIMIT 1) AS cover_photo
+            FROM ktc_episodes e
+            WHERE e.status IN ('revealed','archived') {$exclude}
+            ORDER BY e.id DESC
         ")->fetchAll();
+
+        // answer_confidence — colonne ajoutée en migration 025, chargée séparément pour compatibilité
+        try {
+            $conf_rows = $pdo->query("
+                SELECT id, answer_confidence FROM ktc_episodes
+                WHERE status IN ('revealed','archived') {$exclude}
+            ")->fetchAll(\PDO::FETCH_KEY_PAIR);
+        } catch (\Exception $e) { $conf_rows = []; }
 
         // Gagnant à la révélation
         // Nécessite migration 025_v13_ktc_winner.sql (colonnes winner_proposition_id + answer_confidence)
@@ -127,7 +140,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $episode) {
                     $s2 = $pdo->prepare("SELECT * FROM ktc_propositions WHERE episode_id=:eid AND user_id=:uid LIMIT 1");
                     $s2->execute([':eid' => $episode['id'], ':uid' => $user_id]);
                     $user_prop = $s2->fetch() ?: null;
-                    $flash = 'Votre proposition a été enregistrée !';
+                    // XP participation + points de clan
+                    award_xp($user_id, 10, 'ktc_proposition', $episode['id'], 'Proposition KTC : ' . $episode['title']);
+                    $flash = 'Votre proposition a été enregistrée ! +10 XP';
                 }
             } elseif ($action === 'submit_vote' && $current_week === 3) {
                 $choice = trim($_POST['vote_choice'] ?? '');
@@ -152,7 +167,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $episode) {
                         $vote_counts[$row['vote_choice']] = (int)$row['cnt'];
                     }
                     $vote_total = array_sum($vote_counts);
-                    $flash = 'Vote enregistré. Rendez-vous à la révélation !';
+                    // XP participation au vote
+                    award_xp($user_id, 5, 'ktc_vote', $episode['id'], 'Vote KTC : ' . $episode['title']);
+                    $flash = 'Vote enregistré. +5 XP — Rendez-vous à la révélation !';
                 }
             }
         } catch (Exception $e) {
@@ -397,26 +414,47 @@ $page_styles = '<style>
 .ktc-date-label { font-weight: 600; color: #0c1e2e; flex: 1; }
 .ktc-date-val { font-size: .74rem; color: #6b7f96; }
 
-/* Épisodes passés */
-.ktc-past-section { margin-top: 48px; }
-.ktc-past-title {
-  font-size: .68rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
-  color: #1a2d3e; margin-bottom: 20px; padding-bottom: 10px;
-  border-bottom: 1px solid rgba(18,49,78,.12);
-}
-.ktc-past-grid { display: grid; gap: 14px; }
-@media (min-width: 600px) { .ktc-past-grid { grid-template-columns: 1fr 1fr; } }
-@media (min-width: 900px) { .ktc-past-grid { grid-template-columns: repeat(3, 1fr); } }
-.ktc-past-card {
-  background: #fff; border-radius: 12px;
+/* Bibliothèque KTC */
+.ktc-library { margin-top: 64px; padding-top: 40px; border-top: 2px solid rgba(18,49,78,.08); }
+.ktc-library-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 28px; gap: 12px; flex-wrap: wrap; }
+.ktc-library-title { font-size: 1.25rem; font-weight: 900; color: #0c1e2e; letter-spacing: -.02em; }
+.ktc-library-sub { font-size: .78rem; color: #6b7f96; margin-top: 4px; }
+.ktc-library-count { font-size: .72rem; font-weight: 800; background: rgba(18,49,78,.07); color: #3d5166; padding: 5px 12px; border-radius: 20px; white-space: nowrap; }
+.ktc-lib-grid { display: grid; gap: 18px; }
+@media (min-width: 560px) { .ktc-lib-grid { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 860px) { .ktc-lib-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 1100px) { .ktc-lib-grid { grid-template-columns: repeat(4, 1fr); } }
+.ktc-lib-card {
+  background: #fff; border-radius: 14px; overflow: hidden;
   border: 1px solid rgba(139,90,43,.1);
-  padding: 18px 16px; display: block; text-decoration: none;
+  display: flex; flex-direction: column;
   transition: transform .18s, box-shadow .18s;
+  text-decoration: none;
 }
-.ktc-past-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(139,90,43,.12); }
-.ktc-past-card-kicker { font-size: .64rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: #9a6800; margin-bottom: 6px; }
-.ktc-past-card-title { font-size: .88rem; font-weight: 800; color: #0c1e2e; line-height: 1.35; margin-bottom: 5px; }
-.ktc-past-card-object { font-size: .8rem; color: #3d5166; }
+.ktc-lib-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(139,90,43,.14); }
+.ktc-lib-cover {
+  width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block;
+  background: linear-gradient(135deg, #f0e9de, #e3d9cc);
+}
+.ktc-lib-cover-placeholder {
+  width: 100%; aspect-ratio: 4/3;
+  background: linear-gradient(135deg, #f0e9de, #e3d9cc);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.4rem;
+}
+.ktc-lib-body { padding: 14px 16px 16px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.ktc-lib-date { font-size: .62rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: #9a6800; }
+.ktc-lib-title { font-size: .86rem; font-weight: 800; color: #0c1e2e; line-height: 1.35; }
+.ktc-lib-object { font-size: .8rem; color: #3d5166; font-weight: 700; margin-top: 2px; }
+.ktc-lib-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 10px; gap: 6px; flex-wrap: wrap; }
+.ktc-lib-xp { font-size: .65rem; font-weight: 800; color: #2a8c40; background: rgba(42,140,64,.08); padding: 3px 8px; border-radius: 10px; }
+.ktc-lib-conf {
+  font-size: .62rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 10px;
+}
+.ktc-lib-conf.certain  { background: rgba(42,140,64,.12); color: #1e6b30; }
+.ktc-lib-conf.probable { background: rgba(234,86,73,.1);  color: #c9300e; }
+.ktc-lib-conf.estimation { background: rgba(153,100,0,.1); color: #7a5010; }
 
 /* Bouton submit */
 .ktc-btn-submit {
@@ -793,23 +831,52 @@ function _ktc_fmt_date(?string $d): string {
     </div>
     <?php endif; ?>
 
-    <?php // ── Épisodes passés ── ?>
+    <?php // ── Bibliothèque KTC ── ?>
     <?php if (!empty($past_eps)): ?>
-      <div class="ktc-past-section">
-        <div class="ktc-past-title">Épisodes précédents</div>
-        <div class="ktc-past-grid">
+      <?php
+      $conf_labels = ['certain' => 'Identifié', 'probable' => 'Probable', 'estimation' => 'Estimation'];
+      ?>
+      <div class="ktc-library">
+        <div class="ktc-library-header">
+          <div>
+            <div class="ktc-library-title">La Bibliothèque KTC</div>
+            <div class="ktc-library-sub">Les objets mystérieux vendéens déjà élucidés</div>
+          </div>
+          <span class="ktc-library-count"><?= count($past_eps) ?> objet<?= count($past_eps) > 1 ? 's' : '' ?> révélé<?= count($past_eps) > 1 ? 's' : '' ?></span>
+        </div>
+        <div class="ktc-lib-grid">
           <?php foreach ($past_eps as $ep): ?>
-            <a href="ktc.php" class="ktc-past-card">
-              <div class="ktc-past-card-kicker">
-                <?= $ep['date_revelation'] ? _ktc_fmt_date($ep['date_revelation']) : 'Révélé' ?>
-              </div>
-              <div class="ktc-past-card-title"><?= e($ep['title']) ?></div>
-              <?php if (!empty($ep['object_name']) && !(int)$ep['object_hidden']): ?>
-                <div class="ktc-past-card-object">🔍 <?= e($ep['object_name']) ?></div>
+            <?php
+            $conf = $conf_rows[$ep['id']] ?? 'certain';
+            $conf_label = $conf_labels[$conf] ?? '';
+            ?>
+            <div class="ktc-lib-card">
+              <?php if (!empty($ep['cover_photo'])): ?>
+                <img src="<?= e(media_url($ep['cover_photo'])) ?>" alt="<?= e($ep['title']) ?>" class="ktc-lib-cover" loading="lazy">
               <?php else: ?>
-                <div class="ktc-past-card-object" style="color:#bbb">Objet mystérieux révélé</div>
+                <div class="ktc-lib-cover-placeholder">🔍</div>
               <?php endif; ?>
-            </a>
+              <div class="ktc-lib-body">
+                <div class="ktc-lib-date"><?= $ep['date_revelation'] ? _ktc_fmt_date($ep['date_revelation']) : 'Révélé' ?></div>
+                <div class="ktc-lib-title"><?= e($ep['title']) ?></div>
+                <?php if (!empty($ep['object_name']) && !(int)$ep['object_hidden']): ?>
+                  <div class="ktc-lib-object">🔍 <?= e($ep['object_name']) ?></div>
+                <?php else: ?>
+                  <div class="ktc-lib-object" style="color:#bbb;font-style:italic">Objet révélé</div>
+                <?php endif; ?>
+                <?php if (!empty($ep['person_name'])): ?>
+                  <div style="font-size:.74rem;color:#6b7f96;margin-top:2px">Propriétaire : <?= e($ep['person_name']) ?></div>
+                <?php endif; ?>
+                <div class="ktc-lib-footer">
+                  <?php if ($ep['xp_reward'] > 0): ?>
+                    <span class="ktc-lib-xp">+<?= (int)$ep['xp_reward'] ?> XP</span>
+                  <?php endif; ?>
+                  <?php if ($conf_label): ?>
+                    <span class="ktc-lib-conf <?= e($conf) ?>"><?= e($conf_label) ?></span>
+                  <?php endif; ?>
+                </div>
+              </div>
+            </div>
           <?php endforeach; ?>
         </div>
       </div>

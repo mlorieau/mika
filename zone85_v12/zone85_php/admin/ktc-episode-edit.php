@@ -9,6 +9,7 @@ require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/admin.php';
+require_once __DIR__ . '/../includes/repositories.php';
 
 require_admin();
 
@@ -212,6 +213,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
                             ':id'              => $episode['id'],
                         ]);
                         $saved_id = (int)$episode['id'];
+                        // Récompense gagnant — une seule fois par épisode (vérifié via xp_logs)
+                        if ($f_winner_prop_id) {
+                            $chk = $pdo->prepare("SELECT 1 FROM xp_logs WHERE source_type='ktc_winner' AND source_id=:sid LIMIT 1");
+                            $chk->execute([':sid' => $saved_id]);
+                            if (!$chk->fetchColumn()) {
+                                $wp = $pdo->prepare("SELECT p.user_id, u.clan_id FROM ktc_propositions p JOIN users u ON u.id=p.user_id WHERE p.id=:pid LIMIT 1");
+                                $wp->execute([':pid' => $f_winner_prop_id]);
+                                $winner_row = $wp->fetch();
+                                if ($winner_row && $winner_row['user_id']) {
+                                    $xp_to_give = max((int)$f_xp, 50);
+                                    award_xp((int)$winner_row['user_id'], $xp_to_give, 'ktc_winner', $saved_id, 'Gagnant KTC : ' . $f_title);
+                                    if ($winner_row['clan_id']) {
+                                        $active_s = fetch_active_season();
+                                        if ($active_s) {
+                                            award_clan_points((int)$winner_row['clan_id'], (int)$active_s['id'], 20, 'ktc_winner', $saved_id, 'Gagnant KTC : ' . $f_title, (int)$winner_row['user_id']);
+                                        }
+                                    }
+                                    if (function_exists('push_notification')) {
+                                        push_notification((int)$winner_row['user_id'], 'ktc_winner',
+                                            'Bravo ! Votre réponse a été sélectionnée pour "' . $f_title . '" — +' . $xp_to_give . ' XP !',
+                                            ['link_url' => 'ktc.php']);
+                                    }
+                                }
+                            }
+                        }
                     } else {
                         $ins = $pdo->prepare('
                             INSERT INTO ktc_episodes
@@ -509,6 +535,82 @@ require_once __DIR__ . '/_admin-header.php';
     <?= htmlspecialchars($flash, ENT_QUOTES, 'UTF-8') ?>
   </div>
 <?php endif; ?>
+
+<!-- ── Notice : Comment fonctionne le module KTC ──────────────── -->
+<details class="ktc-notice" style="margin-bottom:28px">
+  <summary style="cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;padding:14px 18px;background:#fffbf5;border:1.5px solid rgba(202,154,0,.25);border-radius:10px;font-weight:800;font-size:.88rem;color:#6b4000;user-select:none">
+    <span style="font-size:1.1rem">📖</span>
+    Comment fonctionne le module KTC ?
+    <span style="margin-left:auto;font-size:.75rem;font-weight:600;color:#9a6800">Cliquer pour déplier</span>
+  </summary>
+  <div style="border:1.5px solid rgba(202,154,0,.2);border-top:none;border-radius:0 0 10px 10px;background:#fffef9;padding:20px 22px;display:grid;gap:22px">
+
+    <!-- Workflow 4 phases -->
+    <div>
+      <p style="font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#9a6800;margin:0 0 12px">Workflow — 4 phases mensuelles</p>
+      <div style="display:grid;gap:8px">
+        <?php foreach ([
+            ['week1', '🔍', 'Semaine 1 — Découverte', 'Publiez le titre, le texte de teaser et une ou plusieurs photos de l\'objet (catégorie sem. 1). Les membres proposent leurs réponses. Statut : <strong>draft → week1</strong> via le bouton "Lancer sem. 1".'],
+            ['week2', '💡', 'Semaine 2 — Indices',    'Ajoutez des photos supplémentaires (catégorie sem. 2) et rédigez le texte de détails. Les propositions continuent. Statut : <strong>week1 → week2</strong>.'],
+            ['week3', '🗳️', 'Semaine 3 — Vote',       'Saisissez la question de vote et les 4 propositions (Section 3). Les membres votent pour la réponse qui leur semble correcte. Statut : <strong>week2 → week3</strong>.'],
+            ['week4', '✨', 'Semaine 4 — Révélation', 'Rédigez le texte de révélation complet (Section 4). Sélectionnez le gagnant parmi les propositions reçues et choisissez le niveau de confiance. Statut : <strong>week3 → révélé</strong>.'],
+        ] as [$key, $ico, $label, $desc]): ?>
+        <div style="display:flex;gap:12px;align-items:flex-start;background:#fff;border-radius:8px;padding:12px 14px;border:1px solid rgba(202,154,0,.15)">
+          <span style="font-size:1.2rem;flex-shrink:0;margin-top:1px"><?= $ico ?></span>
+          <div>
+            <p style="font-size:.82rem;font-weight:800;color:#0c1e2e;margin:0 0 4px"><?= $label ?></p>
+            <p style="font-size:.78rem;color:#4a5f72;margin:0;line-height:1.5"><?= $desc ?></p>
+          </div>
+        </div>
+        <?php endforeach; ?>
+      </div>
+    </div>
+
+    <!-- Sections à remplir -->
+    <div>
+      <p style="font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#9a6800;margin:0 0 12px">Guide des sections</p>
+      <table style="width:100%;border-collapse:collapse;font-size:.8rem">
+        <thead>
+          <tr style="background:rgba(202,154,0,.08)">
+            <th style="padding:7px 10px;text-align:left;font-weight:800;color:#6b4000;border-radius:6px 0 0 6px">Section</th>
+            <th style="padding:7px 10px;text-align:left;font-weight:800;color:#6b4000">Contenu</th>
+            <th style="padding:7px 10px;text-align:left;font-weight:800;color:#6b4000;border-radius:0 6px 6px 0">Quand le remplir</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ([
+            ['1 — Informations',  'Titre, slug, statut, récompense XP, badge',         'Dès la création'],
+            ['2 — L\'objet',      'Nom de l\'objet (masqué ou non), texte teaser, détails','Sem. 1 (teaser) puis sem. 2 (détails)'],
+            ['3 — Vote',          'Question + 4 propositions de vote',                  'Avant le passage en semaine 3'],
+            ['4 — Révélation',    'Texte complet + gagnant + niveau de confiance',      'Avant la révélation (sem. 4)'],
+            ['5 — Le brocanteur', 'Nom, titre, bio, photo de la personne source',       'Facultatif — enrichit la révélation'],
+            ['6 — Calendrier',    'Dates des 4 phases',                                 'Optionnel mais utile pour programmer'],
+            ['7 — Photos',        'Upload des visuels de l\'objet par semaine',         'Sem. 1 minimum, compléter sem. 2'],
+          ] as [$s, $c, $w]): ?>
+          <tr style="border-top:1px solid rgba(202,154,0,.1)">
+            <td style="padding:7px 10px;font-weight:700;color:#0c1e2e;white-space:nowrap"><?= $s ?></td>
+            <td style="padding:7px 10px;color:#3d5166"><?= $c ?></td>
+            <td style="padding:7px 10px;color:#6b7f96;font-style:italic"><?= $w ?></td>
+          </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Conseils pratiques -->
+    <div style="background:rgba(234,86,73,.04);border-left:3px solid #ea5649;border-radius:0 8px 8px 0;padding:14px 16px">
+      <p style="font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#c9300e;margin:0 0 10px">Conseils pour que ce ne soit pas chronophage</p>
+      <ul style="margin:0;padding-left:18px;font-size:.8rem;color:#4a5f72;line-height:1.7">
+        <li>Préparez l'épisode entier (sections 1 à 7) <strong>avant de lancer la semaine 1</strong> — le statut "draft" protège le contenu.</li>
+        <li>Avancez les phases en <strong>un seul clic</strong> via le bouton en haut à droite. Pas de formulaire à remplir à la dernière minute.</li>
+        <li>La section 5 (brocanteur) et le calendrier (section 6) sont <strong>facultatifs</strong> — vous pouvez révéler un objet sans connaître son propriétaire.</li>
+        <li>Le gagnant et la confiance en section 4 s'éditent <strong>à tout moment</strong>, même après révélation.</li>
+        <li>Niveau de confiance <em>Estimation</em> = vous n'êtes pas sûr à 100% — les membres le voient et c'est honnête.</li>
+      </ul>
+    </div>
+
+  </div>
+</details>
 
 <?php if (!$pdo): ?>
   <div class="adm-flash adm-flash-err">
