@@ -922,7 +922,7 @@ JS;
 
                 <!-- Éditer -->
 
-                <button class="btn-adm btn-adm-ghost btn-adm-sm btn-edit-season" data-id="<?= (int)$s['id'] ?>">âœ️ Éditer</button>
+                <button class="btn-adm btn-adm-ghost btn-adm-sm btn-edit-season" data-id="<?= (int)$s['id'] ?>">✏️ Éditer</button>
 
 
 

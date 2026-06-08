@@ -74,9 +74,9 @@ function fetch_all_clans(): ?array {
         }
 
         $chip_map = [
-            'bocage'   => ['bocage-chip',   'bocage-chip-sm',   'bocage-text',   'ðŸŒ³ Bocage'],
-            'littoral' => ['littoral-chip', 'littoral-chip-sm', 'littoral-text', 'âš“ Littoral'],
-            'marais'   => ['marais-chip',   'marais-chip-sm',   'marais-text',   'ðŸŒ¿ Marais'],
+            'bocage'   => ['bocage-chip',   'bocage-chip-sm',   'bocage-text',   '🌳 Bocage'],
+            'littoral' => ['littoral-chip', 'littoral-chip-sm', 'littoral-text', '⚓ Littoral'],
+            'marais'   => ['marais-chip',   'marais-chip-sm',   'marais-text',   '🌿 Marais'],
         ];
 
         $result = [];
@@ -418,7 +418,7 @@ function fetch_trophies(): ?array {
         $rows = $stmt->fetchAll();
         if (empty($rows)) return null;
         foreach ($rows as &$r) {
-            $r['medal']         = 'ðŸ¥‡';
+            $r['medal']         = '🥇';
             $r['main_mission']  = $r['main_mission'] ?? '';
             $r['contributions'] = (int)$r['contributions'];
         }
@@ -460,14 +460,14 @@ function fetch_hall_contributors(int $limit = 5): ?array {
         $rows = $stmt->fetchAll();
         if (empty($rows)) return null;
         $clan_labels = [
-            'bocage'   => 'ðŸŒ³ Bocage',
-            'littoral' => 'âš“ Littoral',
-            'marais'   => 'ðŸŒ¿ Marais',
+            'bocage'   => '🌳 Bocage',
+            'littoral' => '⚓ Littoral',
+            'marais'   => '🌿 Marais',
         ];
         foreach ($rows as &$r) {
             $r['season_pts'] = (int)$r['season_pts'];
             $r['clan_label'] = $clan_labels[$r['clan_slug']] ?? $r['clan_name'];
-            $r['avatar']     = 'ðŸ§­';
+            $r['avatar']     = '🧭';
             $r['type']       = 'Contribution';
         }
         return $rows;
