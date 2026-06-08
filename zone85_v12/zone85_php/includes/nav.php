@@ -183,6 +183,7 @@ if (isset($active_season) && !empty($active_season['title'])) {
     <a href="comment-ca-marche.php">Comment ça marche ?</a>
     <a href="recompenses.php">🏅 XP &amp; Récompenses</a>
     <a href="aide.php">❓ Aide</a>
+    <a href="feedback.php">📝 Donner mon avis (bêta)</a>
   </div>
 
   <div class="mmenu-section">

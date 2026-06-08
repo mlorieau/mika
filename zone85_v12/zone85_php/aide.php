@@ -413,4 +413,19 @@ require_once 'includes/nav.php';
   </div>
 </section>
 
+<!-- ===================== BETA CTA ===================== -->
+<section style="background:var(--beige,#f8f4ef);padding:48px 24px;text-align:center;border-top:1px solid var(--beige-dark,#e8e0d4)">
+  <div style="max-width:560px;margin:0 auto">
+    <p style="font-size:.65rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted,#6b7f96);margin-bottom:12px">B&ecirc;ta priv&eacute;e</p>
+    <h2 style="font-size:1.4rem;font-weight:900;color:var(--navy-dark,#0c1e2e);margin-bottom:10px">Tu testes Zone85&nbsp;en avant-premi&egrave;re&nbsp;?</h2>
+    <p style="font-size:.9rem;color:var(--text-muted,#6b7f96);line-height:1.6;margin-bottom:24px">
+      Ton retour est pr&eacute;cieux. Dis-nous ce qui marche, ce qui coince, et ce que tu am&eacute;liorerais.
+      Quelques minutes suffisent.
+    </p>
+    <a href="feedback.php" style="display:inline-block;background:var(--primary,#ea5649);color:#fff;padding:13px 32px;border-radius:10px;text-decoration:none;font-weight:800;font-size:.92rem;transition:opacity .2s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+      &#x1F4DD; Donner mon avis sur la b&ecirc;ta
+    </a>
+  </div>
+</section>
+
 <?php require_once 'includes/footer.php'; ?>
