@@ -485,7 +485,11 @@ $page_styles = '<style>
 .rando-description { padding:16px 36px 0;font-size:.95rem;color:#3d5166;line-height:1.8; }
 .rando-why { margin:26px 36px 0;padding:18px 20px;border-radius:16px;background:linear-gradient(135deg,#fff7ed,#fff);border:1px solid rgba(234,86,73,.18);box-shadow:0 8px 22px rgba(12,30,46,.06); }
 .rando-why-kicker { font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;font-weight:900;color:#ea5649;margin-bottom:6px; }
-.rando-why-text { font-size:1rem;line-height:1.7;font-weight:650;color:#0c1e2e; }
+.rando-why-text { font-size:1rem;line-height:1.7;font-weight:600;color:#0c1e2e; }
+.rando-why-text h2 { font-size:1.08rem;font-weight:900;color:#0c1e2e;margin:1.4em 0 .5em; }
+.rando-why-text h3 { font-size:.96rem;font-weight:800;color:#12314e;margin:1.2em 0 .4em; }
+.rando-why-text p  { margin:0 0 .9em; }
+.rando-why-text ul,.rando-why-text ol { padding-left:1.4em;margin:0 0 .9em; }
 .rando-season-pills,.rando-commune-pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 .rando-season-pill,.rando-commune-pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;background:#fff;border:1px solid #e7ded5;color:#0c1e2e;padding:7px 11px;font-size:.78rem;font-weight:800}
 .rando-passport-note{font-size:.78rem;color:#6b7f96;margin-top:8px;line-height:1.5}
@@ -794,7 +798,7 @@ require_once 'includes/nav.php';
       </span>
       <span class="rando-hero-badge" style="border-color:rgba(201,150,42,.4)">
         <?= htmlspecialchars($dif_label, ENT_QUOTES, 'UTF-8') ?>
-        &nbsp;<?php for ($i = 1; $i <= $dif_stars; $i++) echo '&#x2605;'; ?>
+        &nbsp;<?php for ($i = 1; $i <= 4; $i++) echo $i <= $dif_stars ? '&#x2605;' : '&#x2606;'; ?>
       </span>
     </div>
     <h1><?= htmlspecialchars($rando['title'], ENT_QUOTES, 'UTF-8') ?></h1>
@@ -842,7 +846,7 @@ require_once 'includes/nav.php';
         </div>
       <?php endif; ?>
       <div class="rando-info-item">
-        <span class="rando-info-item-icon">&#x1F3C6;</span>
+        <span class="rando-info-item-icon">&#x26A1;</span>
         <span class="rando-info-item-value">
           <span class="rando-stars-band">
             <?php for ($i = 1; $i <= 4; $i++): ?>

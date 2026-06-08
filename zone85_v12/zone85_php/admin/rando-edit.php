@@ -1974,14 +1974,20 @@ function toggleAddPanel() {
     [{ 'list': 'ordered' }, { 'list': 'bullet' }],
     ['clean']
   ];
+  var _quills = {};
   function initQuill(editorId, hiddenId, initialHtml) {
     var q = new Quill('#' + editorId, { theme: 'snow', modules: { toolbar: toolbarOptions } });
-    if (initialHtml) q.clipboard.dangerouslyPasteHTML(initialHtml);
+    _quills[hiddenId] = q;
     q.on('text-change', function() {
       document.getElementById(hiddenId).value = q.root.innerHTML;
     });
-    // Init hidden input
-    document.getElementById(hiddenId).value = q.root.innerHTML;
+    if (initialHtml) {
+      q.clipboard.dangerouslyPasteHTML(initialHtml);
+      // dangerouslyPasteHTML est async : forcer la sync après son exécution
+      setTimeout(function() {
+        document.getElementById(hiddenId).value = q.root.innerHTML;
+      }, 80);
+    }
     return q;
   }
 
@@ -1993,17 +1999,12 @@ function toggleAddPanel() {
   initQuill('quill_description', 'f_description', descVal);
   initQuill('quill_why',         'f_why',         whyVal);
 
-  // Sync on form submit (piggyback on any form[action*=save_rando])
+  // Force sync de toutes les instances Quill juste avant soumission
   document.querySelectorAll('form').forEach(function(form) {
     form.addEventListener('submit', function() {
-      var inputs = ['f_intro', 'f_description', 'f_why'];
-      inputs.forEach(function(id) {
-        // Already synced via text-change; force sync on submit as safety net
-        var el = document.getElementById(id);
-        if (el && el.value === '') {
-          // If empty, ensure placeholder <p><br></p> is not sent as content
-          el.value = '';
-        }
+      Object.keys(_quills).forEach(function(hiddenId) {
+        var el = document.getElementById(hiddenId);
+        if (el) el.value = _quills[hiddenId].root.innerHTML;
       });
     });
   });
