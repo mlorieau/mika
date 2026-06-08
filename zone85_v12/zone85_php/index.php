@@ -6,6 +6,7 @@ require_once 'includes/data.php';
 require_once 'includes/functions.php';
 require_once 'includes/db.php';
 require_once 'includes/repositories.php';
+require_once 'includes/auth.php';
 
 // ── Métadonnées depuis la DB (Sprint 3) ──────────────────────
 $_idx_defaults = [
@@ -226,6 +227,25 @@ $page_styles = '<style>
 .idx-flash-badge{display:inline-flex;align-items:center;gap:6px;background:#ea5649;color:#fff;font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:4px 12px;border-radius:4px}
 .idx-flash-dot{width:6px;height:6px;background:#fff;border-radius:50%;animation:blink .9s infinite}
 
+/* Mini Dashboard membre */
+.mini-dash{padding:48px 0;background:#f7f5f1}
+.mini-dash-inner{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.mini-dash-card{background:#fff;border-radius:14px;box-shadow:0 2px 16px rgba(12,30,46,.07);padding:24px 22px;display:flex;flex-direction:column;gap:10px}
+.mini-dash-label{font-size:.62rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#ea5649;margin-bottom:2px}
+.mini-dash-title{font-size:.97rem;font-weight:800;color:#0c1e2e;line-height:1.3}
+.mini-dash-sub{font-size:.82rem;color:#6b7f96;line-height:1.5}
+.mini-dash-xp{display:inline-block;font-size:.8rem;font-weight:800;color:#ea5649;background:rgba(234,86,73,.1);padding:3px 10px;border-radius:4px}
+.mini-dash-pts{font-size:1.5rem;font-weight:900;color:#0c1e2e}
+.mini-dash-pts span{font-size:.78rem;font-weight:600;color:#6b7f96;margin-left:4px}
+.mini-dash-xp-bar-wrap{margin-top:4px}
+.mini-dash-xp-track{background:rgba(12,30,46,.1);border-radius:20px;height:7px;overflow:hidden}
+.mini-dash-xp-fill{height:100%;background:linear-gradient(90deg,#ea5649,#f07066);border-radius:20px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.mini-dash-xp-label{display:flex;justify-content:space-between;font-size:.68rem;color:#6b7f96;font-weight:600;margin-bottom:5px}
+.mini-dash-cta{display:inline-flex;align-items:center;gap:6px;margin-top:6px;font-size:.78rem;font-weight:800;color:#ea5649;text-decoration:none}
+.mini-dash-cta:hover{text-decoration:underline}
+.mini-dash-empty{font-size:.84rem;color:#aaa;font-style:italic}
+@media(max-width:900px){.mini-dash-inner{grid-template-columns:1fr}}
+
 /* Barre membre */
 .idx-member-bar{background:#fff;border-bottom:2px solid rgba(234,86,73,.2);padding:9px 0}
 .idx-member-bar-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
@@ -356,6 +376,120 @@ $_xp_pct  = $_xp_next > $_xp_prev
 
   </div>
 </section>
+
+
+<?php
+// ── Mini dashboard (membres connectés) ───────────────────────
+$_md_mission      = null;
+$_md_clan_pts     = null;
+$_md_clan_name    = '';
+$_md_clan_slug    = '';
+
+if (!$_is_guest && db_enabled()):
+    try {
+        $_md_pdo = db();
+        if ($_md_pdo) {
+            // Carte 1 — Prochaine mission active
+            $_md_stmt = $_md_pdo->query(
+                "SELECT title, xp_participation, mission_type FROM missions
+                 WHERE status='active' ORDER BY created_at DESC LIMIT 1"
+            );
+            $_md_mission = $_md_stmt ? ($_md_stmt->fetch() ?: null) : null;
+
+            // Carte 2 — Clan du jour
+            $_md_cid = (int)($_nav_me['clan_id'] ?? 0);
+            if ($_md_cid > 0) {
+                $_md_clan_stmt = $_md_pdo->prepare(
+                    "SELECT c.name, c.slug,
+                            COALESCE(SUM(cl.points),0) as pts
+                     FROM clans c
+                     LEFT JOIN clan_logs cl
+                       ON cl.clan_id=c.id AND DATE(cl.created_at)=CURDATE()
+                     WHERE c.id=:cid
+                     GROUP BY c.id"
+                );
+                $_md_clan_stmt->execute([':cid' => $_md_cid]);
+                $_md_clan_row = $_md_clan_stmt->fetch();
+                if ($_md_clan_row) {
+                    $_md_clan_pts  = (int)$_md_clan_row['pts'];
+                    $_md_clan_name = $_md_clan_row['name'] ?? '';
+                    $_md_clan_slug = $_md_clan_row['slug'] ?? '';
+                }
+            }
+        }
+    } catch (Exception $_md_e) {}
+endif;
+
+// Carte 3 — Progression XP (réutilise les vars calculées plus haut)
+$_md_xp_total     = $_me_xp;
+$_md_level        = $_me_level;
+$_md_level_name   = function_exists('get_level_name') ? get_level_name($_md_level) : 'Niveau ' . $_md_level;
+$_md_xp_next      = function_exists('get_level_threshold') ? get_level_threshold($_md_level + 1) : 0;
+$_md_xp_prev      = function_exists('get_level_threshold') ? get_level_threshold($_md_level) : 0;
+$_md_xp_pct       = ($_md_xp_next > $_md_xp_prev)
+    ? min(100, round(($_md_xp_total - $_md_xp_prev) / ($_md_xp_next - $_md_xp_prev) * 100))
+    : 100;
+?>
+
+<?php if (!$_is_guest): ?>
+<!-- MINI DASHBOARD MEMBRE ────────────────────────────────────── -->
+<section class="mini-dash">
+  <div class="container">
+    <div class="mini-dash-inner">
+
+      <!-- Carte 1 — Prochaine mission -->
+      <div class="mini-dash-card">
+        <div class="mini-dash-label">🎯 Prochaine mission</div>
+        <?php if ($_md_mission): ?>
+          <div class="mini-dash-title"><?= e($_md_mission['title']) ?></div>
+          <div><span class="mini-dash-xp">+<?= (int)$_md_mission['xp_participation'] ?> XP</span></div>
+          <div class="mini-dash-sub"><?= e(mission_type_label($_md_mission['mission_type'])) ?></div>
+          <a href="missions.php" class="mini-dash-cta">Voir les missions →</a>
+        <?php else: ?>
+          <div class="mini-dash-empty">Pas de mission active</div>
+          <a href="missions.php" class="mini-dash-cta">Explorer →</a>
+        <?php endif; ?>
+      </div>
+
+      <!-- Carte 2 — Mon clan aujourd'hui -->
+      <div class="mini-dash-card">
+        <div class="mini-dash-label">🛡️ Mon clan aujourd'hui</div>
+        <?php if ($_md_clan_pts !== null && $_md_clan_name !== ''): ?>
+          <div class="mini-dash-title"><?= e($_md_clan_name) ?></div>
+          <div class="mini-dash-pts"><?= number_format($_md_clan_pts, 0, ',', '&#8201;') ?><span>pts aujourd'hui</span></div>
+          <a href="clans.php<?= $_md_clan_slug ? '#' . e($_md_clan_slug) : '' ?>" class="mini-dash-cta">Voir mon clan →</a>
+        <?php elseif ($_nav_me['clan'] ?? null): ?>
+          <?php $_cl_slug = $_nav_me['clan']; $_cl_data = $clans[$_cl_slug] ?? []; ?>
+          <div class="mini-dash-title"><?= e($_cl_data['name'] ?? ucfirst($_cl_slug)) ?></div>
+          <div class="mini-dash-pts">—<span>pas de données aujourd'hui</span></div>
+          <a href="clans.php#<?= e($_cl_slug) ?>" class="mini-dash-cta">Voir mon clan →</a>
+        <?php else: ?>
+          <div class="mini-dash-empty">Tu n'as pas encore de clan</div>
+          <a href="clans.php" class="mini-dash-cta">Choisir un clan →</a>
+        <?php endif; ?>
+      </div>
+
+      <!-- Carte 3 — Ma progression -->
+      <div class="mini-dash-card">
+        <div class="mini-dash-label">⚡ Ma progression</div>
+        <div class="mini-dash-title"><?= e($_md_level_name) ?> · Niv.&nbsp;<?= (int)$_md_level ?></div>
+        <div class="mini-dash-sub"><?= number_format($_md_xp_total, 0, ',', '&#8201;') ?>&nbsp;XP</div>
+        <div class="mini-dash-xp-bar-wrap">
+          <div class="mini-dash-xp-label">
+            <span><?= number_format($_md_xp_prev, 0, ',', ' ') ?> XP</span>
+            <span><?= number_format($_md_xp_next, 0, ',', ' ') ?> XP</span>
+          </div>
+          <div class="mini-dash-xp-track">
+            <div class="mini-dash-xp-fill" style="width:<?= (int)$_md_xp_pct ?>%"></div>
+          </div>
+        </div>
+        <a href="communaute.php?tab=passeport" class="mini-dash-cta">Voir mon passeport →</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+<?php endif; ?>
 
 
 <!-- BEAT 2 : L'ICEBERG ─────────────────────────────────────── -->

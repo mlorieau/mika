@@ -806,6 +806,33 @@ $page_styles = '<style>
 }
 
 /* ============================================================
+   BADGES DE LISIBILITÉ
+============================================================ */
+.readability-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.rd-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: .68rem;
+  font-weight: 700;
+  color: #4a5568;
+  background: #f5f2ec;
+  border: 1px solid #e2ddd5;
+  border-radius: 999px;
+  padding: 2px 9px;
+  white-space: nowrap;
+  line-height: 1.6;
+}
+.rd-badge-diff-facile  { background: rgba(42,157,92,.1);  border-color: rgba(42,157,92,.2);  color: #1a6b3a; }
+.rd-badge-diff-moyen   { background: rgba(234,149,26,.1); border-color: rgba(234,149,26,.2); color: #8a5000; }
+.rd-badge-diff-difficile{ background: rgba(234,86,73,.1); border-color: rgba(234,86,73,.2);  color: #9a2020; }
+
+/* ============================================================
    RESPONSIVE — tablette & desktop
 ============================================================ */
 @media (min-width: 600px) {
@@ -1081,6 +1108,64 @@ require_once 'includes/nav.php';
           </div>
           <div class="mission-title"><?= e($mission['title']) ?></div>
           <p class="mission-desc"><?= e($mission['description']) ?></p>
+          <?php
+          // ── Badges de lisibilité ──────────────────────────────
+          // Difficulté déduite depuis les champs réels
+          $_rd_diff = null;
+          if (isset($mission['difficulty'])) {
+              $_rd_diff = strtolower((string)$mission['difficulty']);
+          } elseif (isset($mission['xp_success'])) {
+              $_rd_xps = (int)$mission['xp_success'];
+              if ($_rd_xps <= 15)      $_rd_diff = 'facile';
+              elseif ($_rd_xps <= 50)  $_rd_diff = 'moyen';
+              else                     $_rd_diff = 'difficile';
+          }
+          // Durée déduite depuis duration_minutes si présent, sinon depuis mission_type
+          $_rd_dur = null;
+          if (isset($mission['duration_minutes']) && $mission['duration_minutes'] > 0) {
+              $_rd_dur = '~' . (int)$mission['duration_minutes'] . 'min';
+          } else {
+              $_rd_dur_map = [
+                  'quiz'            => '~5min',
+                  'vote'            => '~2min',
+                  'weather_mission' => '~5min',
+                  'photo_challenge' => '~15min',
+                  'keto_kole_tche'  => '~10min',
+                  'rando'           => '~3h',
+                  'investigation'   => '~20min',
+              ];
+              $_rd_dur = $_rd_dur_map[$mission['mission_type']] ?? null;
+          }
+          // Icône lieu déduite depuis location_type si présent, sinon mission_type
+          $_rd_loc = null;
+          if (isset($mission['location_type'])) {
+              $_rd_loc_map = ['home' => '🏠', 'outdoor' => '🌿', 'photo' => '📸', 'family' => '👨‍👩‍👧'];
+              $_rd_loc = $_rd_loc_map[strtolower((string)$mission['location_type'])] ?? null;
+          } else {
+              $_rd_loc_map2 = [
+                  'rando'           => '🌿',
+                  'photo_challenge' => '📸',
+                  'weather_mission' => '🏠',
+                  'investigation'   => '🏠',
+              ];
+              $_rd_loc = $_rd_loc_map2[$mission['mission_type']] ?? null;
+          }
+          $has_badges = $_rd_diff || $_rd_dur || $_rd_loc;
+          ?>
+          <?php if ($has_badges): ?>
+          <div class="readability-badges">
+            <?php if ($_rd_diff): ?>
+              <?php $_rd_diff_label = ['facile'=>'Facile','moyen'=>'Moyen','difficile'=>'Difficile'][$_rd_diff] ?? $_rd_diff; ?>
+              <span class="rd-badge rd-badge-diff-<?= e($_rd_diff) ?>"><?= e($_rd_diff_label) ?></span>
+            <?php endif; ?>
+            <?php if ($_rd_dur): ?>
+              <span class="rd-badge">⏱ <?= e($_rd_dur) ?></span>
+            <?php endif; ?>
+            <?php if ($_rd_loc): ?>
+              <span class="rd-badge"><?= $_rd_loc ?></span>
+            <?php endif; ?>
+          </div>
+          <?php endif; ?>
         </div>
         <div class="mission-card-footer">
           <span class="mission-xp"><?= e($xp_display) ?></span>
