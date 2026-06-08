@@ -224,6 +224,19 @@ function register_user(array $data): array {
 
         $pdo->commit();
 
+        // Recalculer le niveau après le XP de bienvenue (50 XP = niveau 2)
+        if (function_exists('get_user_level_from_xp')) {
+            try {
+                $correct_level = get_user_level_from_xp(50);
+                if ($correct_level > 1) {
+                    $pdo->prepare("UPDATE users SET level = :lvl WHERE id = :uid")
+                        ->execute([':lvl' => $correct_level, ':uid' => $user_id]);
+                }
+            } catch (PDOException $e) {
+                error_log('[ZONE85] register level update: ' . $e->getMessage());
+            }
+        }
+
         // Badge de bienvenue — non-bloquant, hors transaction
         try {
             $s = $pdo->prepare("SELECT id FROM badges WHERE slug = 'pionnier-zone' LIMIT 1");

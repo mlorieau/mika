@@ -179,12 +179,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $is_logged_in && $user_id > 0 && $p
                 $pdo_main->prepare(
                     "INSERT INTO article_comments (article_id, user_id, body) VALUES (:a,:u,:b)"
                 )->execute([':a'=>$article['id'],':u'=>$user_id,':b'=>$body_raw]);
+                $comment_id = (int)$pdo_main->lastInsertId();
 
                 $xp_earned = 0;
                 if ($existing === 0) {
                     // 5 XP pour le premier commentaire sur cet article
                     $pdo_main->prepare("UPDATE users SET xp_total = xp_total + 5 WHERE id=:id")
                         ->execute([':id' => $user_id]);
+                    // Recalculer le niveau et enregistrer dans xp_logs
+                    $xp_row = $pdo_main->prepare("SELECT xp_total FROM users WHERE id=:id LIMIT 1");
+                    $xp_row->execute([':id' => $user_id]);
+                    $new_xp = (int)$xp_row->fetchColumn();
+                    if (function_exists('get_user_level_from_xp')) {
+                        $pdo_main->prepare("UPDATE users SET level = :lvl WHERE id=:id")
+                            ->execute([':lvl' => get_user_level_from_xp($new_xp), ':id' => $user_id]);
+                    }
+                    $pdo_main->prepare(
+                        "INSERT INTO xp_logs (user_id, source_type, source_id, xp_amount, reason)
+                         VALUES (:uid, 'comment', :src, 5, 'Commentaire sur Les Échos')"
+                    )->execute([':uid' => $user_id, ':src' => $comment_id]);
                     $xp_earned = 5;
                 }
 

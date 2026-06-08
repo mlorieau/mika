@@ -348,11 +348,6 @@ $_xp_pct  = $_xp_next > $_xp_prev
         <a href="missions.php" class="idx-btn-primary">🎯 Voir mes missions →</a>
         <a href="les-echos.php" class="idx-btn-secondary">📰 Les Échos</a>
       <?php endif; ?>
-      <?php if (!$_is_guest): ?>
-        <div style="width:100%;text-align:center;margin-top:-32px;margin-bottom:0">
-          <a href="comment-ca-marche.php" style="font-size:.78rem;color:rgba(255,255,255,.35);text-decoration:none" onmouseover="this.style.color='rgba(255,255,255,.6)'" onmouseout="this.style.color='rgba(255,255,255,.35)'">Comment ça marche ?</a>
-        </div>
-      <?php endif; ?>
     </div>
 
     <!-- Mascottes — atmosphère des 3 clans -->
