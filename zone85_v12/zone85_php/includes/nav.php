@@ -43,6 +43,7 @@ $_mega_sections = [
             ['file' => 'communaute.php',                    'label' => 'Fil de la Zone',  'desc' => 'Activité en temps réel',      'icon' => '🌍'],
             ['file' => 'clans.php',                         'label' => 'Les Clans',       'desc' => 'Bocage · Littoral · Marais',  'icon' => '⚔️'],
             ['file' => 'communaute.php?tab=classement',     'label' => 'Classement',      'desc' => 'Top 50 Zonautes',             'icon' => '📊'],
+            ['file' => 'recompenses.php',                   'label' => 'XP & Récompenses',   'desc' => 'Niveaux, badges et points clan', 'icon' => '🏅'],
             ['file' => 'comment-ca-marche.php',             'label' => 'Comment ça marche ?', 'desc' => 'Comprendre Zone85 en 30 sec', 'icon' => '❓'],
         ],
     ],
@@ -179,6 +180,7 @@ if (isset($active_season) && !empty($active_season['title'])) {
     <a href="missions.php">Missions</a>
     <a href="communaute.php">Communauté</a>
     <a href="comment-ca-marche.php">Comment ça marche ?</a>
+    <a href="recompenses.php">🏅 XP &amp; Récompenses</a>
   </div>
 
   <div class="mmenu-section">

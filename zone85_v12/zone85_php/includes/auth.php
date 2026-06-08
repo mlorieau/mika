@@ -184,7 +184,7 @@ function register_user(array $data): array {
             VALUES
                 (:email, :hash, :pseudo, :fname, :lname, :clan_id,
                  :avatar_type, :avatar_config, :avatar_file, :bio,
-                 10, 1, :newsletter,
+                 50, 1, :newsletter,
                  NOW(), NOW(), 'active', 'member')
         ");
         $stmt->execute([
@@ -202,10 +202,10 @@ function register_user(array $data): array {
         ]);
         $user_id = (int)$pdo->lastInsertId();
 
-        // XP de bienvenue (10 XP = niveau 1, pas d'upgrade immediat)
+        // XP de bienvenue
         $pdo->prepare("
             INSERT INTO xp_logs (user_id, source_type, source_id, xp_amount, reason)
-            VALUES (:uid, 'registration', :src_id, 10, 'Bienvenue dans la Zone')
+            VALUES (:uid, 'registration', :src_id, 50, 'Bienvenue dans la Zone')
         ")->execute([':uid' => $user_id, ':src_id' => $user_id]);
 
         // Acceptations légales

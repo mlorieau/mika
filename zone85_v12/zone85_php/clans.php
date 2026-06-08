@@ -24,6 +24,10 @@ require_once 'includes/data.php';
 require_once 'includes/functions.php';
 require_once 'includes/db.php';
 require_once 'includes/repositories.php';
+require_once 'includes/auth.php';
+
+// Clan de l'utilisateur connecté (0 = non connecté ou sans clan)
+$my_clan_id = is_logged_in() ? (int)(current_user()['clan_id'] ?? 0) : 0;
 
 if (db_enabled()) {
     $_clans_db = fetch_all_clans();
@@ -170,6 +174,7 @@ $page_styles = '<style>
 .bocage-btn{background:#2a9d5c;}
 .littoral-btn{background:#1a6fb8;}
 .marais-btn{background:#8b6340;}
+.pc-my-clan{background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.35);cursor:default;font-size:.8rem;font-weight:800;letter-spacing:.04em;color:#fff;display:block;text-align:center;padding:10px 14px;border-radius:8px;}
 
 @media(max-width:700px){
   .podium-grid{flex-direction:column;align-items:center;}
@@ -434,9 +439,17 @@ require_once 'includes/nav.php';
         <div class="pc-bar-bg">
           <div class="pc-bar-fill" style="width:<?= $bar_pct ?>%;background:<?= e($col['bar']) ?>;"></div>
         </div>
-        <a href="inscription.php?clan=<?= e($slug) ?>" class="pc-btn <?= e($slug) ?>-btn">
-          Rejoindre ce clan
-        </a>
+        <?php if ($my_clan_id && $my_clan_id === (int)$clan['id']): ?>
+          <div class="pc-btn pc-my-clan">✓ Mon clan</div>
+        <?php elseif (is_logged_in()): ?>
+          <a href="clans.php?switch=<?= e($slug) ?>" class="pc-btn <?= e($slug) ?>-btn">
+            Rejoindre ce clan
+          </a>
+        <?php else: ?>
+          <a href="inscription.php?clan=<?= e($slug) ?>" class="pc-btn <?= e($slug) ?>-btn">
+            Rejoindre ce clan
+          </a>
+        <?php endif; ?>
         <?php if (!empty($clan_identity[$slug])): ?>
         <p class="pc-identity"><?= e($clan_identity[$slug]) ?></p>
         <?php endif; ?>
