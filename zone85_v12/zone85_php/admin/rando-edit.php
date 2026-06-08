@@ -122,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
                 $f_communes_list[] = $f_commune;
             }
             $f_communes_json = !empty($f_communes_list) ? json_encode($f_communes_list, JSON_UNESCAPED_UNICODE) : null;
-            $f_why_text = safe_input($_POST['why_text'] ?? '', 900);
+            $f_why_text = $_POST['why_text'] ?? '';  // HTML Quill, non échappé
             $allowed_seasons = ['printemps','ete','automne','hiver'];
             $f_recommended = [];
             foreach (($_POST['recommended_seasons'] ?? []) as $season_key) {
@@ -151,7 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
 
             $f_meta_title  = safe_input($_POST['meta_title']       ?? '', 255);
             $f_meta_desc   = safe_input($_POST['meta_description'] ?? '', 500);
-            $f_intro       = safe_input($_POST['intro_text']       ?? '', 1000);
+            $f_intro       = $_POST['intro_text'] ?? '';  // HTML Quill, non échappé
             $f_description = $_POST['description'] ?? '';  // texte libre long
             // V12.3 : pas de champ résumé dans le BO. On génère un résumé technique pour les cartes/SEO.
             $f_summary = trim(strip_tags($f_intro ?: $f_description));
@@ -842,6 +842,8 @@ function block_preview(array $block): string {
 
 // ── JS inline ───────────────────────────────────────────────
 $admin_scripts = <<<'JS'
+<link rel="stylesheet" href="https://cdn.quilljs.com/1.3.6/quill.snow.css">
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script>
 // ── Slugify ────────────────────────────────────────────────
 function slugify(text) {
@@ -1190,24 +1192,24 @@ require_once __DIR__ . '/_admin-header.php';
 <!-- Introduction courte -->
                 <div class="adm-field adm-form-full">
                     <label class="adm-label" for="f_intro">Introduction courte</label>
-                    <textarea id="f_intro" name="intro_text" rows="3" class="adm-textarea"
-                        placeholder="Texte d'accroche affich&eacute; en haut de la fiche, avant les blocs..."><?= htmlspecialchars($v_intro, ENT_QUOTES, 'UTF-8') ?></textarea>
+                    <input type="hidden" id="f_intro" name="intro_text" value="">
+                    <div id="quill_intro" style="min-height:100px;background:#fff;border-radius:6px"></div>
                     <div class="adm-hint">Accroche forte &mdash; 2 &agrave; 4 lignes. Affich&eacute;e en typographie plus grande.</div>
                 </div>
 
                 <!-- Description longue -->
                 <div class="adm-field adm-form-full">
                     <label class="adm-label" for="f_description">Description longue</label>
-                    <textarea id="f_description" name="description" rows="6" class="adm-textarea"
-                        placeholder="Description compl&egrave;te de la rando : ambiance, paysages, histoire du lieu..."><?= htmlspecialchars($v_description, ENT_QUOTES, 'UTF-8') ?></textarea>
+                    <input type="hidden" id="f_description" name="description" value="">
+                    <div id="quill_description" style="min-height:160px;background:#fff;border-radius:6px"></div>
                     <div class="adm-hint">Corps principal de la fiche. Affich&eacute; apr&egrave;s l'introduction.</div>
                 </div>
 
                 <!-- Pourquoi cette rando -->
                 <div class="adm-field adm-form-full">
                     <label class="adm-label" for="f_why">Pourquoi faire cette rando ?</label>
-                    <textarea id="f_why" name="why_text" rows="3" class="adm-textarea"
-                        placeholder="Ex : Id&eacute;ale en famille, parfaite au coucher du soleil, belle porte d'entr&eacute;e vers le Bocage..."><?= htmlspecialchars($v_why_text, ENT_QUOTES, 'UTF-8') ?></textarea>
+                    <input type="hidden" id="f_why" name="why_text" value="">
+                    <div id="quill_why" style="min-height:100px;background:#fff;border-radius:6px"></div>
                     <div class="adm-hint">Un court argument de s&eacute;duction. Affich&eacute; dans un bandeau sp&eacute;cial sur la fiche.</div>
                 </div>
 
@@ -1959,6 +1961,50 @@ function toggleAddPanel() {
           btn.innerHTML = 'Envoi en cours...';
         });
       }
+    });
+  });
+})();
+</script>
+
+<script>
+(function() {
+  var toolbarOptions = [
+    ['bold', 'italic', 'underline'],
+    [{ 'header': 2 }, { 'header': 3 }],
+    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+    ['clean']
+  ];
+  function initQuill(editorId, hiddenId, initialHtml) {
+    var q = new Quill('#' + editorId, { theme: 'snow', modules: { toolbar: toolbarOptions } });
+    if (initialHtml) q.clipboard.dangerouslyPasteHTML(initialHtml);
+    q.on('text-change', function() {
+      document.getElementById(hiddenId).value = q.root.innerHTML;
+    });
+    // Init hidden input
+    document.getElementById(hiddenId).value = q.root.innerHTML;
+    return q;
+  }
+
+  var introVal = <?= json_encode($v_intro) ?>;
+  var descVal  = <?= json_encode($v_description) ?>;
+  var whyVal   = <?= json_encode($v_why_text) ?>;
+
+  initQuill('quill_intro',       'f_intro',       introVal);
+  initQuill('quill_description', 'f_description', descVal);
+  initQuill('quill_why',         'f_why',         whyVal);
+
+  // Sync on form submit (piggyback on any form[action*=save_rando])
+  document.querySelectorAll('form').forEach(function(form) {
+    form.addEventListener('submit', function() {
+      var inputs = ['f_intro', 'f_description', 'f_why'];
+      inputs.forEach(function(id) {
+        // Already synced via text-change; force sync on submit as safety net
+        var el = document.getElementById(id);
+        if (el && el.value === '') {
+          // If empty, ensure placeholder <p><br></p> is not sent as content
+          el.value = '';
+        }
+      });
     });
   });
 })();

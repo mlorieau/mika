@@ -46,6 +46,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
                 $flash = 'Erreur : ' . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8');
                 $flash_type = 'err';
             }
+        } elseif ($action === 'delete' && $rando_id > 0) {
+            try {
+                $cnt_stmt = $pdo->prepare("SELECT COUNT(*) FROM rando_participations WHERE rando_id=:id");
+                $cnt_stmt->execute([':id' => $rando_id]);
+                $nb_parts = (int)$cnt_stmt->fetchColumn();
+                $pdo->prepare("DELETE FROM randos WHERE id=:id")->execute([':id' => $rando_id]);
+                $flash = 'Randonnée supprimée' . ($nb_parts > 0 ? " ($nb_parts participation(s) associée(s) supprimée(s))." : '.');
+                $flash_type = 'ok';
+            } catch (PDOException $e) {
+                $flash = 'Erreur suppression : ' . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8');
+                $flash_type = 'err';
+            }
         }
     }
 }
@@ -332,6 +344,18 @@ require_once __DIR__ . '/_admin-header.php';
                       </button>
                     </form>
                   <?php endif; ?>
+
+                  <?php $del_confirm = addslashes(htmlspecialchars($r['title'], ENT_QUOTES, 'UTF-8')); ?>
+                  <form method="post" action="randos.php" style="display:inline"
+                        onsubmit="return confirm('⚠️ SUPPRIMER « <?= $del_confirm ?> » ?\n\nCette action est irréversible. Toutes les participations seront perdues.')">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="rando_id" value="<?= (int)$r['id'] ?>">
+                    <input type="hidden" name="action" value="delete">
+                    <button type="submit" class="btn-adm btn-adm-sm"
+                            style="color:#c0392b;border:1px solid rgba(192,57,43,.3);background:rgba(192,57,43,.06)">
+                      🗑 Supprimer
+                    </button>
+                  </form>
                 </div>
               </td>
             </tr>

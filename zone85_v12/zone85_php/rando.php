@@ -725,32 +725,6 @@ $page_styles = '<style>
 .rando-proof-input{width:100%;font-size:.78rem;margin-bottom:10px}
 .rando-proof-btn{width:100%;border:0;border-radius:10px;background:#0c1e2e;color:#fff;font-weight:900;padding:11px 12px;cursor:pointer}
 .rando-proof-btn:hover{opacity:.92}
-/* Modal info participation (règles) */
-.rando-info-modal{position:fixed;inset:0;z-index:99997;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(12,30,46,.6);backdrop-filter:blur(5px)}
-.rando-info-modal.is-open{display:flex}
-.rando-info-card{width:min(520px,96vw);background:#fff;border-radius:22px;box-shadow:0 28px 80px rgba(0,0,0,.28);overflow:hidden}
-.rando-info-head{padding:22px 24px 16px;background:linear-gradient(135deg,#0c1e2e,#163756);display:flex;align-items:flex-start;gap:14px}
-.rando-info-emoji{font-size:2rem;flex-shrink:0;margin-top:2px}
-.rando-info-head h3{margin:0;font-size:1.15rem;font-weight:900;color:#fff;line-height:1.25}
-.rando-info-head p{margin:6px 0 0;font-size:.82rem;color:rgba(255,255,255,.62);line-height:1.4}
-.rando-info-close{margin-left:auto;flex-shrink:0;border:0;background:rgba(255,255,255,.12);color:#fff;width:34px;height:34px;border-radius:999px;font-size:1.3rem;cursor:pointer;font-weight:900;transition:background .15s}
-.rando-info-close:hover{background:rgba(255,255,255,.22)}
-.rando-info-body{padding:18px 20px;display:flex;flex-direction:column;gap:12px}
-.rando-info-option{display:flex;align-items:flex-start;gap:14px;background:#f8f4ef;border-radius:14px;padding:14px 16px;border:1.5px solid transparent}
-.rando-info-option-highlight{background:#fff7ed;border-color:rgba(42,157,92,.25)}
-.rando-info-opt-icon{font-size:1.6rem;flex-shrink:0;margin-top:2px}
-.rando-info-option strong{display:block;font-size:.9rem;font-weight:900;color:#0c1e2e;margin-bottom:4px}
-.rando-info-option p{margin:0;font-size:.8rem;color:#4b6074;line-height:1.55}
-.rando-info-xp-pill{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:900;padding:3px 10px;border-radius:999px;margin-top:2px}
-.rando-info-xp-0{background:#e8edf2;color:#6b7f96}
-.rando-info-xp-25{background:rgba(42,157,92,.15);color:#1a7a42}
-.rando-info-footer{padding:12px 20px 20px;display:flex;gap:10px}
-.rando-info-btn-secondary{flex:1;border:1.5px solid #e0d8d0;background:#fff;color:#6b7f96;font-size:.82rem;font-weight:700;padding:11px 12px;border-radius:10px;cursor:pointer;transition:background .15s}
-.rando-info-btn-secondary:hover{background:#f3eee9}
-.rando-info-btn-primary{flex:1;border:0;background:#2a9d5c;color:#fff;font-size:.85rem;font-weight:900;padding:12px 14px;border-radius:10px;cursor:pointer;box-shadow:0 6px 18px rgba(42,157,92,.28);transition:transform .15s,opacity .15s}
-.rando-info-btn-primary:hover{transform:translateY(-1px);opacity:.92}
-@media(max-width:480px){.rando-info-footer{flex-direction:column}}
-
 .rando-proof-modal{position:fixed;inset:0;z-index:99998;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(12,30,46,.56);backdrop-filter:blur(4px)}
 .rando-proof-modal.is-open{display:flex}
 .rando-proof-card{width:min(560px,94vw);background:#fff;border-radius:22px;box-shadow:0 28px 90px rgba(0,0,0,.24);overflow:hidden}
@@ -927,18 +901,18 @@ require_once 'includes/nav.php';
           <?php // Intro courte (accroche) — priorité sur summary si intro_text défini ?>
           <?php $_intro = $rando['intro_text'] ?? ''; ?>
           <?php if ($_intro): ?>
-            <div class="rando-intro"><?= nl2br(e($_intro)) ?></div>
+            <div class="rando-intro"><?= $_intro ?></div>
           <?php endif; ?>
 
           <?php // Description longue ?>
           <?php if (!empty($rando['description'])): ?>
-            <div class="rando-description"><?= nl2br(e($rando['description'])) ?></div>
+            <div class="rando-description"><?= $rando['description'] ?></div>
           <?php endif; ?>
 
           <?php if (!empty($rando['why_text'])): ?>
             <div class="rando-why">
               <div class="rando-why-kicker">Pourquoi cette rando ?</div>
-              <div class="rando-why-text"><?= nl2br(e($rando['why_text'])) ?></div>
+              <div class="rando-why-text"><?= $rando['why_text'] ?></div>
             </div>
           <?php endif; ?>
 
@@ -1333,38 +1307,71 @@ require_once 'includes/nav.php';
 
 
           <div class="rando-validation-box">
-            <?php if (!$user_has_completed && $is_logged_in): ?>
-              <p style="font-size:.74rem;color:#6b7f96;line-height:1.5;margin-bottom:12px">
-                🥾 Tamponnez votre Passeport gratuitement.<br>
-                📸 Ajoutez une photo devant le Trésor pour débloquer +25 XP.
-              </p>
-            <?php endif; ?>
-            <?php if ($user_has_completed): ?>
-              <?php if ($user_rando_status === 'validated'): ?>
-                <button type="button" class="rando-passport-btn done">✓ Rando validée · +25 XP</button>
-              <?php elseif ($user_rando_status === 'pending'): ?>
-                <button type="button" class="rando-passport-btn done">⏳ Photo envoyée · validation en attente</button>
-              <?php else: ?>
-                <button type="button" class="rando-passport-btn done">✓ Tamponnée dans mon Passeport</button>
-              <?php endif; ?>
-            <?php elseif ($is_logged_in): ?>
-              <form method="post" style="margin-top:16px">
-                <?= csrf_field() ?>
-                <input type="hidden" name="action" value="stamp_rando">
-                <button type="submit" class="rando-passport-btn">🥾 Tamponner mon Passeport</button>
-              </form>
-            <?php else: ?>
-              <a href="login.php" class="rando-passport-btn" style="display:block;text-align:center;text-decoration:none">Se connecter pour tamponner</a>
-            <?php endif; ?>
 
-            <?php if ($is_logged_in && $user_rando_status !== 'validated'): ?>
-              <div class="rando-proof-form">
-                <div class="rando-proof-title">Débloquer les +25 XP</div>
-                <p class="rando-proof-note">Pour les points, envoyez une note, un petit avis et une photo prise devant <strong><?= e($first_treasure_title) ?></strong>. L'équipe Zone85 validera ensuite.</p>
-                <button type="button" class="rando-proof-btn" id="openProofModal">Demander les +25 XP</button>
-              </div>
-            <?php endif; ?>
-          </div>
+  <?php if ($user_rando_status === 'validated'): ?>
+  <!-- État : Validée avec XP -->
+  <div style="background:linear-gradient(135deg,rgba(42,157,92,.1),rgba(42,157,92,.05));border:1.5px solid rgba(42,157,92,.25);border-radius:14px;padding:18px 16px;text-align:center;margin-bottom:14px">
+    <div style="font-size:1.6rem;margin-bottom:6px">🏆</div>
+    <div style="font-size:.9rem;font-weight:900;color:#1a7a42;margin-bottom:4px">Rando validée !</div>
+    <div style="font-size:.78rem;color:#2a9d5c;font-weight:700">+25 XP débloqués · Présence confirmée</div>
+  </div>
+
+  <?php elseif ($user_rando_status === 'pending'): ?>
+  <!-- État : Photo envoyée, en attente -->
+  <div style="background:rgba(201,150,42,.08);border:1.5px solid rgba(201,150,42,.25);border-radius:14px;padding:18px 16px;text-align:center;margin-bottom:14px">
+    <div style="font-size:1.5rem;margin-bottom:6px">⏳</div>
+    <div style="font-size:.88rem;font-weight:900;color:#8a6020;margin-bottom:4px">Photo en cours de vérification</div>
+    <div style="font-size:.76rem;color:#a07828;line-height:1.5">L'équipe Zone85 examine ta photo.<br>Les +25 XP seront débloqués sous peu.</div>
+  </div>
+
+  <?php elseif ($user_rando_status === 'stamped'): ?>
+  <!-- État : Tamponnée, pas encore de XP -->
+  <div style="background:#f8f4ef;border:1.5px solid rgba(107,127,150,.2);border-radius:14px;padding:18px 16px;margin-bottom:14px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <span style="font-size:1.3rem">✅</span>
+      <div>
+        <div style="font-size:.85rem;font-weight:900;color:#0c1e2e">Rando tamponnée !</div>
+        <div style="font-size:.74rem;color:#6b7f96">Elle figure dans ton Passeport Vendéen</div>
+      </div>
+    </div>
+    <div style="background:#fff;border-radius:10px;padding:12px;border:1px solid rgba(234,86,73,.18)">
+      <div style="font-size:.76rem;font-weight:900;color:#ea5649;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Envie de +25 XP ?</div>
+      <p style="font-size:.78rem;color:#4b6074;line-height:1.55;margin:0 0 10px">Prends-toi en photo devant <strong><?= e($first_treasure_title ?: 'le Trésor du parcours') ?></strong> et envoie-la pour validation.</p>
+      <button type="button" class="rando-proof-btn" id="openProofModal">📸 Envoyer ma photo → +25 XP</button>
+    </div>
+  </div>
+
+  <?php elseif ($is_logged_in): ?>
+  <!-- État : Non faite, connecté -->
+  <div style="margin-bottom:14px">
+    <p style="font-size:.84rem;color:#4b6074;line-height:1.65;margin:0 0 14px">
+      <strong style="color:#0c1e2e;display:block;margin-bottom:6px">Tu as fait cette rando ?</strong>
+      Tamponne-la dans ton Passeport Vendéen — c'est gratuit et instantané. Chaque tampon trace ton parcours d'explorateur.
+    </p>
+    <form method="post">
+      <?= csrf_field() ?>
+      <input type="hidden" name="action" value="stamp_rando">
+      <button type="submit" class="rando-passport-btn">🥾 Tamponner mon Passeport</button>
+    </form>
+    <div style="margin-top:14px;background:rgba(42,157,92,.06);border-radius:10px;padding:12px;border:1px solid rgba(42,157,92,.15)">
+      <div style="font-size:.74rem;font-weight:900;color:#2a9d5c;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">⚡ Envie de points XP ?</div>
+      <p style="font-size:.76rem;color:#4b6074;line-height:1.55;margin:0">En plus du tampon, tu peux débloquer <strong>+25 XP</strong> en envoyant une photo prise devant <strong><?= e($first_treasure_title ?: 'le Trésor du parcours') ?></strong>. L'équipe Zone85 valide ensuite ta présence.</p>
+    </div>
+  </div>
+
+  <?php else: ?>
+  <!-- État : non connecté -->
+  <div style="background:#f8f4ef;border-radius:14px;padding:18px 16px;text-align:center;margin-bottom:14px">
+    <div style="font-size:1.4rem;margin-bottom:8px">🥾</div>
+    <p style="font-size:.84rem;color:#4b6074;line-height:1.6;margin:0 0 12px">
+      <strong style="color:#0c1e2e">Tu as fait cette rando ?</strong><br>
+      Connecte-toi pour la tamponner dans ton Passeport Vendéen et gagner des XP.
+    </p>
+    <a href="login.php" class="rando-passport-btn" style="display:block;text-align:center;text-decoration:none">Se connecter</a>
+  </div>
+  <?php endif; ?>
+
+</div>
 
           <!-- Partage FB -->
           <div class="rando-aside-share">
@@ -1529,75 +1536,5 @@ require_once 'includes/nav.php';
 })();
 </script>
 
-<?php if ($is_logged_in && $user_rando_status !== 'validated'): ?>
-<!-- Modal information règles de participation -->
-<div id="randoInfoModal" class="rando-info-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="randoInfoTitle">
-  <div class="rando-info-card">
-    <div class="rando-info-head">
-      <span class="rando-info-emoji">&#x1F97E;</span>
-      <div>
-        <h3 id="randoInfoTitle">Comment valider cette randonnée ?</h3>
-        <p>Deux façons de la marquer dans votre Passeport Vendéen.</p>
-      </div>
-      <button class="rando-info-close" id="closeRandoInfo" aria-label="Fermer">&#xD7;</button>
-    </div>
-    <div class="rando-info-body">
-      <div class="rando-info-option">
-        <div class="rando-info-opt-icon">&#x1F97E;</div>
-        <div>
-          <strong>Tamponner gratuitement</strong>
-          <p>Marquez cette rando comme réalisée dans votre Passeport Vendéen. Aucun justificatif requis, aucun point XP.</p>
-        </div>
-        <span class="rando-info-xp-pill rando-info-xp-0">0 XP</span>
-      </div>
-      <div class="rando-info-option rando-info-option-highlight">
-        <div class="rando-info-opt-icon">&#x1F4F8;</div>
-        <div>
-          <strong>Débloquer les +25 XP</strong>
-          <p>Prenez-vous en photo devant le <strong>Trésor du parcours</strong>, ajoutez un avis et envoyez. L'équipe Zone85 valide ensuite vos points.</p>
-        </div>
-        <span class="rando-info-xp-pill rando-info-xp-25">+25 XP</span>
-      </div>
-    </div>
-    <div class="rando-info-footer">
-      <button id="closeRandoInfoBtn" class="rando-info-btn-secondary">Juste tamponner</button>
-      <button id="goProofFormBtn" class="rando-info-btn-primary">Je veux les +25 XP &#x2192;</button>
-    </div>
-  </div>
-</div>
-<script>
-(function(){
-  var modal = document.getElementById('randoInfoModal');
-  if (!modal) return;
-  var key = 'rando_info_seen_<?= (int)$rando['id'] ?>';
-  if (!sessionStorage.getItem(key)) {
-    setTimeout(function(){
-      modal.classList.add('is-open');
-      modal.setAttribute('aria-hidden', 'false');
-    }, 700);
-  }
-  function closeInfoModal() {
-    modal.classList.remove('is-open');
-    modal.setAttribute('aria-hidden', 'true');
-    sessionStorage.setItem(key, '1');
-  }
-  var btnClose  = document.getElementById('closeRandoInfo');
-  var btnStamp  = document.getElementById('closeRandoInfoBtn');
-  var btnProof  = document.getElementById('goProofFormBtn');
-  if (btnClose) btnClose.addEventListener('click', closeInfoModal);
-  if (btnStamp) btnStamp.addEventListener('click', closeInfoModal);
-  if (btnProof) btnProof.addEventListener('click', function(){
-    closeInfoModal();
-    var openProof = document.getElementById('openProofModal');
-    if (openProof) {
-      openProof.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      setTimeout(function(){ openProof.click(); }, 400);
-    }
-  });
-  modal.addEventListener('click', function(ev){ if (ev.target === modal) closeInfoModal(); });
-  document.addEventListener('keydown', function(ev){ if (ev.key === 'Escape') closeInfoModal(); });
-})();
-</script>
-<?php endif; ?>
 
 <?php require_once 'includes/footer.php'; ?>
