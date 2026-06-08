@@ -227,14 +227,20 @@ function comm_url(string $tab, array $extra = []): string {
 // ─────────────────────────────────────────────────────────────
 $page_styles = '<style>
 
-/* ── Onglet nav (dans le hero) ── */
-.comm-tabs{display:flex;gap:0;margin-top:40px;border-bottom:2px solid rgba(255,255,255,.1);position:relative;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+/* ── Header communauté ── */
+.comm-hero{background:#fff;border-bottom:1.5px solid var(--beige-dark,#e8e0d4);padding:28px 0 0}
+.comm-hero-eyebrow{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px}
+.comm-hero-title{font-size:1.5rem;font-weight:900;color:var(--navy-dark,#0c1e2e);margin:0 0 4px;line-height:1.2}
+.comm-hero-sub{font-size:.88rem;color:var(--text-muted);margin:0 0 4px}
+
+/* ── Onglet nav (fond clair) ── */
+.comm-tabs{display:flex;gap:0;margin-top:20px;border-bottom:2px solid rgba(18,49,78,.1);overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .comm-tabs::-webkit-scrollbar{display:none}
-.comm-tab{display:inline-flex;align-items:center;gap:7px;padding:12px 24px;font-size:.9rem;font-weight:700;color:rgba(255,255,255,.42);text-decoration:none;border-bottom:3px solid transparent;margin-bottom:-2px;transition:color .15s,border-color .15s;white-space:nowrap}
-.comm-tab:hover{color:rgba(255,255,255,.75)}
-.comm-tab.active{color:#fff;border-bottom-color:#ea5649}
-.comm-tab-count{font-size:.68rem;background:rgba(255,255,255,.12);color:rgba(255,255,255,.6);padding:2px 7px;border-radius:10px;font-weight:700}
-.comm-tab.active .comm-tab-count{background:rgba(234,86,73,.2);color:#f5a99f}
+.comm-tab{display:inline-flex;align-items:center;gap:7px;padding:12px 22px;font-size:.9rem;font-weight:700;color:var(--text-muted,#6b7f96);text-decoration:none;border-bottom:3px solid transparent;margin-bottom:-2px;transition:color .15s,border-color .15s;white-space:nowrap}
+.comm-tab:hover{color:var(--navy-dark,#0c1e2e)}
+.comm-tab.active{color:var(--primary,#ea5649);border-bottom-color:var(--primary,#ea5649)}
+.comm-tab-count{font-size:.68rem;background:rgba(18,49,78,.08);color:var(--text-mid,#4a5568);padding:2px 7px;border-radius:10px;font-weight:700}
+.comm-tab.active .comm-tab-count{background:rgba(234,86,73,.12);color:var(--primary,#ea5649)}
 
 /* ── FIL ── */
 .cf-wrap{padding:48px 0 64px;background:var(--beige)}
@@ -258,9 +264,9 @@ $page_styles = '<style>
 
 /* ── CLASSEMENT ── */
 .cl-wrap{padding:48px 0 64px;background:var(--beige)}
-.cl-hero-stats{display:flex;gap:32px;flex-wrap:wrap;margin-top:4px}
+.cl-hero-stats{display:flex;gap:32px;flex-wrap:wrap;margin-top:10px}
 .cl-stat-num{font-size:1.6rem;font-weight:900;color:var(--primary);line-height:1}
-.cl-stat-label{font-size:.68rem;font-weight:600;color:rgba(255,255,255,.45);letter-spacing:.08em;text-transform:uppercase;margin-top:3px}
+.cl-stat-label{font-size:.68rem;font-weight:600;color:var(--text-muted);letter-spacing:.08em;text-transform:uppercase;margin-top:3px}
 .cl-clan-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px}
 .cl-clan-tab{padding:7px 18px;border-radius:20px;font-size:.82rem;font-weight:700;text-decoration:none;border:2px solid var(--beige-dark);color:var(--text-mid);transition:all .15s;background:#fff}
 .cl-clan-tab:hover{border-color:var(--primary);color:var(--primary)}
@@ -395,41 +401,36 @@ require_once 'includes/header.php';
 require_once 'includes/nav.php';
 ?>
 
-<!-- ── HERO + ONGLETS ─────────────────────────────────────── -->
-<section class="page-hero" style="padding-bottom:0">
+<!-- ── HEADER + ONGLETS ──────────────────────────────────── -->
+<section class="comm-hero">
   <div class="container">
-    <div class="page-eyebrow">Zone85 · Communauté</div>
-    <h1 class="page-h1">La <em>Communauté</em></h1>
-    <p class="page-sub">Classement des Zonautes, fil d'activité, passeports vendéens.</p>
+    <p class="comm-hero-eyebrow">Zone85 · Communauté</p>
 
     <?php if ($_tab === 'classement'): ?>
-    <!-- Stats en ligne pour le classement -->
-    <div class="cl-hero-stats">
-      <div>
-        <div class="cl-stat-num"><?= $cl_total ?></div>
-        <div class="cl-stat-label">Zonautes</div>
+      <h1 class="comm-hero-title">Classement</h1>
+      <p class="comm-hero-sub">Les meilleurs Zonautes de la saison en cours.</p>
+      <div class="cl-hero-stats">
+        <div><div class="cl-stat-num"><?= $cl_total ?></div><div class="cl-stat-label">Zonautes</div></div>
+        <?php if ($is_logged && $my_rank): ?>
+        <div><div class="cl-stat-num">#<?= $my_rank ?></div><div class="cl-stat-label">Ton rang</div></div>
+        <?php endif; ?>
       </div>
-      <?php if ($is_logged && $my_rank): ?>
-      <div>
-        <div class="cl-stat-num">#<?= $my_rank ?></div>
-        <div class="cl-stat-label">Ton rang</div>
-      </div>
-      <?php endif; ?>
-    </div>
+    <?php elseif ($_tab === 'zonautes'): ?>
+      <h1 class="comm-hero-title">Les Zonautes</h1>
+      <p class="comm-hero-sub">Tous les membres de Zone85 — clique sur un passeport pour en savoir plus.</p>
+    <?php else: ?>
+      <h1 class="comm-hero-title">Fil de la Zone</h1>
+      <p class="comm-hero-sub">Ce qui se passe en ce moment dans Zone85.</p>
     <?php endif; ?>
 
-    <!-- Tab nav -->
     <nav class="comm-tabs" aria-label="Onglets communauté">
-      <a href="<?= comm_url('fil') ?>"
-         class="comm-tab <?= $_tab === 'fil' ? 'active' : '' ?>">
-        📋 Fil<?php if ($total_items > 0 && $_tab === 'fil'): ?><span class="comm-tab-count"><?= number_format($total_items,0,',','&#8201;') ?></span><?php endif; ?>
+      <a href="<?= comm_url('fil') ?>" class="comm-tab <?= $_tab === 'fil' ? 'active' : '' ?>">
+        🌍 Fil<?php if ($total_items > 0 && $_tab === 'fil'): ?><span class="comm-tab-count"><?= number_format($total_items,0,',','&#8201;') ?></span><?php endif; ?>
       </a>
-      <a href="<?= comm_url('classement') ?>"
-         class="comm-tab <?= $_tab === 'classement' ? 'active' : '' ?>">
+      <a href="<?= comm_url('classement') ?>" class="comm-tab <?= $_tab === 'classement' ? 'active' : '' ?>">
         🏆 Classement
       </a>
-      <a href="<?= comm_url('zonautes') ?>"
-         class="comm-tab <?= $_tab === 'zonautes' ? 'active' : '' ?>">
+      <a href="<?= comm_url('zonautes') ?>" class="comm-tab <?= $_tab === 'zonautes' ? 'active' : '' ?>">
         👥 Zonautes<?php if ($zo_total > 0 && $_tab === 'zonautes'): ?><span class="comm-tab-count"><?= $zo_total ?></span><?php endif; ?>
       </a>
     </nav>

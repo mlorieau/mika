@@ -4,9 +4,10 @@
 
 // Liens directs toujours visibles dans la barre
 $_nav_direct = [
-    ['slug' => 'concept',  'label' => 'Concept',  'file' => 'concept.php'],
-    ['slug' => 'missions', 'label' => 'Missions', 'file' => 'missions.php'],
-    ['slug' => 'clans',    'label' => 'Clans',    'file' => 'clans.php'],
+    ['slug' => 'les-echos',  'label' => 'Les Échos',  'file' => 'les-echos.php'],
+    ['slug' => 'concept',    'label' => 'Concept',    'file' => 'concept.php'],
+    ['slug' => 'missions',   'label' => 'Missions',   'file' => 'missions.php'],
+    ['slug' => 'communaute', 'label' => 'Communauté', 'file' => 'communaute.php'],
 ];
 
 // Contenu du mega menu (3 colonnes)
@@ -35,10 +36,10 @@ $_mega_sections = [
         'label' => 'Communauté',
         'emoji' => '🛡️',
         'links' => [
-            ['file' => 'clans.php',      'label' => 'Les Clans',       'desc' => 'Bocage · Littoral · Marais',  'icon' => '⚔️'],
-            ['file' => 'communaute.php',              'label' => 'Fil de la Zone',  'desc' => 'Activité en temps réel',      'icon' => '🌍'],
-            ['file' => 'communaute.php?tab=zonautes', 'label' => 'Zonautes',        'desc' => 'Annuaire des joueurs',        'icon' => '👥'],
-            ['file' => 'communaute.php?tab=classement','label' => 'Classement',     'desc' => 'Top 50 Zonautes',             'icon' => '📊'],
+            ['file' => 'profil.php',                        'label' => 'Mon Passeport',   'desc' => 'Identité, niveau & badges',   'icon' => '🪪'],
+            ['file' => 'communaute.php',                    'label' => 'Fil de la Zone',  'desc' => 'Activité en temps réel',      'icon' => '🌍'],
+            ['file' => 'clans.php',                         'label' => 'Les Clans',       'desc' => 'Bocage · Littoral · Marais',  'icon' => '⚔️'],
+            ['file' => 'communaute.php?tab=classement',     'label' => 'Classement',      'desc' => 'Top 50 Zonautes',             'icon' => '📊'],
         ],
     ],
 ];
@@ -86,9 +87,6 @@ if (isset($active_season) && !empty($active_season['title'])) {
 
     <!-- Droite : classement, cloche, avatar, connexion -->
     <div class="nav-right">
-      <a href="communaute.php?tab=classement" class="nav-classement<?= ($_cp === 'communaute') ? ' active' : '' ?>" title="Classement">
-        🏆 <span class="nav-classement-label">Classement</span>
-      </a>
       <?php if ($_nav_user): ?>
         <a href="notifications.php" class="nav-notif-bell" title="Notifications"
            style="position:relative;display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;text-decoration:none;font-size:1.1rem;color:var(--text-mid);transition:background .15s<?= ($_cp === 'notifications') ? ';background:rgba(234,86,73,.1)' : '' ?>">
@@ -196,7 +194,7 @@ if (isset($active_season) && !empty($active_season['title'])) {
 
   <div class="mmenu-section" style="border-top:1px solid rgba(0,0,0,.08)">
     <?php if ($_nav_user): ?>
-      <a href="profil.php">👤 Mon Profil — <?= e($_nav_user['pseudo']) ?></a>
+      <a href="profil.php">🪪 Mon Passeport — <?= e($_nav_user['pseudo']) ?></a>
       <a href="mon-compte.php">⚙️ Mon Compte</a>
       <a href="notifications.php">🔔 Notifications<?= $_nav_notif_count > 0 ? ' (' . $_nav_notif_count . ')' : '' ?></a>
       <a href="logout.php" style="color:var(--text-muted)" onclick="return confirm('Se déconnecter ?')">Déconnexion</a>
