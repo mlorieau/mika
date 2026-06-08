@@ -66,6 +66,22 @@ if ($is_edit && $pdo) {
     } catch (PDOException $e) {}
 }
 
+// Propositions des membres (pour sélection du gagnant)
+$all_propositions = [];
+if ($is_edit && $pdo) {
+    try {
+        $sq = $pdo->prepare("
+            SELECT p.id, p.proposition, p.is_correct, p.submitted_at, u.pseudo
+            FROM ktc_propositions p
+            JOIN users u ON u.id = p.user_id
+            WHERE p.episode_id = :eid
+            ORDER BY p.submitted_at ASC
+        ");
+        $sq->execute([':eid' => $episode['id']]);
+        $all_propositions = $sq->fetchAll();
+    } catch (PDOException $e) {}
+}
+
 // ── Traitement POST ────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
     $token = $_POST['csrf_token'] ?? '';
@@ -113,6 +129,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
                 $f_slug = 'episode-' . time();
             }
 
+            // Upload photo personne (facultatif)
+            if (!empty($_FILES['person_photo_file']['tmp_name'])) {
+                $up_person = upload_editorial_image($_FILES['person_photo_file'], 'ktc');
+                if ($up_person['ok']) $f_person_photo = $up_person['path'];
+            }
+            // Winner + confidence
+            $f_winner_prop_id = !empty($_POST['winner_proposition_id']) ? (int)$_POST['winner_proposition_id'] : null;
+            $f_confidence     = in_array($_POST['answer_confidence'] ?? '', ['certain','probable','estimation'], true)
+                                ? $_POST['answer_confidence'] : 'certain';
+
             // Dates — validation simple
             $clean_date = function(string $d): ?string {
                 if (empty($d)) return null;
@@ -140,7 +166,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
                                 vote_choice_2   = :vote_choice_2,
                                 vote_choice_3   = :vote_choice_3,
                                 vote_choice_4   = :vote_choice_4,
-                                revelation_text = :revelation_text,
+                                revelation_text       = :revelation_text,
+                                winner_proposition_id = :winner_proposition_id,
+                                answer_confidence     = :answer_confidence,
                                 person_name     = :person_name,
                                 person_title    = :person_title,
                                 person_bio      = :person_bio,
@@ -167,7 +195,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
                             ':vote_choice_2'   => $f_vote_2 ?: null,
                             ':vote_choice_3'   => $f_vote_3 ?: null,
                             ':vote_choice_4'   => $f_vote_4 ?: null,
-                            ':revelation_text' => $f_revelation ?: null,
+                            ':revelation_text'       => $f_revelation ?: null,
+                            ':winner_proposition_id' => $f_winner_prop_id,
+                            ':answer_confidence'     => $f_confidence,
                             ':person_name'     => $f_person_name ?: null,
                             ':person_title'    => $f_person_title ?: null,
                             ':person_bio'      => $f_person_bio ?: null,
@@ -188,42 +218,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
                                 (slug, title, season_id, object_name, object_hidden,
                                  teaser_text, details_text, vote_question,
                                  vote_choice_1, vote_choice_2, vote_choice_3, vote_choice_4,
-                                 revelation_text, person_name, person_title, person_bio, person_photo,
+                                 revelation_text, winner_proposition_id, answer_confidence,
+                                 person_name, person_title, person_bio, person_photo,
                                  date_week1, date_week2, date_week3, date_revelation,
                                  badge_reward_id, xp_reward, status)
                             VALUES
                                 (:slug, :title, :season_id, :object_name, :object_hidden,
                                  :teaser_text, :details_text, :vote_question,
                                  :vote_choice_1, :vote_choice_2, :vote_choice_3, :vote_choice_4,
-                                 :revelation_text, :person_name, :person_title, :person_bio, :person_photo,
+                                 :revelation_text, :winner_proposition_id, :answer_confidence,
+                                 :person_name, :person_title, :person_bio, :person_photo,
                                  :date_week1, :date_week2, :date_week3, :date_revelation,
                                  :badge_reward_id, :xp_reward, :status)
                         ');
                         $ins->execute([
-                            ':slug'            => $f_slug,
-                            ':title'           => $f_title,
-                            ':season_id'       => $f_season_id,
-                            ':object_name'     => $f_object_name ?: null,
-                            ':object_hidden'   => $f_object_hidden,
-                            ':teaser_text'     => $f_teaser_text ?: null,
-                            ':details_text'    => $f_details_text ?: null,
-                            ':vote_question'   => $f_vote_question ?: null,
-                            ':vote_choice_1'   => $f_vote_1 ?: null,
-                            ':vote_choice_2'   => $f_vote_2 ?: null,
-                            ':vote_choice_3'   => $f_vote_3 ?: null,
-                            ':vote_choice_4'   => $f_vote_4 ?: null,
-                            ':revelation_text' => $f_revelation ?: null,
-                            ':person_name'     => $f_person_name ?: null,
-                            ':person_title'    => $f_person_title ?: null,
-                            ':person_bio'      => $f_person_bio ?: null,
-                            ':person_photo'    => $f_person_photo ?: null,
-                            ':date_week1'      => $clean_date($f_date_week1),
-                            ':date_week2'      => $clean_date($f_date_week2),
-                            ':date_week3'      => $clean_date($f_date_week3),
-                            ':date_revelation' => $clean_date($f_date_revel),
-                            ':badge_reward_id' => $f_badge_id,
-                            ':xp_reward'       => $f_xp,
-                            ':status'          => $f_status,
+                            ':slug'                  => $f_slug,
+                            ':title'                 => $f_title,
+                            ':season_id'             => $f_season_id,
+                            ':object_name'           => $f_object_name ?: null,
+                            ':object_hidden'         => $f_object_hidden,
+                            ':teaser_text'           => $f_teaser_text ?: null,
+                            ':details_text'          => $f_details_text ?: null,
+                            ':vote_question'         => $f_vote_question ?: null,
+                            ':vote_choice_1'         => $f_vote_1 ?: null,
+                            ':vote_choice_2'         => $f_vote_2 ?: null,
+                            ':vote_choice_3'         => $f_vote_3 ?: null,
+                            ':vote_choice_4'         => $f_vote_4 ?: null,
+                            ':revelation_text'       => $f_revelation ?: null,
+                            ':winner_proposition_id' => $f_winner_prop_id,
+                            ':answer_confidence'     => $f_confidence,
+                            ':person_name'           => $f_person_name ?: null,
+                            ':person_title'          => $f_person_title ?: null,
+                            ':person_bio'            => $f_person_bio ?: null,
+                            ':person_photo'          => $f_person_photo ?: null,
+                            ':date_week1'            => $clean_date($f_date_week1),
+                            ':date_week2'            => $clean_date($f_date_week2),
+                            ':date_week3'            => $clean_date($f_date_week3),
+                            ':date_revelation'       => $clean_date($f_date_revel),
+                            ':badge_reward_id'       => $f_badge_id,
+                            ':xp_reward'             => $f_xp,
+                            ':status'                => $f_status,
                         ]);
                         $saved_id = (int)$pdo->lastInsertId();
                     }
@@ -238,15 +272,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
 
         // ── Action : add_photo ─────────────────────────────────
         } elseif ($action === 'add_photo' && $is_edit) {
-            $ph_path   = safe_input($_POST['photo_path']    ?? '', 255);
-            $ph_caption= safe_input($_POST['photo_caption'] ?? '', 255);
-            $ph_week   = max(1, min(4, (int)($_POST['photo_week'] ?? 1)));
-            $ph_order  = max(0, (int)($_POST['photo_sort']  ?? 0));
+            $ph_path    = '';
+            $ph_caption = safe_input($_POST['photo_caption'] ?? '', 255);
+            $ph_week    = max(1, min(4, (int)($_POST['photo_week'] ?? 1)));
+            $ph_order   = max(0, (int)($_POST['photo_sort'] ?? 0));
 
-            if (empty($ph_path)) {
-                $flash = 'L\'URL de la photo est obligatoire.';
+            if (!empty($_FILES['photo_file']['tmp_name'])) {
+                $up_ph = upload_editorial_image($_FILES['photo_file'], 'ktc');
+                if (!$up_ph['ok']) {
+                    $flash = 'Erreur upload : ' . ($up_ph['error'] ?? 'fichier invalide');
+                    $flash_type = 'err';
+                } else {
+                    $ph_path = $up_ph['path'];
+                }
+            } elseif (!empty($_POST['photo_path'])) {
+                $ph_path = safe_input($_POST['photo_path'], 255);
+            }
+
+            if ($flash_type !== 'err' && empty($ph_path)) {
+                $flash = 'Sélectionnez une photo ou fournissez une URL.';
                 $flash_type = 'err';
-            } else {
+            }
+            if ($flash_type !== 'err') {
                 try {
                     $ins = $pdo->prepare('
                         INSERT INTO ktc_episode_photos (episode_id, file_path, caption, reveal_week, sort_order)
@@ -259,9 +306,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
                         ':week'    => $ph_week,
                         ':sort'    => $ph_order,
                     ]);
-                    $flash = 'Photo ajoutee.';
+                    $flash = 'Photo ajoutée.';
                     $flash_type = 'ok';
-                    // Recharger les photos
                     $s = $pdo->prepare('SELECT * FROM ktc_episode_photos WHERE episode_id = :eid ORDER BY sort_order ASC, id ASC');
                     $s->execute([':eid' => $episode['id']]);
                     $photos = $s->fetchAll();
@@ -352,6 +398,8 @@ $v_date_week1     = $v('date_week1');
 $v_date_week2     = $v('date_week2');
 $v_date_week3     = $v('date_week3');
 $v_date_revel     = $v('date_revelation');
+$v_winner_prop_id = (int)$v('winner_proposition_id', 0);
+$v_confidence     = $v('answer_confidence', 'certain');
 
 // Statuts episode pour le select
 $status_options = [
@@ -471,7 +519,7 @@ require_once __DIR__ . '/_admin-header.php';
 <!-- ═══════════════════════════════════════════════════════════ -->
 <!-- FORMULAIRE PRINCIPAL                                        -->
 <!-- ═══════════════════════════════════════════════════════════ -->
-<form method="post" action="ktc-episode-edit.php<?= $is_edit ? '?id=' . (int)$episode['id'] : '' ?>">
+<form method="post" action="ktc-episode-edit.php<?= $is_edit ? '?id=' . (int)$episode['id'] : '' ?>" enctype="multipart/form-data">
   <?= csrf_field() ?>
   <input type="hidden" name="action" value="save_episode">
 
@@ -684,6 +732,44 @@ require_once __DIR__ . '/_admin-header.php';
         <span class="adm-hint">Affiche uniquement quand le statut est "Revele" ou "Archive". HTML simple accepte.</span>
       </div>
 
+      <!-- Niveau de confiance -->
+      <div class="adm-field">
+        <label class="adm-label" for="f_confidence">Niveau de confiance de la réponse</label>
+        <select id="f_confidence" name="answer_confidence" class="adm-select">
+          <option value="certain" <?= $v_confidence === 'certain' ? 'selected' : '' ?>>Réponse certaine — documentée</option>
+          <option value="probable" <?= $v_confidence === 'probable' ? 'selected' : '' ?>>Probable — sources concordantes</option>
+          <option value="estimation" <?= $v_confidence === 'estimation' ? 'selected' : '' ?>>Estimation — tradition orale / incertitude</option>
+        </select>
+        <span class="adm-hint">Affiché aux membres à la révélation pour être transparent sur la fiabilité de la réponse.</span>
+      </div>
+
+      <!-- Sélection du gagnant parmi les propositions -->
+      <?php if (!empty($all_propositions)): ?>
+      <div class="adm-field adm-form-full">
+        <label class="adm-label">Meilleure proposition des Zonautes</label>
+        <div style="display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto;border:1px solid #e8e2db;border-radius:10px;padding:10px;background:#faf8f5">
+          <label style="display:flex;align-items:flex-start;gap:10px;padding:10px;background:#fff;border-radius:8px;cursor:pointer;border:2px solid <?= !$v_winner_prop_id ? '#ea5649' : 'transparent' ?>">
+            <input type="radio" name="winner_proposition_id" value="0" <?= !$v_winner_prop_id ? 'checked' : '' ?> style="margin-top:3px;accent-color:#ea5649">
+            <span style="font-size:.82rem;color:#6b7f96;font-style:italic">Aucun gagnant désigné</span>
+          </label>
+          <?php foreach ($all_propositions as $prop): ?>
+          <label style="display:flex;align-items:flex-start;gap:10px;padding:10px;background:#fff;border-radius:8px;cursor:pointer;border:2px solid <?= (int)$prop['id'] === $v_winner_prop_id ? '#2a8c40' : 'transparent' ?>">
+            <input type="radio" name="winner_proposition_id" value="<?= (int)$prop['id'] ?>" <?= (int)$prop['id'] === $v_winner_prop_id ? 'checked' : '' ?> style="margin-top:3px;accent-color:#2a8c40">
+            <span style="flex:1;min-width:0">
+              <span style="font-size:.72rem;font-weight:800;color:#9a6800;display:block;margin-bottom:2px"><?= htmlspecialchars($prop['pseudo'], ENT_QUOTES, 'UTF-8') ?></span>
+              <span style="font-size:.85rem;color:#0c1e2e;line-height:1.4;display:block"><?= htmlspecialchars($prop['proposition'], ENT_QUOTES, 'UTF-8') ?></span>
+            </span>
+          </label>
+          <?php endforeach; ?>
+        </div>
+        <span class="adm-hint">Le Zonaute dont la proposition est sélectionnée recevra les XP de récompense.</span>
+      </div>
+      <?php else: ?>
+      <div class="adm-form-full" style="padding:12px;background:#faf8f5;border-radius:8px;border:1px dashed #e8e2db">
+        <p style="margin:0;font-size:.82rem;color:#9ca3af">Aucune proposition soumise par les membres pour cet épisode.</p>
+      </div>
+      <?php endif; ?>
+
     </div>
   </div>
 
@@ -716,12 +802,11 @@ require_once __DIR__ . '/_admin-header.php';
       </div>
 
       <div class="adm-field adm-form-full">
-        <label class="adm-label" for="f_person_photo">Photo (URL)</label>
-        <input id="f_person_photo" type="url" name="person_photo" class="adm-input"
-               maxlength="255"
-               placeholder="https://... ou /assets/img/..."
-               value="<?= htmlspecialchars($v_person_photo, ENT_QUOTES, 'UTF-8') ?>">
-        <span class="adm-hint">URL uniquement en V12. L'upload direct sera disponible en V13.</span>
+        <label class="adm-label">Photo de la personne</label>
+        <input type="file" name="person_photo_file" accept="image/jpeg,image/png,image/webp"
+               class="adm-input" style="padding:6px">
+        <input type="hidden" name="person_photo" value="<?= htmlspecialchars($v_person_photo, ENT_QUOTES, 'UTF-8') ?>">
+        <span class="adm-hint">JPEG / PNG / WebP — max 5 Mo. Laissez vide pour conserver la photo actuelle.</span>
       </div>
 
       <?php if ($v_person_photo): ?>
@@ -810,7 +895,7 @@ require_once __DIR__ . '/_admin-header.php';
             <?php foreach ($photos as $ph): ?>
               <tr>
                 <td style="width:64px">
-                  <img src="<?= htmlspecialchars($ph['file_path'], ENT_QUOTES, 'UTF-8') ?>"
+                  <img src="<?= e(media_url($ph['file_path'])) ?>"
                        alt=""
                        style="width:52px;height:40px;object-fit:cover;border-radius:6px;border:1px solid #e8e2db"
                        onerror="this.style.display='none'">
@@ -851,15 +936,21 @@ require_once __DIR__ . '/_admin-header.php';
       <p style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#6b7f96;margin:0 0 14px">
         + Ajouter une photo
       </p>
-      <form method="post" action="ktc-episode-edit.php?id=<?= (int)$episode['id'] ?>">
+      <form method="post" action="ktc-episode-edit.php?id=<?= (int)$episode['id'] ?>" enctype="multipart/form-data">
         <?= csrf_field() ?>
         <input type="hidden" name="action" value="add_photo">
         <div class="adm-form-grid">
 
           <div class="adm-field adm-form-full">
-            <label class="adm-label" for="f_photo_path">URL / Chemin de la photo <span>*</span></label>
+            <label class="adm-label" for="f_photo_file">Photo à uploader <span>*</span></label>
+            <input id="f_photo_file" type="file" name="photo_file" accept="image/jpeg,image/png,image/webp"
+                   class="adm-input" style="padding:6px">
+            <span class="adm-hint">JPEG / PNG / WebP — max 5 Mo. Ou fournissez une URL ci-dessous.</span>
+          </div>
+          <div class="adm-field adm-form-full">
+            <label class="adm-label" for="f_photo_path">URL alternative (optionnel si fichier uploadé)</label>
             <input id="f_photo_path" type="text" name="photo_path" class="adm-input"
-                   maxlength="255" required
+                   maxlength="255"
                    placeholder="https://... ou /assets/img/ktc/...">
           </div>
 

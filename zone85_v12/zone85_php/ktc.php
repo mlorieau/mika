@@ -21,6 +21,7 @@ $user_vote   = null;
 $vote_counts = [];
 $vote_total  = 0;
 $past_eps    = [];
+$winner_data = null;
 $flash       = '';
 $flash_type  = 'ok';
 $current_week = 0;
@@ -80,6 +81,22 @@ try {
             WHERE status IN ('revealed','archived') {$exclude}
             ORDER BY id DESC LIMIT 6
         ")->fetchAll();
+
+        // Gagnant à la révélation
+        // Nécessite migration 025_v13_ktc_winner.sql (colonnes winner_proposition_id + answer_confidence)
+        $winner_data = null;
+        if ($episode && $current_week >= 4 && !empty($episode['winner_proposition_id'])) {
+            try {
+                $sw = $pdo->prepare("
+                    SELECT p.proposition, p.submitted_at, u.pseudo, u.avatar_type, u.avatar_file, u.avatar_config
+                    FROM ktc_propositions p
+                    JOIN users u ON u.id = p.user_id
+                    WHERE p.id = :pid LIMIT 1
+                ");
+                $sw->execute([':pid' => (int)$episode['winner_proposition_id']]);
+                $winner_data = $sw->fetch() ?: null;
+            } catch (Exception $e) {}
+        }
     }
 } catch (Exception $e) {
     // Dégradé silencieux
@@ -531,6 +548,33 @@ function _ktc_fmt_date(?string $d): string {
               <div class="ktc-object-name"><?= e($episode['object_name']) ?></div>
             </div>
           <?php endif; ?>
+
+          <?php if ($winner_data): ?>
+          <?php
+            $conf_labels = [
+              'certain'    => ['Réponse certaine', '#1a5c28', 'rgba(42,140,64,.12)'],
+              'probable'   => ['Réponse probable',  '#7a5010', 'rgba(201,150,42,.15)'],
+              'estimation' => ['Estimation',         '#4a1d96', 'rgba(109,40,217,.1)'],
+            ];
+            [$conf_label, $conf_color, $conf_bg] = $conf_labels[$episode['answer_confidence'] ?? 'certain'] ?? $conf_labels['certain'];
+          ?>
+          <div style="background:#fff;border-radius:16px;border:2px solid #2a8c40;padding:22px 24px;margin-bottom:20px">
+            <div style="font-size:.65rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#1a5c28;margin-bottom:12px">Meilleure réponse des Zonautes</div>
+            <div style="display:flex;align-items:flex-start;gap:14px">
+              <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#163756,#0c1e2e);display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:.82rem;flex-shrink:0">
+                <?= strtoupper(mb_substr($winner_data['pseudo'], 0, 2)) ?>
+              </div>
+              <div style="flex:1">
+                <div style="font-size:.78rem;font-weight:800;color:#9a6800;margin-bottom:4px"><?= e($winner_data['pseudo']) ?></div>
+                <div style="font-size:.95rem;color:#0c1e2e;line-height:1.5;font-style:italic">"<?= e($winner_data['proposition']) ?>"</div>
+              </div>
+            </div>
+            <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+              <span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:800;background:<?= $conf_bg ?>;color:<?= $conf_color ?>"><?= $conf_label ?></span>
+            </div>
+          </div>
+          <?php endif; ?>
+
           <?php if (!empty($episode['revelation_text'])): ?>
             <div class="ktc-revelation-text-block">
               <div class="ktc-section-kicker">L'histoire complète</div>
