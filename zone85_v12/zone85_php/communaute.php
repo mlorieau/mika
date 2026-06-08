@@ -18,8 +18,9 @@ require_once 'includes/auth.php';
 require_once 'includes/repositories.php';
 
 // ── Onglet actif ─────────────────────────────────────────────
-$_tab = in_array($_GET['tab'] ?? '', ['classement', 'zonautes', 'fil'], true)
+$_tab = in_array($_GET['tab'] ?? '', ['passeport', 'fil', 'clans', 'classement', 'zonautes'], true)
     ? $_GET['tab'] : 'fil';
+if ($_tab === 'zonautes') $_tab = 'classement'; // backward compat
 
 $is_logged   = is_logged_in();
 $active_user = $is_logged ? current_user() : null;
@@ -48,6 +49,36 @@ $event_labels = [
 
 // ── Données spécifiques par onglet ───────────────────────────
 
+// ── PASSEPORT ────────────────────────────────────────────────
+$pp_badges         = [];
+$pp_missions_count = 0;
+$pp_collectibles   = 0;
+$pp_recent_xp      = [];
+
+if ($_tab === 'passeport' && $is_logged && $pdo) {
+    $pp_uid = (int)$active_user['id'];
+    try {
+        $s = $pdo->prepare("SELECT b.icon, b.title, b.rarity FROM user_badges ub JOIN badges b ON b.id=ub.badge_id WHERE ub.user_id=:uid ORDER BY ub.unlocked_at DESC LIMIT 6");
+        $s->execute([':uid' => $pp_uid]);
+        $pp_badges = $s->fetchAll();
+    } catch (PDOException $e) {}
+    try {
+        $s = $pdo->prepare("SELECT COUNT(*) FROM participations WHERE user_id=:uid AND status IN ('validated','auto_validated')");
+        $s->execute([':uid' => $pp_uid]);
+        $pp_missions_count = (int)$s->fetchColumn();
+    } catch (PDOException $e) {}
+    try {
+        $s = $pdo->prepare("SELECT COUNT(*) FROM user_collectibles WHERE user_id=:uid");
+        $s->execute([':uid' => $pp_uid]);
+        $pp_collectibles = (int)$s->fetchColumn();
+    } catch (PDOException $e) {}
+    try {
+        $s = $pdo->prepare("SELECT reason, xp_amount, created_at FROM xp_logs WHERE user_id=:uid ORDER BY created_at DESC LIMIT 10");
+        $s->execute([':uid' => $pp_uid]);
+        $pp_recent_xp = $s->fetchAll();
+    } catch (PDOException $e) {}
+}
+
 // ── FIL ──────────────────────────────────────────────────────
 $feed_items  = [];
 $total_items = 0;
@@ -63,6 +94,42 @@ if ($_tab === 'fil') {
         catch (PDOException $e) {}
     }
     $total_pages = max(1, (int)ceil($total_items / $per_feed));
+}
+
+// ── CLANS (onglet dédié) ─────────────────────────────────────
+$clan_rankings      = [];
+$clan_recent_logs   = [];
+
+if ($_tab === 'clans' && $pdo) {
+    $sr_clans = _active_season_row();
+    $sid_clans = $sr_clans ? (int)$sr_clans['id'] : 0;
+    try {
+        $cr = $pdo->prepare("
+            SELECT c.id, c.name, c.slug, c.color_primary, c.emoji,
+                   COALESCE(SUM(csl.points), 0) AS season_points,
+                   COUNT(DISTINCT csl.user_id) AS active_members
+            FROM clans c
+            LEFT JOIN clan_score_logs csl ON csl.clan_id = c.id
+                AND (:season_id = 0 OR csl.season_id = :season_id2)
+            GROUP BY c.id
+            ORDER BY season_points DESC
+        ");
+        $cr->execute([':season_id' => $sid_clans, ':season_id2' => $sid_clans]);
+        $clan_rankings = $cr->fetchAll();
+        foreach ($clan_rankings as $i => &$cr_row) { $cr_row['rank'] = $i + 1; }
+        unset($cr_row);
+    } catch (PDOException $e) {}
+    try {
+        $lr = $pdo->prepare("
+            SELECT csl.points, csl.reason, csl.created_at, u.pseudo, c.name AS clan_name, c.slug AS clan_slug, c.color_primary
+            FROM clan_score_logs csl
+            JOIN clans c ON c.id = csl.clan_id
+            LEFT JOIN users u ON u.id = csl.user_id
+            ORDER BY csl.created_at DESC LIMIT 15
+        ");
+        $lr->execute();
+        $clan_recent_logs = $lr->fetchAll();
+    } catch (PDOException $e) {}
 }
 
 // ── CLASSEMENT ───────────────────────────────────────────────
@@ -144,27 +211,6 @@ if ($_tab === 'classement') {
         }
     }
 
-    // Classement des clans (saison active)
-    $clan_rankings = [];
-    if ($pdo) {
-        try {
-            $cr = $pdo->prepare("
-                SELECT c.id, c.name, c.slug, c.color_primary, c.emoji,
-                       COALESCE(SUM(csl.points), 0) AS season_points,
-                       COUNT(DISTINCT csl.user_id) AS active_members
-                FROM clans c
-                LEFT JOIN clan_score_logs csl ON csl.clan_id = c.id
-                    AND (:season_id = 0 OR csl.season_id = :season_id2)
-                GROUP BY c.id
-                ORDER BY season_points DESC
-            ");
-            $sid = $sr ? (int)$sr['id'] : 0;
-            $cr->execute([':season_id' => $sid, ':season_id2' => $sid]);
-            $clan_rankings = $cr->fetchAll();
-            foreach ($clan_rankings as $i => &$cr_row) { $cr_row['rank'] = $i + 1; }
-            unset($cr_row);
-        } catch (PDOException $e) {}
-    }
 }
 
 // ── ZONAUTES ─────────────────────────────────────────────────
@@ -241,6 +287,98 @@ $page_styles = '<style>
 .comm-tab.active{color:var(--primary,#ea5649);border-bottom-color:var(--primary,#ea5649)}
 .comm-tab-count{font-size:.68rem;background:rgba(18,49,78,.08);color:var(--text-mid,#4a5568);padding:2px 7px;border-radius:10px;font-weight:700}
 .comm-tab.active .comm-tab-count{background:rgba(234,86,73,.12);color:var(--primary,#ea5649)}
+
+/* ── PASSEPORT page ── */
+.pp-page-wrap{background:var(--beige);padding:40px 0 64px}
+.pp-page-inner{max-width:860px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:340px 1fr;gap:28px;align-items:start}
+@media(max-width:760px){.pp-page-inner{grid-template-columns:1fr}}
+.pp-card{background:#fff;border-radius:20px;border:1.5px solid var(--beige-dark);overflow:hidden;box-shadow:0 4px 20px rgba(18,49,78,.08)}
+.pp-card-header{background:linear-gradient(135deg,#0a1a2e,#163756);padding:28px 24px 20px;display:flex;align-items:center;gap:18px}
+.pp-card-avatar{width:72px;height:72px;border-radius:50%;border:3px solid rgba(255,255,255,.2);overflow:hidden;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:900;color:#fff;flex-shrink:0}
+.pp-card-avatar img{width:100%;height:100%;object-fit:cover}
+.pp-card-info{flex:1;min-width:0}
+.pp-card-zone-label{font-size:.6rem;font-weight:900;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:3px}
+.pp-card-pseudo{font-size:1.15rem;font-weight:900;color:#fff;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pp-card-clan{font-size:.8rem;color:rgba(255,255,255,.55)}
+.pp-card-body{padding:20px 24px}
+.pp-card-level{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.pp-card-level-badge{background:#ea5649;color:#fff;border-radius:20px;padding:5px 14px;font-size:.82rem;font-weight:800}
+.pp-card-level-name{font-size:.88rem;color:var(--text-mid);font-weight:600}
+.pp-xp-bar-wrap{margin-bottom:18px}
+.pp-xp-bar-label{display:flex;justify-content:space-between;font-size:.72rem;font-weight:700;color:var(--text-muted);margin-bottom:5px}
+.pp-xp-bar-track{height:8px;background:var(--beige-dark);border-radius:4px;overflow:hidden}
+.pp-xp-bar-fill{height:100%;background:linear-gradient(90deg,#ea5649,#f0856d);border-radius:4px;transition:width .6s cubic-bezier(.22,1,.36,1)}
+.pp-stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.pp-stat-box{background:var(--beige);border-radius:10px;padding:10px 12px;text-align:center}
+.pp-stat-box-val{font-size:1.1rem;font-weight:900;color:var(--navy-dark)}
+.pp-stat-box-lbl{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-top:2px}
+.pp-badges-section{border-top:1px solid var(--beige-dark);padding-top:14px}
+.pp-badges-kicker{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px}
+.pp-badges-list{display:flex;gap:6px;flex-wrap:wrap}
+.pp-badge-pill{padding:4px 10px;border-radius:8px;background:var(--beige);font-size:.78rem;font-weight:700;color:var(--text-mid)}
+.pp-badge-pill.rarity-legendary{background:#fef3c7;color:#92400e}
+.pp-badge-pill.rarity-epic{background:#f3e8ff;color:#6b21a8}
+.pp-badge-pill.rarity-rare{background:#dbeafe;color:#1e40af}
+.pp-badge-pill.rarity-uncommon{background:#d1fae5;color:#065f46}
+.pp-side-col{display:flex;flex-direction:column;gap:20px}
+.pp-xp-log{background:#fff;border-radius:16px;border:1.5px solid var(--beige-dark);padding:20px 22px}
+.pp-xp-log-title{font-size:.78rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:14px}
+.pp-xp-log-item{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--beige-dark)}
+.pp-xp-log-item:last-child{border-bottom:none;padding-bottom:0}
+.pp-xp-log-dot{width:8px;height:8px;border-radius:50%;background:var(--primary);flex-shrink:0}
+.pp-xp-log-reason{flex:1;font-size:.82rem;color:var(--text-mid);font-weight:600}
+.pp-xp-log-amount{font-size:.88rem;font-weight:900;color:var(--primary);white-space:nowrap}
+.pp-xp-log-date{font-size:.68rem;color:var(--text-muted);white-space:nowrap}
+.pp-howto{background:#fff;border-radius:16px;border:1.5px solid var(--beige-dark);padding:20px 22px}
+.pp-howto-title{font-size:.78rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px}
+.pp-howto-item{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid var(--beige-dark)}
+.pp-howto-item:last-child{border-bottom:none}
+.pp-howto-xp{min-width:56px;font-size:.82rem;font-weight:900;color:var(--primary)}
+.pp-howto-label{font-size:.82rem;color:var(--text-mid)}
+.pp-not-logged{background:#fff;border-radius:20px;border:1.5px solid var(--beige-dark);padding:48px 32px;text-align:center;max-width:480px;margin:40px auto}
+
+/* ── CLANS ── */
+.cn-wrap{background:var(--beige);padding:40px 0 64px}
+.cn-grid{max-width:900px;margin:0 auto 36px;padding:0 24px;display:flex;flex-direction:column;gap:16px}
+.cn-card{background:#fff;border-radius:18px;border:1.5px solid var(--beige-dark);padding:0;overflow:hidden;box-shadow:0 2px 12px rgba(18,49,78,.06);transition:box-shadow .15s}
+.cn-card:hover{box-shadow:0 6px 24px rgba(18,49,78,.12)}
+.cn-card-inner{display:flex;align-items:center;gap:0}
+.cn-card-stripe{width:6px;min-height:80px;flex-shrink:0}
+.cn-card-body{flex:1;padding:18px 22px;display:flex;align-items:center;gap:20px}
+.cn-card-rank{font-size:1.8rem;font-weight:900;min-width:38px;text-align:center}
+.cn-card-info{flex:1}
+.cn-card-name{font-size:1.05rem;font-weight:900;color:var(--navy-dark);margin-bottom:3px}
+.cn-card-members{font-size:.78rem;color:var(--text-muted)}
+.cn-card-pts{text-align:right}
+.cn-card-pts-val{font-size:1.4rem;font-weight:900}
+.cn-card-pts-lbl{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted)}
+.cn-section{max-width:900px;margin:0 auto;padding:0 24px}
+.cn-section-title{font-size:.78rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:14px}
+.cn-log{background:#fff;border-radius:16px;border:1.5px solid var(--beige-dark);padding:8px 0;margin-bottom:28px}
+.cn-log-item{display:flex;align-items:center;gap:12px;padding:10px 20px;border-bottom:1px solid var(--beige-dark)}
+.cn-log-item:last-child{border-bottom:none}
+.cn-log-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.cn-log-info{flex:1;min-width:0}
+.cn-log-clan{font-size:.82rem;font-weight:800;color:var(--navy-dark)}
+.cn-log-reason{font-size:.78rem;color:var(--text-muted);margin-top:1px}
+.cn-log-pts{font-size:.88rem;font-weight:900;white-space:nowrap}
+.cn-log-date{font-size:.68rem;color:var(--text-muted);white-space:nowrap}
+.cn-howto{background:#fff;border-radius:16px;border:1.5px solid var(--beige-dark);padding:20px 24px}
+.cn-howto-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-top:12px}
+.cn-howto-card{background:var(--beige);border-radius:12px;padding:14px 16px}
+.cn-howto-card-pts{font-size:1rem;font-weight:900;color:var(--primary);margin-bottom:4px}
+.cn-howto-card-label{font-size:.8rem;font-weight:700;color:var(--navy-dark);margin-bottom:3px}
+.cn-howto-card-desc{font-size:.75rem;color:var(--text-muted);line-height:1.4}
+
+/* ── CLASSEMENT ZONAUTES ── */
+.cl-wrap{padding:40px 0 64px;background:var(--beige)}
+.cl-inner{max-width:900px;margin:0 auto;padding:0 24px}
+.cl-howto{background:#fff;border-radius:16px;border:1.5px solid var(--beige-dark);padding:20px 24px;margin-top:28px}
+.cl-howto-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-top:12px}
+.cl-howto-card{background:var(--beige);border-radius:10px;padding:12px 14px}
+.cl-howto-card-xp{font-size:.95rem;font-weight:900;color:var(--primary);margin-bottom:3px}
+.cl-howto-card-label{font-size:.8rem;font-weight:700;color:var(--navy-dark);margin-bottom:2px}
+.cl-howto-card-desc{font-size:.72rem;color:var(--text-muted);line-height:1.4}
 
 /* ── FIL ── */
 .cf-wrap{padding:48px 0 64px;background:var(--beige)}
@@ -405,40 +543,187 @@ require_once 'includes/nav.php';
 <section class="comm-hero">
   <div class="container">
     <p class="comm-hero-eyebrow">Zone85 · Communauté</p>
-
-    <?php if ($_tab === 'classement'): ?>
-      <h1 class="comm-hero-title">Classement</h1>
-      <p class="comm-hero-sub">Les meilleurs Zonautes de la saison en cours.</p>
-      <div class="cl-hero-stats">
-        <div><div class="cl-stat-num"><?= $cl_total ?></div><div class="cl-stat-label">Zonautes</div></div>
-        <?php if ($is_logged && $my_rank): ?>
-        <div><div class="cl-stat-num">#<?= $my_rank ?></div><div class="cl-stat-label">Ton rang</div></div>
-        <?php endif; ?>
-      </div>
-    <?php elseif ($_tab === 'zonautes'): ?>
-      <h1 class="comm-hero-title">Les Zonautes</h1>
-      <p class="comm-hero-sub">Tous les membres de Zone85 — clique sur un passeport pour en savoir plus.</p>
-    <?php else: ?>
+    <?php if ($_tab === 'passeport'): ?>
+      <h1 class="comm-hero-title"><?= $is_logged ? ('Passeport de ' . e($active_user['pseudo'])) : 'Mon Passeport' ?></h1>
+      <p class="comm-hero-sub">Ton identité dans la Zone — niveau, badges, missions accomplies.</p>
+    <?php elseif ($_tab === 'fil'): ?>
       <h1 class="comm-hero-title">Fil de la Zone</h1>
       <p class="comm-hero-sub">Ce qui se passe en ce moment dans Zone85.</p>
+    <?php elseif ($_tab === 'clans'): ?>
+      <h1 class="comm-hero-title">Classement des Clans</h1>
+      <p class="comm-hero-sub">Bocage · Littoral · Marais — la course aux points de saison.</p>
+    <?php else: ?>
+      <h1 class="comm-hero-title">Classement des Zonautes</h1>
+      <p class="comm-hero-sub">Les meilleurs Zonautes de la saison<?php if ($is_logged && $my_rank): ?> — tu es #<?= $my_rank ?><?php endif; ?>.</p>
     <?php endif; ?>
 
     <nav class="comm-tabs" aria-label="Onglets communauté">
+      <a href="<?= comm_url('passeport') ?>" class="comm-tab <?= $_tab === 'passeport' ? 'active' : '' ?>">
+        Mon Passeport
+      </a>
       <a href="<?= comm_url('fil') ?>" class="comm-tab <?= $_tab === 'fil' ? 'active' : '' ?>">
-        🌍 Fil<?php if ($total_items > 0 && $_tab === 'fil'): ?><span class="comm-tab-count"><?= number_format($total_items,0,',','&#8201;') ?></span><?php endif; ?>
+        Le Fil<?php if ($total_items > 0 && $_tab === 'fil'): ?><span class="comm-tab-count"><?= number_format($total_items,0,',','&#8201;') ?></span><?php endif; ?>
+      </a>
+      <a href="<?= comm_url('clans') ?>" class="comm-tab <?= $_tab === 'clans' ? 'active' : '' ?>">
+        Clans
       </a>
       <a href="<?= comm_url('classement') ?>" class="comm-tab <?= $_tab === 'classement' ? 'active' : '' ?>">
-        🏆 Classement
-      </a>
-      <a href="<?= comm_url('zonautes') ?>" class="comm-tab <?= $_tab === 'zonautes' ? 'active' : '' ?>">
-        👥 Zonautes<?php if ($zo_total > 0 && $_tab === 'zonautes'): ?><span class="comm-tab-count"><?= $zo_total ?></span><?php endif; ?>
+        Zonautes<?php if ($cl_total > 0): ?><span class="comm-tab-count"><?= $cl_total ?></span><?php endif; ?>
       </a>
     </nav>
   </div>
 </section>
 
 
-<?php if ($_tab === 'fil'): ?>
+<?php if ($_tab === 'passeport'): ?>
+<!-- ================================================================
+     MON PASSEPORT
+================================================================ -->
+<section class="pp-page-wrap">
+<?php if (!$is_logged): ?>
+  <div class="pp-not-logged">
+    <div style="font-size:2.5rem;margin-bottom:16px">🪪</div>
+    <h2 style="font-size:1.1rem;font-weight:900;color:var(--navy-dark);margin-bottom:8px">Crée ton Passeport Vendéen</h2>
+    <p style="font-size:.9rem;color:var(--text-muted);margin-bottom:24px">Rejoins Zone85 pour obtenir ton identité dans la Zone : niveau, badges, clan et historique d'aventures.</p>
+    <a href="inscription.php" style="display:inline-block;padding:12px 28px;background:var(--primary);color:#fff;border-radius:var(--radius);font-weight:800;text-decoration:none;font-size:.92rem">Rejoindre la Zone →</a>
+    <p style="margin-top:12px;font-size:.82rem;color:var(--text-muted)">Déjà membre ? <a href="login.php" style="color:var(--primary);font-weight:700;text-decoration:none">Connexion</a></p>
+  </div>
+<?php else:
+  $pp_level      = max(1, min(10, (int)($active_user['level'] ?? 1)));
+  $pp_xp_total   = (int)($active_user['xp_total'] ?? 0);
+  $pp_level_name = get_level_name($pp_level);
+  $pp_xp_next    = ($pp_level < 10) ? ($pp_level * 500) : null;
+  $pp_xp_pct     = $pp_xp_next ? min(100, round(($pp_xp_total % ($pp_level * 500)) / ($pp_level * 500) * 100)) : 100;
+  $pp_avatar_url = avatar_url($active_user);
+  $pp_initials   = strtoupper(mb_substr($active_user['pseudo'], 0, 2));
+?>
+  <div class="pp-page-inner">
+    <!-- Colonne gauche : carte passeport -->
+    <div class="pp-card">
+      <div class="pp-card-header">
+        <div class="pp-card-avatar">
+          <?php if (!empty($pp_avatar_url)): ?>
+            <img src="<?= e($pp_avatar_url) ?>" alt="<?= e($active_user['pseudo']) ?>">
+          <?php else: ?>
+            <?= e($active_user['avatar_key'] ?? $pp_initials) ?>
+          <?php endif; ?>
+        </div>
+        <div class="pp-card-info">
+          <div class="pp-card-zone-label">Zone85 · Passeport Vendéen</div>
+          <div class="pp-card-pseudo"><?= e($active_user['pseudo']) ?></div>
+          <div class="pp-card-clan">
+            <?php
+              $pp_clan_name = $active_user['clan_name'] ?? ($active_user['clan_slug'] ?? null);
+              if (!$pp_clan_name && $pdo) {
+                try {
+                  $cs = $pdo->prepare("SELECT c.name, c.slug FROM clans c JOIN users u ON u.clan_id=c.id WHERE u.id=:uid");
+                  $cs->execute([':uid' => (int)$active_user['id']]);
+                  $cs_row = $cs->fetch();
+                  if ($cs_row) { $pp_clan_name = $cs_row['name']; }
+                } catch (PDOException $e) {}
+              }
+              echo $pp_clan_name ? e($pp_clan_name) : 'Sans clan';
+            ?>
+          </div>
+        </div>
+      </div>
+      <div class="pp-card-body">
+        <div class="pp-card-level">
+          <span class="pp-card-level-badge">Niv. <?= $pp_level ?></span>
+          <span class="pp-card-level-name"><?= e($pp_level_name) ?></span>
+        </div>
+
+        <div class="pp-xp-bar-wrap">
+          <div class="pp-xp-bar-label">
+            <span><?= number_format($pp_xp_total, 0, ',', ' ') ?> XP</span>
+            <?php if ($pp_xp_next): ?><span>Prochain niv. <?= $pp_xp_next ?> XP</span><?php endif; ?>
+          </div>
+          <div class="pp-xp-bar-track">
+            <div class="pp-xp-bar-fill" style="width:<?= $pp_xp_pct ?>%"></div>
+          </div>
+        </div>
+
+        <div class="pp-stats-row">
+          <div class="pp-stat-box">
+            <div class="pp-stat-box-val"><?= $pp_missions_count ?></div>
+            <div class="pp-stat-box-lbl">Missions</div>
+          </div>
+          <div class="pp-stat-box">
+            <div class="pp-stat-box-val"><?= count($pp_badges) ?></div>
+            <div class="pp-stat-box-lbl">Badges</div>
+          </div>
+          <div class="pp-stat-box">
+            <div class="pp-stat-box-val"><?= $pp_collectibles ?></div>
+            <div class="pp-stat-box-lbl">Objets</div>
+          </div>
+        </div>
+
+        <?php if (!empty($pp_badges)): ?>
+        <div class="pp-badges-section">
+          <div class="pp-badges-kicker">Derniers badges obtenus</div>
+          <div class="pp-badges-list">
+            <?php foreach ($pp_badges as $b): ?>
+              <span class="pp-badge-pill rarity-<?= e($b['rarity'] ?? 'common') ?>"><?= e($b['icon'] ?? '') ?> <?= e($b['title']) ?></span>
+            <?php endforeach; ?>
+          </div>
+        </div>
+        <?php else: ?>
+        <div class="pp-badges-section">
+          <div class="pp-badges-kicker">Badges</div>
+          <p style="font-size:.83rem;color:var(--text-muted);font-style:italic">Aucun badge encore — les aventures commencent.</p>
+        </div>
+        <?php endif; ?>
+
+        <div style="margin-top:16px;text-align:center">
+          <a href="profil.php" style="display:inline-block;padding:9px 22px;background:var(--primary);color:#fff;border-radius:var(--radius);font-weight:800;text-decoration:none;font-size:.85rem">Voir mon profil complet →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Colonne droite -->
+    <div class="pp-side-col">
+      <!-- Historique XP -->
+      <?php if (!empty($pp_recent_xp)): ?>
+      <div class="pp-xp-log">
+        <div class="pp-xp-log-title">Historique XP récent</div>
+        <?php foreach ($pp_recent_xp as $xp_row): ?>
+        <div class="pp-xp-log-item">
+          <div class="pp-xp-log-dot"></div>
+          <div class="pp-xp-log-reason"><?= e($xp_row['reason'] ?? 'Action') ?></div>
+          <div class="pp-xp-log-amount">+<?= (int)$xp_row['xp_amount'] ?> XP</div>
+          <div class="pp-xp-log-date"><?= format_date($xp_row['created_at'], 'short') ?></div>
+        </div>
+        <?php endforeach; ?>
+      </div>
+      <?php endif; ?>
+
+      <!-- Comment progresser -->
+      <div class="pp-howto">
+        <div class="pp-howto-title">Comment gagner des XP</div>
+        <?php
+        $xp_sources = [
+          ['+100 XP', 'Valider une mission'],
+          ['+50 XP',  'Terminer une randonnée'],
+          ['+75 XP',  'Trouver un objet KTC'],
+          ['+25 XP',  'Participer à un événement flash'],
+          ['+30 XP',  'Débloquer un badge'],
+          ['+10 XP',  'Trouver un collectible terrain'],
+        ];
+        foreach ($xp_sources as [$xp, $lbl]):
+        ?>
+        <div class="pp-howto-item">
+          <span class="pp-howto-xp"><?= $xp ?></span>
+          <span class="pp-howto-label"><?= $lbl ?></span>
+        </div>
+        <?php endforeach; ?>
+      </div>
+    </div>
+  </div>
+<?php endif; ?>
+</section>
+
+
+<?php elseif ($_tab === 'fil'): ?>
 <!-- ================================================================
      FIL DE LA ZONE
 ================================================================ -->
@@ -495,20 +780,102 @@ require_once 'includes/nav.php';
 </section>
 
 
-<?php elseif ($_tab === 'classement'): ?>
+<?php elseif ($_tab === 'clans'): ?>
 <!-- ================================================================
-     CLASSEMENT
+     CLASSEMENT DES CLANS
 ================================================================ -->
-<section class="cl-wrap">
-  <div class="container">
+<section class="cn-wrap">
+  <?php
+  $clan_colors_map = ['bocage'=>'#2a9d5c','littoral'=>'#1a6fb8','marais'=>'#8b6340'];
+  $clan_medals     = ['🥇','🥈','🥉'];
+  ?>
+  <!-- Podium clans -->
+  <div class="cn-grid">
+    <?php if (empty($clan_rankings)): ?>
+    <p style="text-align:center;padding:48px;color:var(--text-muted)">Aucune donnée de classement pour le moment.</p>
+    <?php else: foreach ($clan_rankings as $cr_row):
+      $c_bg    = $clan_colors_map[$cr_row['slug']] ?? ($cr_row['color_primary'] ?? '#12314e');
+      $c_medal = $clan_medals[$cr_row['rank'] - 1] ?? ('#' . $cr_row['rank']);
+    ?>
+    <div class="cn-card">
+      <div class="cn-card-inner">
+        <div class="cn-card-stripe" style="background:<?= $c_bg ?>;min-height:88px"></div>
+        <div class="cn-card-body">
+          <div class="cn-card-rank"><?= $c_medal ?></div>
+          <div class="cn-card-info">
+            <div class="cn-card-name"><?= e($cr_row['emoji'] ?? '') ?> <?= e($cr_row['name']) ?></div>
+            <div class="cn-card-members"><?= (int)$cr_row['active_members'] ?> membre<?= $cr_row['active_members'] > 1 ? 's' : '' ?> actif<?= $cr_row['active_members'] > 1 ? 's' : '' ?></div>
+          </div>
+          <div class="cn-card-pts">
+            <div class="cn-card-pts-val" style="color:<?= $c_bg ?>"><?= number_format((int)$cr_row['season_points']) ?></div>
+            <div class="cn-card-pts-lbl">pts saison</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <?php endforeach; endif; ?>
+  </div>
 
-    <!-- Filtre clan -->
-    <div class="cl-clan-tabs">
-      <?php foreach (['all'=>'🌍 Tous','bocage'=>'🌳 Bocage','littoral'=>'⚓ Littoral','marais'=>'🌿 Marais'] as $slug => $lbl): ?>
-      <a href="<?= comm_url('classement', ['clan' => $slug === 'all' ? '' : $slug]) ?>"
-         class="cl-clan-tab <?= $clan_filter === $slug ? 'active' : '' ?>"><?= $lbl ?></a>
+  <!-- Historique récent des points clans -->
+  <?php if (!empty($clan_recent_logs)): ?>
+  <div class="cn-section">
+    <div class="cn-section-title">Dernières actions — historique</div>
+    <div class="cn-log">
+      <?php foreach ($clan_recent_logs as $log_row):
+        $log_color = $clan_colors_map[$log_row['clan_slug']] ?? '#12314e';
+      ?>
+      <div class="cn-log-item">
+        <div class="cn-log-dot" style="background:<?= $log_color ?>"></div>
+        <div class="cn-log-info">
+          <div class="cn-log-clan" style="color:<?= $log_color ?>"><?= e($log_row['clan_name']) ?></div>
+          <div class="cn-log-reason"><?= e($log_row['reason'] ?? '') ?><?= $log_row['pseudo'] ? ' · ' . e($log_row['pseudo']) : '' ?></div>
+        </div>
+        <div class="cn-log-pts" style="color:<?= $log_color ?>">+<?= (int)$log_row['points'] ?> pts</div>
+        <div class="cn-log-date"><?= format_date($log_row['created_at'], 'short') ?></div>
+      </div>
       <?php endforeach; ?>
     </div>
+  </div>
+  <?php endif; ?>
+
+  <!-- Comment faire progresser son clan -->
+  <div class="cn-section">
+    <div class="cn-howto">
+      <div class="cn-section-title">Comment faire progresser ton clan</div>
+      <div class="cn-howto-grid">
+        <div class="cn-howto-card">
+          <div class="cn-howto-card-pts">+50 pts</div>
+          <div class="cn-howto-card-label">Valider une mission</div>
+          <div class="cn-howto-card-desc">Chaque mission validée rapporte des points à ton clan pour la saison.</div>
+        </div>
+        <div class="cn-howto-card">
+          <div class="cn-howto-card-pts">+30 pts</div>
+          <div class="cn-howto-card-label">Terminer une randonnée</div>
+          <div class="cn-howto-card-desc">Les randos GPX validées comptent pour le total du clan.</div>
+        </div>
+        <div class="cn-howto-card">
+          <div class="cn-howto-card-pts">+40 pts</div>
+          <div class="cn-howto-card-label">Gagner un KTC</div>
+          <div class="cn-howto-card-desc">Identifier l'objet mystère du mois en premier rapporte gros.</div>
+        </div>
+        <div class="cn-howto-card">
+          <div class="cn-howto-card-pts">+20 pts</div>
+          <div class="cn-howto-card-label">Participer à un flash event</div>
+          <div class="cn-howto-card-desc">Les événements éclair sont de belles opportunités pour booster le clan.</div>
+        </div>
+      </div>
+      <p style="margin-top:14px;font-size:.78rem;color:var(--text-muted)">Le classement est remis à zéro à chaque nouvelle saison. Tout est possible !</p>
+    </div>
+  </div>
+</section>
+
+
+<?php elseif ($_tab === 'classement'): ?>
+<!-- ================================================================
+     CLASSEMENT DES ZONAUTES
+================================================================ -->
+<section class="cl-wrap">
+  <div class="cl-inner">
 
     <?php if ($is_logged && $my_rank && $my_rank > 50): ?>
     <div class="cl-my-rank">
@@ -532,45 +899,32 @@ require_once 'includes/nav.php';
     ?>
 
     <!-- Podium -->
-    <?php if ($p1): ?>
+    <?php if ($p1):
+    $pod_avatar = function(array $p): string {
+        if ($p['avatar_type']==='upload' && !empty($p['avatar_file'])) {
+            return '<img src="'.e(upload_url(ltrim($p['avatar_file'],'/'))).'" alt="'.e($p['pseudo']).'" class="cl-pod-avatar">';
+        }
+        return '<div class="cl-pod-avatar" style="background:linear-gradient(135deg,#163756,#0c1e2e);display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:clamp(.7rem,2vw,.95rem)">'.strtoupper(mb_substr($p['pseudo'],0,2)).'</div>';
+    };
+    ?>
     <div class="cl-podium">
-      <!-- 2e -->
       <?php if ($p2): ?>
       <div class="cl-podium-item cl-pod-2">
-        <div class="cl-pod-avatar-wrap">
-          <?php if ($p2['avatar_type']==='upload' && !empty($p2['avatar_file'])): ?>
-            <img src="<?= e(upload_url(ltrim($p2['avatar_file'],'/'))) ?>" alt="<?= e($p2['pseudo']) ?>" class="cl-pod-avatar">
-          <?php else: ?><div class="cl-pod-emoji">🎮</div><?php endif; ?>
-          <span class="cl-pod-medal">🥈</span>
-        </div>
+        <div class="cl-pod-avatar-wrap"><?= $pod_avatar($p2) ?><span class="cl-pod-medal">🥈</span></div>
         <div class="cl-pod-pseudo"><?= e($p2['pseudo']) ?></div>
         <div class="cl-pod-xp"><?= number_format($p2['xp_season'],0,',',' ') ?> XP</div>
         <div class="cl-pod-plinth"><div class="cl-pod-rank">2</div></div>
       </div>
       <?php endif; ?>
-
-      <!-- 1er -->
       <div class="cl-podium-item cl-pod-1">
-        <div class="cl-pod-avatar-wrap">
-          <?php if ($p1['avatar_type']==='upload' && !empty($p1['avatar_file'])): ?>
-            <img src="<?= e(upload_url(ltrim($p1['avatar_file'],'/'))) ?>" alt="<?= e($p1['pseudo']) ?>" class="cl-pod-avatar">
-          <?php else: ?><div class="cl-pod-emoji">🎮</div><?php endif; ?>
-          <span class="cl-pod-medal">🥇</span>
-        </div>
+        <div class="cl-pod-avatar-wrap"><?= $pod_avatar($p1) ?><span class="cl-pod-medal">🥇</span></div>
         <div class="cl-pod-pseudo"><?= e($p1['pseudo']) ?></div>
         <div class="cl-pod-xp"><?= number_format($p1['xp_season'],0,',',' ') ?> XP</div>
         <div class="cl-pod-plinth"><div class="cl-pod-rank">1</div></div>
       </div>
-
-      <!-- 3e -->
       <?php if ($p3): ?>
       <div class="cl-podium-item cl-pod-3">
-        <div class="cl-pod-avatar-wrap">
-          <?php if ($p3['avatar_type']==='upload' && !empty($p3['avatar_file'])): ?>
-            <img src="<?= e(upload_url(ltrim($p3['avatar_file'],'/'))) ?>" alt="<?= e($p3['pseudo']) ?>" class="cl-pod-avatar">
-          <?php else: ?><div class="cl-pod-emoji">🎮</div><?php endif; ?>
-          <span class="cl-pod-medal">🥉</span>
-        </div>
+        <div class="cl-pod-avatar-wrap"><?= $pod_avatar($p3) ?><span class="cl-pod-medal">🥉</span></div>
         <div class="cl-pod-pseudo"><?= e($p3['pseudo']) ?></div>
         <div class="cl-pod-xp"><?= number_format($p3['xp_season'],0,',',' ') ?> XP</div>
         <div class="cl-pod-plinth"><div class="cl-pod-rank">3</div></div>
@@ -608,7 +962,7 @@ require_once 'includes/nav.php';
               <div class="cl-avatar-cell">
                 <?php if ($row['avatar_type']==='upload' && !empty($row['avatar_file'])): ?>
                   <img src="<?= e(upload_url(ltrim($row['avatar_file'],'/'))) ?>" alt="<?= e($row['pseudo']) ?>" class="cl-avatar">
-                <?php else: ?><div class="cl-avatar-emoji">🎮</div><?php endif; ?>
+                <?php else: ?><div class="cl-avatar-emoji" style="font-size:.78rem;font-weight:900;color:#fff"><?= strtoupper(mb_substr($row['pseudo'],0,2)) ?></div><?php endif; ?>
                 <div>
                   <div class="cl-pseudo"><?= e($row['pseudo']) ?><?php if ($is_me): ?><span class="cl-me-badge">toi</span><?php endif; ?></div>
                   <div class="cl-level">Niv. <?= $row['level'] ?> — <?= e($lvl_name) ?></div>
@@ -637,159 +991,42 @@ require_once 'includes/nav.php';
     </div>
     <?php endif; ?>
 
-    <?php if (!empty($clan_rankings)): ?>
-    <h3 style="font-size:1rem;font-weight:900;color:#0c1e2e;margin:32px 0 14px">🛡 Classement des clans — Saison en cours</h3>
-    <div style="display:flex;flex-direction:column;gap:10px">
-      <?php foreach ($clan_rankings as $cr_row):
-        $clan_colors = ['bocage'=>'#2a9d5c','littoral'=>'#12314e','marais'=>'#8b6914','plaine'=>'#6b7f96'];
-        $bg = $clan_colors[$cr_row['slug']] ?? ($cr_row['color_primary'] ?? '#12314e');
-        $medal = ['🥇','🥈','🥉'][$cr_row['rank']-1] ?? ('#' . $cr_row['rank']);
-      ?>
-      <div style="background:#fff;border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:14px;border:1.5px solid rgba(0,0,0,.07)">
-        <span style="font-size:1.4rem;min-width:32px"><?= $medal ?></span>
-        <span style="display:inline-block;width:12px;height:36px;border-radius:4px;background:<?= $bg ?>;flex-shrink:0"></span>
-        <div style="flex:1">
-          <div style="font-size:.95rem;font-weight:900;color:#0c1e2e"><?= e($cr_row['emoji'] ?? '') ?> <?= e($cr_row['name']) ?></div>
-          <div style="font-size:.72rem;color:#6b7f96"><?= (int)$cr_row['active_members'] ?> membre<?= $cr_row['active_members']>1?'s':'' ?> actif<?= $cr_row['active_members']>1?'s':'' ?></div>
+    <!-- Comment progresser -->
+    <div class="cl-howto">
+      <div class="cn-section-title">Comment progresser dans le classement</div>
+      <div class="cl-howto-grid">
+        <div class="cl-howto-card">
+          <div class="cl-howto-card-xp">+100 XP</div>
+          <div class="cl-howto-card-label">Valider une mission</div>
+          <div class="cl-howto-card-desc">Le cœur de Zone85 — chaque mission validée est récompensée.</div>
         </div>
-        <div style="text-align:right">
-          <div style="font-size:1.3rem;font-weight:900;color:<?= $bg ?>"><?= number_format((int)$cr_row['season_points']) ?></div>
-          <div style="font-size:.68rem;color:#aaa">pts saison</div>
+        <div class="cl-howto-card">
+          <div class="cl-howto-card-xp">+50 XP</div>
+          <div class="cl-howto-card-label">Terminer une randonnée</div>
+          <div class="cl-howto-card-desc">Valide ton GPX ou ton passage sur le terrain pour gagner des XP.</div>
+        </div>
+        <div class="cl-howto-card">
+          <div class="cl-howto-card-xp">+75 XP</div>
+          <div class="cl-howto-card-label">Trouver un KTC</div>
+          <div class="cl-howto-card-desc">Le premier à identifier l'objet mystère du mois rafle la mise.</div>
+        </div>
+        <div class="cl-howto-card">
+          <div class="cl-howto-card-xp">+30 XP</div>
+          <div class="cl-howto-card-label">Badge débloqué</div>
+          <div class="cl-howto-card-desc">Chaque badge obtenu vient gonfler ton compteur XP.</div>
         </div>
       </div>
-      <?php endforeach; ?>
+      <p style="margin-top:14px;font-size:.78rem;color:var(--text-muted)">Le classement est calculé sur les XP de la saison en cours — tout le monde repart de zéro à chaque nouvelle saison.</p>
     </div>
-    <?php endif; ?>
 
     <?php endif; // leaderboard ?>
   </div>
 </section>
 
 
-<?php else: // zonautes ?>
-<!-- ================================================================
-     ZONAUTES
-================================================================ -->
-
-<!-- Barre de filtres collante -->
-<div class="zo-filters" role="navigation" aria-label="Filtres Zonautes">
-  <div class="zo-filters-inner">
-    <a href="<?= comm_url('zonautes') ?>"
-       class="zo-filter-btn <?= $filter_clan==='' ? 'active' : '' ?>">Tous</a>
-    <a href="<?= comm_url('zonautes',['clan'=>'bocage']) ?>"
-       class="zo-filter-btn <?= $filter_clan==='bocage' ? 'bocage-active' : '' ?>">🌳 Bocage</a>
-    <a href="<?= comm_url('zonautes',['clan'=>'littoral']) ?>"
-       class="zo-filter-btn <?= $filter_clan==='littoral' ? 'littoral-active' : '' ?>">⚓ Littoral</a>
-    <a href="<?= comm_url('zonautes',['clan'=>'marais']) ?>"
-       class="zo-filter-btn <?= $filter_clan==='marais' ? 'marais-active' : '' ?>">🌿 Marais</a>
-    <a href="<?= comm_url('zonautes', array_merge($filter_clan?['clan'=>$filter_clan]:[], ['sort'=>$sort_mode==='season'?'total':'season'])) ?>"
-       class="zo-sort-toggle <?= $sort_mode==='season' ? 'active' : '' ?>">
-      <?= $sort_mode==='season' ? '★ Saison' : '★ Total XP' ?>
-    </a>
-  </div>
-</div>
-
-<!-- Grille joueurs -->
-<section class="zo-wrap">
-  <?php if (empty($players)): ?>
-  <p class="zo-empty">
-    <span style="display:block;font-size:1.2rem;margin-bottom:12px">🗺️</span>
-    <strong>Soyez parmi les premiers membres de l'aventure.</strong>
-  </p>
-  <?php else: ?>
-
-  <div class="zo-grid" id="players-grid">
-    <?php
-    $rank_start = $zo_offset + 1;
-    foreach ($players as $i => $p):
-      $global_rank  = $rank_start + $i;
-      $rank_cls     = match($global_rank) {1=>' rank-1',2=>' rank-2',3=>' rank-3',default=>''};
-      $cs           = $p['clan_slug'] ?? '';
-      $chip_cls     = ['bocage'=>'bocage-chip-sm','littoral'=>'littoral-chip-sm','marais'=>'marais-chip-sm'][$cs] ?? '';
-      $avatar_type  = $p['avatar_type'] ?? 'preset';
-      $avatar_emoji = '&#128100;';
-      if ($avatar_type==='preset') {
-          $cfg = $p['avatar_config'] ?? '';
-          if ($cfg) { $cfg_arr = json_decode($cfg,true); if (!empty($cfg_arr['emoji'])) $avatar_emoji = htmlspecialchars($cfg_arr['emoji'],ENT_QUOTES,'UTF-8'); }
-      }
-      $level   = max(1,(int)($p['level'] ?? get_user_level_from_xp((int)$p['xp_total'])));
-      $xp_show = $sort_mode==='season' ? (int)$p['xp_season'] : (int)$p['xp_total'];
-      $xp_suf  = $sort_mode==='season' ? ' XP saison' : ' XP';
-    ?>
-    <div class="player-card" data-user-id="<?= (int)$p['id'] ?>"
-         onclick="openPassport(<?= (int)$p['id'] ?>)" tabindex="0" role="button"
-         aria-label="Ouvrir le passeport de <?= e($p['pseudo']) ?>"
-         onkeydown="if(event.key==='Enter'||event.key===' ')openPassport(<?= (int)$p['id'] ?>)">
-      <span class="pc-rank-badge<?= $rank_cls ?>"><?= $global_rank ?></span>
-      <div class="pc-avatar">
-        <?php if ($avatar_type==='upload' && !empty($p['avatar_file'])): ?>
-          <img src="<?= upload_url(e($p['avatar_file'])) ?>" alt="<?= e($p['pseudo']) ?>">
-        <?php else: ?><?= $avatar_emoji ?><?php endif; ?>
-      </div>
-      <div class="pc-pseudo"><?= e($p['pseudo']) ?></div>
-      <?php if ($p['clan_name']): ?><div class="pc-clan-chip <?= e($chip_cls) ?>"><?= e($p['clan_name']) ?></div><?php endif; ?>
-      <div class="pc-level-badge">Niv. <?= $level ?></div>
-      <div class="pc-xp"><?= number_format($xp_show,0,',',' ') ?><small><?= e($xp_suf) ?></small></div>
-    </div>
-    <?php endforeach; ?>
-  </div>
-
-  <?php if (($zo_offset + 50) < $zo_total): ?>
-  <div class="zo-voir-plus">
-    <a href="<?= comm_url('zonautes', array_merge(['offset'=>$zo_offset+50], $filter_clan?['clan'=>$filter_clan]:[], $sort_mode==='season'?['sort'=>'season']:[])) ?>"
-       class="btn btn-primary">
-      Voir plus — <?= max(0,$zo_total-$zo_offset-50) ?> restants
-    </a>
-  </div>
-  <?php endif; ?>
-  <?php endif; ?>
-
-</section>
-
-<!-- Passeport modal -->
-<div class="passport-overlay" id="passport-overlay" role="dialog" aria-modal="true" aria-label="Passeport Vendéen" onclick="if(event.target===this)closePassport()">
-  <div class="passport-modal" id="passport-modal">
-    <div class="pp-loading" id="pp-loading"><span class="spinner"></span><br>Chargement du passeport...</div>
-    <div id="pp-content" style="display:none"></div>
-  </div>
-</div>
-
-<?php endif; // tab zonautes ?>
+<?php endif; // tab ?>
 
 <?php
-// Scripts (Passeport — uniquement pour l'onglet zonautes)
-if ($_tab === 'zonautes') {
-$page_scripts = '<script>
-var _ppCache={};
-function openPassport(userId){
-  var overlay=document.getElementById("passport-overlay"),loading=document.getElementById("pp-loading"),content=document.getElementById("pp-content");
-  overlay.classList.add("open");document.body.style.overflow="hidden";
-  if(_ppCache[userId]){loading.style.display="none";content.style.display="block";content.innerHTML=_ppCache[userId];return;}
-  loading.style.display="block";content.style.display="none";content.innerHTML="";
-  var xhr=new XMLHttpRequest();
-  xhr.open("GET","ajax/passport.php?user_id="+encodeURIComponent(userId),true);
-  xhr.setRequestHeader("X-Requested-With","XMLHttpRequest");
-  xhr.onreadystatechange=function(){
-    if(xhr.readyState!==4)return;
-    loading.style.display="none";content.style.display="block";
-    if(xhr.status===200){try{var d=JSON.parse(xhr.responseText);if(d.ok){var h=renderPassport(d);_ppCache[userId]=h;content.innerHTML=h;}else{content.innerHTML="<div style=\"padding:32px;text-align:center;color:#ef4444;\">Passeport introuvable.</div>";}}catch(e){content.innerHTML="<div style=\"padding:32px;text-align:center;color:#ef4444;\">Erreur.</div>";}}
-    else{content.innerHTML="<div style=\"padding:32px;text-align:center;color:#ef4444;\">Erreur serveur.</div>";}
-  };xhr.send();
-}
-function closePassport(){document.getElementById("passport-overlay").classList.remove("open");document.body.style.overflow="";}
-document.addEventListener("keydown",function(e){if(e.key==="Escape")closePassport();});
-function renderPassport(d){
-  var clanChip=d.clan_slug?"<span class=\"pc-clan-chip "+d.clan_slug+"-chip-sm\">"+esc(d.clan_name)+"</span>":"<span style=\"font-size:.82rem;color:rgba(255,255,255,.4);\">Sans clan</span>";
-  var avatarHtml=d.avatar_type==="upload"&&d.avatar_url?"<img src=\""+esc(d.avatar_url)+"\" alt=\""+esc(d.pseudo)+"\">":d.avatar_emoji||"&#128100;";
-  var badgesHtml="";
-  if(d.badges&&d.badges.length>0){badgesHtml="<div class=\"pp-badges-row\">";for(var i=0;i<d.badges.length;i++){var b=d.badges[i];badgesHtml+="<span class=\"pp-badge-chip rarity-"+esc(b.rarity)+"\">"+esc(b.icon)+" "+esc(b.title)+"</span>";}badgesHtml+="</div>";}
-  else{badgesHtml="<p class=\"pp-no-badges\">Aucun badge encore &mdash; les aventures commencent.</p>";}
-  return "<div class=\"pp-header\"><button class=\"pp-close\" onclick=\"closePassport()\" aria-label=\"Fermer\">&times;</button><div class=\"pp-avatar\">"+avatarHtml+"</div><div class=\"pp-info\"><div class=\"pp-logo\">Zone85</div><div class=\"pp-id-label\">Passeport Vend&#233;en</div><div class=\"pp-pseudo\">"+esc(d.pseudo)+"</div><div class=\"pp-clan-line\">"+clanChip+"</div></div></div><div class=\"pp-body\"><div class=\"pp-level-line\"><span class=\"pp-level-badge\">Niv. "+d.level+"</span><span class=\"pp-level-name\">"+esc(d.level_name)+"</span></div><p class=\"pp-member-since\">Membre depuis&nbsp;: "+esc(d.joined)+"</p><div class=\"pp-stats-grid\"><div class=\"pp-stat\"><span class=\"pp-stat-val\">"+number(d.xp_total)+" <small style=\"font-size:.65rem;font-weight:600;color:#9ca3af;\">XP</small></span><span class=\"pp-stat-lbl\">XP Total</span></div><div class=\"pp-stat\"><span class=\"pp-stat-val\">"+d.badges_count+"</span><span class=\"pp-stat-lbl\">Badges</span></div><div class=\"pp-stat\"><span class=\"pp-stat-val\">"+d.participations+"</span><span class=\"pp-stat-lbl\">Participations</span></div><div class=\"pp-stat\"><span class=\"pp-stat-val\">"+d.collectibles+"</span><span class=\"pp-stat-lbl\">Objets trouv&#233;s</span></div></div><p class=\"pp-badges-title\">Derniers badges</p>"+badgesHtml+"</div>";
-}
-function esc(str){if(!str)return"";return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
-function number(n){return parseInt(n||0).toLocaleString("fr-FR");}
-</script>';
-}
 
 render_hidden_collectibles('communaute');
 require_once 'includes/footer.php';

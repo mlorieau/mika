@@ -4,8 +4,11 @@
 
 // Liens directs toujours visibles dans la barre
 $_nav_direct = [
-    ['slug' => 'les-echos',  'label' => 'Les Échos',  'file' => 'les-echos.php'],
+    ['slug' => 'index',      'label' => 'Accueil',    'file' => 'index.php'],
     ['slug' => 'concept',    'label' => 'Concept',    'file' => 'concept.php'],
+    ['slug' => 'les-echos',  'label' => 'Les Échos',  'file' => 'les-echos.php'],
+    ['slug' => 'randos',     'label' => 'Randos',     'file' => 'randos.php'],
+    ['slug' => 'ktc',        'label' => 'Kétokole',   'file' => 'ktc.php'],
     ['slug' => 'missions',   'label' => 'Missions',   'file' => 'missions.php'],
     ['slug' => 'communaute', 'label' => 'Communauté', 'file' => 'communaute.php'],
 ];
@@ -73,11 +76,8 @@ if (isset($active_season) && !empty($active_season['title'])) {
       </a>
     </div>
 
-    <!-- Centre : trigger + liens directs -->
+    <!-- Centre : liens directs -->
     <div class="nav-center">
-      <button class="mega-trigger" id="mega-trigger" aria-expanded="false" aria-controls="mega-panel">
-        Explorer <span class="mega-arrow" aria-hidden="true">▾</span>
-      </button>
       <?php foreach ($_nav_direct as $_nd): ?>
         <a href="<?= $_nd['file'] ?>" class="nav-direct<?= ($_cp === $_nd['slug']) ? ' active' : '' ?>">
           <?= $_nd['label'] ?>
@@ -169,27 +169,30 @@ if (isset($active_season) && !empty($active_season['title'])) {
 <div class="mobile-menu" id="mobileMenu">
 
   <div class="mmenu-section">
-    <div class="mmenu-section-label">🗺️ La Zone</div>
-    <a href="index.php">🏠 Accueil</a>
-    <a href="hall.php">🏆 Hall de la Zone</a>
-    <a href="les-echos.php">📰 Les Échos</a>
-    <a href="trophees.php">🥇 Trophées</a>
+    <div class="mmenu-section-label">Zone85</div>
+    <a href="index.php">Accueil</a>
+    <a href="concept.php">Concept</a>
+    <a href="les-echos.php">Les Échos</a>
+    <a href="randos.php">Randos</a>
+    <a href="ktc.php">Kétokole</a>
+    <a href="missions.php">Missions</a>
+    <a href="communaute.php">Communauté</a>
   </div>
 
   <div class="mmenu-section">
-    <div class="mmenu-section-label">⚡ Jouer</div>
-    <a href="missions.php">🎯 Missions</a>
-    <a href="randos.php">🥾 Randos</a>
-    <a href="ktc.php">🔍 KTC</a>
-    <a href="evenements.php">🎉 Événements</a>
+    <div class="mmenu-section-label">Communauté</div>
+    <a href="communaute.php?tab=passeport">🪪 Mon Passeport</a>
+    <a href="communaute.php">🌍 Le Fil</a>
+    <a href="communaute.php?tab=clans">🛡 Classement Clans</a>
+    <a href="communaute.php?tab=classement">📊 Classement Zonautes</a>
   </div>
 
   <div class="mmenu-section">
-    <div class="mmenu-section-label">🛡️ Communauté</div>
-    <a href="clans.php">⚔️ Les Clans</a>
-    <a href="communaute.php">🌍 Fil de la Zone</a>
-    <a href="communaute.php?tab=zonautes">👥 Zonautes</a>
-    <a href="communaute.php?tab=classement">📊 Classement</a>
+    <div class="mmenu-section-label">Découvrir</div>
+    <a href="hall.php">Hall de la Zone</a>
+    <a href="trophees.php">Trophées</a>
+    <a href="clans.php">Les Clans</a>
+    <a href="evenements.php">Événements</a>
   </div>
 
   <div class="mmenu-section" style="border-top:1px solid rgba(0,0,0,.08)">
