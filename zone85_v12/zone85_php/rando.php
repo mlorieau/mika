@@ -484,10 +484,22 @@ $page_styles = '<style>
 .rando-intro { padding:28px 36px 0;font-size:1.05rem;font-weight:600;color:#0c1e2e;line-height:1.75; }
 .rando-description { padding:16px 36px 0;font-size:.95rem;color:#3d5166;line-height:1.8; }
 .rando-why { margin:26px 36px 0;padding:18px 20px;border-radius:16px;background:linear-gradient(135deg,#fff7ed,#fff);border:1px solid rgba(234,86,73,.18);box-shadow:0 8px 22px rgba(12,30,46,.06); }
-.rando-why-kicker { font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;font-weight:900;color:#ea5649;margin-bottom:6px; }
+.rando-why-kicker { font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;font-weight:900;color:#ea5649;margin-bottom:10px; }
+/* Onglets zones */
+.rando-why-tabs { display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px; }
+.rando-why-tab {
+  padding:6px 18px;border-radius:999px;border:1.5px solid rgba(234,86,73,.3);
+  background:transparent;color:#ea5649;font-size:.8rem;font-weight:800;cursor:pointer;
+  transition:all .18s;
+}
+.rando-why-tab.active { background:#ea5649;color:#fff;border-color:#ea5649; }
+.rando-why-tab:hover:not(.active) { background:rgba(234,86,73,.08); }
+.rando-why-panel { display:none; }
+.rando-why-panel.active { display:block; }
+/* Contenu zone */
 .rando-why-text { font-size:1rem;line-height:1.7;font-weight:600;color:#0c1e2e; }
-.rando-why-text h2 { font-size:1.08rem;font-weight:900;color:#0c1e2e;margin:1.4em 0 .5em; }
-.rando-why-text h3 { font-size:.96rem;font-weight:800;color:#12314e;margin:1.2em 0 .4em; }
+.rando-why-text h2 { font-size:1.08rem;font-weight:900;color:#0c1e2e;margin:1.2em 0 .4em; }
+.rando-why-text h3 { font-size:.96rem;font-weight:800;color:#12314e;margin:1em 0 .35em; }
 .rando-why-text p  { margin:0 0 .9em; }
 .rando-why-text ul,.rando-why-text ol { padding-left:1.4em;margin:0 0 .9em; }
 .rando-season-pills,.rando-commune-pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
@@ -913,10 +925,45 @@ require_once 'includes/nav.php';
             <div class="rando-description"><?= $rando['description'] ?></div>
           <?php endif; ?>
 
-          <?php if (!empty($rando['why_text'])): ?>
+          <?php
+            // Décode les zones JSON ou fallback HTML legacy
+            $_why_raw   = $rando['why_text'] ?? '';
+            $_why_zones = [];
+            if ($_why_raw && $_why_raw[0] === '[') {
+              $_dec = json_decode($_why_raw, true);
+              if (is_array($_dec) && !empty($_dec)) $_why_zones = $_dec;
+            }
+          ?>
+          <?php if (!empty($_why_zones)): ?>
             <div class="rando-why">
               <div class="rando-why-kicker">Pourquoi cette rando ?</div>
-              <div class="rando-why-text"><?= $rando['why_text'] ?></div>
+              <?php if (count($_why_zones) > 1): ?>
+              <div class="rando-why-tabs" role="tablist">
+                <?php foreach ($_why_zones as $_zi => $_zone): ?>
+                  <button class="rando-why-tab<?= $_zi === 0 ? ' active' : '' ?>"
+                          role="tab"
+                          data-zone="<?= $_zi ?>"
+                          aria-selected="<?= $_zi === 0 ? 'true' : 'false' ?>">
+                    <?= e($_zone['title'] ?? ('Zone '.($_zi+1))) ?>
+                  </button>
+                <?php endforeach; ?>
+              </div>
+              <?php endif; ?>
+              <div class="rando-why-panels">
+                <?php foreach ($_why_zones as $_zi => $_zone): ?>
+                  <div class="rando-why-panel<?= $_zi === 0 ? ' active' : '' ?>"
+                       role="tabpanel"
+                       data-zone="<?= $_zi ?>">
+                    <div class="rando-why-text"><?= $_zone['content'] ?? '' ?></div>
+                  </div>
+                <?php endforeach; ?>
+              </div>
+            </div>
+          <?php elseif (!empty($_why_raw)): ?>
+            <!-- Legacy : HTML brut (ancienne entrée avant onglets) -->
+            <div class="rando-why">
+              <div class="rando-why-kicker">Pourquoi cette rando ?</div>
+              <div class="rando-why-text"><?= $_why_raw ?></div>
             </div>
           <?php endif; ?>
 
@@ -1540,5 +1587,25 @@ require_once 'includes/nav.php';
 })();
 </script>
 
+
+<script>
+// Onglets "Pourquoi cette rando ?"
+(function() {
+  var tabs   = document.querySelectorAll('.rando-why-tab');
+  var panels = document.querySelectorAll('.rando-why-panel');
+  if (!tabs.length) return;
+  tabs.forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      var zone = this.dataset.zone;
+      tabs.forEach(function(t) { t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
+      panels.forEach(function(p) { p.classList.remove('active'); });
+      this.classList.add('active');
+      this.setAttribute('aria-selected','true');
+      var target = document.querySelector('.rando-why-panel[data-zone="'+zone+'"]');
+      if (target) target.classList.add('active');
+    });
+  });
+})();
+</script>
 
 <?php require_once 'includes/footer.php'; ?>

@@ -1205,12 +1205,16 @@ require_once __DIR__ . '/_admin-header.php';
                     <div class="adm-hint">Corps principal de la fiche. Affich&eacute; apr&egrave;s l'introduction.</div>
                 </div>
 
-                <!-- Pourquoi cette rando -->
+                <!-- Pourquoi cette rando — onglets par zone -->
                 <div class="adm-field adm-form-full">
-                    <label class="adm-label" for="f_why">Pourquoi faire cette rando ?</label>
+                    <label class="adm-label">Pourquoi faire cette rando ? <span style="font-weight:500;color:#6b7f96;font-size:.82rem">(un onglet par zone)</span></label>
                     <input type="hidden" id="f_why" name="why_text" value="">
-                    <div id="quill_why" style="min-height:100px;background:#fff;border-radius:6px"></div>
-                    <div class="adm-hint">Un court argument de s&eacute;duction. Affich&eacute; dans un bandeau sp&eacute;cial sur la fiche.</div>
+                    <div id="why-zone-bar" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px;padding:10px 12px;background:#f8f4ef;border-radius:10px;border:1px solid rgba(0,0,0,.07)">
+                        <!-- onglets injectés par JS -->
+                        <button type="button" id="why-add-zone" style="display:inline-flex;align-items:center;gap:4px;padding:5px 14px;border-radius:999px;border:1.5px dashed rgba(42,157,92,.5);background:transparent;color:#2a9d5c;font-size:.78rem;font-weight:800;cursor:pointer">+ Zone</button>
+                    </div>
+                    <div id="why-zone-panels"></div>
+                    <div class="adm-hint">Chaque zone = un onglet sur la fiche publique. Titre court recommand&eacute; (ex&nbsp;: &laquo;&nbsp;Zone 1 &ndash; Le Ch&acirc;teau&nbsp;&raquo;).</div>
                 </div>
 
                 <!-- Image de couverture -->
@@ -1993,13 +1997,11 @@ function toggleAddPanel() {
 
   var introVal = <?= json_encode($v_intro) ?>;
   var descVal  = <?= json_encode($v_description) ?>;
-  var whyVal   = <?= json_encode($v_why_text) ?>;
 
   initQuill('quill_intro',       'f_intro',       introVal);
   initQuill('quill_description', 'f_description', descVal);
-  initQuill('quill_why',         'f_why',         whyVal);
 
-  // Force sync de toutes les instances Quill juste avant soumission
+  // Sync intro + description sur submit (f_why géré par le zone manager)
   document.querySelectorAll('form').forEach(function(form) {
     form.addEventListener('submit', function() {
       Object.keys(_quills).forEach(function(hiddenId) {
@@ -2007,6 +2009,166 @@ function toggleAddPanel() {
         if (el) el.value = _quills[hiddenId].root.innerHTML;
       });
     });
+  });
+})();
+</script>
+
+<script>
+// ── Zone manager — "Pourquoi cette rando ?" ──────────────────
+(function() {
+  var TB = [
+    ['bold','italic','underline'],
+    [{'header':2},{'header':3}],
+    [{'list':'ordered'},{'list':'bullet'}],
+    ['clean']
+  ];
+
+  // Charger les zones depuis la valeur PHP (JSON ou HTML legacy)
+  var rawWhy = <?= json_encode($v_why_text) ?>;
+  var zones = [];
+  var nextId = 0;
+  try {
+    if (rawWhy && rawWhy.charAt(0) === '[') {
+      var parsed = JSON.parse(rawWhy);
+      if (Array.isArray(parsed) && parsed.length) {
+        zones = parsed.map(function(z) {
+          return { id: nextId++, title: z.title || ('Zone '+nextId), content: z.content || '' };
+        });
+      }
+    }
+  } catch(e) {}
+  // Migration HTML legacy → zone unique
+  if (!zones.length) {
+    zones = [{ id: nextId++, title: 'Zone 1', content: (rawWhy && rawWhy.charAt(0) !== '[') ? rawWhy : '' }];
+  }
+
+  var activeId = zones[0].id;
+  var quillMap = {};
+  var bar      = document.getElementById('why-zone-bar');
+  var panelsEl = document.getElementById('why-zone-panels');
+  var fWhy     = document.getElementById('f_why');
+  var addBtn   = document.getElementById('why-add-zone');
+
+  function syncHidden() {
+    fWhy.value = JSON.stringify(zones.map(function(z) {
+      return {
+        title:   z.title,
+        content: quillMap[z.id] ? quillMap[z.id].root.innerHTML : (z.content || '')
+      };
+    }));
+  }
+
+  function updateDelBtns() {
+    bar.querySelectorAll('.wz-del').forEach(function(b) {
+      b.style.display = zones.length > 1 ? '' : 'none';
+    });
+  }
+
+  function setTabActive(id) {
+    bar.querySelectorAll('.wz-btn').forEach(function(b) {
+      var on = parseInt(b.getAttribute('data-zone-id')) === id;
+      b.style.background   = on ? '#0c1e2e' : '#fff';
+      b.style.color        = on ? '#fff' : '#0c1e2e';
+      b.style.borderColor  = on ? '#0c1e2e' : 'rgba(12,30,46,.15)';
+    });
+    panelsEl.querySelectorAll('[data-zone-panel]').forEach(function(p) {
+      p.style.display = parseInt(p.getAttribute('data-zone-panel')) === id ? '' : 'none';
+    });
+    activeId = id;
+  }
+
+  function addZoneToDOM(zone) {
+    // ── Tab ────────────────────────────────────────────────────
+    var wrap = document.createElement('div');
+    wrap.style.cssText = 'display:inline-flex;align-items:center;gap:0';
+    wrap.setAttribute('data-zone-tab', zone.id);
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'wz-btn';
+    btn.setAttribute('data-zone-id', zone.id);
+    btn.textContent = zone.title || ('Zone '+(zones.indexOf(zone)+1));
+    btn.style.cssText = 'padding:5px 14px;border-radius:999px 0 0 999px;border:1.5px solid rgba(12,30,46,.15);background:#fff;color:#0c1e2e;font-size:.8rem;font-weight:800;cursor:pointer;transition:all .15s;white-space:nowrap';
+    btn.addEventListener('click', function() { setTabActive(zone.id); });
+    wrap.appendChild(btn);
+
+    var del = document.createElement('button');
+    del.type = 'button';
+    del.className = 'wz-del';
+    del.title = 'Supprimer cette zone';
+    del.textContent = '×';
+    del.style.cssText = 'padding:5px 9px;border-radius:0 999px 999px 0;border:1.5px solid rgba(234,86,73,.35);border-left:0;background:#fff;color:#ea5649;font-size:.9rem;font-weight:900;cursor:pointer;transition:all .15s';
+    del.addEventListener('click', function() { removeZone(zone.id); });
+    wrap.appendChild(del);
+
+    bar.insertBefore(wrap, addBtn);
+
+    // ── Panel ──────────────────────────────────────────────────
+    var panel = document.createElement('div');
+    panel.setAttribute('data-zone-panel', zone.id);
+    panel.style.display = 'none';
+
+    var titleInp = document.createElement('input');
+    titleInp.type = 'text';
+    titleInp.className = 'adm-input';
+    titleInp.placeholder = 'Titre de la zone (ex : Zone 1 – Le château de la Hussarde)';
+    titleInp.value = zone.title;
+    titleInp.style.cssText = 'margin-bottom:8px;font-weight:700';
+    titleInp.addEventListener('input', function() {
+      zone.title = this.value;
+      btn.textContent = this.value || ('Zone '+(zones.indexOf(zone)+1));
+      syncHidden();
+    });
+    panel.appendChild(titleInp);
+
+    var editorDiv = document.createElement('div');
+    editorDiv.id  = 'qwhy_' + zone.id;
+    editorDiv.style.cssText = 'min-height:140px;background:#fff;border-radius:6px';
+    panel.appendChild(editorDiv);
+    panelsEl.appendChild(panel);
+
+    // Init Quill
+    var q = new Quill('#qwhy_' + zone.id, { theme: 'snow', modules: { toolbar: TB } });
+    quillMap[zone.id] = q;
+    if (zone.content) {
+      q.clipboard.dangerouslyPasteHTML(zone.content);
+      setTimeout(syncHidden, 120);
+    }
+    q.on('text-change', syncHidden);
+  }
+
+  function removeZone(id) {
+    if (zones.length <= 1) return;
+    var idx = zones.findIndex(function(z) { return z.id === id; });
+    zones.splice(idx, 1);
+    delete quillMap[id];
+    var tabEl   = bar.querySelector('[data-zone-tab="'+id+'"]');
+    var panelEl = panelsEl.querySelector('[data-zone-panel="'+id+'"]');
+    if (tabEl)   tabEl.remove();
+    if (panelEl) panelEl.remove();
+    setTabActive(zones[Math.max(0, idx-1)].id);
+    updateDelBtns();
+    syncHidden();
+  }
+
+  addBtn.addEventListener('click', function() {
+    var z = { id: nextId++, title: 'Zone '+(zones.length+1), content: '' };
+    zones.push(z);
+    addZoneToDOM(z);
+    setTabActive(z.id);
+    updateDelBtns();
+    syncHidden();
+  });
+
+  // Rendu initial
+  zones.forEach(function(z) { addZoneToDOM(z); });
+  setTabActive(activeId);
+  updateDelBtns();
+  setTimeout(syncHidden, 150);
+
+  // Sync forcée sur submit
+  document.querySelectorAll('form').forEach(function(form) {
+    form.addEventListener('submit', function() { syncHidden(); });
   });
 })();
 </script>
