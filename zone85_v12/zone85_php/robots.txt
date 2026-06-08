@@ -4,13 +4,26 @@ Allow: /
 # Pages privées / dynamiques à ne pas indexer
 Disallow: /profil.php
 Disallow: /inscription.php
+Disallow: /login.php
+Disallow: /forgot-password.php
+Disallow: /reset-password.php
+Disallow: /mon-compte.php
+Disallow: /notifications.php
+Disallow: /logout.php
+
+# Diagnostic et outils (sécurité)
+Disallow: /check-db.php
+Disallow: /tools/
+Disallow: /ajax/
+
+# Back-office
+Disallow: /admin/
+Disallow: /back-office/
+
+# Uploads (médias non indexables)
 Disallow: /uploads/
 
 # Assets : autorisés (nécessaires pour le rendu)
 Allow: /assets/
-
-# Futur back-office (non encore créé, préventif)
-Disallow: /admin/
-Disallow: /back-office/
 
 Sitemap: https://www.zone85.fr/sitemap.php

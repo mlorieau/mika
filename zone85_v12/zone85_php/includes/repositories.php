@@ -1740,30 +1740,35 @@ function upload_collectible_media(array $file, string $type = 'object'): array {
         return ['ok'=>false, 'error'=>'Type non autorisé. Utilisez jpg, png, webp ou gif.'];
     }
 
-    // Vérification image réelle + dimensions max (non appliqué aux GIF animés)
+    // Vérification image réelle via getimagesize() (non appliqué aux GIF animés)
     if ($mime !== 'image/gif') {
         $img_info = @getimagesize($file['tmp_name']);
-        if (!$img_info) {
+        if (!$img_info || empty($img_info[0]) || empty($img_info[1])) {
             return ['ok'=>false, 'error'=>'Fichier image invalide ou corrompu.'];
         }
-        $max_dim = defined('UPLOAD_MAX_DIM') ? UPLOAD_MAX_DIM : 4000;
+        // Dimensions max : 2000 px pour les collectibles (valeur spécifique, indépendante de UPLOAD_MAX_DIM)
+        $max_dim = 2000;
         if ($img_info[0] > $max_dim || $img_info[1] > $max_dim) {
-            return ['ok'=>false, 'error'=>"Dimensions trop grandes (max {$max_dim}×{$max_dim} px)."];
+            return ['ok'=>false, 'error'=>"Dimensions trop grandes (max {$max_dim}×{$max_dim} px). Réduisez votre image avant l'envoi."];
         }
     }
 
     $upload_dir = defined('BASE_PATH') ? BASE_PATH . 'uploads/collectibles/' : dirname(__DIR__) . '/uploads/collectibles/';
     if (!is_dir($upload_dir)) {
-        mkdir($upload_dir, 0755, true);
+        if (!mkdir($upload_dir, 0755, true)) {
+            return ['ok'=>false, 'error'=>'Impossible de créer le dossier de destination.'];
+        }
     }
 
-    // Créer .htaccess de protection si absent
+    // Garantir la présence du .htaccess de protection dans uploads/collectibles/
     $htaccess = $upload_dir . '.htaccess';
     if (!file_exists($htaccess)) {
         $ht_content = function_exists('_upload_htaccess_content')
             ? _upload_htaccess_content()
             : "Options -Indexes\n<FilesMatch \"\\.(php[0-9]?|phtml|pl|py|cgi|sh|bash)$\">\n<IfModule mod_authz_core.c>\nRequire all denied\n</IfModule>\n</FilesMatch>\n";
-        @file_put_contents($htaccess, $ht_content);
+        if (@file_put_contents($htaccess, $ht_content) === false) {
+            error_log('[ZONE85] upload_collectible_media : impossible d\'écrire le .htaccess dans ' . $upload_dir);
+        }
     }
 
     $ext      = $allowed[$mime];
