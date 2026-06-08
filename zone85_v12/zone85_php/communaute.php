@@ -1330,24 +1330,37 @@ $cn_total_pts    = array_sum(array_column($clan_rankings, 'season_points'));
           <div style="display:flex;flex-wrap:wrap;gap:8px">
             <?php foreach ($rw_badges_grouped[$rar] as $b): ?>
               <?php $got = isset($rw_my_badges[$b['id']]); ?>
-              <div style="display:flex;align-items:center;gap:7px;background:#fff;border:<?= $got ? '1.5px solid var(--primary,#ea5649)' : '1.5px solid var(--beige-dark,#e8e0d4)' ?>;border-radius:9px;padding:7px 11px;opacity:<?= $got ? '1' : '.6' ?>">
-                <span style="font-size:1.2rem;line-height:1"><?= e($b['icon_emoji'] ?? '🏅') ?></span>
-                <div>
-                  <div style="font-size:.78rem;font-weight:700;color:var(--navy-dark,#0c1e2e);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><?= e($b['title']) ?></div>
-                  <?php
-                    $ct = $b['condition_type'] ?? '';
-                    $cv = (int)($b['condition_value'] ?? 0);
-                    $cond = match($ct) {
-                      'xp_threshold'   => number_format($cv).' XP',
-                      'missions_count' => $cv.' mission'.($cv>1?'s':'').' validée'.($cv>1?'s':''),
-                      'randos_count'   => $cv.' rando'.($cv>1?'s':'').' terminée'.($cv>1?'s':''),
-                      'registration'   => 'Inscription',
-                      default          => $ct,
-                    };
-                  ?>
-                  <?php if ($cond): ?><div style="font-size:.65rem;color:var(--text-muted,#6b7f96)"><?= e($cond) ?></div><?php endif; ?>
+              <?php
+                $ct2 = $b['condition_type'] ?? '';
+                $cv2 = (int)($b['condition_value'] ?? 0);
+                [$how2_type, $how2_label, $how2_text] = match($ct2) {
+                  'xp_threshold'    => ['auto',   '⚡', 'Atteindre '.number_format($cv2).' XP'],
+                  'mission_success' => ['auto',   '⚡', $cv2.' mission'.($cv2>1?'s':'').' validée'.($cv2>1?'s':'')],
+                  'missions_count'  => ['auto',   '⚡', $cv2.' mission'.($cv2>1?'s':'').' validée'.($cv2>1?'s':'')],
+                  'rando_validated' => ['auto',   '⚡', $cv2.' rando'.($cv2>1?'s':'').' terminée'.($cv2>1?'s':'')],
+                  'randos_count'    => ['auto',   '⚡', $cv2.' rando'.($cv2>1?'s':'').' terminée'.($cv2>1?'s':'')],
+                  'registration'    => ['auto',   '⚡', 'À l\'inscription'],
+                  'season'          => ['auto',   '⚡', 'Participer à une saison'],
+                  'mission_reward'  => ['reward', '🎯', 'Récompense de mission'],
+                  'manual'          => ['manual', '👤', 'Attribué par l\'équipe'],
+                  'special'         => ['special','✨', 'Condition spéciale'],
+                  default           => ['auto',   '⚡', $ct2 ?: '—'],
+                };
+                $how2_fg = match($how2_type) {
+                  'auto'    => '#166534',
+                  'manual'  => '#854d0e',
+                  'reward'  => '#1e40af',
+                  'special' => '#6b21a8',
+                  default   => '#475569',
+                };
+              ?>
+              <div style="display:flex;flex-direction:column;gap:4px;background:#fff;border:<?= $got ? '1.5px solid var(--primary,#ea5649)' : '1.5px solid var(--beige-dark,#e8e0d4)' ?>;border-radius:9px;padding:8px 11px;opacity:<?= $got ? '1' : '.55' ?>;min-width:160px">
+                <div style="display:flex;align-items:center;gap:7px">
+                  <span style="font-size:1.2rem;line-height:1"><?= e($b['icon_emoji'] ?? '🏅') ?></span>
+                  <div style="font-size:.78rem;font-weight:700;color:var(--navy-dark,#0c1e2e);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><?= e($b['title']) ?></div>
+                  <?php if ($got): ?><span style="font-size:.65rem;color:var(--primary,#ea5649);font-weight:800;flex-shrink:0">✓</span><?php endif; ?>
                 </div>
-                <?php if ($got): ?><span style="font-size:.65rem;color:var(--primary,#ea5649);font-weight:800;margin-left:2px">✓</span><?php endif; ?>
+                <span style="font-size:.62rem;font-weight:700;color:<?= e($how2_fg) ?>"><?= e($how2_label) ?> <?= e($how2_text) ?></span>
               </div>
             <?php endforeach; ?>
           </div>

@@ -283,6 +283,26 @@ require_once 'includes/nav.php';
       <h2 class="rw-section-title">🏅 Les badges</h2>
       <p class="rw-section-sub">Les badges récompensent les accomplissements remarquables. Ils sont permanents et visibles sur ton profil.<?= $is_logged ? ' <strong>' . count($my_badges) . ' débloqué' . (count($my_badges) > 1 ? 's' : '') . '</strong> sur ' . ($badges_db ? count($badges_db) : '?') . ' disponibles.' : '' ?></p>
 
+      <?php
+      // Helper : traduit condition_type + condition_value en phrase lisible
+      function rw_badge_how(array $b): array {
+          $ct = $b['condition_type'] ?? '';
+          $cv = (int)($b['condition_value'] ?? 0);
+          return match($ct) {
+              'xp_threshold'   => ['auto', '⚡ Automatique', 'Atteindre ' . number_format($cv) . ' XP au total'],
+              'mission_success' => ['auto', '⚡ Automatique', 'Valider ' . $cv . ' mission' . ($cv > 1 ? 's' : '')],
+              'missions_count' => ['auto', '⚡ Automatique', 'Valider ' . $cv . ' mission' . ($cv > 1 ? 's' : '')],
+              'rando_validated' => ['auto', '⚡ Automatique', 'Terminer ' . $cv . ' rando' . ($cv > 1 ? 's' : '')],
+              'randos_count'   => ['auto', '⚡ Automatique', 'Terminer ' . $cv . ' rando' . ($cv > 1 ? 's' : '')],
+              'registration'   => ['auto', '⚡ Automatique', 'S\'inscrire sur Zone85'],
+              'season'         => ['auto', '⚡ Automatique', 'Participer à une saison'],
+              'mission_reward' => ['reward', '🎯 Récompense', 'Récompense d\'une mission spécifique'],
+              'manual'         => ['manual', '👤 Attribution', 'Attribué par l\'équipe Zone85'],
+              'special'        => ['special', '✨ Spécial', 'Condition spéciale — voir description'],
+              default          => ['auto', '⚡ Automatique', $ct ?: 'Condition inconnue'],
+          };
+      }
+      ?>
       <?php if ($badges_db): ?>
         <?php foreach ($rarity_order as $rarity): ?>
           <?php if (empty($badges_by_rarity[$rarity])) continue; ?>
@@ -297,26 +317,29 @@ require_once 'includes/nav.php';
                 <?php
                   $obtained = isset($my_badges[$b['id']]);
                   $chip_cls = $obtained ? 'obtained' : 'locked';
-                  $cond_text = '';
-                  if ($b['condition_type'] === 'xp_threshold') {
-                      $cond_text = number_format((int)$b['condition_value']) . ' XP atteints';
-                  } elseif ($b['condition_type'] === 'missions_count') {
-                      $cond_text = (int)$b['condition_value'] . ' mission' . ((int)$b['condition_value'] > 1 ? 's' : '') . ' validée' . ((int)$b['condition_value'] > 1 ? 's' : '');
-                  } elseif ($b['condition_type'] === 'randos_count') {
-                      $cond_text = (int)$b['condition_value'] . ' rando' . ((int)$b['condition_value'] > 1 ? 's' : '') . ' terminée' . ((int)$b['condition_value'] > 1 ? 's' : '');
-                  } elseif ($b['condition_type'] === 'registration') {
-                      $cond_text = 'Inscription';
-                  } elseif (!empty($b['condition_type'])) {
-                      $cond_text = $b['condition_type'];
-                  }
+                  [$how_type, $how_label, $how_text] = rw_badge_how($b);
+                  $how_colors = [
+                      'auto'    => ['#dcfce7', '#166534'],
+                      'manual'  => ['#fef9c3', '#854d0e'],
+                      'reward'  => ['#dbeafe', '#1e40af'],
+                      'special' => ['#f3e8ff', '#6b21a8'],
+                  ];
+                  [$how_bg, $how_fg] = $how_colors[$how_type] ?? ['#f1f5f9', '#475569'];
                 ?>
-                <div class="rw-badge-chip <?= $chip_cls ?>">
-                  <span class="rw-badge-emoji"><?= e($b['icon_emoji'] ?? '🏅') ?></span>
-                  <div class="rw-badge-info">
-                    <div class="rw-badge-name"><?= e($b['title']) ?></div>
-                    <?php if ($cond_text): ?><div class="rw-badge-cond"><?= e($cond_text) ?></div><?php endif; ?>
+                <div class="rw-badge-chip <?= $chip_cls ?>" style="flex-direction:column;align-items:flex-start;gap:6px;min-width:200px;max-width:260px">
+                  <div style="display:flex;align-items:center;gap:8px;width:100%">
+                    <span class="rw-badge-emoji"><?= e($b['icon_emoji'] ?? '🏅') ?></span>
+                    <div class="rw-badge-info" style="flex:1;min-width:0">
+                      <div class="rw-badge-name"><?= e($b['title']) ?></div>
+                      <?php if (!empty($b['description'])): ?>
+                        <div class="rw-badge-cond" style="font-size:.68rem;color:var(--text-muted)"><?= e($b['description']) ?></div>
+                      <?php endif; ?>
+                    </div>
+                    <?php if ($obtained): ?><span class="rw-badge-check" style="margin-left:auto;flex-shrink:0">✓</span><?php endif; ?>
                   </div>
-                  <?php if ($obtained): ?><span class="rw-badge-check">✓</span><?php endif; ?>
+                  <span style="font-size:.65rem;font-weight:700;background:<?= e($how_bg) ?>;color:<?= e($how_fg) ?>;border-radius:20px;padding:2px 8px;display:inline-block">
+                    <?= e($how_label) ?> — <?= e($how_text) ?>
+                  </span>
                 </div>
               <?php endforeach; ?>
             </div>

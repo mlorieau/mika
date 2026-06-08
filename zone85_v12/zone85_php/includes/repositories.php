@@ -1180,6 +1180,18 @@ function create_participation(int $userId, int $missionId, array $data = []): ar
 
         $pdo->commit();
 
+        // Badge de récompense spécifique à la mission (auto uniquement, non-blocking)
+        if ($shouldAuto && !empty($mission['badge_reward_id'])) {
+            try {
+                $pdo->prepare("
+                    INSERT IGNORE INTO user_badges (user_id, badge_id, source_type, source_id)
+                    VALUES (:uid, :bid, 'mission_reward', :src)
+                ")->execute([':uid' => $userId, ':bid' => (int)$mission['badge_reward_id'], ':src' => $participationId]);
+            } catch (PDOException $e) {
+                error_log('[ZONE85] create_participation badge_reward : ' . $e->getMessage());
+            }
+        }
+
         return [
             'ok'               => true,
             'participation_id' => $participationId,
@@ -1224,7 +1236,7 @@ function admin_validate_participation(int $participation_id, int $admin_user_id)
     try {
         // 1. Charger la participation + mission + user en une requÃªte
         $s = $pdo->prepare("
-            SELECT p.*, m.xp_success, m.clan_points_success, m.title AS mission_title,
+            SELECT p.*, m.xp_success, m.clan_points_success, m.badge_reward_id, m.title AS mission_title,
                    u.clan_id, u.xp_total, u.level, u.pseudo
             FROM participations p
             JOIN missions m ON m.id = p.mission_id
@@ -1309,6 +1321,18 @@ function admin_validate_participation(int $participation_id, int $admin_user_id)
 
         // Auto-badge check after participation validated (non-blocking)
         check_and_award_badges($user_id);
+
+        // Badge de récompense spécifique à la mission (non-blocking)
+        if (!empty($row['badge_reward_id'])) {
+            try {
+                $pdo->prepare("
+                    INSERT IGNORE INTO user_badges (user_id, badge_id, source_type, source_id)
+                    VALUES (:uid, :bid, 'mission_reward', :src)
+                ")->execute([':uid' => $user_id, ':bid' => (int)$row['badge_reward_id'], ':src' => $participation_id]);
+            } catch (PDOException $e) {
+                error_log('[ZONE85] admin_validate_participation badge_reward : ' . $e->getMessage());
+            }
+        }
 
         // Notification + fil communautaire (hors transaction — ne bloque pas si table absente)
         if (function_exists('push_notification')) {

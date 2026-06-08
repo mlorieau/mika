@@ -427,21 +427,47 @@ require_once '_admin-header.php';
   <!-- Badge de récompense -->
   <div class="adm-card">
     <div class="adm-card-title">🏅 Badge de récompense (optionnel)</div>
-    <p style="font-size:.78rem;color:#6b7f96;margin-bottom:16px;line-height:1.6">
-      Si renseigné, ce badge est attribué automatiquement au membre lors de la complétion de la mission. Attribution unique.
-    </p>
+
+    <details style="margin-bottom:16px;background:#f8f9fa;border-radius:8px;padding:0">
+      <summary style="cursor:pointer;padding:10px 14px;font-size:.82rem;font-weight:700;color:#1e40af;list-style:none">
+        ℹ️ Comment fonctionne l'attribution des badges ? (cliquer pour lire)
+      </summary>
+      <div style="padding:0 14px 14px;font-size:.8rem;color:#374151;line-height:1.7">
+        <p style="margin-bottom:10px"><strong>3 façons d'attribuer un badge à un membre :</strong></p>
+        <ol style="margin:0 0 12px 16px;padding:0">
+          <li style="margin-bottom:6px">
+            <strong>⚡ Automatique via condition</strong> — Badges avec <em>condition_type = xp_threshold / mission_success / rando_validated / registration / season</em>.
+            Attribués automatiquement par le système dès que la condition est remplie. Rien à faire en tant qu'admin.
+          </li>
+          <li style="margin-bottom:6px">
+            <strong>🎯 Récompense de mission</strong> — Ce champ ci-dessous.
+            Si tu sélectionnes un badge ici, il sera attribué automatiquement quand un admin valide la participation
+            (ou immédiatement si la mission est en mode <em>auto</em>). Attribution unique par membre.
+          </li>
+          <li style="margin-bottom:6px">
+            <strong>👤 Attribution manuelle</strong> — Badges avec <em>condition_type = manual</em> (ex : "Oeil de Faucon").
+            Jamais attribués automatiquement. L'admin les attribue à la main depuis
+            <a href="users.php" style="color:#1e40af">Utilisateurs → Modifier → section Badges</a>.
+            Parfait pour les "coups de coeur" ou récompenses exceptionnelles.
+          </li>
+        </ol>
+        <p style="color:#6b7280;font-size:.75rem">💡 Un badge avec <em>condition_type = manual</em> sélectionné ici ne sera PAS attribué automatiquement — il faut le passer en <em>mission_reward</em> ou le donner à la main.</p>
+      </div>
+    </details>
+
     <div class="adm-field" style="max-width:360px">
-      <label class="adm-label">Badge attribué à la complétion</label>
+      <label class="adm-label">Badge attribué à la complétion (mode auto &amp; validation admin)</label>
       <select name="badge_reward_id" class="adm-select">
         <option value="">— Aucun badge —</option>
         <?php foreach ($available_badges as $b): ?>
         <option value="<?= (int)$b['id'] ?>" <?= (int)($f['badge_reward_id'] ?? 0) === (int)$b['id'] ? 'selected' : '' ?>>
-          <?= e($b['icon'] ?? '🏅') ?> <?= e($b['title']) ?>
+          <?= e($b['icon_emoji'] ?? $b['icon'] ?? '🏅') ?> <?= e($b['title']) ?>
+          <?php if (($b['condition_type'] ?? '') === 'manual'): ?>(⚠️ manuel — ne s'attribue pas automatiquement)<?php endif; ?>
         </option>
         <?php endforeach; ?>
       </select>
       <?php if (empty($available_badges)): ?>
-      <span class="adm-hint">Aucun badge disponible. Créez des badges dans la table <code>badges</code>.</span>
+      <span class="adm-hint">Aucun badge disponible. Créez des badges dans <a href="badges.php">Badges</a>.</span>
       <?php endif; ?>
     </div>
   </div>
