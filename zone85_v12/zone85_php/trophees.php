@@ -327,10 +327,10 @@ require 'includes/nav.php';
   <div class="container">
     <div class="trophees-hero-inner">
       <div>
-        <h1>ðŸ† Trophéothèque Zone85</h1>
+        <h1>🏆 Trophéothèque Zone85</h1>
         <p>L'histoire des saisons — chaque trophée, un clan vainqueur, une époque gravée dans la mémoire de la Zone.</p>
       </div>
-      <div class="hero-trophy-icon" aria-hidden="true">ðŸ†</div>
+      <div class="hero-trophy-icon" aria-hidden="true">🏆</div>
     </div>
   </div>
 </section>
@@ -350,8 +350,8 @@ require 'includes/nav.php';
       ?>
       <div class="trophy-card">
         <div class="trophy-card-header" style="background: <?= _season_gradient($bg_color) ?>">
-          <div class="trophy-emoji"><?= e($t['emoji'] ?? 'ðŸ†') ?></div>
-          <div class="trophy-icon-big">ðŸ†</div>
+          <div class="trophy-emoji"><?= e($t['emoji'] ?? '🏆') ?></div>
+          <div class="trophy-icon-big">🏆</div>
           <div class="trophy-season-name"><?= e($t['title']) ?></div>
           <?php if (!empty($t['start_date']) && !empty($t['end_date'])): ?>
           <div class="trophy-dates">
@@ -375,10 +375,11 @@ require 'includes/nav.php';
     </div>
 
     <?php else: ?>
-    <div class="empty-state">
-      <div class="empty-state-icon">👑</div>
-      <h3>Les premiers trophées seront bientôt remportés.</h3>
-      <p>La saison est en cours. Aidez votre clan à prendre la tête — le clan vainqueur recevra son trophée à la clôture de la saison.</p>
+    <div style="text-align:center;padding:64px 24px;color:var(--text-muted)">
+      <div style="font-size:3rem;margin-bottom:16px">🏆</div>
+      <h3 style="color:var(--navy-dark);margin-bottom:8px">Aucun trophée pour l'instant</h3>
+      <p style="max-width:400px;margin:0 auto 24px">Les trophées se gagnent au fil des saisons. Ton aventure commence maintenant.</p>
+      <a href="missions.php" style="display:inline-block;background:var(--primary);color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700">Voir les missions →</a>
     </div>
     <?php endif; ?>
 
@@ -399,7 +400,7 @@ require 'includes/nav.php';
           <?php endif; ?>
         </div>
         <span class="season-status-badge <?= $s['status'] === 'active' ? 'badge-active' : 'badge-closed' ?>">
-          <?= $s['status'] === 'active' ? 'â— En cours' : 'Terminée' ?>
+          <?= $s['status'] === 'active' ? '● En cours' : 'Terminée' ?>
         </span>
       </div>
       <?php endforeach; ?>

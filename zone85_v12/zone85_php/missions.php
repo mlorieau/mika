@@ -1100,8 +1100,9 @@ require_once 'includes/nav.php';
     <?php if (empty($missions_list)): ?>
     <div style="text-align:center;padding:64px 24px;color:var(--text-muted)">
       <div style="font-size:3rem;margin-bottom:16px">🗺️</div>
-      <p style="font-size:1.05rem;font-weight:700;color:var(--navy-dark);margin-bottom:8px">Les missions arrivent bientôt.</p>
-      <p style="font-size:.9rem">Reviens dans la Zone — les premières aventures se préparent.</p>
+      <p style="font-size:1.05rem;font-weight:700;color:var(--navy-dark);margin-bottom:8px">Les missions arrivent bientôt. En attendant, explore les randos.</p>
+      <p style="font-size:.9rem;margin-bottom:24px">Reviens dans la Zone — les premières aventures se préparent.</p>
+      <a href="randos.php" style="display:inline-block;background:var(--primary);color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:.88rem">Explorer les randos →</a>
     </div>
     <?php endif; ?>
     <!-- Message affiché par JS si les filtres ne donnent aucun résultat -->

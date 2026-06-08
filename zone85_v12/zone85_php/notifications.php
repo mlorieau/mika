@@ -68,8 +68,9 @@ $type_icons = [
     <?php if (empty($notifs)): ?>
     <div class="notif-empty">
       <div class="notif-empty-icon">🔕</div>
-      <p style="font-weight:700;color:var(--navy-dark);margin-bottom:8px">Aucune notification</p>
-      <p style="font-size:.88rem;color:var(--text-muted)">Tu seras averti ici lors de tes validations, badges débloqués et événements de la Zone.</p>
+      <p style="font-weight:700;color:var(--navy-dark);margin-bottom:8px">Aucune notification pour l'instant.</p>
+      <p style="font-size:.88rem;color:var(--text-muted);margin-bottom:20px">Tu seras averti ici lors de tes validations, badges débloqués et événements de la Zone.</p>
+      <a href="missions.php" style="display:inline-block;background:var(--primary);color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:.88rem">Voir les missions →</a>
     </div>
     <?php else: ?>
     <div class="notif-list">

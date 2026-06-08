@@ -1225,6 +1225,49 @@ require_once 'includes/nav.php';
           <?php endif; // blocs ?>
           <?php // ferme le elseif(!empty($blocks)) — note: si intro uniquement, on ne fait rien de plus ?>
 
+          <?php $_gpx_help = $rando['gpx_file'] ?? $rando['gpx_url'] ?? ''; ?>
+          <?php if (!empty($_gpx_help)): ?>
+          <!-- Bloc pédagogique GPX -->
+          <div style="margin:0 36px 28px;background:#f8f4ef;border-radius:14px;border:1px solid rgba(12,30,46,.08);padding:22px 24px">
+            <div style="font-size:.68rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:#2a9d5c;margin-bottom:14px">Comment utiliser cette rando&nbsp;?</div>
+            <ol style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px">
+              <li style="display:flex;align-items:flex-start;gap:12px">
+                <span style="flex-shrink:0;width:26px;height:26px;border-radius:50%;background:#0c1e2e;color:#fff;font-size:.75rem;font-weight:900;display:flex;align-items:center;justify-content:center">1</span>
+                <span style="font-size:.88rem;color:#0c1e2e;line-height:1.5;padding-top:3px"><strong>T&eacute;l&eacute;charge la trace GPX</strong> depuis le bouton ci-dessous ou dans la barre d'infos.</span>
+              </li>
+              <li style="display:flex;align-items:flex-start;gap:12px">
+                <span style="flex-shrink:0;width:26px;height:26px;border-radius:50%;background:#0c1e2e;color:#fff;font-size:.75rem;font-weight:900;display:flex;align-items:center;justify-content:center">2</span>
+                <span style="font-size:.88rem;color:#0c1e2e;line-height:1.5;padding-top:3px"><strong>Ouvre-la dans une application compatible&nbsp;:</strong> Komoot, GPX Viewer, Organic Maps, OsmAnd.</span>
+              </li>
+              <li style="display:flex;align-items:flex-start;gap:12px">
+                <span style="flex-shrink:0;width:26px;height:26px;border-radius:50%;background:#0c1e2e;color:#fff;font-size:.75rem;font-weight:900;display:flex;align-items:center;justify-content:center">3</span>
+                <span style="font-size:.88rem;color:#0c1e2e;line-height:1.5;padding-top:3px"><strong>Suis le parcours</strong> sur ton t&eacute;l&eacute;phone, m&ecirc;me sans connexion.</span>
+              </li>
+              <li style="display:flex;align-items:flex-start;gap:12px">
+                <span style="flex-shrink:0;width:26px;height:26px;border-radius:50%;background:#ea5649;color:#fff;font-size:.75rem;font-weight:900;display:flex;align-items:center;justify-content:center">4</span>
+                <span style="font-size:.88rem;color:#0c1e2e;line-height:1.5;padding-top:3px"><strong>Ajoute ta photo souvenir</strong> pour valider ta participation et d&eacute;bloquer tes XP.</span>
+              </li>
+            </ol>
+            <div style="margin-top:16px">
+              <details style="background:#fff;border:1px solid rgba(12,30,46,.1);border-radius:10px;overflow:hidden">
+                <summary style="padding:11px 16px;font-size:.82rem;font-weight:700;color:#0c1e2e;cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px">
+                  <span style="font-size:.9rem">&#x2753;</span> Je ne sais pas utiliser un GPX
+                </summary>
+                <div style="padding:14px 16px;border-top:1px solid rgba(12,30,46,.07);font-size:.84rem;color:#4b6074;line-height:1.65">
+                  Une trace GPX, c'est un fichier de parcours. Tu peux l'ouvrir dans une application de randonn&eacute;e pour suivre l'itin&eacute;raire sur ton t&eacute;l&eacute;phone, m&ecirc;me si tu ne connais pas le chemin.<br>
+                  <strong style="display:block;margin-top:10px;color:#0c1e2e">Applications compatibles&nbsp;:</strong>
+                  <span style="display:inline-flex;gap:8px;flex-wrap:wrap;margin-top:6px">
+                    <a href="https://www.komoot.com/" target="_blank" rel="noopener noreferrer" style="background:#e8e0d4;border-radius:6px;padding:4px 10px;font-size:.78rem;font-weight:700;color:#0c1e2e;text-decoration:none">Komoot</a>
+                    <a href="https://play.google.com/store/apps/details?id=com.vecturagames.android.app.gpxviewer" target="_blank" rel="noopener noreferrer" style="background:#e8e0d4;border-radius:6px;padding:4px 10px;font-size:.78rem;font-weight:700;color:#0c1e2e;text-decoration:none">GPX Viewer</a>
+                    <a href="https://organicmaps.app/" target="_blank" rel="noopener noreferrer" style="background:#e8e0d4;border-radius:6px;padding:4px 10px;font-size:.78rem;font-weight:700;color:#0c1e2e;text-decoration:none">Organic Maps</a>
+                    <a href="https://osmand.net/" target="_blank" rel="noopener noreferrer" style="background:#e8e0d4;border-radius:6px;padding:4px 10px;font-size:.78rem;font-weight:700;color:#0c1e2e;text-decoration:none">OsmAnd</a>
+                  </span>
+                </div>
+              </details>
+            </div>
+          </div>
+          <?php endif; ?>
+
           <!-- Pied de fiche -->
           <div style="padding:20px 36px 28px;border-top:1px solid rgba(0,0,0,.06);margin-top:8px;
                       display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
