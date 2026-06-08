@@ -18,7 +18,7 @@ require_once 'includes/auth.php';
 require_once 'includes/repositories.php';
 
 // ── Onglet actif ─────────────────────────────────────────────
-$_tab = in_array($_GET['tab'] ?? '', ['passeport', 'fil', 'clans', 'classement', 'zonautes'], true)
+$_tab = in_array($_GET['tab'] ?? '', ['passeport', 'fil', 'clans', 'classement', 'zonautes', 'recompenses'], true)
     ? $_GET['tab'] : 'fil';
 if ($_tab === 'zonautes') $_tab = 'classement'; // backward compat
 
@@ -260,6 +260,21 @@ if ($_tab === 'zonautes') {
         } catch (PDOException $e) {
             error_log('[communaute zonautes] '.$e->getMessage());
         }
+    }
+}
+
+// ── RÉCOMPENSES (data lazy-loaded si tab actif) ──────────────
+$rw_badges_db = null;
+$rw_my_badges = [];
+$rw_levels    = [];
+if ($_tab === 'recompenses') {
+    $rw_badges_db = fetch_badges();
+    if ($is_logged && $active_user) {
+        $ub = fetch_user_badges((int)$active_user['id']);
+        foreach ($ub as $b) $rw_my_badges[$b['id']] = true;
+    }
+    for ($l = 1; $l <= 10; $l++) {
+        $rw_levels[] = ['level' => $l, 'name' => get_level_name($l), 'threshold' => get_level_threshold($l)];
     }
 }
 
@@ -700,6 +715,7 @@ require_once 'includes/nav.php';
     <a href="<?= comm_url('classement') ?>" class="comm-tab <?= $_tab === 'classement' ? 'active' : '' ?>">
       Zonautes<?php if ($cl_total > 0): ?><span class="comm-tab-count"><?= $cl_total ?></span><?php endif; ?>
     </a>
+    <a href="<?= comm_url('recompenses') ?>" class="comm-tab <?= $_tab === 'recompenses' ? 'active' : '' ?>">🏅 Récompenses</a>
   </nav>
 </div>
 
@@ -1191,6 +1207,162 @@ $cn_total_pts    = array_sum(array_column($clan_rankings, 'season_points'));
     <?php endif; // leaderboard ?>
   </div>
 </div>
+
+<?php elseif ($_tab === 'recompenses'): ?>
+<div class="comm-inner" style="max-width:860px">
+
+  <?php
+  $rw_xp_rows = [
+    ['🎉', 'Inscription sur Zone85',           '+50 XP',         'Une fois'],
+    ['🎯', 'Valider une mission',               '+20 à +150 XP',  'Par mission'],
+    ['🥾', 'Terminer une randonnée',            '+25 XP',         'Par rando'],
+    ['🔍', 'Proposer pour un KTC',              '+10 XP',         'Par épisode'],
+    ['🗳', 'Voter pour un KTC',                 '+5 XP',          'Par épisode'],
+    ['🏆', 'Gagner le KTC du mois',             '+50 à +200 XP',  'Par mois'],
+    ['✍️', 'Commenter Les Échos',               '+5 XP',          'Par article'],
+    ['🏅', 'Débloquer un badge',                'Variable',        'Selon badge'],
+  ];
+  $rw_clan_rows = [
+    ['🎯', 'Valider une mission',           '+50 pts'],
+    ['🥾', 'Terminer une randonnée',        '+30 pts'],
+    ['🏆', 'Gagner un KTC',                 '+40 pts'],
+    ['⚡', 'Participer à un flash event',  '+20 pts'],
+  ];
+  $rw_rarity_labels = [
+    'legendary' => ['Légendaire', '#f59e0b'],
+    'epic'      => ['Épique',     '#7c3aed'],
+    'rare'      => ['Rare',       '#2563eb'],
+    'uncommon'  => ['Peu commun', '#059669'],
+    'common'    => ['Commun',     '#6b7280'],
+  ];
+  $rw_rarity_order = ['legendary','epic','rare','uncommon','common'];
+  $rw_badges_grouped = [];
+  foreach ($rw_rarity_order as $r) $rw_badges_grouped[$r] = [];
+  if ($rw_badges_db) {
+    foreach ($rw_badges_db as $b) {
+      $r = $b['rarity'] ?? 'common';
+      if (!isset($rw_badges_grouped[$r])) $r = 'common';
+      $rw_badges_grouped[$r][] = $b;
+    }
+  }
+  $rw_my_xp  = $is_logged ? (int)$active_user['xp_total'] : 0;
+  $rw_my_lvl = $is_logged ? (int)$active_user['level']    : 0;
+  ?>
+
+  <!-- XP -->
+  <div style="margin-bottom:36px">
+    <h2 style="font-size:1.05rem;font-weight:900;color:var(--navy-dark,#0c1e2e);margin-bottom:4px">🎯 Comment gagner des XP</h2>
+    <p style="font-size:.82rem;color:var(--text-muted,#6b7f96);margin-bottom:16px;line-height:1.5">Chaque action compte et s'accumule définitivement sur ton profil.</p>
+    <div style="background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.06)">
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr style="background:var(--beige,#f8f4ef)">
+            <th style="font-size:.65rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted,#6b7f96);padding:10px 14px;text-align:left;border-bottom:1px solid var(--beige-dark,#e8e0d4)">Action</th>
+            <th style="font-size:.65rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted,#6b7f96);padding:10px 14px;text-align:left;border-bottom:1px solid var(--beige-dark,#e8e0d4)">XP</th>
+            <th style="font-size:.65rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted,#6b7f96);padding:10px 14px;text-align:left;border-bottom:1px solid var(--beige-dark,#e8e0d4)">Fréquence</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ($rw_xp_rows as [$ico, $label, $xp, $freq]): ?>
+          <tr>
+            <td style="padding:11px 14px;font-size:.85rem;color:var(--text-mid,#3d5166);border-bottom:1px solid var(--beige-dark,#e8e0d4)"><?= $ico ?> <?= e($label) ?></td>
+            <td style="padding:11px 14px;border-bottom:1px solid var(--beige-dark,#e8e0d4)"><span style="background:rgba(234,86,73,.1);color:var(--primary,#ea5649);border-radius:20px;padding:2px 9px;font-size:.75rem;font-weight:800"><?= e($xp) ?></span></td>
+            <td style="padding:11px 14px;border-bottom:1px solid var(--beige-dark,#e8e0d4)"><span style="background:var(--beige,#f8f4ef);color:var(--text-muted,#6b7f96);border-radius:20px;padding:2px 8px;font-size:.7rem;font-weight:600"><?= e($freq) ?></span></td>
+          </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Clan points + Niveaux côte à côte -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:36px">
+    <!-- Clan points -->
+    <div>
+      <h2 style="font-size:1.05rem;font-weight:900;color:var(--navy-dark,#0c1e2e);margin-bottom:4px">🛡 Points de clan</h2>
+      <p style="font-size:.78rem;color:var(--text-muted,#6b7f96);margin-bottom:12px">Saisonniers — remis à zéro chaque saison</p>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <?php foreach ($rw_clan_rows as [$ico, $label, $pts]): ?>
+        <div style="background:#fff;border-radius:10px;padding:12px 14px;border:1.5px solid var(--beige-dark,#e8e0d4);display:flex;align-items:center;gap:10px">
+          <span style="font-size:1.2rem"><?= $ico ?></span>
+          <span style="flex:1;font-size:.82rem;color:var(--text-mid,#3d5166);font-weight:600"><?= e($label) ?></span>
+          <strong style="font-size:.95rem;color:var(--navy-dark,#0c1e2e)"><?= e($pts) ?></strong>
+        </div>
+        <?php endforeach; ?>
+      </div>
+    </div>
+
+    <!-- Niveaux -->
+    <div>
+      <h2 style="font-size:1.05rem;font-weight:900;color:var(--navy-dark,#0c1e2e);margin-bottom:4px">⬆️ Les niveaux</h2>
+      <p style="font-size:.78rem;color:var(--text-muted,#6b7f96);margin-bottom:12px">De Novice à Immortel</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <?php foreach ($rw_levels as $lv): ?>
+          <?php $is_cur = $is_logged && $rw_my_lvl === $lv['level']; ?>
+          <div style="background:#fff;border-radius:8px;padding:8px 10px;border:<?= $is_cur ? '2px solid var(--primary,#ea5649)' : '1.5px solid var(--beige-dark,#e8e0d4)' ?>;<?= $is_cur ? 'background:rgba(234,86,73,.03)' : '' ?>">
+            <div style="font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted,#6b7f96)">Niv. <?= $lv['level'] ?></div>
+            <div style="font-size:.8rem;font-weight:800;color:var(--navy-dark,#0c1e2e)"><?= e($lv['name']) ?></div>
+            <div style="font-size:.68rem;color:var(--text-muted,#6b7f96)"><?= $lv['threshold'] === 0 ? 'Dès l\'inscription' : number_format($lv['threshold']).' XP' ?></div>
+            <?php if ($is_cur): ?><span style="font-size:.58rem;font-weight:800;background:var(--primary,#ea5649);color:#fff;border-radius:20px;padding:1px 6px;display:inline-block;margin-top:2px">Ton niveau</span><?php endif; ?>
+          </div>
+        <?php endforeach; ?>
+      </div>
+    </div>
+  </div>
+
+  <!-- Badges -->
+  <div>
+    <h2 style="font-size:1.05rem;font-weight:900;color:var(--navy-dark,#0c1e2e);margin-bottom:4px">🏅 Les badges</h2>
+    <p style="font-size:.82rem;color:var(--text-muted,#6b7f96);margin-bottom:16px">
+      Récompenses permanentes, visibles sur ton profil.
+      <?php if ($is_logged): ?><strong><?= count($rw_my_badges) ?> débloqué<?= count($rw_my_badges) > 1 ? 's' : '' ?></strong> sur <?= $rw_badges_db ? count($rw_badges_db) : '?' ?>.<?php endif; ?>
+    </p>
+
+    <?php if ($rw_badges_db): ?>
+      <?php foreach ($rw_rarity_order as $rar): ?>
+        <?php if (empty($rw_badges_grouped[$rar])) continue; ?>
+        <?php [$rl, $rc] = $rw_rarity_labels[$rar]; ?>
+        <div style="margin-bottom:20px">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+            <span style="width:8px;height:8px;border-radius:50%;background:<?= e($rc) ?>;flex-shrink:0;display:inline-block"></span>
+            <span style="font-size:.7rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:<?= e($rc) ?>"><?= e($rl) ?></span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <?php foreach ($rw_badges_grouped[$rar] as $b): ?>
+              <?php $got = isset($rw_my_badges[$b['id']]); ?>
+              <div style="display:flex;align-items:center;gap:7px;background:#fff;border:<?= $got ? '1.5px solid var(--primary,#ea5649)' : '1.5px solid var(--beige-dark,#e8e0d4)' ?>;border-radius:9px;padding:7px 11px;opacity:<?= $got ? '1' : '.6' ?>">
+                <span style="font-size:1.2rem;line-height:1"><?= e($b['icon_emoji'] ?? '🏅') ?></span>
+                <div>
+                  <div style="font-size:.78rem;font-weight:700;color:var(--navy-dark,#0c1e2e);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><?= e($b['title']) ?></div>
+                  <?php
+                    $ct = $b['condition_type'] ?? '';
+                    $cv = (int)($b['condition_value'] ?? 0);
+                    $cond = match($ct) {
+                      'xp_threshold'   => number_format($cv).' XP',
+                      'missions_count' => $cv.' mission'.($cv>1?'s':'').' validée'.($cv>1?'s':''),
+                      'randos_count'   => $cv.' rando'.($cv>1?'s':'').' terminée'.($cv>1?'s':''),
+                      'registration'   => 'Inscription',
+                      default          => $ct,
+                    };
+                  ?>
+                  <?php if ($cond): ?><div style="font-size:.65rem;color:var(--text-muted,#6b7f96)"><?= e($cond) ?></div><?php endif; ?>
+                </div>
+                <?php if ($got): ?><span style="font-size:.65rem;color:var(--primary,#ea5649);font-weight:800;margin-left:2px">✓</span><?php endif; ?>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        </div>
+      <?php endforeach; ?>
+    <?php else: ?>
+      <p style="text-align:center;padding:32px;color:var(--text-muted,#6b7f96);font-size:.88rem">Les badges arrivent bientôt.</p>
+    <?php endif; ?>
+
+    <p style="font-size:.78rem;color:var(--text-muted,#6b7f96);margin-top:20px;line-height:1.6">
+      XP acquis définitivement · Points clan remis à zéro chaque saison · Certains badges non cumulables.
+    </p>
+  </div>
+
+</div><!-- /.comm-inner recompenses -->
 
 <?php endif; // tab ?>
 </div><!-- /.comm-content -->
