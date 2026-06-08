@@ -1,20 +1,20 @@
 <?php
 // ============================================================
-// ZONE 85 â€” Repositories (lecture donnÃ©es)
-// Retourne null si DB non disponible â†’ fallback sur data.php
+// ZONE 85 — Repositories (lecture données)
+// Retourne null si DB non disponible → fallback sur data.php
 // ============================================================
 
 if (!function_exists('db')) {
     require_once __DIR__ . '/db.php';
 }
 
-// â”€â”€ Helper interne â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Helper interne ────────────────────────────────────────────
 
 /**
  * Retourne l'id et la start_date de la saison active (singleton).
  */
 function _active_season_row(): ?array {
-    static $_cache = false; // false = non encore tentÃ©
+    static $_cache = false; // false = non encore tenté
     if ($_cache !== false) return $_cache ?: null;
     $pdo = db();
     if (!$pdo) { $_cache = null; return null; }
@@ -31,10 +31,10 @@ function _active_season_row(): ?array {
     }
 }
 
-// â”€â”€ Clans â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Clans ─────────────────────────────────────────────────────
 
 /**
- * Retourne les 3 clans indexÃ©s par slug, avec tous les champs attendus par clans.php / classement.php.
+ * Retourne les 3 clans indexés par slug, avec tous les champs attendus par clans.php / classement.php.
  * Champs : id, name, slug, mascot, hero_name, season_score, members_count, members,
  *          trophies, color, chip_class, chip_sm_class, text_class, label, description,
  *          race_width, podium_rank, podium_id, top_members.
@@ -74,9 +74,9 @@ function fetch_all_clans(): ?array {
         }
 
         $chip_map = [
-            'bocage'   => ['bocage-chip',   'bocage-chip-sm',   'bocage-text',   '🌳 Bocage'],
-            'littoral' => ['littoral-chip', 'littoral-chip-sm', 'littoral-text', '⚓ Littoral'],
-            'marais'   => ['marais-chip',   'marais-chip-sm',   'marais-text',   '🌿 Marais'],
+            'bocage'   => ['bocage-chip',   'bocage-chip-sm',   'bocage-text',   ' Bocage'],
+            'littoral' => ['littoral-chip', 'littoral-chip-sm', 'littoral-text', ' Littoral'],
+            'marais'   => ['marais-chip',   'marais-chip-sm',   'marais-text',   ' Marais'],
         ];
 
         $result = [];
@@ -85,7 +85,7 @@ function fetch_all_clans(): ?array {
             $cm         = $chip_map[$slug] ?? ['', '', '', ''];
             $score      = (int)$row['season_score'];
             $raceWidth  = ($maxScore > 0) ? (int)round(($score / $maxScore) * 94) : 0;
-            $podiumRank = $i + 1; // triÃ© par score DESC â†’ i=0 est le leader
+            $podiumRank = $i + 1; // trié par score DESC → i=0 est le leader
 
             $result[$slug] = [
                 'id'            => (int)$row['id'],
@@ -116,7 +116,7 @@ function fetch_all_clans(): ?array {
     }
 }
 
-// â”€â”€ Saisons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Saisons ───────────────────────────────────────────────────
 
 /**
  * Retourne la saison active ou null.
@@ -182,10 +182,10 @@ function fetch_current_season_scores(): ?array {
     }
 }
 
-// â”€â”€ Missions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Missions ──────────────────────────────────────────────────
 
 /**
- * Retourne les missions actives avec race_progress calculÃ©.
+ * Retourne les missions actives avec race_progress calculé.
  * Compatible avec $missions de data.php.
  */
 function fetch_featured_missions(int $limit = 9): ?array {
@@ -246,7 +246,7 @@ function fetch_featured_missions(int $limit = 9): ?array {
 }
 
 /**
- * Retourne les missions d'un type donnÃ©.
+ * Retourne les missions d'un type donné.
  */
 function fetch_missions_by_type(string $type): ?array {
     $pdo = db();
@@ -274,7 +274,7 @@ function fetch_missions_by_type(string $type): ?array {
     }
 }
 
-// â”€â”€ Badges â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Badges ────────────────────────────────────────────────────
 
 /**
  * Retourne les badges du catalogue.
@@ -290,7 +290,7 @@ function fetch_badges(?int $limit = null): ?array {
         $rows = $pdo->query($sql)->fetchAll();
         if (empty($rows)) return null;
         foreach ($rows as &$r) {
-            $r['obtained']     = false; // nÃ©cessite une session utilisateur
+            $r['obtained']     = false; // nécessite une session utilisateur
             $r['progress']     = 0;
             $r['xp_threshold'] = ($r['condition_type'] === 'xp_threshold')
                                  ? (int)$r['condition_value'] : null;
@@ -302,12 +302,12 @@ function fetch_badges(?int $limit = null): ?array {
     }
 }
 
-// â”€â”€ Membres â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Membres ───────────────────────────────────────────────────
 
 /**
- * Retourne le top membres global (classement par XP Ã  vie).
+ * Retourne le top membres global (classement par XP à vie).
  * Compatible avec $top_zonautes de data.php.
- * Le rang est calculÃ© cÃ´tÃ© PHP â€” compatible MySQL 8+ et MariaDB.
+ * Le rang est calculé côté PHP — compatible MySQL 8+ et MariaDB.
  */
 function fetch_top_members(int $limit = 8): ?array {
     $pdo = db();
@@ -355,7 +355,7 @@ function fetch_top_members(int $limit = 8): ?array {
 /**
  * Retourne le top membres d'un clan (par XP de saison).
  * Compatible avec $clans[$slug]['top_members'] de data.php.
- * Retourne [] (tableau vide) en cas d'Ã©chec pour ne pas casser les foreach.
+ * Retourne [] (tableau vide) en cas d'échec pour ne pas casser les foreach.
  */
 function fetch_top_members_by_clan(string $clanSlug, int $limit = 6): array {
     $pdo = db();
@@ -393,10 +393,10 @@ function fetch_top_members_by_clan(string $clanSlug, int $limit = 6): array {
     }
 }
 
-// â”€â”€ TrophÃ©es â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Trophées ──────────────────────────────────────────────────
 
 /**
- * Retourne les trophÃ©es des saisons archivÃ©es.
+ * Retourne les trophées des saisons archivées.
  * Compatible avec $season_trophies de data.php.
  */
 function fetch_trophies(): ?array {
@@ -418,7 +418,7 @@ function fetch_trophies(): ?array {
         $rows = $stmt->fetchAll();
         if (empty($rows)) return null;
         foreach ($rows as &$r) {
-            $r['medal']         = '🥇';
+            $r['medal']         = '';
             $r['main_mission']  = $r['main_mission'] ?? '';
             $r['contributions'] = (int)$r['contributions'];
         }
@@ -429,7 +429,7 @@ function fetch_trophies(): ?array {
     }
 }
 
-// â”€â”€ Hall â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Hall ──────────────────────────────────────────────────────
 
 /**
  * Retourne les top contributeurs du Hall.
@@ -460,14 +460,14 @@ function fetch_hall_contributors(int $limit = 5): ?array {
         $rows = $stmt->fetchAll();
         if (empty($rows)) return null;
         $clan_labels = [
-            'bocage'   => '🌳 Bocage',
-            'littoral' => '⚓ Littoral',
-            'marais'   => '🌿 Marais',
+            'bocage'   => ' Bocage',
+            'littoral' => ' Littoral',
+            'marais'   => ' Marais',
         ];
         foreach ($rows as &$r) {
             $r['season_pts'] = (int)$r['season_pts'];
             $r['clan_label'] = $clan_labels[$r['clan_slug']] ?? $r['clan_name'];
-            $r['avatar']     = '🧭';
+            $r['avatar']     = '';
             $r['type']       = 'Contribution';
         }
         return $rows;
@@ -516,7 +516,7 @@ function fetch_hall_photos(int $limit = 8): ?array {
     }
 }
 
-// â”€â”€ Profil utilisateur â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Profil utilisateur ────────────────────────────────────────
 
 /**
  * Retourne le profil d'un utilisateur par son ID.
@@ -549,13 +549,13 @@ function fetch_user_profile(int $userId): ?array {
         $seasonStart = $sr ? $sr['start_date'] : '1970-01-01';
         $seasonId    = $sr ? (int)$sr['id'] : 0;
 
-        // XP personnels gagnés cette saison (pour référence interne)
+        // XP personnels gagn�s cette saison (pour r�f�rence interne)
         $s4 = $pdo->prepare("SELECT COALESCE(SUM(xp_amount), 0) FROM xp_logs WHERE user_id = :id AND created_at >= :start");
         $s4->execute([':id' => $userId, ':start' => $seasonStart]);
         $xp_season = (int)$s4->fetchColumn();
 
-        // Points clan réellement apportés cette saison (source : clan_score_logs)
-        // Distinct des XP personnels — c'est ce que le joueur a donné à son clan
+        // Points clan r�ellement apport�s cette saison (source : clan_score_logs)
+        // Distinct des XP personnels � c'est ce que le joueur a donn� � son clan
         $clan_pts = 0;
         if ($seasonId > 0) {
             $s5 = $pdo->prepare("
@@ -584,14 +584,14 @@ function fetch_user_profile(int $userId): ?array {
             $rank_in_clan = (int)$s6->fetchColumn();
         }
 
-        // Résolution de l'avatar (fix encodage emoji)
+        // R�solution de l'avatar (fix encodage emoji)
         $avatar_config = [];
         if (!empty($row['avatar_config'])) {
             $avatar_config = json_decode($row['avatar_config'], true) ?? [];
         }
         $avatar = $row['avatar_type'] === 'upload'
-            ? ($row['avatar_file'] ?? '🧭')
-            : ($avatar_config['emoji'] ?? '🧭');
+            ? ($row['avatar_file'] ?? '')
+            : ($avatar_config['emoji'] ?? '');
 
         return [
             'id'                   => (int)$row['id'],
@@ -603,7 +603,7 @@ function fetch_user_profile(int $userId): ?array {
             'level'                => (int)$row['level'],
             'xp_total'             => (int)$row['xp_total'],
             'xp_this_season'       => $xp_season,   // XP perso cette saison
-            'clan_pts_contributed' => $clan_pts,     // Pts clan apportés cette saison
+            'clan_pts_contributed' => $clan_pts,     // Pts clan apport�s cette saison
             'avatar'               => $avatar,
             'avatar_type'          => $row['avatar_type'] ?? 'preset',
             'bio'                  => $row['bio'] ?? '',
@@ -619,7 +619,7 @@ function fetch_user_profile(int $userId): ?array {
     }
 }
 
-// â”€â”€ Hall items â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Hall items ────────────────────────────────────────────────
 
 /**
  * Retourne les items du Hall (tous types confondus).
@@ -647,7 +647,7 @@ function fetch_hall_items(int $limit = 12): ?array {
 }
 
 /**
- * Retourne les items du Hall filtrÃ©s par type.
+ * Retourne les items du Hall filtrés par type.
  * Types : 'photo', 'contribution', 'keto', 'rando', 'trophy', 'member', 'archive'
  */
 function fetch_hall_items_by_type(string $type, int $limit = 12): array {
@@ -698,11 +698,11 @@ function fetch_featured_hall_items(int $limit = 6): array {
     }
 }
 
-// â”€â”€ Utilisateur (dÃ©mo & enrichissement) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Utilisateur (démo & enrichissement) ──────────────────────
 
 /**
- * Retourne un utilisateur de dÃ©monstration par ID (pour profil.php sans auth rÃ©elle).
- * DÃ©lÃ¨gue Ã  fetch_user_profile() â€” retourne null si indisponible.
+ * Retourne un utilisateur de démonstration par ID (pour profil.php sans auth réelle).
+ * Délègue à fetch_user_profile() — retourne null si indisponible.
  */
 function fetch_demo_user(int $userId = 1): ?array {
     return fetch_user_profile($userId);
@@ -764,10 +764,10 @@ function fetch_user_participations(int $userId, int $limit = 20): array {
     }
 }
 
-// â”€â”€ Missions par saison â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Missions par saison ───────────────────────────────────────
 
 /**
- * Retourne les missions liÃ©es Ã  une saison donnÃ©e.
+ * Retourne les missions liées à une saison donnée.
  */
 function fetch_missions_by_season(int $seasonId, string $status = 'active'): ?array {
     $pdo = db();
@@ -795,10 +795,10 @@ function fetch_missions_by_season(int $seasonId, string $status = 'active'): ?ar
     }
 }
 
-// â”€â”€ Historique XP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Historique XP ─────────────────────────────────────────────
 
 /**
- * Retourne les derniÃ¨res entrÃ©es XP d'un utilisateur.
+ * Retourne les dernières entrées XP d'un utilisateur.
  */
 function fetch_user_xp_logs(int $userId, int $limit = 10): array {
     $pdo = db();
@@ -823,10 +823,10 @@ function fetch_user_xp_logs(int $userId, int $limit = 10): array {
 
 
 
-// ── Feed d'activité unifié ────────────────────────────────────────
+//  Feed d'activit� unifi� 
 
 /**
- * Retourne les N derniers événements d'activité d'un user, toutes sources confondues.
+ * Retourne les N derniers �v�nements d'activit� d'un user, toutes sources confondues.
  */
 function fetch_user_activity_feed(int $userId, int $limit = 10): array {
     $pdo = db();
@@ -834,7 +834,7 @@ function fetch_user_activity_feed(int $userId, int $limit = 10): array {
     $items = [];
 
     try {
-        // Missions participées
+        // Missions particip�es
         $s = $pdo->prepare("
             SELECT 'mission' AS feed_type, p.created_at AS feed_date,
                    m.title AS feed_title, m.mission_type AS feed_sub,
@@ -847,7 +847,7 @@ function fetch_user_activity_feed(int $userId, int $limit = 10): array {
         $s->execute([':id' => $userId]);
         $items = array_merge($items, $s->fetchAll());
 
-        // Randos (toutes, pas seulement validées)
+        // Randos (toutes, pas seulement valid�es)
         $s = $pdo->prepare("
             SELECT 'rando' AS feed_type, rp.done_at AS feed_date,
                    r.title AS feed_title, 'rando' AS feed_sub,
@@ -860,7 +860,7 @@ function fetch_user_activity_feed(int $userId, int $limit = 10): array {
         $s->execute([':id' => $userId]);
         $items = array_merge($items, $s->fetchAll());
 
-        // Commentaires Échos ayant reçu des XP
+        // Commentaires �chos ayant re�u des XP
         $s = $pdo->prepare("
             SELECT 'comment' AS feed_type, ac.created_at AS feed_date,
                    a.title AS feed_title, 'comment' AS feed_sub,
@@ -873,7 +873,7 @@ function fetch_user_activity_feed(int $userId, int $limit = 10): array {
         $s->execute([':id' => $userId]);
         $items = array_merge($items, $s->fetchAll());
 
-        // XP divers (badges, admin, inscription…) — sources non couvertes ci-dessus
+        // XP divers (badges, admin, inscription�) � sources non couvertes ci-dessus
         $s = $pdo->prepare("
             SELECT 'xp_event' AS feed_type, xl.created_at AS feed_date,
                    COALESCE(xl.reason, xl.source_type) AS feed_title,
@@ -891,12 +891,12 @@ function fetch_user_activity_feed(int $userId, int $limit = 10): array {
         error_log('[ZONE85] fetch_user_activity_feed : ' . $e->getMessage());
     }
 
-    // Tri chronologique décroissant puis troncature
+    // Tri chronologique d�croissant puis troncature
     usort($items, fn($a, $b) => strcmp($b['feed_date'] ?? '', $a['feed_date'] ?? ''));
     return array_slice($items, 0, $limit);
 }
 
-// â”€â”€ Moteur de participation V1 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Moteur de participation V1 ────────────────────────────────
 
 /**
  * Retourne une mission par son ID.
@@ -952,8 +952,8 @@ function fetch_active_missions(int $limit = 20): ?array {
 }
 
 /**
- * Retourne les IDs des missions auxquelles l'utilisateur a participÃ©.
- * UtilisÃ© pour afficher l'Ã©tat "DÃ©jÃ  participÃ©" sur les listes.
+ * Retourne les IDs des missions auxquelles l'utilisateur a participé.
+ * Utilisé pour afficher l'état "Déjà participé" sur les listes.
  */
 function fetch_user_participated_mission_ids(int $userId): array {
     $pdo = db();
@@ -969,7 +969,7 @@ function fetch_user_participated_mission_ids(int $userId): array {
 }
 
 /**
- * VÃ©rifie si un utilisateur a dÃ©jÃ  participÃ© Ã  une mission.
+ * Vérifie si un utilisateur a déjà participé à une mission.
  */
 function has_user_participated(int $userId, int $missionId): bool {
     $pdo = db();
@@ -988,7 +988,7 @@ function has_user_participated(int $userId, int $missionId): bool {
 }
 
 /**
- * Attribue des XP Ã  un utilisateur (standalone, transaction propre).
+ * Attribue des XP à un utilisateur (standalone, transaction propre).
  * Pour usage hors participation (admin, bonus ponctuel).
  */
 function award_xp(int $userId, int $amount, string $sourceType, ?int $sourceId, string $reason): bool {
@@ -1017,7 +1017,7 @@ function award_xp(int $userId, int $amount, string $sourceType, ?int $sourceId, 
         if ($newLevel > $oldLevel && function_exists('push_notification')) {
             $lvlName = function_exists('get_level_name') ? get_level_name($newLevel) : 'Niveau ' . $newLevel;
             push_notification($userId, 'level_up',
-                'Niveau ' . $newLevel . ' atteint — ' . $lvlName . ' !',
+                'Niveau ' . $newLevel . ' atteint � ' . $lvlName . ' !',
                 ['link_url' => 'profil.php']
             );
         }
@@ -1034,7 +1034,7 @@ function award_xp(int $userId, int $amount, string $sourceType, ?int $sourceId, 
 }
 
 /**
- * Attribue des points Ã  un clan pour une saison (standalone, transaction propre).
+ * Attribue des points à un clan pour une saison (standalone, transaction propre).
  * Pour usage hors participation (admin, bonus ponctuel).
  */
 function award_clan_points(int $clanId, int $seasonId, int $points, string $sourceType,
@@ -1060,10 +1060,10 @@ function award_clan_points(int $clanId, int $seasonId, int $points, string $sour
 }
 
 /**
- * Enregistre une participation complÃ¨te en une transaction atomique.
+ * Enregistre une participation complète en une transaction atomique.
  *
- * Ã‰tapes : doublon check â†’ INSERT participations â†’ INSERT xp_logs â†’
- *          UPDATE users.xp_total + level â†’ INSERT clan_score_logs (si applicable).
+ * Étapes : doublon check → INSERT participations → INSERT xp_logs →
+ *          UPDATE users.xp_total + level → INSERT clan_score_logs (si applicable).
  *
  * @return array{ok:bool, error:?string, xp_awarded:int, new_xp_total:int,
  *               participation_id:int, status:string, debug_error:?string}
@@ -1071,7 +1071,7 @@ function award_clan_points(int $clanId, int $seasonId, int $points, string $sour
 function create_participation(int $userId, int $missionId, array $data = []): array {
     $pdo = db();
     if (!$pdo) {
-        return ['ok' => false, 'error' => 'Base de donnÃ©es non disponible.',
+        return ['ok' => false, 'error' => 'Base de données non disponible.',
                 'xp_awarded' => 0, 'new_xp_total' => 0, 'participation_id' => 0, 'status' => ''];
     }
 
@@ -1080,7 +1080,7 @@ function create_participation(int $userId, int $missionId, array $data = []): ar
         $dup = $pdo->prepare("SELECT COUNT(*) FROM participations WHERE user_id = :uid AND mission_id = :mid");
         $dup->execute([':uid' => $userId, ':mid' => $missionId]);
         if ((int)$dup->fetchColumn() > 0) {
-            return ['ok' => false, 'error' => 'Tu as dÃ©jÃ  participÃ© Ã  cette mission.',
+            return ['ok' => false, 'error' => 'Tu as déjà participé à cette mission.',
                     'xp_awarded' => 0, 'new_xp_total' => 0, 'participation_id' => 0, 'status' => 'duplicate'];
         }
 
@@ -1109,7 +1109,7 @@ function create_participation(int $userId, int $missionId, array $data = []): ar
         if ($shouldAuto && $xpToAward <= 0) $xpToAward = 5; // fallback V1
         $clanPts     = $shouldAuto ? (int)$mission['clan_points_participation'] : 0;
 
-        // â”€â”€ TRANSACTION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── TRANSACTION ──────────────────────────────────────────
         $pdo->beginTransaction();
 
         // 5. INSERT participation
@@ -1135,7 +1135,7 @@ function create_participation(int $userId, int $missionId, array $data = []): ar
 
         $newXpTotal = (int)$user['xp_total'];
 
-        // 6. XP si auto-validÃ©
+        // 6. XP si auto-validé
         if ($xpToAward > 0) {
             $pdo->prepare("
                 INSERT INTO xp_logs (user_id, source_type, source_id, xp_amount, reason)
@@ -1144,7 +1144,7 @@ function create_participation(int $userId, int $missionId, array $data = []): ar
                 ':uid'    => $userId,
                 ':sid'    => $participationId,
                 ':amt'    => $xpToAward,
-                ':reason' => 'Participation Ã  la mission : ' . mb_substr($mission['title'], 0, 80),
+                ':reason' => 'Participation à la mission : ' . mb_substr($mission['title'], 0, 80),
             ]);
 
             $pdo->prepare("UPDATE users SET xp_total = xp_total + :amt WHERE id = :uid")
@@ -1180,7 +1180,7 @@ function create_participation(int $userId, int $missionId, array $data = []): ar
 
         $pdo->commit();
 
-        // Badge de récompense spécifique à la mission (auto uniquement, non-blocking)
+        // Badge de r�compense sp�cifique � la mission (auto uniquement, non-blocking)
         if ($shouldAuto && !empty($mission['badge_reward_id'])) {
             try {
                 $pdo->prepare("
@@ -1208,7 +1208,7 @@ function create_participation(int $userId, int $missionId, array $data = []): ar
         $debug = (defined('APP_ENV') && APP_ENV === 'dev') ? $e->getMessage() : null;
         return [
             'ok'               => false,
-            'error'            => 'Une erreur est survenue. Veuillez rÃ©essayer.',
+            'error'            => 'Une erreur est survenue. Veuillez réessayer.',
             'debug_error'      => $debug,
             'xp_awarded'       => 0,
             'new_xp_total'     => 0,
@@ -1219,22 +1219,22 @@ function create_participation(int $userId, int $missionId, array $data = []): ar
 }
 
 // ============================================================
-// ADMIN V8 â€” Validation / Refus participations manuelles
+// ADMIN V8 — Validation / Refus participations manuelles
 // ============================================================
 
 /**
- * Valide une participation manuelle (pending â†’ validated).
+ * Valide une participation manuelle (pending → validated).
  * Attribue xp_success et clan_points_success en transaction.
- * Idempotent : si dÃ©jÃ  traitÃ©e, retourne une erreur propre.
+ * Idempotent : si déjà traitée, retourne une erreur propre.
  *
  * @return array{ok:bool, error:?string, xp_awarded:int, clan_pts:int}
  */
 function admin_validate_participation(int $participation_id, int $admin_user_id): array {
     $pdo = db();
-    if (!$pdo) return ['ok' => false, 'error' => 'Base de donnÃ©es non disponible.', 'xp_awarded' => 0, 'clan_pts' => 0];
+    if (!$pdo) return ['ok' => false, 'error' => 'Base de données non disponible.', 'xp_awarded' => 0, 'clan_pts' => 0];
 
     try {
-        // 1. Charger la participation + mission + user en une requÃªte
+        // 1. Charger la participation + mission + user en une requête
         $s = $pdo->prepare("
             SELECT p.*, m.xp_success, m.clan_points_success, m.badge_reward_id, m.title AS mission_title,
                    u.clan_id, u.xp_total, u.level, u.pseudo
@@ -1251,7 +1251,7 @@ function admin_validate_participation(int $participation_id, int $admin_user_id)
             return ['ok' => false, 'error' => 'Participation introuvable.', 'xp_awarded' => 0, 'clan_pts' => 0];
         }
         if ($row['status'] !== 'pending') {
-            return ['ok' => false, 'error' => 'Action impossible : participation dÃ©jÃ  traitÃ©e (' . $row['status'] . ').', 'xp_awarded' => 0, 'clan_pts' => 0];
+            return ['ok' => false, 'error' => 'Action impossible : participation déjà traitée (' . $row['status'] . ').', 'xp_awarded' => 0, 'clan_pts' => 0];
         }
 
         $xp_success  = (int)$row['xp_success'];
@@ -1262,7 +1262,7 @@ function admin_validate_participation(int $participation_id, int $admin_user_id)
 
         $pdo->beginTransaction();
 
-        // 2. Mettre Ã  jour la participation
+        // 2. Mettre à jour la participation
         $pdo->prepare("
             UPDATE participations
             SET status       = 'validated',
@@ -1275,7 +1275,7 @@ function admin_validate_participation(int $participation_id, int $admin_user_id)
             WHERE id = :id AND status = 'pending'
         ")->execute([':admin' => $admin_user_id, ':xp' => $xp_success, ':cp' => $clan_pts, ':id' => $participation_id]);
 
-        // 3. XP rÃ©ussite si > 0
+        // 3. XP réussite si > 0
         if ($xp_success > 0) {
             $pdo->prepare("
                 INSERT INTO xp_logs (user_id, source_type, source_id, xp_amount, reason)
@@ -1284,7 +1284,7 @@ function admin_validate_participation(int $participation_id, int $admin_user_id)
                 ':uid'    => $user_id,
                 ':src'    => $participation_id,
                 ':amt'    => $xp_success,
-                ':reason' => 'RÃ©ussite validÃ©e : ' . mb_substr($row['mission_title'], 0, 60),
+                ':reason' => 'Réussite validée : ' . mb_substr($row['mission_title'], 0, 60),
             ]);
 
             $pdo->prepare("UPDATE users SET xp_total = xp_total + :amt WHERE id = :uid")
@@ -1298,7 +1298,7 @@ function admin_validate_participation(int $participation_id, int $admin_user_id)
             }
         }
 
-        // 4. Points clan rÃ©ussite si > 0
+        // 4. Points clan réussite si > 0
         if ($clan_pts > 0 && $clan_id > 0) {
             $sr = _active_season_row();
             if ($sr) {
@@ -1312,7 +1312,7 @@ function admin_validate_participation(int $participation_id, int $admin_user_id)
                     ':uid'    => $user_id,
                     ':src'    => $participation_id,
                     ':pts'    => $clan_pts,
-                    ':reason' => 'RÃ©ussite clan validÃ©e : ' . mb_substr($row['mission_title'], 0, 60),
+                    ':reason' => 'Réussite clan validée : ' . mb_substr($row['mission_title'], 0, 60),
                 ]);
             }
         }
@@ -1322,7 +1322,7 @@ function admin_validate_participation(int $participation_id, int $admin_user_id)
         // Auto-badge check after participation validated (non-blocking)
         check_and_award_badges($user_id);
 
-        // Badge de récompense spécifique à la mission (non-blocking)
+        // Badge de r�compense sp�cifique � la mission (non-blocking)
         if (!empty($row['badge_reward_id'])) {
             try {
                 $pdo->prepare("
@@ -1334,11 +1334,11 @@ function admin_validate_participation(int $participation_id, int $admin_user_id)
             }
         }
 
-        // Notification + fil communautaire (hors transaction — ne bloque pas si table absente)
+        // Notification + fil communautaire (hors transaction � ne bloque pas si table absente)
         if (function_exists('push_notification')) {
             $xp_str = $xp_success > 0 ? ' (+' . $xp_success . ' XP)' : '';
             push_notification($user_id, 'mission_validated',
-                'Mission validée : ' . mb_substr($row['mission_title'], 0, 60) . $xp_str,
+                'Mission valid�e : ' . mb_substr($row['mission_title'], 0, 60) . $xp_str,
                 ['link_url' => 'missions.php', 'mission_id' => (int)$row['mission_id']]
             );
         }
@@ -1347,8 +1347,8 @@ function admin_validate_participation(int $participation_id, int $admin_user_id)
                 'user_id'    => $user_id,
                 'clan_id'    => $clan_id ?: null,
                 'mission_id' => (int)$row['mission_id'],
-                'title'      => ($row['pseudo'] ?? 'Zonaute') . ' a validé : ' . mb_substr($row['mission_title'], 0, 60),
-                'icon_emoji' => '✅',
+                'title'      => ($row['pseudo'] ?? 'Zonaute') . ' a valid� : ' . mb_substr($row['mission_title'], 0, 60),
+                'icon_emoji' => '',
                 'link_url'   => 'mission.php?id=' . (int)$row['mission_id'],
             ]);
         }
@@ -1364,14 +1364,14 @@ function admin_validate_participation(int $participation_id, int $admin_user_id)
 }
 
 /**
- * Refuse une participation manuelle (pending â†’ rejected).
- * N'attribue aucun XP rÃ©ussite ni points clan.
+ * Refuse une participation manuelle (pending → rejected).
+ * N'attribue aucun XP réussite ni points clan.
  *
  * @return array{ok:bool, error:?string}
  */
 function admin_reject_participation(int $participation_id, int $admin_user_id): array {
     $pdo = db();
-    if (!$pdo) return ['ok' => false, 'error' => 'Base de donnÃ©es non disponible.'];
+    if (!$pdo) return ['ok' => false, 'error' => 'Base de données non disponible.'];
 
     try {
         $s = $pdo->prepare("SELECT status FROM participations WHERE id = :id LIMIT 1");
@@ -1382,7 +1382,7 @@ function admin_reject_participation(int $participation_id, int $admin_user_id): 
             return ['ok' => false, 'error' => 'Participation introuvable.'];
         }
         if ($row['status'] !== 'pending') {
-            return ['ok' => false, 'error' => 'Action impossible : participation dÃ©jÃ  traitÃ©e (' . $row['status'] . ').'];
+            return ['ok' => false, 'error' => 'Action impossible : participation déjà traitée (' . $row['status'] . ').'];
         }
 
         $pdo->prepare("
@@ -1403,12 +1403,12 @@ function admin_reject_participation(int $participation_id, int $admin_user_id): 
 }
 
 // ============================================================
-// HIDDEN HUNT V9 â€” Moteur collectibles
+// HIDDEN HUNT V9 — Moteur collectibles
 // ============================================================
 
 /**
- * Retourne les collectibles actifs pour une page donnÃ©e et une mission active.
- * Si $user_id > 0 : exclut ceux dÃ©jÃ  trouvÃ©s par l'utilisateur.
+ * Retourne les collectibles actifs pour une page donnée et une mission active.
+ * Si $user_id > 0 : exclut ceux déjà trouvés par l'utilisateur.
  */
 function fetch_active_collectibles_for_page(string $page_slug, int $user_id = 0): array {
     $pdo = db();
@@ -1453,7 +1453,7 @@ function fetch_active_collectibles_for_page(string $page_slug, int $user_id = 0)
 }
 
 /**
- * Retourne le nombre d'objets trouvÃ©s par un user pour une mission.
+ * Retourne le nombre d'objets trouvés par un user pour une mission.
  */
 function count_user_collectibles(int $user_id, int $mission_id): int {
     $pdo = db();
@@ -1485,14 +1485,14 @@ function count_mission_collectibles(int $mission_id): int {
 }
 
 /**
- * Retourne les missions hidden_hunt en cours ou terminÃ©es pour un user (profil).
+ * Retourne les missions hidden_hunt en cours ou terminées pour un user (profil).
  * Retourne [] si aucune.
  */
 function fetch_user_hidden_hunts(int $user_id): array {
     $pdo = db();
     if (!$pdo) return [];
     try {
-        // Missions hidden_hunt actives ou que l'user a commencÃ©
+        // Missions hidden_hunt actives ou que l'user a commencé
         $s = $pdo->prepare("
             SELECT DISTINCT
                 m.id, m.title, m.slug, m.status,
@@ -1526,8 +1526,8 @@ function fetch_user_hidden_hunts(int $user_id): array {
 }
 
 /**
- * Enregistre qu'un utilisateur a trouvÃ© un collectible.
- * GÃ¨re la progression et la complÃ©tion de mission en transaction atomique.
+ * Enregistre qu'un utilisateur a trouvé un collectible.
+ * Gère la progression et la complétion de mission en transaction atomique.
  *
  * @return array{ok:bool, reason:string, message:string, found:int, total:int,
  *               completed:bool, xp_awarded:int, badge_awarded:?string}
@@ -1569,7 +1569,7 @@ function process_collectible_found(int $user_id, int $collectible_id): array {
             $found = count_user_collectibles($user_id, $mission_id);
             $total = count_mission_collectibles($mission_id);
             return ['ok'=>false,'reason'=>'already_found',
-                    'message'=>'Tu avais dÃ©jÃ  trouvÃ© cet objet.',
+                    'message'=>'Tu avais déjà trouvé cet objet.',
                     'found'=>$found,'total'=>$total,'completed'=>($found>=$total),'xp_awarded'=>0,'badge_awarded'=>null];
         }
 
@@ -1582,7 +1582,7 @@ function process_collectible_found(int $user_id, int $collectible_id): array {
         $pdo->prepare("INSERT INTO user_collectibles (user_id, mission_id, collectible_id) VALUES (:uid,:mid,:cid)")
             ->execute([':uid'=>$user_id, ':mid'=>$mission_id, ':cid'=>$collectible_id]);
 
-        // 5. Compter le nombre trouvÃ© maintenant
+        // 5. Compter le nombre trouvé maintenant
         $s2 = $pdo->prepare("SELECT COUNT(*) FROM user_collectibles WHERE user_id=:uid AND mission_id=:mid");
         $s2->execute([':uid'=>$user_id, ':mid'=>$mission_id]);
         $found = (int)$s2->fetchColumn();
@@ -1592,26 +1592,26 @@ function process_collectible_found(int $user_id, int $collectible_id): array {
         $badge_name  = null;
         $new_xp      = (int)$coll['xp_total'];
 
-        // 6. Assurer l'existence d'une participation (INSERT IGNORE = no-op si elle existe dÃ©jÃ )
+        // 6. Assurer l'existence d'une participation (INSERT IGNORE = no-op si elle existe déjà)
         $pdo->prepare("
             INSERT IGNORE INTO participations
                 (user_id, mission_id, status, is_success, xp_awarded, clan_points_awarded)
             VALUES (:uid, :mid, 'pending', 0, 0, 0)
         ")->execute([':uid'=>$user_id, ':mid'=>$mission_id]);
 
-        // 7. Si complÃ©tion : valider + XP + pts clan + badge
+        // 7. Si complétion : valider + XP + pts clan + badge
         if ($completed) {
             $xp_success = (int)$coll['xp_success'];
             $clan_pts   = (int)$coll['clan_points_success'];
             $clan_id    = (int)$coll['clan_id'];
 
-            // VÃ©rifier si la participation Ã©tait dÃ©jÃ  validÃ©e (anti-doublon XP)
+            // Vérifier si la participation était déjà validée (anti-doublon XP)
             $chk = $pdo->prepare("SELECT status FROM participations WHERE user_id=:uid AND mission_id=:mid LIMIT 1");
             $chk->execute([':uid'=>$user_id, ':mid'=>$mission_id]);
             $chk_row = $chk->fetch();
             $already_validated = ($chk_row && in_array($chk_row['status'], ['validated','auto_validated']));
 
-            // Valider la participation â€” sans filtre sur status (robuste dans tous les cas)
+            // Valider la participation — sans filtre sur status (robuste dans tous les cas)
             $pdo->prepare("
                 UPDATE participations
                 SET status='auto_validated', is_success=1,
@@ -1622,7 +1622,7 @@ function process_collectible_found(int $user_id, int $collectible_id): array {
                 WHERE user_id=:uid AND mission_id=:mid
             ")->execute([':xp'=>$xp_success, ':cp'=>$clan_pts, ':uid'=>$user_id, ':mid'=>$mission_id]);
 
-            // XP rÃ©ussite â€” uniquement si pas dÃ©jÃ  attribuÃ©s
+            // XP réussite — uniquement si pas déjà attribués
             if ($xp_success > 0 && !$already_validated) {
                 $part_s = $pdo->prepare("SELECT id FROM participations WHERE user_id=:uid AND mission_id=:mid LIMIT 1");
                 $part_s->execute([':uid'=>$user_id, ':mid'=>$mission_id]);
@@ -1636,7 +1636,7 @@ function process_collectible_found(int $user_id, int $collectible_id): array {
                     ':uid'    => $user_id,
                     ':src'    => $part_src,
                     ':amt'    => $xp_success,
-                    ':reason' => 'Chasse complÃ©tÃ©e : ' . mb_substr($coll['mission_title'], 0, 60),
+                    ':reason' => 'Chasse complétée : ' . mb_substr($coll['mission_title'], 0, 60),
                 ]);
 
                 $pdo->prepare("UPDATE users SET xp_total=xp_total+:amt WHERE id=:uid")
@@ -1652,7 +1652,7 @@ function process_collectible_found(int $user_id, int $collectible_id): array {
                 $xp_awarded = $xp_success;
             }
 
-            // Points clan â€” uniquement si pas dÃ©jÃ  attribuÃ©s
+            // Points clan — uniquement si pas déjà attribués
             if ($clan_pts > 0 && $clan_id > 0 && !$already_validated) {
                 $sr = _active_season_row();
                 if ($sr) {
@@ -1668,7 +1668,7 @@ function process_collectible_found(int $user_id, int $collectible_id): array {
                 }
             }
 
-            // Badge si dÃ©fini
+            // Badge si défini
             if (!empty($coll['badge_reward_id'])) {
                 try {
                     $bs = $pdo->prepare("SELECT title FROM badges WHERE id=:bid LIMIT 1");
@@ -1690,8 +1690,8 @@ function process_collectible_found(int $user_id, int $collectible_id): array {
         $pdo->commit();
 
         $msg = $completed
-            ? 'Bravo ! Tu as complÃ©tÃ© la chasse !'
-            : ($coll['success_message'] ?: ('TrouvÃ© ! ' . $coll['title']));
+            ? 'Bravo ! Tu as complété la chasse !'
+            : ($coll['success_message'] ?: ('Trouvé ! ' . $coll['title']));
 
         return [
             'ok'            => true,
@@ -1738,7 +1738,7 @@ function fetch_mission_collectibles_admin(int $mission_id): array {
 }
 
 /**
- * Helper d'upload pour objets cachÃ©s et GIFs de succÃ¨s.
+ * Helper d'upload pour objets cachés et GIFs de succès.
  * $type = 'object' | 'success'
  */
 function upload_collectible_media(array $file, string $type = 'object'): array {
@@ -1757,41 +1757,41 @@ function upload_collectible_media(array $file, string $type = 'object'): array {
         return ['ok'=>false, 'error'=>'Fichier trop lourd (max ' . ($max_size/1024/1024) . ' Mo).'];
     }
 
-    // Pour les GIFs, vÃ©rifier par extension + mime
+    // Pour les GIFs, vérifier par extension + mime
     $finfo = new finfo(FILEINFO_MIME_TYPE);
     $mime  = $finfo->file($file['tmp_name']);
     if (!array_key_exists($mime, $allowed)) {
-        return ['ok'=>false, 'error'=>'Type non autorisé. Utilisez jpg, png, webp ou gif.'];
+        return ['ok'=>false, 'error'=>'Type non autoris�. Utilisez jpg, png, webp ou gif.'];
     }
 
-    // Vérification image réelle via getimagesize() (non appliqué aux GIF animés)
+    // V�rification image r�elle via getimagesize() (non appliqu� aux GIF anim�s)
     if ($mime !== 'image/gif') {
         $img_info = @getimagesize($file['tmp_name']);
         if (!$img_info || empty($img_info[0]) || empty($img_info[1])) {
             return ['ok'=>false, 'error'=>'Fichier image invalide ou corrompu.'];
         }
-        // Dimensions max : 2000 px pour les collectibles (valeur spécifique, indépendante de UPLOAD_MAX_DIM)
+        // Dimensions max : 2000 px pour les collectibles (valeur sp�cifique, ind�pendante de UPLOAD_MAX_DIM)
         $max_dim = 2000;
         if ($img_info[0] > $max_dim || $img_info[1] > $max_dim) {
-            return ['ok'=>false, 'error'=>"Dimensions trop grandes (max {$max_dim}×{$max_dim} px). Réduisez votre image avant l'envoi."];
+            return ['ok'=>false, 'error'=>"Dimensions trop grandes (max {$max_dim}�{$max_dim} px). R�duisez votre image avant l'envoi."];
         }
     }
 
     $upload_dir = defined('BASE_PATH') ? BASE_PATH . 'uploads/collectibles/' : dirname(__DIR__) . '/uploads/collectibles/';
     if (!is_dir($upload_dir)) {
         if (!mkdir($upload_dir, 0755, true)) {
-            return ['ok'=>false, 'error'=>'Impossible de créer le dossier de destination.'];
+            return ['ok'=>false, 'error'=>'Impossible de cr�er le dossier de destination.'];
         }
     }
 
-    // Garantir la présence du .htaccess de protection dans uploads/collectibles/
+    // Garantir la pr�sence du .htaccess de protection dans uploads/collectibles/
     $htaccess = $upload_dir . '.htaccess';
     if (!file_exists($htaccess)) {
         $ht_content = function_exists('_upload_htaccess_content')
             ? _upload_htaccess_content()
             : "Options -Indexes\n<FilesMatch \"\\.(php[0-9]?|phtml|pl|py|cgi|sh|bash)$\">\n<IfModule mod_authz_core.c>\nRequire all denied\n</IfModule>\n</FilesMatch>\n";
         if (@file_put_contents($htaccess, $ht_content) === false) {
-            error_log('[ZONE85] upload_collectible_media : impossible d\'écrire le .htaccess dans ' . $upload_dir);
+            error_log('[ZONE85] upload_collectible_media : impossible d\'�crire le .htaccess dans ' . $upload_dir);
         }
     }
 
@@ -1809,11 +1809,11 @@ function upload_collectible_media(array $file, string $type = 'object'): array {
 
 
 // ============================================================
-// V11 â€” Fonctions communautaires
+// V11 — Fonctions communautaires
 // ============================================================
 
 /**
- * InsÃ¨re un Ã©vÃ©nement dans le feed communautaire.
+ * Insère un événement dans le feed communautaire.
  * Non-bloquant : catch silencieux si la table n'existe pas encore.
  */
 function push_community_feed(string $event_type, array $data = []): void {
@@ -1840,7 +1840,7 @@ function push_community_feed(string $event_type, array $data = []): void {
             ':sid'    => $data['season_id']  ?? null,
             ':title'  => substr($data['title']  ?? '', 0, 255),
             ':body'   => substr($data['body']   ?? '', 0, 512),
-            ':icon'   => $data['icon_emoji'] ?? 'ðŸ“‹',
+            ':icon'   => $data['icon_emoji'] ?? '📋',
             ':link'   => $data['link_url']   ?? null,
             ':pinned' => $data['is_pinned']  ?? 0,
         ]);
@@ -1848,7 +1848,7 @@ function push_community_feed(string $event_type, array $data = []): void {
 }
 
 /**
- * Retourne le feed communautaire paginÃ©.
+ * Retourne le feed communautaire paginé.
  */
 function fetch_community_feed(int $page = 1, int $per_page = 30): array {
     $pdo = db();
@@ -1919,7 +1919,7 @@ function fetch_grande_mission_active(): ?array {
         $stmt->execute([':sid' => (int)$sr['id']]);
         return $stmt->fetch() ?: null;
     } catch (PDOException $e) {
-        // Fallback : premiÃ¨re mission collective de la saison
+        // Fallback : première mission collective de la saison
         try {
             $stmt2 = $pdo->prepare("
                 SELECT * FROM missions
@@ -1936,7 +1936,7 @@ function fetch_grande_mission_active(): ?array {
 
 /**
  * Retourne le passeport Zone85 d'un utilisateur (profil enrichi V11).
- * Calcule : saisons vÃ©cues, trophÃ©es, missions terminÃ©es, badges par catÃ©gorie.
+ * Calcule : saisons vécues, trophées, missions terminées, badges par catégorie.
  */
 function fetch_user_passport(int $user_id): array {
     $pdo = db();
@@ -1955,7 +1955,7 @@ function fetch_user_passport(int $user_id): array {
     ];
     if (!$pdo) return $passport;
     try {
-        // Saisons vÃ©cues (a participÃ© Ã  au moins 1 mission dans la saison)
+        // Saisons vécues (a participé à au moins 1 mission dans la saison)
         $s = $pdo->prepare("
             SELECT COUNT(DISTINCT m.season_id) FROM participations p
             JOIN missions m ON m.id = p.mission_id
@@ -1964,7 +1964,7 @@ function fetch_user_passport(int $user_id): array {
         $s->execute([':uid' => $user_id]);
         $passport['seasons_lived'] = (int)$s->fetchColumn();
 
-        // Missions validÃ©es totales
+        // Missions validées totales
         $s = $pdo->prepare("SELECT COUNT(*) FROM participations WHERE user_id=:uid AND status IN ('validated','auto_validated')");
         $s->execute([':uid' => $user_id]);
         $passport['missions_total'] = (int)$s->fetchColumn();
@@ -1976,7 +1976,7 @@ function fetch_user_passport(int $user_id): array {
             $passport['collectibles'] = (int)$s->fetchColumn();
         } catch (PDOException $e) {}
 
-        // KTC : épisodes auxquels l'utilisateur a participé (proposition ou vote)
+        // KTC : �pisodes auxquels l'utilisateur a particip� (proposition ou vote)
         try {
             $s = $pdo->prepare("
                 SELECT COUNT(DISTINCT episode_id) FROM (
@@ -1990,8 +1990,8 @@ function fetch_user_passport(int $user_id): array {
             $passport['ktc_correct'] = 0;
         } catch (PDOException $e) {}
 
-        // Randos validées admin — depuis rando_participations (source V12)
-        // Cohérent avec passeport.php qui utilise la même table
+        // Randos valid�es admin � depuis rando_participations (source V12)
+        // Coh�rent avec passeport.php qui utilise la m�me table
         try {
             $s = $pdo->prepare("
                 SELECT COUNT(*) FROM rando_participations
@@ -2015,7 +2015,7 @@ function fetch_user_passport(int $user_id): array {
             } catch (PDOException $e2) {}
         }
 
-        // Badges par catÃ©gorie
+        // Badges par catégorie
         try {
             $s = $pdo->prepare("
                 SELECT b.category, COUNT(*) AS cnt
@@ -2028,7 +2028,7 @@ function fetch_user_passport(int $user_id): array {
             $passport['badges_by_cat'] = $cats;
         } catch (PDOException $e) {}
 
-        // Saisons vÃ©cues (liste)
+        // Saisons vécues (liste)
         try {
             $s = $pdo->prepare("
                 SELECT DISTINCT s.title, s.emoji, s.color_primary, s.start_date
@@ -2042,7 +2042,7 @@ function fetch_user_passport(int $user_id): array {
             $passport['seasons_list'] = $s->fetchAll();
         } catch (PDOException $e) {}
 
-        // TrophÃ©es de clan (clan gagnant d'une saison)
+        // Trophées de clan (clan gagnant d'une saison)
         try {
             $s = $pdo->prepare("
                 SELECT COUNT(*) FROM season_trophies st
@@ -2081,7 +2081,7 @@ function fetch_all_seasons(): array {
 }
 
 /**
- * Retourne les posts mÃ©tÃ©o actifs.
+ * Retourne les posts météo actifs.
  */
 function fetch_weather_current(): ?array {
     $pdo = db();
@@ -2099,7 +2099,7 @@ function fetch_weather_current(): ?array {
 }
 
 /**
- * Retourne les alertes mÃ©tÃ©o actives.
+ * Retourne les alertes météo actives.
  */
 function fetch_weather_alerts(): array {
     $pdo = db();
@@ -2116,10 +2116,10 @@ function fetch_weather_alerts(): array {
     }
 }
 
-// ── Notifications ─────────────────────────────────────────────
+//  Notifications 
 
 /**
- * Crée une notification in-app pour un utilisateur.
+ * Cr�e une notification in-app pour un utilisateur.
  * Non-bloquant : silencieux si table inexistante.
  */
 function push_notification(int $user_id, string $type, string $title, array $opts = []): void {
@@ -2159,7 +2159,7 @@ function count_unread_notifications(int $user_id): int {
 }
 
 /**
- * Retourne les notifications d'un utilisateur (récentes en premier).
+ * Retourne les notifications d'un utilisateur (r�centes en premier).
  */
 function fetch_user_notifications(int $user_id, int $limit = 30, bool $unread_only = false): array {
     $pdo = db();
@@ -2183,7 +2183,7 @@ function fetch_user_notifications(int $user_id, int $limit = 30, bool $unread_on
 
 /**
  * Marque les notifications comme lues.
- * $notif_id = null → marque toutes les notifications de l'utilisateur.
+ * $notif_id = null  marque toutes les notifications de l'utilisateur.
  */
 function mark_notifications_read(int $user_id, ?int $notif_id = null): void {
     $pdo = db();
@@ -2200,7 +2200,7 @@ function mark_notifications_read(int $user_id, ?int $notif_id = null): void {
 }
 
 /**
- * Retourne les XP gagnés depuis le début de la saison active.
+ * Retourne les XP gagn�s depuis le d�but de la saison active.
  */
 function fetch_user_xp_season(int $user_id): int {
     $pdo = db();
@@ -2216,15 +2216,15 @@ function fetch_user_xp_season(int $user_id): int {
     }
 }
 
-// ── Auto-badge attribution engine ──────────────────────────────
+//  Auto-badge attribution engine 
 
 /**
- * Vérifie et attribue automatiquement les badges débloqués par un utilisateur.
- * Appelée après chaque gain de XP ou validation de participation.
- * Entièrement silencieuse sur erreur — ne doit jamais bloquer la page appelante.
+ * V�rifie et attribue automatiquement les badges d�bloqu�s par un utilisateur.
+ * Appel�e apr�s chaque gain de XP ou validation de participation.
+ * Enti�rement silencieuse sur erreur � ne doit jamais bloquer la page appelante.
  *
  * @param  int   $userId
- * @return array Tableau des lignes de badges nouvellement attribués
+ * @return array Tableau des lignes de badges nouvellement attribu�s
  */
 function check_and_award_badges(int $userId): array {
     if ($userId <= 0) return [];
@@ -2232,7 +2232,7 @@ function check_and_award_badges(int $userId): array {
     if (!$pdo) return [];
 
     try {
-        // -- 1. Charger tous les badges auto-éligibles (non-manual, non-special, non-hidden)
+        // -- 1. Charger tous les badges auto-�ligibles (non-manual, non-special, non-hidden)
         $stmtBadges = $pdo->prepare(
             "SELECT * FROM badges
               WHERE condition_type NOT IN ('manual','special')
@@ -2242,14 +2242,14 @@ function check_and_award_badges(int $userId): array {
         $badges = $stmtBadges->fetchAll(PDO::FETCH_ASSOC);
         if (empty($badges)) return [];
 
-        // -- 2. Badges déjà obtenus par l'utilisateur
+        // -- 2. Badges d�j� obtenus par l'utilisateur
         $stmtEarned = $pdo->prepare(
             "SELECT badge_id FROM user_badges WHERE user_id = :uid"
         );
         $stmtEarned->execute([':uid' => $userId]);
         $earnedIds = array_flip($stmtEarned->fetchAll(PDO::FETCH_COLUMN));
 
-        // -- 3. Données utilisateur nécessaires aux vérifications
+        // -- 3. Donn�es utilisateur n�cessaires aux v�rifications
         $stmtUser = $pdo->prepare(
             "SELECT xp_total FROM users WHERE id = :uid LIMIT 1"
         );
@@ -2258,10 +2258,10 @@ function check_and_award_badges(int $userId): array {
         if (!$userRow) return [];
         $userXp = (int)$userRow['xp_total'];
 
-        // Saison active (peut être null)
+        // Saison active (peut �tre null)
         $activeSeason = _active_season_row();
 
-        // -- 4. Évaluer chaque badge non encore obtenu
+        // -- 4. �valuer chaque badge non encore obtenu
         $newlyAwarded = [];
 
         foreach ($badges as $badge) {
@@ -2269,7 +2269,7 @@ function check_and_award_badges(int $userId): array {
             $condType  = $badge['condition_type'];
             $condValue = (int)$badge['condition_value'];
 
-            // Ignorer les badges déjà obtenus
+            // Ignorer les badges d�j� obtenus
             if (isset($earnedIds[$badgeId])) continue;
 
             $unlocked = false;
@@ -2313,13 +2313,13 @@ function check_and_award_badges(int $userId): array {
                     break;
 
                 default:
-                    // Type non géré → on ignore silencieusement
+                    // Type non g�r�  on ignore silencieusement
                     break;
             }
 
             if (!$unlocked) continue;
 
-            // -- 5. Attribuer le badge (INSERT IGNORE pour éviter les doublons)
+            // -- 5. Attribuer le badge (INSERT IGNORE pour �viter les doublons)
             $stmtIns = $pdo->prepare(
                 "INSERT IGNORE INTO user_badges
                     (user_id, badge_id, source_type, awarded_by, awarded_at)
@@ -2327,7 +2327,7 @@ function check_and_award_badges(int $userId): array {
             );
             $stmtIns->execute([':uid' => $userId, ':bid' => $badgeId]);
 
-            // Ne notifier que si une ligne a vraiment été insérée
+            // Ne notifier que si une ligne a vraiment �t� ins�r�e
             if ($stmtIns->rowCount() > 0) {
                 $newlyAwarded[] = $badge;
 
@@ -2336,10 +2336,10 @@ function check_and_award_badges(int $userId): array {
                     push_notification(
                         $userId,
                         'badge_unlock',
-                        'Badge débloqué : ' . $badge['title'],
+                        'Badge d�bloqu� : ' . $badge['title'],
                         [
                             'link_url'   => 'profil.php',
-                            'icon_emoji' => $badge['icon_emoji'] ?? '🏅',
+                            'icon_emoji' => $badge['icon_emoji'] ?? '',
                         ]
                     );
                 }
@@ -2349,7 +2349,7 @@ function check_and_award_badges(int $userId): array {
         return $newlyAwarded;
 
     } catch (Throwable $e) {
-        // Entièrement silencieux — ne doit jamais interrompre la page appelante
+        // Enti�rement silencieux � ne doit jamais interrompre la page appelante
         error_log('[ZONE85] check_and_award_badges : ' . $e->getMessage());
         return [];
     }

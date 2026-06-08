@@ -10,7 +10,7 @@ $_nav_direct = [
     ['slug' => 'randos',     'label' => 'Randos',     'file' => 'randos.php'],
     ['slug' => 'ktc',        'label' => 'Kétokole',   'file' => 'ktc.php'],
     ['slug' => 'missions',   'label' => 'Missions',   'file' => 'missions.php'],
-    ['slug' => 'communaute', 'label' => 'Communauté', 'file' => 'communaute.php'],
+    ['slug' => 'communaute', 'label' => 'Clans & Classements', 'file' => 'communaute.php'],
 ];
 
 // Contenu du mega menu (3 colonnes)
@@ -179,7 +179,7 @@ if (isset($active_season) && !empty($active_season['title'])) {
     <a href="randos.php">Randos</a>
     <a href="ktc.php">Kétokole</a>
     <a href="missions.php">Missions</a>
-    <a href="communaute.php">Communauté</a>
+    <a href="communaute.php">Clans &amp; Classements</a>
     <a href="comment-ca-marche.php">Comment ça marche ?</a>
     <a href="recompenses.php">🏅 XP &amp; Récompenses</a>
     <a href="aide.php">❓ Aide</a>

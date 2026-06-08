@@ -43,29 +43,13 @@ $manifest = [
         ['src' => $base . '/assets/img/pwa/icon-384.png', 'sizes' => '384x384', 'type' => 'image/png', 'purpose' => 'any'],
         ['src' => $base . '/assets/img/pwa/icon-512.png', 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'any maskable'],
     ],
-    'shortcuts' => [
-        [
-            'name'        => 'Mes missions',
-            'short_name'  => 'Missions',
-            'description' => 'Voir les missions actives',
-            'url'         => $base . '/missions.php',
-            'icons'       => [['src' => $base . '/assets/img/pwa/shortcut-missions.png', 'sizes' => '96x96']],
-        ],
-        [
-            'name'        => 'Mon profil',
-            'short_name'  => 'Profil',
-            'description' => 'Accéder à mon profil',
-            'url'         => $base . '/profil.php',
-            'icons'       => [['src' => $base . '/assets/img/pwa/shortcut-profil.png', 'sizes' => '96x96']],
-        ],
-        [
-            'name'        => 'Classement',
-            'short_name'  => 'Classement',
-            'description' => 'Voir le classement des clans',
-            'url'         => $base . '/classement.php',
-            'icons'       => [['src' => $base . '/assets/img/pwa/shortcut-classement.png', 'sizes' => '96x96']],
-        ],
-    ],
+    // Shortcuts désactivés temporairement — icônes PNG (96×96) à générer depuis icon.svg
+    // puis à placer dans assets/img/pwa/ avant de réactiver cette section.
+    // 'shortcuts' => [
+    //     ['name' => 'Missions', 'url' => $base . '/missions.php',  'icons' => [['src' => $base . '/assets/img/pwa/shortcut-missions.png',   'sizes' => '96x96']]],
+    //     ['name' => 'Profil',   'url' => $base . '/profil.php',    'icons' => [['src' => $base . '/assets/img/pwa/shortcut-profil.png',     'sizes' => '96x96']]],
+    //     ['name' => 'Clans',    'url' => $base . '/classement.php','icons' => [['src' => $base . '/assets/img/pwa/shortcut-classement.png', 'sizes' => '96x96']]],
+    // ],
 ];
 
 echo json_encode($manifest, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);

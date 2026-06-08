@@ -1,6 +1,6 @@
 # Roadmap Sprints Zone85 — V12 → V13
 
-> Dernière mise à jour : 2026-06-08  
+> Dernière mise à jour : 2026-06-08 — passe pré-bêta  
 > Objectif général : rendre Zone85 plus clair, plus guidé, plus mobile, plus rassurant, plus simple à comprendre avant la bêta privée.
 
 ---
@@ -10,8 +10,9 @@
 **Objectif :** Verrouiller la base avant bêta.  
 **Statut :** Terminé
 
-- [x] Correction encodage `repositories.php`, `trophees.php`, `admin/seasons.php`
-- [x] Vérification PWA (event aliases, manifest, icônes)
+- [x] Correction encodage `repositories.php`, `admin/seasons.php` — fix cp1252→utf-8 round-trip (0 mojibake restant)
+- [x] `check-db.php` supprimé du projet (token hardcodé + infos sensibles)
+- [x] Manifest PWA : shortcuts désactivés temporairement (icônes PNG absentes, commentaire de réactivation en place)
 - [x] `robots.txt` renforcé (`/ajax/`, `/tools/`, `/check-db.php`, `/login.php`, `/forgot-password.php`)
 - [x] `upload_collectible_media()` : `getimagesize`, dimensions max 2000px, `.htaccess`
 - [x] Formulaire contact branché (`send_email` + templates `contact_message` / `contact_ack`)
@@ -171,8 +172,10 @@
 ## Points d'attention techniques (déploiement prod)
 
 - `.env` prod : ne jamais committer, vérifier BREVO_API_KEY, DB_*, SITE_URL
-- `check-db.php` : supprimer du serveur prod avant ouverture bêta
+- `check-db.php` : ✅ supprimé du projet — ne pas recréer en prod
 - `uploads/` : vérifier permissions (755 dossiers, 644 fichiers)
 - PHP `error_log` : activer en dev, désactiver ou rediriger en prod
 - Sitemap : régénérer après ajout pages publiques (recompenses.php, aide.php, feedback.php, comment-ca-marche.php)
 - Open Graph : vérifier les previews Facebook pour les nouvelles pages
+- PWA icônes : générer les PNG depuis `assets/img/pwa/icon.svg` (72, 96, 128, 144, 152, 192, 384, 512px + shortcuts 96px)
+  puis décommenter la section `shortcuts` dans `manifest.php`

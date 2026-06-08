@@ -24,9 +24,6 @@ $missions_done = 0;
 $pdo = db();
 if ($pdo) {
     try {
-        $missions_done = (int)$pdo->prepare(
-            "SELECT COUNT(*) FROM participations WHERE user_id=:uid AND status IN ('validated','auto_validated')"
-        )->execute([':uid' => (int)$user['id']]) ? 0 : 0;
         $s = $pdo->prepare("SELECT COUNT(*) FROM participations WHERE user_id=:uid AND status IN ('validated','auto_validated')");
         $s->execute([':uid' => (int)$user['id']]);
         $missions_done = (int)$s->fetchColumn();
