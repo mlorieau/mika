@@ -76,6 +76,13 @@ $clan_cries = [
 // ── Médailles ────────────────────────────────────────────────
 $rank_medals = [1 => '&#127945;', 2 => '&#129356;', 3 => '&#129357;'];
 
+// ── Phrases identitaires ─────────────────────────────────────
+$clan_identity = [
+    'bocage'   => 'Pour ceux qui aiment les chemins secrets, les haies, les villages et les vieilles pierres.',
+    'littoral' => 'Pour ceux qui respirent mieux face à l\'océan, le long des côtes et des îles.',
+    'marais'   => 'Pour ceux qui aiment les lieux calmes, les histoires enfouies et les paysages qui changent avec l\'eau.',
+];
+
 // ── Saisons archivées ────────────────────────────────────────
 $archived_seasons = array_filter($seasons, fn($s) => $s['status'] === 'archived');
 
@@ -330,6 +337,37 @@ $page_styles = '<style>
 .clans-cta p{font-size:.95rem;color:rgba(255,255,255,.55);margin-bottom:32px;}
 .clans-cta .cta-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
 
+/* AIDE AU CHOIX */
+.clan-choose-help{
+  background:var(--beige,#f8f4ef);
+  padding:48px 24px 12px;
+  text-align:center;
+}
+.clan-choose-help-label{
+  font-size:.68rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  color:#9ca3af;margin-bottom:14px;
+}
+.clan-choose-help h2{
+  font-size:clamp(1.15rem,3vw,1.5rem);font-weight:900;color:#0d1e2c;
+  margin-bottom:18px;
+}
+.clan-choose-pills{
+  display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:0;
+}
+.clan-choose-pill{
+  padding:10px 20px;border-radius:40px;font-size:.88rem;font-weight:700;
+  border:2px solid transparent;cursor:default;
+}
+.clan-choose-pill.bocage{background:#e8f5ee;color:#1a5c38;border-color:#c6e8d4;}
+.clan-choose-pill.littoral{background:#e8f0fb;color:#154f8b;border-color:#c3d8f5;}
+.clan-choose-pill.marais{background:#f5ede4;color:#6b4c2a;border-color:#e3ccb5;}
+
+/* Phrase identitaire sous carte clan */
+.pc-identity{
+  font-size:.78rem;color:#6b7280;line-height:1.5;
+  padding:10px 14px 0;text-align:center;font-style:italic;
+}
+
 /* Utilitaires */
 .container{max-width:1160px;margin:0 auto;padding:0 24px;}
 </style>';
@@ -352,6 +390,17 @@ require_once 'includes/nav.php';
     <p class="hero-sub">Trois clans. Une seule Vendée.<br>Qui mènera la danse cette saison&nbsp;?</p>
   </div>
 </section>
+
+<!-- ===================== AIDE AU CHOIX ===================== -->
+<div class="clan-choose-help">
+  <p class="clan-choose-help-label">Aide au choix</p>
+  <h2>Tu es plutôt&nbsp;…</h2>
+  <div class="clan-choose-pills">
+    <span class="clan-choose-pill bocage">🌳 chemins creux et bocage&nbsp;?</span>
+    <span class="clan-choose-pill littoral">🌊 embruns, sable et horizon&nbsp;?</span>
+    <span class="clan-choose-pill marais">🌿 marais, mystère et mémoire&nbsp;?</span>
+  </div>
+</div>
 
 <!-- ===================== PODIUM ===================== -->
 <section class="podium-section">
@@ -388,6 +437,9 @@ require_once 'includes/nav.php';
         <a href="inscription.php?clan=<?= e($slug) ?>" class="pc-btn <?= e($slug) ?>-btn">
           Rejoindre ce clan
         </a>
+        <?php if (!empty($clan_identity[$slug])): ?>
+        <p class="pc-identity"><?= e($clan_identity[$slug]) ?></p>
+        <?php endif; ?>
       </div>
     </div>
     <?php endforeach; ?>

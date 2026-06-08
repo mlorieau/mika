@@ -158,9 +158,9 @@
 
     var installBtn = !isIOS ? [
       '<button id="z85-pwa-install-btn">',
-        _prompt ? '📲 Installer Zone85' : '📲 Ajouter à l\'écran d\'accueil',
+        '📲 Ajouter sur mon écran d\'accueil',
       '</button>',
-    ].join('') : '<button id="z85-pwa-install-btn">C\'est parti !</button>';
+    ].join('') : '<button id="z85-pwa-install-btn">📲 Je l\'ajoute maintenant</button>';
 
     div.innerHTML = [
       '<div id="z85-pwa-card" role="dialog" aria-labelledby="z85-pwa-title" aria-modal="true">',
@@ -169,8 +169,8 @@
             '<img src="' + iconSrc + '" alt="Zone85" onerror="this.parentNode.innerHTML=\'Z85\'">',
           '</div>',
           '<div id="z85-pwa-hero-text">',
-            '<div class="t1" id="z85-pwa-title">Installer Zone85</div>',
-            '<div class="t2">Application gratuite · Aucun store requis</div>',
+            '<div class="t1" id="z85-pwa-title">Ajouter Zone85 sur mon écran d\'accueil</div>',
+            '<div class="t2">Comme une appli, sans passer par le store.</div>',
           '</div>',
         '</div>',
         '<div id="z85-pwa-body">',

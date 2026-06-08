@@ -34,10 +34,10 @@ if ($pdo) {
 }
 
 $steps = [
-    ['done' => true,       'icon' => '✅', 'title' => 'Compte créé',             'desc' => 'Tu es officiellement Zonaute. Bienvenue !'],
-    ['done' => $has_clan,  'icon' => '🛡', 'title' => 'Rejoindre un clan',        'desc' => 'Rejoins Bocage, Littoral ou Marais pour contribuer à la Bataille des Clans.', 'link' => 'clans.php', 'cta' => 'Choisir un clan'],
-    ['done' => $has_avatar,'icon' => '🧭', 'title' => 'Personnaliser ton avatar',  'desc' => 'Donne un visage à ton profil — preset, généré ou photo.', 'link' => 'mon-compte.php', 'cta' => 'Modifier mon avatar'],
-    ['done' => $missions_done > 0, 'icon' => '🎯', 'title' => 'Première mission', 'desc' => 'Lance-toi dans une mission pour gagner tes premiers XP.', 'link' => 'missions.php', 'cta' => 'Voir les missions'],
+    ['done' => true,              'icon' => '✅', 'title' => 'Compte créé',               'desc' => 'Tu es officiellement Zonaute. Bienvenue !'],
+    ['done' => $has_clan,         'icon' => '🛡', 'title' => 'Choisir mon clan',           'desc' => 'Rejoins Bocage, Littoral ou Marais pour contribuer à la Bataille des Clans.', 'link' => 'clans.php',    'cta' => 'Choisir mon clan'],
+    ['done' => $missions_done > 0,'icon' => '🎯', 'title' => 'Première mission',           'desc' => 'Lance-toi dans une mission pour gagner tes premiers XP.', 'link' => 'missions.php', 'cta' => 'Voir les missions'],
+    ['done' => $has_avatar,       'icon' => '🧭', 'title' => 'Personnaliser mon passeport','desc' => 'Donne un visage à ton profil — preset, généré ou photo.', 'link' => 'profil.php',   'cta' => 'Personnaliser mon passeport'],
 ];
 
 $done_count = count(array_filter($steps, fn($s) => $s['done']));
@@ -112,11 +112,16 @@ require_once 'includes/nav.php';
 
     <!-- CTA final -->
     <div class="bv-cta-section">
-      <p class="bv-cta-title">Prêt à jouer ?</p>
-      <p class="bv-cta-sub">La Zone t'attend. Explore les missions, les randos et les événements flash pour grimper dans le classement.</p>
-      <a href="missions.php" class="bv-cta-primary">Voir les missions →</a>
-      <a href="profil.php" class="bv-cta-secondary">Mon profil</a>
-      <a href="communaute.php?tab=classement" class="bv-cta-secondary">Classement</a>
+      <?php if (!$has_clan): ?>
+        <p class="bv-cta-title">Première étape : ton clan</p>
+        <p class="bv-cta-sub">Rejoins un clan. C'est gratuit, immédiat, et ça change tout.</p>
+        <a href="clans.php" class="bv-cta-primary">Choisir mon clan →</a>
+      <?php else: ?>
+        <p class="bv-cta-title">Ton clan t'attend !</p>
+        <p class="bv-cta-sub">Lance-toi dans une première mission pour marquer tes premiers XP.</p>
+        <a href="missions.php" class="bv-cta-primary">Découvrir ma première mission →</a>
+        <a href="profil.php" class="bv-cta-secondary">Personnaliser mon passeport</a>
+      <?php endif; ?>
     </div>
 
     <p style="text-align:center;margin-top:24px;font-size:.78rem;color:var(--text-muted);font-style:italic">
