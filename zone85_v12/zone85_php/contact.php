@@ -2,6 +2,7 @@
 require_once 'includes/config.php';
 require_once 'includes/db.php';
 require_once 'includes/functions.php';
+require_once 'includes/mailer.php';
 
 // ── Traitement POST ───────────────────────────────────────────
 $contact_success = false;
@@ -11,16 +12,17 @@ if (is_post_request()) {
     if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
         $contact_error = 'Token de sécurité invalide. Rechargez la page.';
     } else {
-        $c_name    = safe_input($_POST['name']     ?? '', 100);
+        $c_name    = safe_input($_POST['name']    ?? '', 100);
         $c_email   = filter_var(trim($_POST['email'] ?? ''), FILTER_VALIDATE_EMAIL);
-        $c_subject = safe_input($_POST['subject']  ?? '', 200);
-        $c_reason  = safe_input($_POST['reason']   ?? '', 100);
-        $c_message = safe_input($_POST['message']  ?? '', 2000);
+        $c_subject = safe_input($_POST['subject'] ?? '', 200);
+        $c_reason  = safe_input($_POST['reason']  ?? '', 100);
+        $c_message = safe_input($_POST['message'] ?? '', 2000);
         $c_rgpd    = !empty($_POST['rgpd_consent']);
 
         if (!$c_name || !$c_email || !$c_message || !$c_rgpd) {
             $contact_error = 'Veuillez remplir tous les champs obligatoires et accepter la politique de confidentialité.';
         } else {
+            // 1. Sauvegarde en base
             $pdo = db();
             if ($pdo) {
                 try {
@@ -39,10 +41,45 @@ if (is_post_request()) {
                         ':ua'      => $ua_hash,
                     ]);
                 } catch (PDOException $e) {
-                    error_log('[ZONE85] contact : ' . $e->getMessage());
-                    // UX : on affiche succès même si erreur DB (ne pas bloquer l'utilisateur)
+                    error_log('[ZONE85] contact DB : ' . $e->getMessage());
                 }
             }
+
+            // 2. Notification à l'équipe Zone85
+            $admin_email = get_setting('site_email', 'contact@zone85.fr');
+            $reason_label = [
+                'question'    => 'Question générale',
+                'technique'   => 'Problème technique',
+                'partenariat' => 'Partenariat',
+                'signalement' => 'Signalement de contenu',
+                'rgpd'        => 'Données personnelles / RGPD',
+                'autre'       => 'Autre',
+            ][$c_reason] ?? ($c_reason ?: 'Non précisé');
+
+            send_email(
+                $admin_email,
+                '[Zone85 Contact] ' . ($c_subject ?: $reason_label) . ' — ' . $c_name,
+                'contact_message',
+                [
+                    'sender_name'    => $c_name,
+                    'sender_email'   => $c_email,
+                    'reason_label'   => $reason_label,
+                    'subject'        => $c_subject ?: '(sans sujet)',
+                    'message'        => $c_message,
+                ]
+            );
+
+            // 3. Accusé de réception à l'expéditeur
+            send_email(
+                $c_email,
+                'Nous avons bien reçu votre message — Zone85',
+                'contact_ack',
+                [
+                    'pseudo'  => $c_name,
+                    'subject' => $c_subject ?: $reason_label,
+                ]
+            );
+
             $contact_success = true;
         }
     }
@@ -393,11 +430,6 @@ require_once 'includes/nav.php';
 
     <!-- LEFT: FORM -->
     <div>
-      <!-- Info banner -->
-      <div class="info-banner">
-        <strong>Formulaire en cours de connexion.</strong> En attendant, vous pouvez nous écrire directement à <a href="mailto:contact@zone85.fr">contact@zone85.fr</a>.
-      </div>
-
       <div class="form-card reveal">
         <div class="form-card-title">Envoyer un message</div>
 
@@ -416,36 +448,39 @@ require_once 'includes/nav.php';
 
           <div class="form-row">
             <div class="form-group">
-              <label for="nom">Nom ou pseudo</label>
-              <input type="text" id="nom" name="nom" placeholder="Ex. : VendéenDu85" autocomplete="name">
+              <label for="f_name">Nom ou pseudo <span style="color:var(--primary)">*</span></label>
+              <input type="text" id="f_name" name="name" placeholder="Ex. : VendéenDu85" autocomplete="name"
+                     value="<?= isset($c_name) ? e($c_name) : '' ?>" required>
             </div>
             <div class="form-group">
-              <label for="email">Email</label>
-              <input type="email" id="email" name="email" placeholder="ton@email.fr" autocomplete="email">
+              <label for="f_email">Email <span style="color:var(--primary)">*</span></label>
+              <input type="email" id="f_email" name="email" placeholder="ton@email.fr" autocomplete="email"
+                     value="<?= isset($c_email) && $c_email ? e($c_email) : (isset($_POST['email']) ? e(trim($_POST['email'])) : '') ?>" required>
             </div>
           </div>
 
           <div class="form-group">
-            <label for="sujet">Sujet</label>
-            <input type="text" id="sujet" name="sujet" placeholder="Résumez votre demande en quelques mots">
+            <label for="f_subject">Sujet</label>
+            <input type="text" id="f_subject" name="subject" placeholder="Résumez votre demande en quelques mots"
+                   value="<?= isset($c_subject) ? e($c_subject) : '' ?>">
           </div>
 
           <div class="form-group">
-            <label for="motif">Motif de contact</label>
-            <select id="motif" name="motif">
-              <option value="" disabled selected>Sélectionner un motif…</option>
-              <option value="question">Question générale</option>
-              <option value="technique">Problème technique</option>
-              <option value="partenariat">Partenariat</option>
-              <option value="signalement">Signalement de contenu</option>
-              <option value="rgpd">Données personnelles / RGPD</option>
-              <option value="autre">Autre</option>
+            <label for="f_reason">Motif de contact</label>
+            <select id="f_reason" name="reason">
+              <?php
+              $sel = isset($c_reason) ? $c_reason : '';
+              $opts = [''=>'Sélectionner un motif…','question'=>'Question générale','technique'=>'Problème technique','partenariat'=>'Partenariat','signalement'=>'Signalement de contenu','rgpd'=>'Données personnelles / RGPD','autre'=>'Autre'];
+              foreach ($opts as $val => $lbl):
+              ?>
+              <option value="<?= e($val) ?>"<?= $val==='' ? ' disabled' : '' ?><?= $val==='' && !$sel ? ' selected' : ($val===$sel ? ' selected' : '') ?>><?= e($lbl) ?></option>
+              <?php endforeach; ?>
             </select>
           </div>
 
           <div class="form-group">
-            <label for="message">Message</label>
-            <textarea id="message" name="message" rows="5" placeholder="Décrivez votre demande en détail…"></textarea>
+            <label for="f_message">Message <span style="color:var(--primary)">*</span></label>
+            <textarea id="f_message" name="message" rows="5" placeholder="Décrivez votre demande en détail…" required><?= isset($c_message) ? e($c_message) : '' ?></textarea>
           </div>
 
           <label class="form-check">

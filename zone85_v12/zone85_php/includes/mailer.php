@@ -146,12 +146,17 @@ function _send_via_php_mail(string $to_email, ?string $to_name, string $subject,
 
     $html = _build_fallback_html($subject, $variables, $template_slug);
 
+    // Pour les messages de contact, Reply-To pointe vers l'expéditeur
+    $reply_to = ($template_slug === 'contact_message' && !empty($variables['sender_email']))
+        ? $variables['sender_email']
+        : $from_email;
+
     $boundary = '----=_Part_' . md5(uniqid());
     $headers  = implode("\r\n", [
         'MIME-Version: 1.0',
         'Content-Type: multipart/alternative; boundary="' . $boundary . '"',
         'From: ' . $from_name . ' <' . $from_email . '>',
-        'Reply-To: ' . $from_email,
+        'Reply-To: ' . $reply_to,
         'X-Mailer: Zone85-Mailer/10',
     ]);
 
@@ -211,6 +216,22 @@ function _build_fallback_html(string $subject, array $vars, string $template_slu
             '<h2 style="margin:0 0 16px;color:#0c1e2e">Demande de suppression reçue</h2>' .
             '<p>Nous avons bien reçu ta demande de suppression de compte.</p>' .
             '<p>Ton compte sera anonymisé sous 30 jours. Tu peux annuler cette demande en nous contactant.</p>',
+        'contact_message' =>
+            '<h2 style="margin:0 0 16px;color:#0c1e2e">📩 Nouveau message de contact</h2>' .
+            '<table style="width:100%;border-collapse:collapse;font-size:.88rem;margin-bottom:20px">' .
+            '<tr><td style="padding:7px 10px;font-weight:700;color:#0c1e2e;background:#f8f4ef;border-radius:4px;white-space:nowrap">De</td><td style="padding:7px 10px">' . htmlspecialchars($vars['sender_name'] ?? '', ENT_QUOTES) . ' &lt;<a href="mailto:' . htmlspecialchars($vars['sender_email'] ?? '', ENT_QUOTES) . '" style="color:#ea5649">' . htmlspecialchars($vars['sender_email'] ?? '', ENT_QUOTES) . '</a>&gt;</td></tr>' .
+            '<tr><td style="padding:7px 10px;font-weight:700;color:#0c1e2e;background:#f8f4ef;border-radius:4px;white-space:nowrap">Motif</td><td style="padding:7px 10px">' . htmlspecialchars($vars['reason_label'] ?? '', ENT_QUOTES) . '</td></tr>' .
+            '<tr><td style="padding:7px 10px;font-weight:700;color:#0c1e2e;background:#f8f4ef;border-radius:4px;white-space:nowrap">Sujet</td><td style="padding:7px 10px">' . htmlspecialchars($vars['subject'] ?? '', ENT_QUOTES) . '</td></tr>' .
+            '</table>' .
+            '<div style="background:#f8f4ef;border-left:4px solid #ea5649;border-radius:4px;padding:14px 18px;font-size:.9rem;line-height:1.7;white-space:pre-wrap">' . htmlspecialchars($vars['message'] ?? '', ENT_QUOTES) . '</div>' .
+            '<p style="margin-top:20px;font-size:.82rem;color:#6b7f96">Répondez directement à cet email pour contacter l\'expéditeur.</p>',
+        'contact_ack' =>
+            '<h2 style="margin:0 0 16px;color:#0c1e2e">Votre message a bien été reçu ✅</h2>' .
+            '<p>Bonjour <strong>' . htmlspecialchars($vars['pseudo'] ?? '', ENT_QUOTES) . '</strong>,</p>' .
+            '<p>Nous avons bien reçu votre message concernant <strong>"' . htmlspecialchars($vars['subject'] ?? '', ENT_QUOTES) . '"</strong>.</p>' .
+            '<p>Notre équipe vous répondra dans les meilleurs délais à cette adresse email.</p>' .
+            '<p style="margin-top:20px">À très vite dans la Zone !</p>' .
+            '<p style="font-weight:800;color:#0c1e2e">L\'équipe Zone85</p>',
         default =>
             '<h2 style="margin:0 0 16px;color:#0c1e2e">' . htmlspecialchars($subject, ENT_QUOTES) . '</h2>' .
             '<p>Notification de Zone85.</p>',
