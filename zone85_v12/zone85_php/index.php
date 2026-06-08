@@ -347,6 +347,7 @@ $_xp_pct  = $_xp_next > $_xp_prev
       <?php else: ?>
         <a href="missions.php" class="idx-btn-primary">🎯 Voir mes missions →</a>
         <a href="les-echos.php" class="idx-btn-secondary">📰 Les Échos</a>
+        <a href="comment-ca-marche.php" class="idx-btn-secondary">Comment ça marche ?</a>
       <?php endif; ?>
     </div>
 

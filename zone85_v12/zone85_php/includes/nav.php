@@ -20,7 +20,6 @@ $_mega_sections = [
         'emoji' => '🗺️',
         'links' => [
             ['file' => 'index.php',      'label' => 'Accueil',         'desc' => 'La Vendée Joue',              'icon' => '🏠'],
-            ['file' => 'hall.php',       'label' => 'Hall de la Zone', 'desc' => 'Galerie & saisons passées',   'icon' => '🏆'],
             ['file' => 'les-echos.php',  'label' => 'Les Échos',       'desc' => 'Le magazine de la Zone',      'icon' => '📰'],
             ['file' => 'trophees.php',   'label' => 'Trophées',        'desc' => 'Palmarès des clans',          'icon' => '🥇'],
         ],
@@ -196,7 +195,6 @@ if (isset($active_season) && !empty($active_season['title'])) {
 
   <div class="mmenu-section">
     <div class="mmenu-section-label">Découvrir</div>
-    <a href="hall.php">Hall de la Zone</a>
     <a href="trophees.php">Trophées</a>
     <a href="clans.php">Les Clans</a>
     <a href="evenements.php">Événements</a>

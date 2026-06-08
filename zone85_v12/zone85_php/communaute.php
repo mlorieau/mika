@@ -1209,7 +1209,7 @@ $cn_total_pts    = array_sum(array_column($clan_rankings, 'season_points'));
 </div>
 
 <?php elseif ($_tab === 'recompenses'): ?>
-<div class="comm-inner" style="max-width:860px">
+<div class="comm-inner" style="max-width:860px;margin:0 auto;padding:36px 24px 64px">
 
   <?php
   $rw_xp_rows = [

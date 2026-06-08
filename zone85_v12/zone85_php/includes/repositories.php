@@ -549,13 +549,13 @@ function fetch_user_profile(int $userId): ?array {
         $seasonStart = $sr ? $sr['start_date'] : '1970-01-01';
         $seasonId    = $sr ? (int)$sr['id'] : 0;
 
-        // XP personnels gagn�s cette saison (pour r�f�rence interne)
+        // XP personnels gagnés cette saison (pour référence interne)
         $s4 = $pdo->prepare("SELECT COALESCE(SUM(xp_amount), 0) FROM xp_logs WHERE user_id = :id AND created_at >= :start");
         $s4->execute([':id' => $userId, ':start' => $seasonStart]);
         $xp_season = (int)$s4->fetchColumn();
 
-        // Points clan r�ellement apport�s cette saison (source : clan_score_logs)
-        // Distinct des XP personnels � c'est ce que le joueur a donn� � son clan
+        // Points clan réellement apportés cette saison (source : clan_score_logs)
+        // Distinct des XP personnels — c'est ce que le joueur a donné à son clan
         $clan_pts = 0;
         if ($seasonId > 0) {
             $s5 = $pdo->prepare("
@@ -584,7 +584,7 @@ function fetch_user_profile(int $userId): ?array {
             $rank_in_clan = (int)$s6->fetchColumn();
         }
 
-        // R�solution de l'avatar (fix encodage emoji)
+        // Résolution de l'avatar (fix encodage emoji)
         $avatar_config = [];
         if (!empty($row['avatar_config'])) {
             $avatar_config = json_decode($row['avatar_config'], true) ?? [];
@@ -603,7 +603,7 @@ function fetch_user_profile(int $userId): ?array {
             'level'                => (int)$row['level'],
             'xp_total'             => (int)$row['xp_total'],
             'xp_this_season'       => $xp_season,   // XP perso cette saison
-            'clan_pts_contributed' => $clan_pts,     // Pts clan apport�s cette saison
+            'clan_pts_contributed' => $clan_pts,     // Pts clan apportés cette saison
             'avatar'               => $avatar,
             'avatar_type'          => $row['avatar_type'] ?? 'preset',
             'bio'                  => $row['bio'] ?? '',
@@ -823,10 +823,10 @@ function fetch_user_xp_logs(int $userId, int $limit = 10): array {
 
 
 
-//  Feed d'activit� unifi� 
+//  Feed d'activité unifié 
 
 /**
- * Retourne les N derniers �v�nements d'activit� d'un user, toutes sources confondues.
+ * Retourne les N derniers événements d'activité d'un user, toutes sources confondues.
  */
 function fetch_user_activity_feed(int $userId, int $limit = 10): array {
     $pdo = db();
@@ -834,7 +834,7 @@ function fetch_user_activity_feed(int $userId, int $limit = 10): array {
     $items = [];
 
     try {
-        // Missions particip�es
+        // Missions participées
         $s = $pdo->prepare("
             SELECT 'mission' AS feed_type, p.created_at AS feed_date,
                    m.title AS feed_title, m.mission_type AS feed_sub,
@@ -847,7 +847,7 @@ function fetch_user_activity_feed(int $userId, int $limit = 10): array {
         $s->execute([':id' => $userId]);
         $items = array_merge($items, $s->fetchAll());
 
-        // Randos (toutes, pas seulement valid�es)
+        // Randos (toutes, pas seulement validées)
         $s = $pdo->prepare("
             SELECT 'rando' AS feed_type, rp.done_at AS feed_date,
                    r.title AS feed_title, 'rando' AS feed_sub,
@@ -860,7 +860,7 @@ function fetch_user_activity_feed(int $userId, int $limit = 10): array {
         $s->execute([':id' => $userId]);
         $items = array_merge($items, $s->fetchAll());
 
-        // Commentaires �chos ayant re�u des XP
+        // Commentaires Échos ayant reçu des XP
         $s = $pdo->prepare("
             SELECT 'comment' AS feed_type, ac.created_at AS feed_date,
                    a.title AS feed_title, 'comment' AS feed_sub,
@@ -873,7 +873,7 @@ function fetch_user_activity_feed(int $userId, int $limit = 10): array {
         $s->execute([':id' => $userId]);
         $items = array_merge($items, $s->fetchAll());
 
-        // XP divers (badges, admin, inscription�) � sources non couvertes ci-dessus
+        // XP divers (badges, admin, inscription…) — sources non couvertes ci-dessus
         $s = $pdo->prepare("
             SELECT 'xp_event' AS feed_type, xl.created_at AS feed_date,
                    COALESCE(xl.reason, xl.source_type) AS feed_title,
@@ -881,7 +881,7 @@ function fetch_user_activity_feed(int $userId, int $limit = 10): array {
                    xl.xp_amount AS feed_xp, NULL AS feed_status
             FROM xp_logs xl
             WHERE xl.user_id = :id
-              AND xl.source_type NOT IN ('mission','article_comment','rando','rando_review')
+              AND xl.source_type NOT IN ('mission','mission_participation','article_comment','rando','rando_review')
             ORDER BY xl.created_at DESC LIMIT 5
         ");
         $s->execute([':id' => $userId]);
@@ -891,7 +891,7 @@ function fetch_user_activity_feed(int $userId, int $limit = 10): array {
         error_log('[ZONE85] fetch_user_activity_feed : ' . $e->getMessage());
     }
 
-    // Tri chronologique d�croissant puis troncature
+    // Tri chronologique décroissant puis troncature
     usort($items, fn($a, $b) => strcmp($b['feed_date'] ?? '', $a['feed_date'] ?? ''));
     return array_slice($items, 0, $limit);
 }
@@ -1017,7 +1017,7 @@ function award_xp(int $userId, int $amount, string $sourceType, ?int $sourceId, 
         if ($newLevel > $oldLevel && function_exists('push_notification')) {
             $lvlName = function_exists('get_level_name') ? get_level_name($newLevel) : 'Niveau ' . $newLevel;
             push_notification($userId, 'level_up',
-                'Niveau ' . $newLevel . ' atteint � ' . $lvlName . ' !',
+                'Niveau ' . $newLevel . ' atteint — ' . $lvlName . ' !',
                 ['link_url' => 'profil.php']
             );
         }
@@ -1180,7 +1180,7 @@ function create_participation(int $userId, int $missionId, array $data = []): ar
 
         $pdo->commit();
 
-        // Badge de r�compense sp�cifique � la mission (auto uniquement, non-blocking)
+        // Badge de récompense spécifique à la mission (auto uniquement, non-blocking)
         if ($shouldAuto && !empty($mission['badge_reward_id'])) {
             try {
                 $pdo->prepare("
@@ -1322,7 +1322,7 @@ function admin_validate_participation(int $participation_id, int $admin_user_id)
         // Auto-badge check after participation validated (non-blocking)
         check_and_award_badges($user_id);
 
-        // Badge de r�compense sp�cifique � la mission (non-blocking)
+        // Badge de récompense spécifique à la mission (non-blocking)
         if (!empty($row['badge_reward_id'])) {
             try {
                 $pdo->prepare("
@@ -1334,11 +1334,11 @@ function admin_validate_participation(int $participation_id, int $admin_user_id)
             }
         }
 
-        // Notification + fil communautaire (hors transaction � ne bloque pas si table absente)
+        // Notification + fil communautaire (hors transaction — ne bloque pas si table absente)
         if (function_exists('push_notification')) {
             $xp_str = $xp_success > 0 ? ' (+' . $xp_success . ' XP)' : '';
             push_notification($user_id, 'mission_validated',
-                'Mission valid�e : ' . mb_substr($row['mission_title'], 0, 60) . $xp_str,
+                'Mission validée : ' . mb_substr($row['mission_title'], 0, 60) . $xp_str,
                 ['link_url' => 'missions.php', 'mission_id' => (int)$row['mission_id']]
             );
         }
@@ -1347,7 +1347,7 @@ function admin_validate_participation(int $participation_id, int $admin_user_id)
                 'user_id'    => $user_id,
                 'clan_id'    => $clan_id ?: null,
                 'mission_id' => (int)$row['mission_id'],
-                'title'      => ($row['pseudo'] ?? 'Zonaute') . ' a valid� : ' . mb_substr($row['mission_title'], 0, 60),
+                'title'      => ($row['pseudo'] ?? 'Zonaute') . ' a validé : ' . mb_substr($row['mission_title'], 0, 60),
                 'icon_emoji' => '',
                 'link_url'   => 'mission.php?id=' . (int)$row['mission_id'],
             ]);
@@ -1761,37 +1761,37 @@ function upload_collectible_media(array $file, string $type = 'object'): array {
     $finfo = new finfo(FILEINFO_MIME_TYPE);
     $mime  = $finfo->file($file['tmp_name']);
     if (!array_key_exists($mime, $allowed)) {
-        return ['ok'=>false, 'error'=>'Type non autoris�. Utilisez jpg, png, webp ou gif.'];
+        return ['ok'=>false, 'error'=>'Type non autorisé. Utilisez jpg, png, webp ou gif.'];
     }
 
-    // V�rification image r�elle via getimagesize() (non appliqu� aux GIF anim�s)
+    // Vérification image réelle via getimagesize() (non appliqué aux GIF animés)
     if ($mime !== 'image/gif') {
         $img_info = @getimagesize($file['tmp_name']);
         if (!$img_info || empty($img_info[0]) || empty($img_info[1])) {
             return ['ok'=>false, 'error'=>'Fichier image invalide ou corrompu.'];
         }
-        // Dimensions max : 2000 px pour les collectibles (valeur sp�cifique, ind�pendante de UPLOAD_MAX_DIM)
+        // Dimensions max : 2000 px pour les collectibles (valeur spécifique, indépendante de UPLOAD_MAX_DIM)
         $max_dim = 2000;
         if ($img_info[0] > $max_dim || $img_info[1] > $max_dim) {
-            return ['ok'=>false, 'error'=>"Dimensions trop grandes (max {$max_dim}�{$max_dim} px). R�duisez votre image avant l'envoi."];
+            return ['ok'=>false, 'error'=>"Dimensions trop grandes (max {$max_dim}×{$max_dim} px). Réduisez votre image avant l'envoi."];
         }
     }
 
     $upload_dir = defined('BASE_PATH') ? BASE_PATH . 'uploads/collectibles/' : dirname(__DIR__) . '/uploads/collectibles/';
     if (!is_dir($upload_dir)) {
         if (!mkdir($upload_dir, 0755, true)) {
-            return ['ok'=>false, 'error'=>'Impossible de cr�er le dossier de destination.'];
+            return ['ok'=>false, 'error'=>'Impossible de créer le dossier de destination.'];
         }
     }
 
-    // Garantir la pr�sence du .htaccess de protection dans uploads/collectibles/
+    // Garantir la présence du .htaccess de protection dans uploads/collectibles/
     $htaccess = $upload_dir . '.htaccess';
     if (!file_exists($htaccess)) {
         $ht_content = function_exists('_upload_htaccess_content')
             ? _upload_htaccess_content()
             : "Options -Indexes\n<FilesMatch \"\\.(php[0-9]?|phtml|pl|py|cgi|sh|bash)$\">\n<IfModule mod_authz_core.c>\nRequire all denied\n</IfModule>\n</FilesMatch>\n";
         if (@file_put_contents($htaccess, $ht_content) === false) {
-            error_log('[ZONE85] upload_collectible_media : impossible d\'�crire le .htaccess dans ' . $upload_dir);
+            error_log('[ZONE85] upload_collectible_media : impossible d\'écrire le .htaccess dans ' . $upload_dir);
         }
     }
 
@@ -1976,7 +1976,7 @@ function fetch_user_passport(int $user_id): array {
             $passport['collectibles'] = (int)$s->fetchColumn();
         } catch (PDOException $e) {}
 
-        // KTC : �pisodes auxquels l'utilisateur a particip� (proposition ou vote)
+        // KTC : Épisodes auxquels l'utilisateur a participé (proposition ou vote)
         try {
             $s = $pdo->prepare("
                 SELECT COUNT(DISTINCT episode_id) FROM (
@@ -1990,8 +1990,8 @@ function fetch_user_passport(int $user_id): array {
             $passport['ktc_correct'] = 0;
         } catch (PDOException $e) {}
 
-        // Randos valid�es admin � depuis rando_participations (source V12)
-        // Coh�rent avec passeport.php qui utilise la m�me table
+        // Randos validées admin — depuis rando_participations (source V12)
+        // Cohérent avec passeport.php qui utilise la même table
         try {
             $s = $pdo->prepare("
                 SELECT COUNT(*) FROM rando_participations
@@ -2119,7 +2119,7 @@ function fetch_weather_alerts(): array {
 //  Notifications 
 
 /**
- * Cr�e une notification in-app pour un utilisateur.
+ * Crée une notification in-app pour un utilisateur.
  * Non-bloquant : silencieux si table inexistante.
  */
 function push_notification(int $user_id, string $type, string $title, array $opts = []): void {
@@ -2159,7 +2159,7 @@ function count_unread_notifications(int $user_id): int {
 }
 
 /**
- * Retourne les notifications d'un utilisateur (r�centes en premier).
+ * Retourne les notifications d'un utilisateur (récentes en premier).
  */
 function fetch_user_notifications(int $user_id, int $limit = 30, bool $unread_only = false): array {
     $pdo = db();
@@ -2200,7 +2200,7 @@ function mark_notifications_read(int $user_id, ?int $notif_id = null): void {
 }
 
 /**
- * Retourne les XP gagn�s depuis le d�but de la saison active.
+ * Retourne les XP gagnés depuis le début de la saison active.
  */
 function fetch_user_xp_season(int $user_id): int {
     $pdo = db();
@@ -2219,12 +2219,12 @@ function fetch_user_xp_season(int $user_id): int {
 //  Auto-badge attribution engine 
 
 /**
- * V�rifie et attribue automatiquement les badges d�bloqu�s par un utilisateur.
- * Appel�e apr�s chaque gain de XP ou validation de participation.
- * Enti�rement silencieuse sur erreur � ne doit jamais bloquer la page appelante.
+ * Vérifie et attribue automatiquement les badges débloqués par un utilisateur.
+ * Appelée après chaque gain de XP ou validation de participation.
+ * Entièrement silencieuse sur erreur — ne doit jamais bloquer la page appelante.
  *
  * @param  int   $userId
- * @return array Tableau des lignes de badges nouvellement attribu�s
+ * @return array Tableau des lignes de badges nouvellement attribués
  */
 function check_and_award_badges(int $userId): array {
     if ($userId <= 0) return [];
@@ -2232,7 +2232,7 @@ function check_and_award_badges(int $userId): array {
     if (!$pdo) return [];
 
     try {
-        // -- 1. Charger tous les badges auto-�ligibles (non-manual, non-special, non-hidden)
+        // -- 1. Charger tous les badges auto-éligibles (non-manual, non-special, non-hidden)
         $stmtBadges = $pdo->prepare(
             "SELECT * FROM badges
               WHERE condition_type NOT IN ('manual','special')
@@ -2242,14 +2242,14 @@ function check_and_award_badges(int $userId): array {
         $badges = $stmtBadges->fetchAll(PDO::FETCH_ASSOC);
         if (empty($badges)) return [];
 
-        // -- 2. Badges d�j� obtenus par l'utilisateur
+        // -- 2. Badges déjà obtenus par l'utilisateur
         $stmtEarned = $pdo->prepare(
             "SELECT badge_id FROM user_badges WHERE user_id = :uid"
         );
         $stmtEarned->execute([':uid' => $userId]);
         $earnedIds = array_flip($stmtEarned->fetchAll(PDO::FETCH_COLUMN));
 
-        // -- 3. Donn�es utilisateur n�cessaires aux v�rifications
+        // -- 3. Données utilisateur nécessaires aux vérifications
         $stmtUser = $pdo->prepare(
             "SELECT xp_total FROM users WHERE id = :uid LIMIT 1"
         );
@@ -2258,10 +2258,10 @@ function check_and_award_badges(int $userId): array {
         if (!$userRow) return [];
         $userXp = (int)$userRow['xp_total'];
 
-        // Saison active (peut �tre null)
+        // Saison active (peut être null)
         $activeSeason = _active_season_row();
 
-        // -- 4. �valuer chaque badge non encore obtenu
+        // -- 4. Évaluer chaque badge non encore obtenu
         $newlyAwarded = [];
 
         foreach ($badges as $badge) {
@@ -2269,7 +2269,7 @@ function check_and_award_badges(int $userId): array {
             $condType  = $badge['condition_type'];
             $condValue = (int)$badge['condition_value'];
 
-            // Ignorer les badges d�j� obtenus
+            // Ignorer les badges déjà obtenus
             if (isset($earnedIds[$badgeId])) continue;
 
             $unlocked = false;
@@ -2313,13 +2313,13 @@ function check_and_award_badges(int $userId): array {
                     break;
 
                 default:
-                    // Type non g�r�  on ignore silencieusement
+                    // Type non géré — on ignore silencieusement
                     break;
             }
 
             if (!$unlocked) continue;
 
-            // -- 5. Attribuer le badge (INSERT IGNORE pour �viter les doublons)
+            // -- 5. Attribuer le badge (INSERT IGNORE pour éviter les doublons)
             $stmtIns = $pdo->prepare(
                 "INSERT IGNORE INTO user_badges
                     (user_id, badge_id, source_type, awarded_by, awarded_at)
@@ -2327,7 +2327,7 @@ function check_and_award_badges(int $userId): array {
             );
             $stmtIns->execute([':uid' => $userId, ':bid' => $badgeId]);
 
-            // Ne notifier que si une ligne a vraiment �t� ins�r�e
+            // Ne notifier que si une ligne a vraiment été insérée
             if ($stmtIns->rowCount() > 0) {
                 $newlyAwarded[] = $badge;
 
@@ -2336,7 +2336,7 @@ function check_and_award_badges(int $userId): array {
                     push_notification(
                         $userId,
                         'badge_unlock',
-                        'Badge d�bloqu� : ' . $badge['title'],
+                        'Badge débloqué : ' . $badge['title'],
                         [
                             'link_url'   => 'profil.php',
                             'icon_emoji' => $badge['icon_emoji'] ?? '',
@@ -2349,7 +2349,7 @@ function check_and_award_badges(int $userId): array {
         return $newlyAwarded;
 
     } catch (Throwable $e) {
-        // Enti�rement silencieux � ne doit jamais interrompre la page appelante
+        // Entièrement silencieux — ne doit jamais interrompre la page appelante
         error_log('[ZONE85] check_and_award_badges : ' . $e->getMessage());
         return [];
     }

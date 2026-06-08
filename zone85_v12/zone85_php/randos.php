@@ -1101,8 +1101,8 @@ require_once 'includes/nav.php';
     </p>
     <div class="randos-cta-btns">
       <?php if ($is_logged_in): ?>
-        <a href="missions.php" class="randos-btn-primary">&#x1F3AF; Voir les missions</a>
-        <a href="hall.php"     class="randos-btn-outline">&#x1F3DB; Hall de la Zone</a>
+        <a href="missions.php"    class="randos-btn-primary">&#x1F3AF; Voir les missions</a>
+        <a href="communaute.php" class="randos-btn-outline">&#x1F465; La communauté</a>
       <?php else: ?>
         <a href="inscription.php" class="randos-btn-primary">&#x1F331; Rejoindre la Zone</a>
         <a href="concept.php"     class="randos-btn-outline">D&eacute;couvrir le concept</a>

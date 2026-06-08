@@ -594,8 +594,8 @@ require_once 'includes/nav.php';
     </p>
     <div class="echos-cta-btns">
       <?php if ($is_logged_in): ?>
-        <a href="missions.php" class="echos-btn-primary">&#x1F3AF; Voir les missions</a>
-        <a href="hall.php"     class="echos-btn-outline">&#x1F3DB; Hall de la Zone</a>
+        <a href="missions.php"    class="echos-btn-primary">&#x1F3AF; Voir les missions</a>
+        <a href="communaute.php" class="echos-btn-outline">&#x1F465; La communauté</a>
       <?php else: ?>
         <a href="inscription.php" class="echos-btn-primary">&#x1F331; Rejoindre la Zone</a>
         <a href="concept.php"     class="echos-btn-outline">D&eacute;couvrir le concept</a>

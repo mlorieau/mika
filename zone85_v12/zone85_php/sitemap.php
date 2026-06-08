@@ -25,7 +25,6 @@ $static_pages = [
     ['loc' => '/randos.php',          'priority' => '0.8', 'changefreq' => 'weekly',  'lastmod' => $today],
     ['loc' => '/clans.php',           'priority' => '0.7', 'changefreq' => 'weekly',  'lastmod' => $today],
     ['loc' => '/communaute.php',      'priority' => '0.7', 'changefreq' => 'daily',   'lastmod' => $today],
-    ['loc' => '/hall.php',            'priority' => '0.6', 'changefreq' => 'weekly',  'lastmod' => $today],
     ['loc' => '/contact.php',         'priority' => '0.5', 'changefreq' => 'yearly',  'lastmod' => $today],
     ['loc' => '/mentions-legales.php','priority' => '0.3', 'changefreq' => 'yearly',  'lastmod' => $today],
     ['loc' => '/confidentialite.php', 'priority' => '0.3', 'changefreq' => 'yearly',  'lastmod' => $today],

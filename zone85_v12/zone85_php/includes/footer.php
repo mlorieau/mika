@@ -27,7 +27,6 @@ $footer_active_season = $active_season ?? (function_exists('get_active_season') 
           <li><a href="clans.php">Les Clans</a></li>
           <li><a href="missions.php">Missions</a></li>
           <li><a href="communaute.php?tab=classement">Classement</a></li>
-          <li><a href="hall.php">Hall de la Zone</a></li>
         </ul>
       </div>
       <div class="footer-col">
