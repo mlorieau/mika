@@ -842,8 +842,6 @@ function block_preview(array $block): string {
 
 // ── JS inline ───────────────────────────────────────────────
 $admin_scripts = <<<'JS'
-<link rel="stylesheet" href="https://cdn.quilljs.com/1.3.6/quill.snow.css">
-<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script>
 // ── Slugify ────────────────────────────────────────────────
 function slugify(text) {
@@ -1005,6 +1003,9 @@ JS;
 
 require_once __DIR__ . '/_admin-header.php';
 ?>
+<!-- Quill CDN — chargé ici pour être disponible avant les scripts d'init en bas de page -->
+<link rel="stylesheet" href="https://cdn.quilljs.com/1.3.6/quill.snow.css">
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <style>
 /* ── Onglets ──────────────────────────────────────────────── */
 .rando-tabs {
