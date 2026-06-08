@@ -764,6 +764,25 @@ $page_styles = '<style>
 .rando-click-spark{position:fixed;pointer-events:none;z-index:9999;font-size:14px;animation:randoSpark .75s ease-out forwards}
 @keyframes randoSpark{0%{transform:translate(-50%,-50%) scale(.6);opacity:1}100%{transform:translate(-50%,-80px) scale(1.25);opacity:0}}
 
+/* BADGES LISIBILITÉ */
+.rando-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25);
+  color: #fff; font-size: .72rem; font-weight: 700;
+  border-radius: 20px; padding: 2px 8px;
+  white-space: nowrap; backdrop-filter: blur(4px);
+}
+.rando-badges-row {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin-top: 16px;
+}
+/* Variantes colorées dans les sections fond clair */
+.rando-badge-light { background: #f7f4ef; border-color: rgba(12,30,46,.1); color: #4a5f73; }
+.rando-badge-diff-facile   { background: rgba(42,157,92,.1);  color: #1a7a42; border-color: rgba(42,157,92,.25); }
+.rando-badge-diff-moyen    { background: rgba(201,150,42,.1); color: #8a6020; border-color: rgba(201,150,42,.25); }
+.rando-badge-diff-difficile{ background: rgba(234,86,73,.1);  color: #b83a2f; border-color: rgba(234,86,73,.25); }
+.rando-badge-gpx  { background: rgba(12,99,195,.1); color: #0c63c3; border-color: rgba(12,99,195,.2); }
+.rando-badge-fam  { background: rgba(42,157,92,.08); color: #1a7a42; border-color: rgba(42,157,92,.2); }
 
 /* Retours validés des explorateurs */
 .rando-returns-section{margin-top:32px;background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:18px;box-shadow:0 8px 30px rgba(12,30,46,.06);overflow:hidden}
@@ -814,6 +833,31 @@ require_once 'includes/nav.php';
       </span>
     </div>
     <h1><?= htmlspecialchars($rando['title'], ENT_QUOTES, 'UTF-8') ?></h1>
+
+    <!-- Badges lisibilité hero -->
+    <?php
+      $hero_diff_cls = ['facile'=>'', 'moyen'=>'', 'difficile'=>''][$dif] ?? '';
+    ?>
+    <div class="rando-badges-row">
+      <?php if ($dist_str): ?>
+        <span class="rando-badge">&#x1F4CD; <?= htmlspecialchars($dist_str, ENT_QUOTES, 'UTF-8') ?></span>
+      <?php endif; ?>
+      <?php if ($dur_str): ?>
+        <span class="rando-badge">&#x23F1; ~<?= htmlspecialchars($dur_str, ENT_QUOTES, 'UTF-8') ?></span>
+      <?php endif; ?>
+      <?php
+        $diff_badge_labels = ['facile' => 'Facile', 'moyen' => 'Moyen', 'difficile' => 'Difficile'];
+      ?>
+      <span class="rando-badge">
+        <?= htmlspecialchars($diff_badge_labels[$dif] ?? ucfirst($dif), ENT_QUOTES, 'UTF-8') ?>
+      </span>
+      <?php if (!empty($rando['gpx_file']) || !empty($rando['gpx_url'])): ?>
+        <span class="rando-badge">&#x1F4CD; GPX</span>
+      <?php endif; ?>
+      <?php if (!empty($rando['famille_score']) && (int)$rando['famille_score'] >= 3): ?>
+        <span class="rando-badge">&#x1F46A; Famille</span>
+      <?php endif; ?>
+    </div>
   </div>
 </section>
 
