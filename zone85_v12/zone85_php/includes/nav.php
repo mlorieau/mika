@@ -33,7 +33,7 @@ $_mega_sections = [
             ['file' => 'randos.php',     'label' => 'Randos',          'desc' => 'Parcours & traces GPX',            'icon' => '🥾'],
             ['file' => 'missions.php',   'label' => 'Participer',      'desc' => 'Participations ponctuelles',       'icon' => '🎯'],
             ['file' => 'victor.php',     'label' => 'Victor',          'desc' => 'Le livre PDF de la Zone',          'icon' => '📖'],
-            ['file' => 'ktc.php',        'label' => 'Kétokole Tchè',   'desc' => 'Chercher & identifier',            'icon' => '🔍'],
+
             ['file' => 'evenements.php', 'label' => 'Événements',      'desc' => 'Rendez-vous de la Zone',           'icon' => '🎉'],
         ],
     ],

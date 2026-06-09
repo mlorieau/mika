@@ -129,7 +129,7 @@ require_once 'includes/nav.php';
 
     <div class="xp-card">
       <div class="xp-card-title">Score de clan</div>
-      <p>Saisonnier — repart à zéro à chaque nouvelle saison. Détermine le vainqueur de la Bataille des Clans.</p>
+      <p>Annuel — chaque participation validée peut faire avancer votre clan jusqu'au podium de fin d'année.</p>
     </div>
 
     <div class="xp-card">

@@ -1,6 +1,6 @@
 <?php
 $page_title       = 'Trophéothèque — Zone85';
-$page_description = 'Découvre l\'histoire des saisons Zone85 et les clans qui ont remporté les trophées. La Trophéothèque, mémoire de la Bataille des Clans.';
+$page_description = 'La Trophéothèque garde la mémoire des podiums, coups de cœur et trophées symboliques de Zone85.';
 $page_canonical   = 'https://www.zone85.fr/trophees.php';
 $page_robots      = 'index,follow';
 $page_og_image    = 'assets/img/ZONE852025.png';
@@ -328,7 +328,7 @@ require 'includes/nav.php';
     <div class="trophees-hero-inner">
       <div>
         <h1>🏆 Trophéothèque Zone85</h1>
-        <p>L'histoire des saisons — chaque trophée, un clan vainqueur, une époque gravée dans la mémoire de la Zone.</p>
+        <p>Podiums annuels, trophées symboliques, coups de cœur — la mémoire du QG.</p>
       </div>
       <div class="hero-trophy-icon" aria-hidden="true">🏆</div>
     </div>

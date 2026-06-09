@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
 
     if (!verify_csrf_token($csrf)) {
 
-        $flash = ['type' => 'err', 'msg' => 'Token CSRF invalide. Action annul�e.'];
+        $flash = ['type' => 'err', 'msg' => 'Token CSRF invalide. Action annulée.'];
 
     } else {
 
@@ -142,13 +142,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
 
                     ]);
 
-                    $flash = ['type' => 'ok', 'msg' => "Saison � {$title} � cr��e en brouillon."];
+                    $flash = ['type' => 'ok', 'msg' => "Saison « {$title} » créée en brouillon."];
 
                 } catch (PDOException $e) {
 
                     error_log('[ZONE85 admin/seasons create] ' . $e->getMessage());
 
-                    $flash = ['type' => 'err', 'msg' => 'Erreur lors de la cr�ation : ' . $e->getMessage()];
+                    $flash = ['type' => 'err', 'msg' => 'Erreur lors de la création : ' . $e->getMessage()];
 
                 }
 
@@ -170,13 +170,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
 
                     $pdo->beginTransaction();
 
-                    // Fermer les �ventuelles saisons actives pr�c�dentes
+                    // Fermer les éventuelles saisons actives précédentes
 
                     $pdo->prepare("UPDATE seasons SET status='archived' WHERE status='active' AND id != :id")
 
                         ->execute([':id' => $id]);
 
-                    // Activer la saison demand�e
+                    // Activer la saison demandée
 
                     $pdo->prepare("UPDATE seasons SET status='active' WHERE id = :id")
 
@@ -184,7 +184,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
 
                     $pdo->commit();
 
-                    $flash = ['type' => 'ok', 'msg' => "Saison #$id activ�e. Les autres saisons actives ont �t� ferm�es."];
+                    $flash = ['type' => 'ok', 'msg' => "Saison #$id activée. Les autres saisons actives ont été fermées."];
 
                 } catch (PDOException $e) {
 
@@ -216,7 +216,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
 
 
 
-                    // D�terminer le clan gagnant (score le plus �lev� sur la saison)
+                    // Déterminer le clan gagnant (score le plus élevé sur la saison)
 
                     $winnerStmt = $pdo->prepare("
 
@@ -260,7 +260,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
 
 
 
-                    // Ins�rer le troph�e pour le clan gagnant
+                    // Insérer le trophée pour le clan gagnant
 
                     if ($winner_clan_id) {
 
@@ -286,7 +286,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
 
 
 
-                    // Cr�er un fil d'actualit� (community_feed)
+                    // Créer un fil d'actualité (community_feed)
 
                     try {
 
@@ -310,9 +310,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
 
                     $pdo->commit();
 
-                    $clanMsg = $winner_clan_id ? " Le clan #$winner_clan_id remporte le troph�e." : '';
+                    $clanMsg = $winner_clan_id ? " Le clan #$winner_clan_id remporte le trophée." : '';
 
-                    $flash = ['type' => 'ok', 'msg' => "Saison #$id cl�tur�e.$clanMsg"];
+                    $flash = ['type' => 'ok', 'msg' => "Saison #$id clôturée.$clanMsg"];
 
                 } catch (PDOException $e) {
 
@@ -320,7 +320,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
 
                     error_log('[ZONE85 admin/seasons close] ' . $e->getMessage());
 
-                    $flash = ['type' => 'err', 'msg' => 'Erreur lors de la cl�ture.'];
+                    $flash = ['type' => 'err', 'msg' => 'Erreur lors de la clôture.'];
 
                 }
 
@@ -416,13 +416,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
 
                     ]);
 
-                    $flash = ['type' => 'ok', 'msg' => "Saison #$id mise � jour."];
+                    $flash = ['type' => 'ok', 'msg' => "Saison #$id mise à jour."];
 
                 } catch (PDOException $e) {
 
                     error_log('[ZONE85 admin/seasons update] ' . $e->getMessage());
 
-                    $flash = ['type' => 'err', 'msg' => 'Erreur lors de la mise � jour.'];
+                    $flash = ['type' => 'err', 'msg' => 'Erreur lors de la mise à jour.'];
 
                 }
 
@@ -494,7 +494,7 @@ if ($pdo) {
 
 
 
-//  Missions �ligibles (grande mission / chasse cach�e) 
+//  Missions éligibles (grande mission / chasse cachée) 
 
 $missions_eligible = [];
 
@@ -530,7 +530,7 @@ require_once '_admin-header.php';
 
 
 
-// Ajouter Saisons dans la nav � patch inline topnav via JS
+// Ajouter Saisons dans la nav — patch inline topnav via JS
 
 $admin_scripts = <<<'JS'
 
@@ -588,7 +588,7 @@ $admin_scripts = <<<'JS'
 
 
 
-    // Toggles modales d'�dition
+    // Toggles modales d'édition
 
     document.querySelectorAll('.btn-edit-season').forEach(function(btn) {
 
@@ -606,7 +606,7 @@ $admin_scripts = <<<'JS'
 
 
 
-    // Toggle formulaire de cr�ation
+    // Toggle formulaire de création
 
     var btnCreate = document.getElementById('btn-show-create');
 
@@ -640,13 +640,13 @@ JS;
 
     <h1 class="adm-page-title"> Saisons</h1>
 
-    <p class="adm-page-sub">Cr�er, activer et cl�turer les saisons de jeu Zone85.</p>
+    <p class="adm-page-sub">Créer, activer et clôturer les saisons de jeu Zone85.</p>
 
   </div>
 
   <div class="adm-page-actions">
 
-    <button id="btn-show-create" class="btn-adm btn-adm-primary">+ Cr�er une saison</button>
+    <button id="btn-show-create" class="btn-adm btn-adm-primary">+ Créer une saison</button>
 
   </div>
 
@@ -658,7 +658,7 @@ JS;
 
 <div class="adm-flash adm-flash-<?= $flash['type'] === 'ok' ? 'ok' : ($flash['type'] === 'info' ? 'info' : 'err') ?>">
 
-  <?= $flash['type'] === 'ok' ? '' : ($flash['type'] === 'info' ? '' : '�') ?>
+  <?= $flash['type'] === 'ok' ? '' : ($flash['type'] === 'info' ? '' : '⚠') ?>
 
   <span><?= e($flash['msg']) ?></span>
 
@@ -670,13 +670,13 @@ JS;
 
 <?php if (!$pdo): ?>
 
-<div class="adm-flash adm-flash-err"> <span>Base de donn�es indisponible.</span></div>
+<div class="adm-flash adm-flash-err"> <span>Base de données indisponible.</span></div>
 
 <?php endif; ?>
 
 
 
-<!--  Formulaire de cr�ation  -->
+<!--  Formulaire de création  -->
 
 <div id="panel-create" class="adm-card" style="display:none;margin-bottom:24px">
 
@@ -708,7 +708,7 @@ JS;
 
         <input id="new_slug" name="slug" type="text" class="adm-input" required maxlength="120" placeholder="saison-des-chemins-creux">
 
-        <span class="adm-hint">G�n�r� automatiquement depuis le titre, �ditable.</span>
+        <span class="adm-hint">Généré automatiquement depuis le titre, éditable.</span>
 
       </div>
 
@@ -746,7 +746,7 @@ JS;
 
       <div class="adm-field">
 
-        <label class="adm-label" for="new_start_date">Date de d�but</label>
+        <label class="adm-label" for="new_start_date">Date de début</label>
 
         <input id="new_start_date" name="start_date" type="date" class="adm-input">
 
@@ -770,7 +770,7 @@ JS;
 
         <select id="new_badge_id" name="badge_id" class="adm-select">
 
-          <option value="">� Aucun badge �</option>
+          <option value="">« Aucun badge »</option>
 
           <?php foreach ($badges as $b): ?>
 
@@ -786,11 +786,11 @@ JS;
 
       <div class="adm-field">
 
-        <label class="adm-label" for="new_mission_id">Grande Mission / Chasse cach�e</label>
+        <label class="adm-label" for="new_mission_id">Grande Mission / Chasse cachée</label>
 
         <select id="new_mission_id" name="mission_id" class="adm-select">
 
-          <option value="">� Aucune mission principale �</option>
+          <option value="">« Aucune mission principale »</option>
 
           <?php foreach ($missions_eligible as $m): ?>
 
@@ -808,7 +808,7 @@ JS;
 
         <label class="adm-label" for="new_description">Description courte</label>
 
-        <input id="new_description" name="description" type="text" class="adm-input" maxlength="500" placeholder="R�sum� en une phrase�">
+        <input id="new_description" name="description" type="text" class="adm-input" maxlength="500" placeholder="Résumé en une phrase…">
 
       </div>
 
@@ -818,7 +818,7 @@ JS;
 
         <label class="adm-label" for="new_description_long">Description longue</label>
 
-        <textarea id="new_description_long" name="description_long" class="adm-textarea" rows="5" placeholder="Texte de pr�sentation complet de la saison�"></textarea>
+        <textarea id="new_description_long" name="description_long" class="adm-textarea" rows="5" placeholder="Texte de présentation complet de la saison…"></textarea>
 
       </div>
 
@@ -828,7 +828,7 @@ JS;
 
     <div style="margin-top:20px;display:flex;gap:10px">
 
-      <button type="submit" class="btn-adm btn-adm-primary">Cr�er la saison</button>
+      <button type="submit" class="btn-adm btn-adm-primary">Créer la saison</button>
 
       <button type="button" class="btn-adm btn-adm-ghost" onclick="document.getElementById('panel-create').style.display='none'">Annuler</button>
 
@@ -854,7 +854,7 @@ JS;
 
       <div class="adm-empty-icon"></div>
 
-      <p>Aucune saison pour le moment. Cr�ez la premi�re !</p>
+      <p>Aucune saison pour le moment. Créez la première !</p>
 
     </div>
 
@@ -874,7 +874,7 @@ JS;
 
             <th>Slug</th>
 
-            <th>D�but</th>
+            <th>Début</th>
 
             <th>Fin</th>
 
@@ -900,9 +900,9 @@ JS;
 
             <td><code style="font-size:.75rem;color:#6b7f96"><?= e($s['slug']) ?></code></td>
 
-            <td><?= $s['start_date'] ? htmlspecialchars(date('d/m/Y', strtotime($s['start_date'])), ENT_QUOTES, 'UTF-8') : '<span style="color:#aaa">�</span>' ?></td>
+            <td><?= $s['start_date'] ? htmlspecialchars(date('d/m/Y', strtotime($s['start_date'])), ENT_QUOTES, 'UTF-8') : '<span style="color:#aaa">—</span>' ?></td>
 
-            <td><?= $s['end_date']   ? htmlspecialchars(date('d/m/Y', strtotime($s['end_date'])),   ENT_QUOTES, 'UTF-8') : '<span style="color:#aaa">�</span>' ?></td>
+            <td><?= $s['end_date']   ? htmlspecialchars(date('d/m/Y', strtotime($s['end_date'])),   ENT_QUOTES, 'UTF-8') : '<span style="color:#aaa">—</span>' ?></td>
 
             <td>
 
@@ -920,9 +920,9 @@ JS;
 
               <div style="display:flex;gap:6px;flex-wrap:wrap">
 
-                <!-- �diter -->
+                <!-- Éditer -->
 
-                <button class="btn-adm btn-adm-ghost btn-adm-sm btn-edit-season" data-id="<?= (int)$s['id'] ?>"> �diter</button>
+                <button class="btn-adm btn-adm-ghost btn-adm-sm btn-edit-season" data-id="<?= (int)$s['id'] ?>"> Éditer</button>
 
 
 
@@ -930,7 +930,7 @@ JS;
 
                   <!-- Activer -->
 
-                  <form method="post" action="seasons.php" style="display:inline" onsubmit="return confirm('Activer cette saison ? Les autres saisons actives seront ferm�es.')">
+                  <form method="post" action="seasons.php" style="display:inline" onsubmit="return confirm('Activer cette saison ? Les autres saisons actives seront fermées.')">
 
                     <?= csrf_field() ?>
 
@@ -948,9 +948,9 @@ JS;
 
                 <?php if ($s['status'] === 'active'): ?>
 
-                  <!-- Cl�turer -->
+                  <!-- Clôturer -->
 
-                  <form method="post" action="seasons.php" style="display:inline" onsubmit="return confirm('Cl�turer d�finitivement cette saison ? Cette action est irr�versible.')">
+                  <form method="post" action="seasons.php" style="display:inline" onsubmit="return confirm('Clôturer définitivement cette saison ? Cette action est irréversible.')">
 
                     <?= csrf_field() ?>
 
@@ -958,7 +958,7 @@ JS;
 
                     <input type="hidden" name="id" value="<?= (int)$s['id'] ?>">
 
-                    <button type="submit" class="btn-adm btn-adm-danger btn-adm-sm"> Cl�turer</button>
+                    <button type="submit" class="btn-adm btn-adm-danger btn-adm-sm"> Clôturer</button>
 
                   </form>
 
@@ -968,7 +968,7 @@ JS;
 
 
 
-              <!-- Panneau d'�dition inline -->
+              <!-- Panneau d'édition inline -->
 
               <div id="edit-panel-<?= (int)$s['id'] ?>" style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid #f0ece7">
 
@@ -1026,7 +1026,7 @@ JS;
 
                     <div class="adm-field">
 
-                      <label class="adm-label">Date de d�but</label>
+                      <label class="adm-label">Date de début</label>
 
                       <input name="start_date" type="date" class="adm-input" value="<?= e($s['start_date'] ?? '') ?>">
 
@@ -1050,7 +1050,7 @@ JS;
 
                       <select name="badge_id" class="adm-select">
 
-                        <option value="">� Aucun badge �</option>
+                        <option value="">« Aucun badge »</option>
 
                         <?php foreach ($badges as $b): ?>
 
@@ -1070,11 +1070,11 @@ JS;
 
                     <div class="adm-field">
 
-                      <label class="adm-label">Grande Mission / Chasse cach�e</label>
+                      <label class="adm-label">Grande Mission / Chasse cachée</label>
 
                       <select name="mission_id" class="adm-select">
 
-                        <option value="">� Aucune �</option>
+                        <option value="">« Aucune »</option>
 
                         <?php foreach ($missions_eligible as $m): ?>
 

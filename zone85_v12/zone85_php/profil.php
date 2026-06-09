@@ -1,6 +1,6 @@
 <?php
 $page_title       = 'Mon Profil';
-$page_description = 'Consulte ta progression, tes badges, ton XP à vie et ta contribution à la Bataille des Clans sur ZONE85.';
+$page_description = 'Consulte ta progression, tes badges, ton XP à vie et ta contribution au classement annuel des clans sur ZONE85.';
 $page_canonical   = 'https://www.zone85.fr/profil.php';
 $page_robots      = 'noindex,follow';
 $page_og_image    = null;
@@ -458,7 +458,7 @@ require_once 'includes/nav.php';
     <div style="width:80px;height:80px;background:var(--navy-dark);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 24px">🛡️</div>
     <h1 style="font-size:clamp(1.6rem,4vw,2.2rem);font-weight:900;color:var(--navy-dark);letter-spacing:-.5px;margin-bottom:10px">Ton profil t'attend</h1>
     <p style="font-size:.95rem;color:var(--text-muted);margin-bottom:32px;line-height:1.7">
-      Connecte-toi pour voir ta progression, tes badges et ta contribution à la Bataille des Clans.
+      Connecte-toi pour voir ta progression, tes badges et ta contribution au classement annuel des clans.
     </p>
     <div style="display:flex;flex-direction:column;gap:12px;max-width:300px;margin:0 auto">
       <a href="login.php" class="btn btn-primary btn-lg" style="text-align:center">Se connecter →</a>
@@ -539,7 +539,7 @@ require_once 'includes/nav.php';
       <div class="sidebar-axe sidebar-axe-total" onclick="location.href='communaute.php?tab=classement'" role="button" tabindex="0" title="Voir le classement">
         <div class="sidebar-axe-label">🏆 Score de mon clan</div>
         <div class="sidebar-axe-val sidebar-axe-val-total"><?= number_format($_clan_total, 0, ',', ' ') ?> pts</div>
-        <div class="sidebar-axe-sub"><?= e($user['clan_label']) ?> — saison en cours</div>
+        <div class="sidebar-axe-sub"><?= e($user['clan_label']) ?> — classement annuel</div>
         <?php if ($user['clan_place'] > 0): ?>
         <div class="sidebar-axe-hint">📊 <?= (int)$user['clan_place'] ?>e au classement →</div>
         <?php else: ?>

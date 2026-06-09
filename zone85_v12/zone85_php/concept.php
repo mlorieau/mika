@@ -288,7 +288,7 @@ require_once 'includes/nav.php';
       <div class="cp-eyebrow">Les clans — c'est une guerre ?</div>
       <h2 class="cp-title">Non. C'est une appartenance.</h2>
     </div>
-    <p class="cp-clan-intro">Bocage, Littoral, Marais — ce sont trois façons d'être vendéen. Pas trois armées. Quand vous choisissez un clan, vous choisissez une <strong style="color:#fff">identité territoriale</strong>, pas un camp. Vous pouvez admirer les deux autres clans — et quand même porter fièrement votre bocage, votre côte ou vos marais.<br><br>Le créateur de Zone85 lui-même aime "voir tout le monde avancer". La Bataille des Clans, c'est une <strong style="color:#fff">émulation collective</strong> — pas une guerre. Comme choisir sa région de cœur : on aime les trois, on appartient à l'une.</p>
+    <p class="cp-clan-intro">Bocage, Littoral, Marais — ce sont trois façons d'être vendéen. Pas trois armées. Quand vous choisissez un clan, vous choisissez une <strong style="color:#fff">identité territoriale</strong>, pas un camp. Vous pouvez admirer les deux autres clans — et quand même porter fièrement votre bocage, votre côte ou vos marais.<br><br>Le créateur de Zone85 lui-même aime "voir tout le monde avancer". Le classement des clans, c'est une <strong style="color:#fff">émulation collective</strong> — pas une guerre. Comme choisir sa région de cœur : on aime les trois, on appartient à l'une.</p>
     <div class="cp-clan-strip">
       <?php
       $clan_taglines = [
@@ -436,7 +436,7 @@ require_once 'includes/nav.php';
           <div class="cp-pillar-title">Les Missions</div>
         </div>
         <div class="cp-pillar-body">
-          <p class="cp-pillar-desc">Des défis ponctuels et saisonniers : photo de terrain, quiz, enquête, défi météo. Chaque participation rapporte des XP et des points pour votre clan.</p>
+          <p class="cp-pillar-desc">Des participations ponctuelles : photo de Vendée, Kétokole Tchè, quiz flash, pistes mystères. Chaque participation rapporte des XP et des points pour votre clan.</p>
           <a href="missions.php" class="cp-pillar-link">Voir les missions →</a>
         </div>
       </div>
@@ -477,7 +477,7 @@ require_once 'includes/nav.php';
         <div style="border-left:2px solid var(--beige-dark);padding-left:28px;padding-bottom:8px">
           <div style="width:10px;height:10px;border-radius:50%;background:var(--primary);position:absolute;left:80px;transform:translate(-3px,6px)"></div>
           <h3 style="font-size:.97rem;font-weight:800;color:var(--text);margin-bottom:8px">La communauté prend forme</h3>
-          <p style="font-size:.88rem;color:var(--text-muted);line-height:1.72">Les lecteurs deviennent acteurs. Les premiers Zonautes rejoignent la Zone, participent aux enquêtes, commentent les rubriques. La Bataille des Clans naît de ce besoin de jeu collectif : Bocage, Littoral ou Marais — chacun défend ses couleurs.</p>
+          <p style="font-size:.88rem;color:var(--text-muted);line-height:1.72">Les lecteurs deviennent acteurs. Les premiers Zonautes rejoignent la Zone, participent aux enquêtes, commentent les rubriques. Le classement des clans naît de ce besoin de participation collective : Bocage, Littoral ou Marais — chacun avance à son rythme.</p>
         </div>
       </div>
 
@@ -599,9 +599,9 @@ require_once 'includes/nav.php';
           ['q' => "C'est quoi VICTOR ?",
            'a' => "VICTOR est le livre PDF de Zone85 — une histoire vendéenne avec personnages, territoire et mémoire. Il est offert à tous les membres et déverrouillé dès l'inscription. C'est votre première récompense pour avoir rejoint la Zone."],
           ['q' => "Les clans, c'est obligatoire ?",
-           'a' => "Non. Mais choisir un clan, c'est rejoindre une identité territoriale et contribuer collectivement à la Bataille des Clans. Bocage, Littoral ou Marais — choisissez votre appartenance. Vous pouvez admirer les deux autres et quand même porter fièrement le vôtre."],
+           'a' => "Non. Mais choisir un clan, c'est rejoindre une identité territoriale et contribuer collectivement au classement annuel des clans. Bocage, Littoral ou Marais — choisissez votre appartenance. Vous pouvez admirer les deux autres et quand même porter fièrement le vôtre."],
           ['q' => "Est-ce que c'est une guerre entre clans ?",
-           'a' => "Non. La Bataille des Clans est une émulation amicale entre trois identités vendéennes — pas une guerre. Choisir son clan, c'est comme choisir sa région de cœur : on peut aimer les trois, et se sentir profondément appartenir à l'une. Le créateur de Zone85 aime \"voir tout le monde avancer\"."],
+           'a' => "Non. Le classement des clans est une émulation amicale entre trois identités vendéennes — pas une guerre. Choisir son clan, c'est comme choisir sa région de cœur : on peut aimer les trois, et se sentir profondément appartenir à l'une. Le créateur de Zone85 aime \"voir tout le monde avancer\"."],
           ['q' => "C'est quoi Les Invisibles ?",
            'a' => "Les Invisibles est le prochain jeu immersif de Zone85. Une aventure ancrée dans la Vendée réelle — des lieux, des indices, des personnages à découvrir sur le terrain. Les membres seront les premiers prévenus. Plus d'infos bientôt."],
           ['q' => "Faut-il payer pour participer ?",

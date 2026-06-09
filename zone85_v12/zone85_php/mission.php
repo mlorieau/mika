@@ -931,7 +931,7 @@ if (in_array($mission['mission_type'], ['quiz','vote']) && db_enabled()) {
         </p>
         <?php if ($clan_pts > 0): ?>
         <p style="font-size:.82rem;color:var(--text-muted);line-height:1.6;margin-top:10px;padding-top:10px;border-top:1px solid var(--beige-dark)">
-          🛡️ Les points clan comptent pour la <strong>Bataille des Clans</strong> de la saison en cours.
+          🛡️ Les points clan comptent pour le <strong>classement annuel des clans</strong>.
         </p>
         <?php endif; ?>
       </div>

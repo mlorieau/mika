@@ -100,7 +100,7 @@ require_once 'includes/nav.php';
       <li>Création et gestion de votre compte membre</li>
       <li>Affichage de votre profil et de vos statistiques</li>
       <li>Attribution des XP, niveaux et badges</li>
-      <li>Participation aux missions et à la Bataille des Clans</li>
+      <li>Participation aux missions et au classement des clans</li>
       <li>Gestion des classements</li>
       <li>Modération des contributions</li>
       <li>Réponse à vos demandes de contact</li>
