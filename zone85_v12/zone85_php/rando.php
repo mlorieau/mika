@@ -1281,7 +1281,7 @@ require_once 'includes/nav.php';
               </li>
               <li style="display:flex;align-items:flex-start;gap:12px">
                 <span style="flex-shrink:0;width:26px;height:26px;border-radius:50%;background:#0c1e2e;color:#fff;font-size:.75rem;font-weight:900;display:flex;align-items:center;justify-content:center">2</span>
-                <span style="font-size:.88rem;color:#0c1e2e;line-height:1.5;padding-top:3px"><strong>Ouvre-la dans une application compatible&nbsp;:</strong> Komoot, GPX Viewer, Organic Maps, OsmAnd.</span>
+                <span style="font-size:.88rem;color:#0c1e2e;line-height:1.5;padding-top:3px"><strong>Ouvre-la dans une application compatible&nbsp;:</strong> Komoot, Strava, Wikiloc, OsmAnd, AllTrails&hellip; ou presque toute appli GPS.</span>
               </li>
               <li style="display:flex;align-items:flex-start;gap:12px">
                 <span style="flex-shrink:0;width:26px;height:26px;border-radius:50%;background:#0c1e2e;color:#fff;font-size:.75rem;font-weight:900;display:flex;align-items:center;justify-content:center">3</span>
@@ -1298,14 +1298,19 @@ require_once 'includes/nav.php';
                   <span style="font-size:.9rem">&#x2753;</span> Je ne sais pas utiliser un GPX
                 </summary>
                 <div style="padding:14px 16px;border-top:1px solid rgba(12,30,46,.07);font-size:.84rem;color:#4b6074;line-height:1.65">
-                  Une trace GPX, c'est un fichier de parcours. Tu peux l'ouvrir dans une application de randonn&eacute;e pour suivre l'itin&eacute;raire sur ton t&eacute;l&eacute;phone, m&ecirc;me si tu ne connais pas le chemin.<br>
-                  <strong style="display:block;margin-top:10px;color:#0c1e2e">Applications compatibles&nbsp;:</strong>
+                  Une trace GPX, c'est un fichier de parcours. Tu peux l'ouvrir dans une application de randonn&eacute;e ou de sport pour suivre l'itin&eacute;raire sur ton t&eacute;l&eacute;phone, m&ecirc;me sans connexion.<br>
+                  <strong style="display:block;margin-top:10px;color:#0c1e2e">Quelques applications compatibles&nbsp;:</strong>
                   <span style="display:inline-flex;gap:8px;flex-wrap:wrap;margin-top:6px">
                     <a href="https://www.komoot.com/" target="_blank" rel="noopener noreferrer" style="background:#e8e0d4;border-radius:6px;padding:4px 10px;font-size:.78rem;font-weight:700;color:#0c1e2e;text-decoration:none">Komoot</a>
-                    <a href="https://play.google.com/store/apps/details?id=com.vecturagames.android.app.gpxviewer" target="_blank" rel="noopener noreferrer" style="background:#e8e0d4;border-radius:6px;padding:4px 10px;font-size:.78rem;font-weight:700;color:#0c1e2e;text-decoration:none">GPX Viewer</a>
-                    <a href="https://organicmaps.app/" target="_blank" rel="noopener noreferrer" style="background:#e8e0d4;border-radius:6px;padding:4px 10px;font-size:.78rem;font-weight:700;color:#0c1e2e;text-decoration:none">Organic Maps</a>
+                    <a href="https://www.strava.com/" target="_blank" rel="noopener noreferrer" style="background:#e8e0d4;border-radius:6px;padding:4px 10px;font-size:.78rem;font-weight:700;color:#0c1e2e;text-decoration:none">Strava</a>
+                    <a href="https://www.wikiloc.com/" target="_blank" rel="noopener noreferrer" style="background:#e8e0d4;border-radius:6px;padding:4px 10px;font-size:.78rem;font-weight:700;color:#0c1e2e;text-decoration:none">Wikiloc</a>
+                    <a href="https://www.alltrails.com/" target="_blank" rel="noopener noreferrer" style="background:#e8e0d4;border-radius:6px;padding:4px 10px;font-size:.78rem;font-weight:700;color:#0c1e2e;text-decoration:none">AllTrails</a>
                     <a href="https://osmand.net/" target="_blank" rel="noopener noreferrer" style="background:#e8e0d4;border-radius:6px;padding:4px 10px;font-size:.78rem;font-weight:700;color:#0c1e2e;text-decoration:none">OsmAnd</a>
+                    <a href="https://organicmaps.app/" target="_blank" rel="noopener noreferrer" style="background:#e8e0d4;border-radius:6px;padding:4px 10px;font-size:.78rem;font-weight:700;color:#0c1e2e;text-decoration:none">Organic Maps</a>
+                    <a href="https://play.google.com/store/apps/details?id=com.vecturagames.android.app.gpxviewer" target="_blank" rel="noopener noreferrer" style="background:#e8e0d4;border-radius:6px;padding:4px 10px;font-size:.78rem;font-weight:700;color:#0c1e2e;text-decoration:none">GPX Viewer</a>
+                    <a href="https://connect.garmin.com/" target="_blank" rel="noopener noreferrer" style="background:#e8e0d4;border-radius:6px;padding:4px 10px;font-size:.78rem;font-weight:700;color:#0c1e2e;text-decoration:none">Garmin Connect</a>
                   </span>
+                  <span style="display:block;margin-top:8px;font-size:.75rem;color:#7a8fa0;font-style:italic">Liste non exhaustive — la plupart des applications GPS et sport acceptent le format GPX.</span>
                 </div>
               </details>
             </div>

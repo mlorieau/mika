@@ -335,7 +335,7 @@ require_once 'includes/nav.php';
           <summary>Comment t&eacute;l&eacute;charger un fichier GPX pour une randonnée&nbsp;?</summary>
           <div class="aide-accordion-answer">
             <p>Sur la fiche de chaque randonnée disposant d&rsquo;une trace GPS, un bouton <strong>&laquo;&nbsp;T&eacute;l&eacute;charger GPX&nbsp;&raquo;</strong> est disponible dans la barre d&rsquo;informations et dans le panneau lat&eacute;ral.</p>
-            <p>Le fichier .gpx peut ensuite &ecirc;tre import&eacute; dans des applications compatibles&nbsp;: <strong>Komoot, GPX Viewer, Organic Maps, OsmAnd</strong>.</p>
+            <p>Le fichier .gpx peut ensuite &ecirc;tre import&eacute; dans la grande majorit&eacute; des applications GPS et sport&nbsp;: <strong>Komoot, Strava, Wikiloc, AllTrails, OsmAnd, Organic Maps, Garmin Connect, GPX Viewer</strong>&hellip; Liste non exhaustive &mdash; la plupart des applis GPS acceptent ce format.</p>
           </div>
         </details>
 

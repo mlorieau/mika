@@ -207,6 +207,11 @@ require_once 'includes/nav.php';
     </details>
 
     <details>
+      <summary>C'est quoi une trace GPX ?</summary>
+      <div class="ccm-faq-answer">Un fichier de parcours que tu ouvres dans une application GPS ou sport (Komoot, Strava, Wikiloc, AllTrails, OsmAnd…). Il te guide sur le chemin, même sans connexion. La plupart des applications de randonnée et de sport acceptent ce format.</div>
+    </details>
+
+    <details>
       <summary>Est-ce que je dois installer une application ?</summary>
       <div class="ccm-faq-answer">Non. Zone85 fonctionne dans votre navigateur. Vous pouvez l'ajouter à votre écran d'accueil comme une appli, sans passer par le store.</div>
     </details>
