@@ -6,6 +6,8 @@ $page_robots      = 'noindex,follow';
 $page_og_image    = null;
 $page_schema      = null;
 $current_page = 'profil';
+$_profil_allowed_tabs = ['apercu','progression','badges','activite','passeport','randos','participations','avis','compte'];
+$_profile_tab = in_array($_GET['tab'] ?? '', $_profil_allowed_tabs, true) ? ($_GET['tab'] ?? 'apercu') : 'apercu';
 require_once 'includes/config.php';
 require_once 'includes/data.php';
 require_once 'includes/functions.php';
@@ -192,7 +194,7 @@ if (!$is_guest) {
             'clan_slug'       => $_db_profile['clan_slug'] ?? '',
             'clan_label'      => $_clan_labels[$_db_profile['clan_slug'] ?? ''] ?? 'Aucun clan',
             'clan_chip_class' => $_chip_map[$_db_profile['clan_slug'] ?? ''] ?? '',
-            // Axe 2 sidebar : points clan réellement apportés cette saison
+            // Axe 2 sidebar : points clan réellement apportés au classement annuel
             // DISTINCT des XP personnels (xp_this_season)
             'season_pts'      => (int)($_db_profile['clan_pts_contributed'] ?? 0),
             'clan_rank'       => (int)$_db_profile['rank_in_clan'],
@@ -203,7 +205,7 @@ if (!$is_guest) {
             'joined'          => $_db_profile['joined'] ?? '',
         ];
 
-        // XP saison (depuis le début de la saison active)
+        // XP du moment (calculé depuis le temps fort actif)
         $_xp_season = function_exists('fetch_user_xp_season')
             ? fetch_user_xp_season((int)$_db_profile['id'])
             : 0;
@@ -214,6 +216,78 @@ if (!$is_guest) {
         $_user_participations = fetch_user_participations((int)$_db_profile['id'], 5);
         $_activity_feed       = function_exists('fetch_user_activity_feed') ? fetch_user_activity_feed((int)$_db_profile['id'], 10) : [];
         $_user_hidden_hunts = function_exists('fetch_user_hidden_hunts') ? fetch_user_hidden_hunts((int)$_db_profile['id']) : [];
+
+        // V13.0.10 — Traces personnelles dans le compte
+        $_my_randos = [];
+        $_my_rando_stats = ['count'=>0, 'km'=>0.0, 'minutes'=>0];
+        $_my_participations_full = [];
+        $_my_reviews = [];
+        try {
+            $_pdo_traces = db();
+            if ($_pdo_traces) {
+                $_uid_traces = (int)$_db_profile['id'];
+
+                $_rs = $_pdo_traces->prepare("
+                    SELECT rp.status, rp.done_at, rp.validated_at, rp.proof_rating, rp.proof_review, rp.rating, rp.comment,
+                           r.id AS rando_id, r.title, r.slug, r.commune, r.secteur, r.distance_km, r.duration_min, r.cover_image
+                    FROM rando_participations rp
+                    JOIN randos r ON r.id = rp.rando_id
+                    WHERE rp.user_id = :uid
+                      AND rp.status IN ('stamped','pending','pending_proof','validated','auto_validated')
+                    ORDER BY COALESCE(rp.done_at, rp.validated_at, rp.id) DESC
+                    LIMIT 80
+                ");
+                $_rs->execute([':uid' => $_uid_traces]);
+                $_my_randos = $_rs->fetchAll();
+                foreach ($_my_randos as $_mr) {
+                    $_my_rando_stats['count']++;
+                    $_my_rando_stats['km'] += (float)($_mr['distance_km'] ?? 0);
+                    $_my_rando_stats['minutes'] += (int)($_mr['duration_min'] ?? 0);
+                }
+
+                $_ps = $_pdo_traces->prepare("
+                    SELECT p.id, p.status, p.created_at, p.validated_at, p.xp_awarded,
+                           m.id AS mission_id, m.title AS mission_title, m.mission_type AS mission_type, m.slug AS mission_slug
+                    FROM participations p
+                    LEFT JOIN missions m ON m.id = p.mission_id
+                    WHERE p.user_id = :uid
+                    ORDER BY COALESCE(p.validated_at, p.created_at, p.id) DESC
+                    LIMIT 80
+                ");
+                $_ps->execute([':uid' => $_uid_traces]);
+                $_my_participations_full = $_ps->fetchAll();
+
+                try {
+                    $_as = $_pdo_traces->prepare("
+                        SELECT 'echo' AS source_type, ac.id, ac.body AS body, ac.status, ac.created_at,
+                               NULL AS rating, a.title AS target_title, a.slug AS target_slug, 'les-echos-article.php' AS target_page
+                        FROM article_comments ac
+                        LEFT JOIN articles a ON a.id = ac.article_id
+                        WHERE ac.user_id = :uid
+                        ORDER BY ac.created_at DESC
+                        LIMIT 60
+                    ");
+                    $_as->execute([':uid' => $_uid_traces]);
+                    $_my_reviews = array_merge($_my_reviews, $_as->fetchAll());
+                } catch (PDOException $_e) {}
+                try {
+                    $_rr = $_pdo_traces->prepare("
+                        SELECT 'rando' AS source_type, rp.id, COALESCE(NULLIF(rp.proof_review,''), NULLIF(rp.comment,'')) AS body, rp.status, rp.done_at AS created_at,
+                               COALESCE(rp.proof_rating, rp.rating) AS rating, r.title AS target_title, r.slug AS target_slug, 'rando.php' AS target_page
+                        FROM rando_participations rp
+                        LEFT JOIN randos r ON r.id = rp.rando_id
+                        WHERE rp.user_id = :uid
+                          AND (rp.proof_review IS NOT NULL OR rp.comment IS NOT NULL OR rp.proof_rating IS NOT NULL OR rp.rating IS NOT NULL)
+                        ORDER BY rp.done_at DESC
+                        LIMIT 60
+                    ");
+                    $_rr->execute([':uid' => $_uid_traces]);
+                    $_my_reviews = array_merge($_my_reviews, $_rr->fetchAll());
+                } catch (PDOException $_e) {}
+                usort($_my_reviews, function($a,$b){ return strcmp((string)($b['created_at'] ?? ''), (string)($a['created_at'] ?? '')); });
+                $_my_reviews = array_slice($_my_reviews, 0, 80);
+            }
+        } catch (Throwable $_trace_e) { /* traces indisponibles : affichage vide */ }
         // V11 — Passeport (chargé en lazy dans le panneau passeport)
     } else {
         // DB non disponible — construire depuis session
@@ -253,6 +327,11 @@ if (!$is_guest) {
         ];
     }
 }
+
+$_my_randos = $_my_randos ?? [];
+$_my_rando_stats = $_my_rando_stats ?? ['count'=>0,'km'=>0.0,'minutes'=>0];
+$_my_participations_full = $_my_participations_full ?? [];
+$_my_reviews = $_my_reviews ?? [];
 
 $page_styles = '<style>
 /* ── PAGE LAYOUT ── */
@@ -301,20 +380,25 @@ $page_styles = '<style>
 /* Nav */
 .sidebar-separator { border: none; border-top: 1px solid var(--beige-dark); margin: 0; }
 .sidebar-nav { display: flex; flex-direction: column; gap: 0; padding: 8px 12px 12px; }
-.sidebar-nav-link { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--radius-sm); font-size: .86rem; font-weight: 600; color: var(--text-mid); cursor: pointer; transition: all .18s; border: none; background: none; font-family: \'Inter\', sans-serif; width: 100%; text-align: left; }
+.sidebar-nav-link { display: flex; text-decoration:none; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--radius-sm); font-size: .86rem; font-weight: 600; color: var(--text-mid); cursor: pointer; transition: all .18s; border: none; background: none; font-family: \'Inter\', sans-serif; width: 100%; text-align: left; }
 .sidebar-nav-link:hover { background: var(--beige); color: var(--text); }
 .sidebar-nav-link.active { background: rgba(234,86,73,.08); color: var(--primary); font-weight: 800; }
 .sidebar-nav-icon { font-size: 1rem; width: 20px; text-align: center; flex-shrink: 0; }
+.sidebar-nav-sep{font-size:.62rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);padding:12px 10px 6px;margin-top:4px;border-top:1px solid var(--beige-dark)}
 
 /* compat anciens sélecteurs */
 .sidebar-section-label { display: none; }
 .xp-bar-wrap,.sidebar-stats-row,.clan-contribution-val,.clan-contribution-sub,.clan-rank-line { display: none; }
 
+
+.profil-trace-hero{background:linear-gradient(135deg,#0c1e2e,#163756);border-radius:var(--radius-lg);padding:28px;margin-bottom:20px;position:relative;overflow:hidden;color:#fff}.profil-trace-hero::after{content:"";position:absolute;top:-42px;right:-34px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.06)}.profil-trace-kicker{font-size:.68rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:#ff7b6d;margin-bottom:8px}.profil-trace-title{font-size:2.1rem;font-weight:900;line-height:1;margin:0 0 10px}.profil-trace-sub{font-size:.92rem;line-height:1.6;color:rgba(255,255,255,.72);max-width:720px}.profil-trace-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}.profil-trace-stat{background:#fff;border-radius:14px;padding:16px;border:1.5px solid var(--beige-dark);box-shadow:0 2px 10px rgba(18,49,78,.05)}.profil-trace-stat-val{font-size:1.7rem;font-weight:900;color:var(--navy-dark);line-height:1}.profil-trace-stat-lbl{font-size:.72rem;font-weight:700;color:var(--text-muted);margin-top:5px}.profil-trace-list{display:flex;flex-direction:column;gap:12px}.profil-trace-item{background:#fff;border-radius:14px;padding:16px 18px;border:1.5px solid var(--beige-dark);box-shadow:0 2px 10px rgba(18,49,78,.05);display:flex;align-items:center;gap:14px}.profil-trace-icon{width:42px;height:42px;border-radius:10px;background:var(--beige);display:flex;align-items:center;justify-content:center;flex-shrink:0}.profil-trace-main{flex:1;min-width:0}.profil-trace-name{font-size:.96rem;font-weight:900;color:var(--navy-dark);margin-bottom:3px}.profil-trace-meta{font-size:.78rem;color:var(--text-muted);display:flex;gap:8px;flex-wrap:wrap}.profil-trace-badge{font-size:.72rem;font-weight:800;border-radius:999px;padding:3px 9px;background:rgba(42,157,92,.12);color:#1a7a42;white-space:nowrap}.profil-trace-badge.pending{background:rgba(201,150,42,.14);color:#8a6020}.profil-trace-empty{background:#fff;border-radius:14px;padding:30px;text-align:center;border:1.5px dashed var(--beige-dark);color:var(--text-muted)}@media(max-width:760px){.profil-trace-stats{grid-template-columns:1fr}.profil-trace-item{align-items:flex-start}.profil-trace-title{font-size:1.6rem}}
+
 /* ── MAIN CONTENT ── */
 .profil-content { min-width: 0; }
 
 /* ── TAB PANEL SHARED ── */
-.profil-panel { animation: fadeUp .3s ease both; }
+.profil-panel { display: none; }
+.profil-panel.is-active { display: block; animation: fadeUp .3s ease both; }
 .profil-card { background: var(--white); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); padding: 28px; margin-bottom: 20px; }
 .profil-card-title { font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
 
@@ -518,10 +602,10 @@ require_once 'includes/nav.php';
         <?php $_clan_contrib = (int)$user['season_pts']; ?>
         <?php if ($_clan_contrib > 0): ?>
         <div class="sidebar-axe-val sidebar-axe-val-clan">+<?= number_format($_clan_contrib, 0, ',', ' ') ?> pts</div>
-        <div class="sidebar-axe-sub">points apportés au <?= e($user['clan_label']) ?><?php if (!empty($active_season['title'])): ?> — <?= e($active_season['title']) ?><?php endif; ?></div>
+        <div class="sidebar-axe-sub">points apportés au <?= e($user['clan_label']) ?> dans le classement annuel</div>
         <?php else: ?>
         <div class="sidebar-axe-val sidebar-axe-val-clan" style="font-size:1.1rem;color:var(--text-muted)">0 pt</div>
-        <div class="sidebar-axe-sub">Participez à une mission pour contribuer au <?= e($user['clan_label']) ?></div>
+        <div class="sidebar-axe-sub">Participez à un temps fort pour contribuer au <?= e($user['clan_label']) ?></div>
         <?php endif; ?>
         <?php if ((int)$user['clan_rank'] > 0 && (int)$user['clan_members'] > 0): ?>
         <div class="sidebar-axe-bar-track">
@@ -537,7 +621,7 @@ require_once 'includes/nav.php';
       <!-- Axe 3 : Score total du clan -->
       <?php $_clan_total = (int)($user['clan_score'] ?? 0); ?>
       <div class="sidebar-axe sidebar-axe-total" onclick="location.href='communaute.php?tab=classement'" role="button" tabindex="0" title="Voir le classement">
-        <div class="sidebar-axe-label">🏆 Score de mon clan</div>
+        <div class="sidebar-axe-label">🏆 Classement de mon clan</div>
         <div class="sidebar-axe-val sidebar-axe-val-total"><?= number_format($_clan_total, 0, ',', ' ') ?> pts</div>
         <div class="sidebar-axe-sub"><?= e($user['clan_label']) ?> — classement annuel</div>
         <?php if ($user['clan_place'] > 0): ?>
@@ -565,26 +649,37 @@ require_once 'includes/nav.php';
 
       <!-- Nav tabs -->
       <nav class="sidebar-nav">
-        <button class="sidebar-nav-link active" data-tab-group="profil" data-tab-id="apercu" onclick="switchTab('profil','apercu')">
+        <a href="profil.php?tab=apercu" class="sidebar-nav-link <?= $_profile_tab === 'apercu' ? 'active' : '' ?>" data-tab-group="profil" data-tab-id="apercu" onclick="return openProfilTab(event, 'apercu')">
           <span class="sidebar-nav-icon">👁</span> Aperçu
-        </button>
-        <button class="sidebar-nav-link" data-tab-group="profil" data-tab-id="progression" onclick="switchTab('profil','progression')">
+        </a>
+        <a href="profil.php?tab=progression" class="sidebar-nav-link <?= $_profile_tab === 'progression' ? 'active' : '' ?>" data-tab-group="profil" data-tab-id="progression" onclick="return openProfilTab(event, 'progression')">
           <span class="sidebar-nav-icon">📈</span> Progression
-        </button>
-        <button class="sidebar-nav-link" data-tab-group="profil" data-tab-id="badges" onclick="switchTab('profil','badges')">
+        </a>
+        <a href="profil.php?tab=badges" class="sidebar-nav-link <?= $_profile_tab === 'badges' ? 'active' : '' ?>" data-tab-group="profil" data-tab-id="badges" onclick="return openProfilTab(event, 'badges')">
           <span class="sidebar-nav-icon">🏅</span> Badges
-        </button>
-        <button class="sidebar-nav-link" data-tab-group="profil" data-tab-id="activite" onclick="switchTab('profil','activite')">
+        </a>
+        <a href="profil.php?tab=activite" class="sidebar-nav-link <?= $_profile_tab === 'activite' ? 'active' : '' ?>" data-tab-group="profil" data-tab-id="activite" onclick="return openProfilTab(event, 'activite')">
           <span class="sidebar-nav-icon">📋</span> Activité
-        </button>
-        <button class="sidebar-nav-link" data-tab-group="profil" data-tab-id="passeport" onclick="switchTab('profil','passeport')">
+        </a>
+        <a href="profil.php?tab=passeport" class="sidebar-nav-link <?= $_profile_tab === 'passeport' ? 'active' : '' ?>" data-tab-group="profil" data-tab-id="passeport" onclick="return openProfilTab(event, 'passeport')">
           <span class="sidebar-nav-icon">🗺️</span> Passeport
-        </button>
-        <button class="sidebar-nav-link" data-tab-group="profil" data-tab-id="compte"
-          onclick="switchTab('profil','compte')"
+        </a>
+
+        <div class="sidebar-nav-sep">Mes traces dans le QG</div>
+        <a href="profil.php?tab=randos" class="sidebar-nav-link <?= $_profile_tab === 'randos' ? 'active' : '' ?>" data-tab-group="profil" data-tab-id="randos" onclick="return openProfilTab(event, 'randos')">
+          <span class="sidebar-nav-icon">🥾</span> Mes RandoZones
+        </a>
+        <a href="profil.php?tab=participations" class="sidebar-nav-link <?= $_profile_tab === 'participations' ? 'active' : '' ?>" data-tab-group="profil" data-tab-id="participations" onclick="return openProfilTab(event, 'participations')">
+          <span class="sidebar-nav-icon">✨</span> Mes participations
+        </a>
+        <a href="profil.php?tab=avis" class="sidebar-nav-link <?= $_profile_tab === 'avis' ? 'active' : '' ?>" data-tab-group="profil" data-tab-id="avis" onclick="return openProfilTab(event, 'avis')">
+          <span class="sidebar-nav-icon">💬</span> Mes avis
+        </a>
+
+        <a href="profil.php?tab=compte" class="sidebar-nav-link <?= $_profile_tab === 'compte' ? 'active' : '' ?>" data-tab-group="profil" data-tab-id="compte" onclick="return openProfilTab(event, 'compte')"
           style="margin-top:4px;border-top:1px solid var(--beige-dark);padding-top:10px">
           <span class="sidebar-nav-icon">⚙️</span> Mon Compte
-        </button>
+        </a>
       </nav>
 
     </aside>
@@ -595,7 +690,7 @@ require_once 'includes/nav.php';
       <!-- ══════════════════════════════
            TAB 1 — APERÇU
       ══════════════════════════════ -->
-      <div data-panel-group="profil" data-panel-id="apercu" class="profil-panel">
+      <div data-panel-group="profil" data-panel-id="apercu" class="profil-panel <?= $_profile_tab === 'apercu' ? 'is-active' : '' ?>">
 
         <?php
         // ── Onboarding : affiché uniquement à la 1ère connexion ──
@@ -618,7 +713,7 @@ require_once 'includes/nav.php';
             $onboarding_steps = [
               ['🎯','Découvre les missions','Participe à une mission et gagne tes premiers XP.',   'missions.php'],
               ['🛡️','Rejoins la course des clans','Ton clan a besoin de toi pour grimper au classement.','clans.php'],
-              ['🥐','Essaie le KTC','Un mystère vendéen t\'attend. Sauras-tu le résoudre ?',       'ktc.php'],
+              ['🥐','Essaie Kétokole Tchè','Un mystère vendéen t\'attend. Sauras-tu le résoudre ?',       'missions.php'],
             ];
             foreach ($onboarding_steps as [$icon,$titre,$desc,$lien]):
             ?>
@@ -768,12 +863,12 @@ require_once 'includes/nav.php';
 
         <div class="profil-cta">
           <div class="profil-cta-text">
-            <div class="profil-cta-label">Saison <?= e($active_season['title']) ?></div>
-            <div class="profil-cta-title">Tu joues pour le <?= e($user['clan_label']) ?></div>
-            <div class="profil-cta-score">Score clan : <strong><?= format_score($user['clan_score']) ?> pts</strong> — Place <strong>n°<?= e($user['clan_place']) ?></strong> 🥇</div>
+            <div class="profil-cta-label">En ce moment · <?= e($active_season['title']) ?></div>
+            <div class="profil-cta-title">Tu contribues au <?= e($user['clan_label']) ?></div>
+            <div class="profil-cta-score">Classement annuel : <strong><?= format_score($user['clan_score']) ?> pts</strong> — place <strong>n°<?= e($user['clan_place']) ?></strong></div>
           </div>
           <div class="profil-cta-action">
-            <a href="clans.php" class="btn-cta-white">Voir la course des clans →</a>
+            <a href="clans.php" class="btn-cta-white">Voir les clans →</a>
           </div>
         </div>
 
@@ -783,7 +878,7 @@ require_once 'includes/nav.php';
       <!-- ══════════════════════════════
            TAB 2 — PROGRESSION
       ══════════════════════════════ -->
-      <div data-panel-group="profil" data-panel-id="progression" class="profil-panel" style="display:none">
+      <div data-panel-group="profil" data-panel-id="progression" class="profil-panel <?= $_profile_tab === 'progression' ? 'is-active' : '' ?>">
 
         <!-- Level hero card -->
         <?php
@@ -830,7 +925,7 @@ require_once 'includes/nav.php';
           </div>
         </div>
 
-        <!-- Progression saisonnière -->
+        <!-- Progression du moment -->
         <?php if (isset($_xp_season)): ?>
         <?php
         $_szn_xp    = $_xp_season;
@@ -847,7 +942,7 @@ require_once 'includes/nav.php';
             <span style="font-size:1.6rem;font-weight:900;color:var(--navy-dark)"><?= number_format($_szn_xp, 0, ',', ' ') ?> <span style="font-size:.85rem;font-weight:600;color:var(--text-muted)">XP du moment</span></span>
             <a href="communaute.php?tab=classement" style="font-size:.78rem;font-weight:700;color:var(--primary);text-decoration:none">Voir classement →</a>
           </div>
-          <!-- Barre XP saison vers prochain niveau -->
+          <!-- Barre XP du moment vers prochain niveau -->
           <div style="background:var(--beige-dark);border-radius:20px;height:10px;overflow:hidden;margin-bottom:6px">
             <div style="width:<?= $_szn_pct ?>%;height:100%;background:linear-gradient(90deg,var(--primary),#f07066);border-radius:20px;transition:width .6s ease"></div>
           </div>
@@ -859,7 +954,7 @@ require_once 'includes/nav.php';
             <span style="color:#d4af37;font-weight:800">🏆 Niveau max atteint !</span>
             <?php endif; ?>
           </div>
-          <!-- Mini stat XP total vs saison -->
+          <!-- Mini stat XP total vs QG -->
           <div style="display:flex;gap:16px;margin-top:16px;flex-wrap:wrap">
             <div style="flex:1;min-width:100px;background:var(--beige-light);border-radius:8px;padding:10px 14px;text-align:center">
               <div style="font-size:1.1rem;font-weight:900;color:var(--navy-dark)"><?= number_format((int)$user['xp_current'], 0, ',', ' ') ?></div>
@@ -963,7 +1058,7 @@ require_once 'includes/nav.php';
       <!-- ══════════════════════════════
            TAB 3 — BADGES
       ══════════════════════════════ -->
-      <div data-panel-group="profil" data-panel-id="badges" class="profil-panel" style="display:none">
+      <div data-panel-group="profil" data-panel-id="badges" class="profil-panel <?= $_profile_tab === 'badges' ? 'is-active' : '' ?>">
 
         <div class="profil-card">
           <div class="profil-card-title">🏅 Badges obtenus <span style="color:var(--primary);font-size:.9em"><?= e($user['badges_count']) ?></span></div>
@@ -1043,7 +1138,7 @@ require_once 'includes/nav.php';
         }
         $_rarity_colors_badge = $_rarity_colors_badge ?? ['common'=>'#6b7f96','uncommon'=>'#2a9d5c','rare'=>'#12314e','epic'=>'#9b59b6','legendary'=>'#C9962A'];
         $_rarity_fr = $_rarity_fr ?? ['common'=>'Commun','uncommon'=>'Peu commun','rare'=>'Rare','epic'=>'Épique','legendary'=>'Légendaire'];
-        $_cond_labels = ['xp_threshold'=>'XP requis','mission_success'=>'Missions validées','rando_validated'=>'Randos validées','season'=>'Participation saison'];
+        $_cond_labels = ['xp_threshold'=>'XP requis','mission_success'=>'Missions validées','rando_validated'=>'Randos validées','season'=>'Temps fort du QG'];
         ?>
         <?php if (!empty($_locked_badges)): ?>
         <div class="profil-card">
@@ -1074,7 +1169,7 @@ require_once 'includes/nav.php';
       <!-- ══════════════════════════════
            TAB 4 — ACTIVITÉ
       ══════════════════════════════ -->
-      <div data-panel-group="profil" data-panel-id="activite" class="profil-panel" style="display:none">
+      <div data-panel-group="profil" data-panel-id="activite" class="profil-panel <?= $_profile_tab === 'activite' ? 'is-active' : '' ?>">
 
         <div class="profil-card">
           <div class="profil-card-title">📊 Activité — 4 dernières semaines</div>
@@ -1163,9 +1258,9 @@ require_once 'includes/nav.php';
       <?php
       $_passport = function_exists('fetch_user_passport') ? fetch_user_passport((int)$user['id']) : [];
       $_rarity_colors = ['commun'=>'#6b7f96','rare'=>'#12314e','epique'=>'#9b59b6','legendaire'=>'#C9962A'];
-      $_cat_emojis = ['exploration'=>'🧭','clan'=>'🛡️','saison'=>'⚔️','meteo'=>'🌤️','rando'=>'🥾','culture'=>'🥐','invisible'=>'👁','general'=>'🏅'];
+      $_cat_emojis = ['exploration'=>'🧭','clan'=>'🛡️','saison'=>'📅','meteo'=>'🌤️','rando'=>'🥾','culture'=>'🥐','invisible'=>'👁','general'=>'🏅'];
       ?>
-      <div class="profil-panel" data-panel-group="profil" data-panel-id="passeport" style="display:none">
+      <div class="profil-panel <?= $_profile_tab === 'passeport' ? 'is-active' : '' ?>" data-panel-group="profil" data-panel-id="passeport">
 
         <!-- Passeport card -->
         <div class="profil-card" style="background:linear-gradient(135deg,var(--navy-dark),#1e3a5f);color:#fff;margin-bottom:20px">
@@ -1199,7 +1294,7 @@ require_once 'includes/nav.php';
               ['🏆', 'Trophées clan',    $_passport['clan_trophies'] ?? 0, ''],
               ['🎯', 'Missions validées',$_passport['missions_total'] ?? 0,''],
               ['🗝️', 'Objets trouvés',  $_passport['collectibles'] ?? 0,  ''],
-              ['🥐', 'KTC réussis',      $_passport['ktc_correct'] ?? 0,   '/' . ($_passport['ktc_total'] ?? 0)],
+              ['🥐', 'Kétokole participés',      $_passport['ktc_correct'] ?? 0,   '/' . ($_passport['ktc_total'] ?? 0)],
               ['🥾', 'Randos validées',  $_passport['randos'] ?? 0,        ''],
             ];
             foreach ($passport_stats as [$icon, $label, $val, $suffix]):
@@ -1272,7 +1367,92 @@ require_once 'includes/nav.php';
           $_cur_emoji = $_cfg['emoji'] ?? $user['avatar'] ?? '🧭';
       }
       ?>
-      <div class="profil-panel" data-panel-group="profil" data-panel-id="compte" style="display:none">
+      <div class="profil-panel <?= $_profile_tab === 'randos' ? 'is-active' : '' ?>" data-panel-group="profil" data-panel-id="randos">
+        <div class="profil-trace-hero">
+          <div class="profil-trace-kicker">Mes traces dans le QG</div>
+          <h2 class="profil-trace-title">Mes RandoZones</h2>
+          <p class="profil-trace-sub">Les randos que tu as tamponnées restent ici : ton carnet de balade, tes kilomètres et tes passages dans la Zone.</p>
+        </div>
+        <div class="profil-trace-stats">
+          <div class="profil-trace-stat"><div class="profil-trace-stat-val"><?= (int)$_my_rando_stats['count'] ?></div><div class="profil-trace-stat-lbl">randos tamponnées</div></div>
+          <div class="profil-trace-stat"><div class="profil-trace-stat-val"><?= number_format((float)$_my_rando_stats['km'], 1, ',', ' ') ?></div><div class="profil-trace-stat-lbl">km cumulés</div></div>
+          <div class="profil-trace-stat"><div class="profil-trace-stat-val"><?= floor((int)$_my_rando_stats['minutes']/60) ?>h<?= str_pad(((int)$_my_rando_stats['minutes'])%60, 2, '0', STR_PAD_LEFT) ?></div><div class="profil-trace-stat-lbl">temps estimé</div></div>
+        </div>
+        <?php if (!empty($_my_randos)): ?>
+        <div class="profil-trace-list">
+          <?php foreach ($_my_randos as $_tr):
+            $_status = $_tr['status'] ?? '';
+            $_badge_label = in_array($_status, ['validated','auto_validated','stamped'], true) ? 'Tamponnée' : 'En validation';
+            $_badge_class = in_array($_status, ['validated','auto_validated','stamped'], true) ? '' : 'pending';
+          ?>
+          <div class="profil-trace-item">
+            <div class="profil-trace-icon">🥾</div>
+            <div class="profil-trace-main">
+              <div class="profil-trace-name"><?= e($_tr['title'] ?? 'RandoZone') ?></div>
+              <div class="profil-trace-meta"><span><?= e($_tr['commune'] ?? '') ?></span><span><?= number_format((float)($_tr['distance_km'] ?? 0), 1, ',', ' ') ?> km</span><span><?= (int)($_tr['duration_min'] ?? 0) ?> min</span></div>
+            </div>
+            <span class="profil-trace-badge <?= e($_badge_class) ?>"><?= e($_badge_label) ?></span>
+          </div>
+          <?php endforeach; ?>
+        </div>
+        <?php else: ?>
+        <div class="profil-trace-empty">Aucune RandoZone tamponnée pour le moment. Quand tu valideras une rando, elle apparaîtra ici.</div>
+        <?php endif; ?>
+      </div>
+
+      <div class="profil-panel <?= $_profile_tab === 'participations' ? 'is-active' : '' ?>" data-panel-group="profil" data-panel-id="participations">
+        <div class="profil-trace-hero">
+          <div class="profil-trace-kicker">Présence dans la Zone</div>
+          <h2 class="profil-trace-title">Mes participations</h2>
+          <p class="profil-trace-sub">Un historique simple de tes passages dans le QG : missions tentées, contributions envoyées, participations validées ou en attente.</p>
+        </div>
+        <?php if (!empty($_my_participations_full)): ?>
+        <div class="profil-trace-list">
+          <?php foreach ($_my_participations_full as $_pt):
+            $_st = $_pt['status'] ?? '';
+            $_label = in_array($_st, ['validated','auto_validated'], true) ? 'Validée' : ($_st === 'rejected' ? 'Refusée' : 'En attente');
+            $_cls = in_array($_st, ['validated','auto_validated'], true) ? '' : 'pending';
+          ?>
+          <div class="profil-trace-item">
+            <div class="profil-trace-icon">✨</div>
+            <div class="profil-trace-main">
+              <div class="profil-trace-name"><?= e($_pt['mission_title'] ?? 'Mission Zone85') ?></div>
+              <div class="profil-trace-meta"><span><?= e(format_relative_time($_pt['created_at'] ?? '')) ?></span><?php if ((int)($_pt['xp_awarded'] ?? 0) > 0): ?><span>+<?= (int)$_pt['xp_awarded'] ?> XP</span><?php endif; ?></div>
+            </div>
+            <span class="profil-trace-badge <?= e($_cls) ?>"><?= e($_label) ?></span>
+          </div>
+          <?php endforeach; ?>
+        </div>
+        <?php else: ?>
+        <div class="profil-trace-empty">Aucune participation pour le moment. Les missions du QG t’attendent quand tu veux.</div>
+        <?php endif; ?>
+      </div>
+
+      <div class="profil-panel <?= $_profile_tab === 'avis' ? 'is-active' : '' ?>" data-panel-group="profil" data-panel-id="avis">
+        <div class="profil-trace-hero">
+          <div class="profil-trace-kicker">Mes mots dans le QG</div>
+          <h2 class="profil-trace-title">Mes avis & commentaires</h2>
+          <p class="profil-trace-sub">Retrouve ici les avis, notes et commentaires que tu as laissés sur les randos et les Échos.</p>
+        </div>
+        <?php if (!empty($_my_reviews)): ?>
+        <div class="profil-trace-list">
+          <?php foreach ($_my_reviews as $_rv): ?>
+          <div class="profil-trace-item">
+            <div class="profil-trace-icon">💬</div>
+            <div class="profil-trace-main">
+              <div class="profil-trace-name"><?= e($_rv['target_title'] ?? 'Contribution Zone85') ?></div>
+              <div class="profil-trace-meta"><?php if (!empty($_rv['rating'])): ?><span>⭐ <?= e((string)$_rv['rating']) ?>/5</span><?php endif; ?><span><?= e(format_relative_time($_rv['created_at'] ?? '')) ?></span><span><?= e(mb_strimwidth(strip_tags((string)($_rv['body'] ?? '')),0,90,'…')) ?></span></div>
+            </div>
+            <span class="profil-trace-badge <?= ($_rv['status'] ?? '') === 'validated' ? '' : 'pending' ?>"><?= e(($_rv['status'] ?? '') === 'validated' ? 'Publié' : 'En validation') ?></span>
+          </div>
+          <?php endforeach; ?>
+        </div>
+        <?php else: ?>
+        <div class="profil-trace-empty">Aucun avis ou commentaire pour le moment. Tes mots laissés dans le QG apparaîtront ici.</div>
+        <?php endif; ?>
+      </div>
+
+      <div class="profil-panel <?= $_profile_tab === 'compte' ? 'is-active' : '' ?>" data-panel-group="profil" data-panel-id="compte">
 
         <?php if (!empty($_compte_flash)): ?>
         <div class="profil-card" style="padding:14px 20px;margin-bottom:14px;
@@ -1500,56 +1680,80 @@ require_once 'includes/nav.php';
 </div><!-- /profil-page -->
 
 <?php
-$page_scripts = '<script>
-const _origSwitchTab = switchTab;
-window.switchTab = function(group, id) {
-  _origSwitchTab(group, id);
-  if (group === \'profil\') {
-    document.querySelectorAll(\'.sidebar-nav-link\').forEach(btn => {
-      btn.classList.toggle(\'active\', btn.dataset.tabId === id);
-    });
-    if (id === \'activite\') animateActivityChart();
+$page_scripts = <<<'HTML'
+<script>
+function switchTab(group, id) {
+  const tabs = document.querySelectorAll('[data-tab-group="' + group + '"]');
+  const panels = document.querySelectorAll('[data-panel-group="' + group + '"]');
+
+  tabs.forEach(tab => {
+    tab.classList.toggle('active', tab.dataset.tabId === id);
+    if (tab.dataset.tabId === id) {
+      tab.setAttribute('aria-current', 'page');
+    } else {
+      tab.removeAttribute('aria-current');
+    }
+  });
+
+  panels.forEach(panel => {
+    panel.classList.toggle('is-active', panel.dataset.panelId === id);
+  });
+
+  if (group === 'profil' && id === 'activite' && typeof animateActivityChart === 'function') {
+    animateActivityChart();
   }
-};
+}
+
+function openProfilTab(event, id) {
+  if (event) event.preventDefault();
+  switchTab('profil', id);
+  try { history.pushState(null, '', 'profil.php?tab=' + encodeURIComponent(id)); } catch(e) {}
+  var main = document.querySelector('.profil-content');
+  if (main && window.innerWidth < 900) main.scrollIntoView({behavior:'smooth', block:'start'});
+  return false;
+}
 
 function selectProfilEmoji(btn, emoji) {
-  document.querySelectorAll(\'[data-emoji]\').forEach(b => {
-    b.style.borderColor = \'\'; b.style.background = \'\';
+  document.querySelectorAll('[data-emoji]').forEach(b => {
+    b.style.borderColor = ''; b.style.background = '';
   });
-  btn.style.borderColor = \'var(--primary)\';
-  btn.style.background  = \'rgba(234,86,73,.08)\';
-  document.getElementById(\'profil_selected_emoji\').value = emoji;
+  btn.style.borderColor = 'var(--primary)';
+  btn.style.background  = 'rgba(234,86,73,.08)';
+  document.getElementById('profil_selected_emoji').value = emoji;
 }
 
-// Ouvrir tab=compte si paramètre GET présent
-if (new URLSearchParams(window.location.search).get(\'tab\') === \'compte\') {
-  switchTab(\'profil\', \'compte\');
-}
+// Ouvrir le bon onglet si paramètre GET présent
+(function(){
+  const allowed = ['apercu','progression','badges','activite','passeport','randos','participations','avis','compte'];
+  const tab = new URLSearchParams(window.location.search).get('tab') || 'apercu';
+  if (allowed.includes(tab)) switchTab('profil', tab);
+})();
 
 function animateActivityChart() {
   const maxH = 90;
-  document.querySelectorAll(\'.chart-bar[data-height]\').forEach(bar => {
+  document.querySelectorAll('.chart-bar[data-height]').forEach(bar => {
     const pct = parseInt(bar.dataset.height, 10) / 100;
-    bar.style.height = Math.round(maxH * pct) + \'px\';
+    bar.style.height = Math.round(maxH * pct) + 'px';
   });
 }
 
 function filterActivity(btn, type) {
-  document.querySelectorAll(\'.activity-filter-btn\').forEach(b => b.classList.remove(\'active\'));
-  btn.classList.add(\'active\');
-  document.querySelectorAll(\'#activityFeed .feed-item\').forEach(item => {
-    const match = type === \'all\' || item.dataset.activityType === type;
-    item.style.display = match ? \'\' : \'none\';
+  document.querySelectorAll('.activity-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#activityFeed .feed-item').forEach(item => {
+    const match = type === 'all' || item.dataset.activityType === type;
+    item.style.display = match ? '' : 'none';
   });
 }
 
-window.addEventListener(\'load\', () => {
+window.addEventListener('load', () => {
   setTimeout(() => {
-    document.querySelectorAll(\'.mission-prog-fill[data-prog]\').forEach(bar => {
-      bar.style.width = bar.dataset.prog + \'%\';
+    document.querySelectorAll('.mission-prog-fill[data-prog]').forEach(bar => {
+      bar.style.width = bar.dataset.prog + '%';
     });
   }, 500);
 });
-</script>';
+</script>
+HTML;
 require_once 'includes/footer.php';
 ?>
