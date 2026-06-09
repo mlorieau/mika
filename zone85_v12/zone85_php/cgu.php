@@ -139,7 +139,7 @@ require_once 'includes/nav.php';
 
     <div class="xp-card">
       <div class="xp-card-title">Trophées de clan</div>
-      <p>Archivés pour chaque saison remportée par le clan vainqueur.</p>
+      <p>Archivés pour les podiums annuels et les coups de cœur symboliques du QG.</p>
     </div>
 
     <p style="margin-top:18px">Les points peuvent être ajustés en cas d'erreur technique ou d'abus constaté.</p>

@@ -340,7 +340,7 @@ require 'includes/nav.php';
   <div class="container">
 
     <!-- TROPHÉES -->
-    <div class="section-title">Palmarès des saisons</div>
+    <div class="section-title">Mémoire des trophées</div>
 
     <?php if (!empty($trophies)): ?>
     <div class="trophees-grid">
@@ -378,7 +378,7 @@ require 'includes/nav.php';
     <div style="text-align:center;padding:64px 24px;color:var(--text-muted)">
       <div style="font-size:3rem;margin-bottom:16px">🏆</div>
       <h3 style="color:var(--navy-dark);margin-bottom:8px">Aucun trophée pour l'instant</h3>
-      <p style="max-width:400px;margin:0 auto 24px">Les trophées se gagnent au fil des saisons. Ton aventure commence maintenant.</p>
+      <p style="max-width:400px;margin:0 auto 24px">Les trophées, podiums et coups de cœur se construiront au fil de l'année. L'aventure du QG commence maintenant.</p>
       <a href="missions.php" style="display:inline-block;background:var(--primary);color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700">Voir les missions →</a>
     </div>
     <?php endif; ?>

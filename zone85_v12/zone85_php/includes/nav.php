@@ -179,7 +179,6 @@ if (isset($active_season) && !empty($active_season['title'])) {
     <a href="randos.php">Randos</a>
     <a href="missions.php">🎯 Participer</a>
     <a href="victor.php">📖 Victor</a>
-    <a href="ktc.php">🔍 Kétokole Tchè</a>
     <a href="communaute.php">Clans &amp; Classements</a>
   </div>
 

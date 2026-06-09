@@ -992,7 +992,7 @@ if ($is_logged_in && !$already_participated): ?>
         <div class="mission-info-row-icon">&#x1F6E1;</div>
         <div>
           <strong>Points clan</strong>
-          <p>Ta participation rapporte aussi des points à ton clan pour le classement de saison.</p>
+          <p>Ta participation rapporte aussi des points à ton clan pour le classement annuel.</p>
         </div>
         <span class="mission-info-xp mission-info-xp-auto">+<?= $clan_pts ?>&thinsp;pts</span>
       </div>

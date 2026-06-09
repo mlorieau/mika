@@ -942,7 +942,7 @@ require_once 'includes/nav.php';
 
 <?php elseif ($_tab === 'clans'): ?>
 <!-- ════════════════════════════════════════════════════════
-     CLANS — La Bataille des Clans
+     CLANS — Classement annuel des clans
 ════════════════════════════════════════════════════════ -->
 <?php
 $clan_colors_map = ['bocage' => '#2a9d5c', 'littoral' => '#1a6fb8', 'marais' => '#8b6340'];
@@ -973,7 +973,7 @@ $cn_total_pts    = array_sum(array_column($clan_rankings, 'season_points'));
         <?php endforeach; ?>
       </div>
       <?php elseif (!empty($clan_rankings)): ?>
-      <p style="color:rgba(255,255,255,.4);font-size:.85rem">Aucun point marqué encore — la saison commence !</p>
+      <p style="color:rgba(255,255,255,.4);font-size:.85rem">Aucun point marqué encore — le QG vient d'ouvrir !</p>
       <?php endif; ?>
     </div>
   </div>
@@ -996,7 +996,7 @@ $cn_total_pts    = array_sum(array_column($clan_rankings, 'season_points'));
         </div>
         <div class="cn-card-bd">
           <div class="cn-card-pts" style="color:<?= $c_bg ?>"><?= number_format((int)$cr_row['season_points']) ?></div>
-          <div class="cn-card-pts-lbl">points de saison</div>
+          <div class="cn-card-pts-lbl">points annuels</div>
           <div class="cn-card-members"><?= (int)$cr_row['active_members'] ?> membre<?= (int)$cr_row['active_members'] > 1 ? 's' : '' ?> actif<?= (int)$cr_row['active_members'] > 1 ? 's' : '' ?></div>
           <div class="cn-card-bar-track">
             <div class="cn-card-bar-fill xp-bar-fill" data-pct="<?= $c_pbar ?>" style="background:<?= $c_bg ?>;width:0"></div>
@@ -1035,7 +1035,7 @@ $cn_total_pts    = array_sum(array_column($clan_rankings, 'season_points'));
     <div class="cn-howto">
       <div class="cn-howto-grid">
         <?php foreach ([
-          ['+50 pts', 'Valider une mission',        'Chaque mission validée rapporte des points à ton clan pour la saison.'],
+          ['+50 pts', 'Valider une mission',        'Chaque participation validée rapporte des points à ton clan pour l\'année.'],
           ['+30 pts', 'Terminer une randonnée',      'Les randos GPX validées comptent pour le total du clan.'],
           ['+40 pts', 'Gagner un KTC',               'Identifier l\'objet mystère en premier rapporte gros.'],
           ['+20 pts', 'Participer à un flash event', 'Les événements éclair boostent le clan.'],
@@ -1055,7 +1055,7 @@ $cn_total_pts    = array_sum(array_column($clan_rankings, 'season_points'));
 
 <?php elseif ($_tab === 'classement'): ?>
 <!-- ════════════════════════════════════════════════════════
-     ZONAUTES — classement de la saison
+     ZONAUTES — classement annuel
 ════════════════════════════════════════════════════════ -->
 <div class="zo-wrap">
   <div class="zo-inner">

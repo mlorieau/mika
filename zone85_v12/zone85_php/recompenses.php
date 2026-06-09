@@ -141,8 +141,8 @@ require_once 'includes/nav.php';
   <div class="rw-hero">
     <div class="rw-hero-inner">
       <span class="rw-hero-label">Zone85 · Progression</span>
-      <h1 class="rw-hero-title">Récompenses &amp; XP</h1>
-      <p class="rw-hero-sub">Le guide complet et à jour de tous les points XP à gagner,<br>les niveaux à franchir et les badges à débloquer.</p>
+      <h1 class="rw-hero-title">Trophées &amp; coups de cœur</h1>
+      <p class="rw-hero-sub">Badges, mises en avant, podium annuel et petites traces<br>laissées par les Zonautes dans le QG.</p>
       <?php if ($is_logged && $me): ?>
         <?php
           $av_url = ($me['avatar_type'] === 'upload') ? avatar_url($me) : '';
@@ -165,7 +165,7 @@ require_once 'includes/nav.php';
 
     <!-- ════ SECTION XP ════ -->
     <div class="rw-section">
-      <h2 class="rw-section-title">🎯 Comment gagner des XP</h2>
+      <h2 class="rw-section-title">🎯 Comment vos participations sont valorisées</h2>
       <p class="rw-section-sub">Chaque action compte. Les XP s'accumulent sur ton profil et font progresser ton niveau. Ils contribuent aussi aux points de ton clan dans le classement annuel.</p>
 
       <table class="rw-xp-table">

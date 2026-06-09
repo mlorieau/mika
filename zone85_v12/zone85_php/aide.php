@@ -280,7 +280,7 @@ require_once 'includes/nav.php';
               &#x2022; <strong>Validant des missions</strong> (&agrave; partir de 10 XP par mission)<br>
               &#x2022; <strong>Tampon nant des randonnées</strong> et en faisant valider votre photo (+25 XP)<br>
               &#x2022; <strong>Participant &agrave; des &eacute;v&eacute;nements flash</strong> (bonus XP temporaires)<br>
-              &#x2022; <strong>R&eacute;pondant au KTC</strong> (Kétokole, objet myst&egrave;re mensuel)
+              &#x2022; <strong>R&eacute;pondant au KTC</strong> (Kétokole, mission d'identification collective)
             </p>
             <p>Consultez la page <a href="recompenses.php">XP &amp; R&eacute;compenses</a> pour le d&eacute;tail complet.</p>
           </div>
