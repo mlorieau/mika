@@ -900,5 +900,65 @@ body,#navbar,.mobile-menu,.profil-card,.ev-card,.race-card,.cf-widget{
   .trophees-hero,.echos-hero,.randos-hero,.ktc-hero,.ev-hero{
     padding:88px 0 48px
   }
-  .page-tab-bar{width:100%;overflow-x:auto}
+  .page-tab-bar{width:100%;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none}
+  .page-tab-bar::-webkit-scrollbar{display:none}
+  .page-tab-btn{flex-shrink:0}
+  .filter-tabs{overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none}
+  .filter-tabs::-webkit-scrollbar{display:none}
+  .filter-tab{white-space:nowrap;flex-shrink:0}
 }
+
+/* ============================================================
+   V13.0.16 — PASSE UX MOBILE
+   Confort smartphone sans refonte graphique
+============================================================ */
+
+/* ── Tailles tactiles min 44px ── */
+@media(max-width:768px){
+  .btn,.btn-primary,.btn-ghost,.btn-white,.btn-outline-white,.nav-btn,.btn-lg{
+    min-height:44px
+  }
+  .filter-tab,.activity-filter-btn{min-height:40px}
+  .page-tab-btn{min-height:40px;padding:8px 14px}
+}
+
+/* ── Formulaires : empêcher zoom iOS (16px min) ── */
+@media(max-width:768px){
+  input[type="text"],input[type="email"],input[type="password"],
+  input[type="number"],input[type="search"],input[type="tel"],
+  textarea,select{font-size:16px !important}
+}
+
+/* ── Mobile menu : touch targets 44px ── */
+.mobile-menu a{min-height:44px;display:flex;align-items:center}
+
+/* ── Nav : avatar et cloche toujours visibles ── */
+@media(max-width:900px){
+  .nav-right .nav-notif-bell,.nav-right .nav-avatar{display:flex !important}
+}
+
+/* ── Hero très petit écran ── */
+@media(max-width:430px){
+  .page-h1{font-size:clamp(1.45rem,6.5vw,1.9rem)}
+  .page-sub{font-size:.86rem;margin-bottom:20px}
+  .page-hero-ctas{flex-direction:column}
+  .page-hero-ctas .btn{width:100%;justify-content:center}
+  .cta-bloc{padding:28px 16px}
+  .profil-cta{padding:18px 16px}
+}
+
+/* ── Toast centré sur petit écran ── */
+@media(max-width:480px){
+  #z85-toast{
+    left:12px;right:12px;transform:translateY(20px);
+    white-space:normal;text-align:center;width:auto;max-width:none
+  }
+  #z85-toast.show{transform:translateY(0)}
+}
+
+/* ── Divers petits mobiles ── */
+@media(max-width:480px){
+  .race-mini-stats{grid-template-columns:1fr 1fr}
+  .page-steps{gap:12px}
+}
+

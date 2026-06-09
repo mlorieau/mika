@@ -509,8 +509,9 @@ $page_styles = '<style>
   .sidebar-name { font-size: .95rem; }
   .sidebar-axe-val { font-size: 1.25rem; }
   .sidebar-avatar-hero { height: 120px; }
-  .sidebar-nav { flex-direction: row; flex-wrap: wrap; gap: 4px; padding: 6px 8px 8px; }
-  .sidebar-nav-link { flex: 1 1 auto; min-width: 90px; justify-content: center; font-size: .76rem; padding: 7px 8px; }
+  .sidebar-nav { flex-direction: row; overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap; gap: 4px; padding: 6px 8px 8px; scrollbar-width: none; }
+  .sidebar-nav::-webkit-scrollbar { display: none; }
+  .sidebar-nav-link { flex: 0 0 auto; min-height: 44px; justify-content: center; font-size: .76rem; padding: 7px 12px; }
   .sidebar-nav-icon { display: none; }
   .badges-grid { grid-template-columns: repeat(2, 1fr); }
   .welcome-season { display: none; }
@@ -1469,7 +1470,7 @@ require_once 'includes/nav.php';
           <form method="POST" action="profil.php?tab=compte">
             <?= csrf_field() ?>
             <input type="hidden" name="compte_action" value="update_profile">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+            <div class="mc-row" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
               <div>
                 <label style="display:block;font-size:.76rem;font-weight:700;color:#3d5166;margin-bottom:6px">Pseudo <span style="color:var(--primary)">*</span></label>
                 <input type="text" name="pseudo" value="<?= e($user['pseudo']) ?>" maxlength="30" required
@@ -1499,7 +1500,7 @@ require_once 'includes/nav.php';
           <form method="POST" action="profil.php?tab=compte">
             <?= csrf_field() ?>
             <input type="hidden" name="compte_action" value="update_password">
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px">
+            <div class="mc-row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px">
               <div>
                 <label style="display:block;font-size:.76rem;font-weight:700;color:#3d5166;margin-bottom:6px">Mot de passe actuel</label>
                 <input type="password" name="password_current" required
