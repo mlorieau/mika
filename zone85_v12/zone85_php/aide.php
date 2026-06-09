@@ -218,7 +218,7 @@ require_once 'includes/nav.php';
   <div class="aide-hero-inner">
     <div class="aide-eyebrow">&#x2753; Centre d&rsquo;aide</div>
     <h1>Toutes vos questions<br><em>sur Zone85</em></h1>
-    <p class="aide-hero-sub">Compte, XP, missions, randos, clans&hellip; Trouvez la r&eacute;ponse en quelques secondes.</p>
+    <p class="aide-hero-sub">QG, Facebook, clans, randos, participations&hellip; Toutes les r&eacute;ponses en quelques lignes.</p>
   </div>
 </section>
 
@@ -290,7 +290,7 @@ require_once 'includes/nav.php';
           <summary>Mes XP disparaissent-ils &agrave; la fin d&rsquo;une saison&nbsp;?</summary>
           <div class="aide-accordion-answer">
             <p>Non. <strong>Vos XP personnels sont permanents</strong> et s&rsquo;accumulent tout au long de votre aventure Zone85, quelle que soit la saison. Ils d&eacute;finissent votre niveau global de Zonaute.</p>
-            <p>Les points de clan, en revanche, sont remis &agrave; z&eacute;ro entre chaque saison pour repartir &eacute;quitablement.</p>
+            <p>Les points de clan contribuent au classement annuel des clans. Le bilan est fait en fin d&rsquo;ann&eacute;e.</p>
           </div>
         </details>
 
@@ -364,10 +364,10 @@ require_once 'includes/nav.php';
       <div class="aide-accordion">
 
         <details>
-          <summary>C&rsquo;est quoi la Bataille des Clans&nbsp;?</summary>
+          <summary>C&rsquo;est quoi le classement des clans&nbsp;?</summary>
           <div class="aide-accordion-answer">
-            <p>La Bataille des Clans est la comp&eacute;tition centrale de Zone85. Les trois clans &mdash; <strong>Bocage, Littoral, Marais</strong> &mdash; s&rsquo;affrontent chaque saison en accumulant des points via les missions accomplies par leurs membres.</p>
-            <p>Le clan le mieux class&eacute; en fin de saison remporte des r&eacute;compenses exclusives. Le classement en temps r&eacute;el est consultable sur la page <a href="clans.php">Les Clans</a>.</p>
+            <p>Les trois clans &mdash; <strong>Bocage, Littoral, Marais</strong> &mdash; accumulent des points tout au long de l&rsquo;ann&eacute;e gr&acirc;ce aux participations de leurs membres (randos, photos, quiz, missions&hellip;).</p>
+            <p>Le classement est <strong>annuel</strong>. Un podium final est r&eacute;v&eacute;l&eacute; en fin d&rsquo;ann&eacute;e. Les clans n&rsquo;ont pas besoin de se prendre trop au s&eacute;rieux : ils ajoutent une touche de jeu et de fiert&eacute; locale.</p>
           </div>
         </details>
 
@@ -379,10 +379,18 @@ require_once 'includes/nav.php';
         </details>
 
         <details>
-          <summary>Quand les saisons se terminent-elles&nbsp;?</summary>
+          <summary>Zone85.fr remplace-t-il la page Facebook&nbsp;?</summary>
           <div class="aide-accordion-answer">
-            <p>Chaque saison Zone85 dure plusieurs semaines. Les dates de d&eacute;but et de fin sont annonc&eacute;es sur le <a href="communaute.php">Fil de la Zone</a> et dans <a href="les-echos.php">Les &Eacute;chos</a>.</p>
-            <p>Entre deux saisons, une p&eacute;riode de transition permet de publier les r&eacute;sultats et de pr&eacute;parer la prochaine comp&eacute;tition. Les XP personnels restent acquis.</p>
+            <p>Non. Zone85.fr et la page Facebook sont compl&eacute;mentaires. <strong>Facebook reste le moteur quotidien de la communaut&eacute;</strong> pour les annonces, les &eacute;changes et les nouvelles fraîches.</p>
+            <p>Zone85.fr est le camp de base durable : on y retrouve les randos, les r&eacute;cits, Les &Eacute;chos, Victor et les participations propos&eacute;es par la communaut&eacute;.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Dois-je me connecter tous les jours&nbsp;?</summary>
+          <div class="aide-accordion-answer">
+            <p>Non. Zone85 fonctionne par &eacute;clats de participation : une photo de temps en temps, une rando, un quiz quand il appara&icirc;t. <strong>Aucune pression, aucune obligation quotidienne.</strong></p>
+            <p>Les participations se r&eacute;veillent au fil des saisons. Suivez les annonces sur Facebook pour ne rien rater.</p>
           </div>
         </details>
 

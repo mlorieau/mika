@@ -715,7 +715,7 @@ require_once 'includes/nav.php';
     <a href="<?= comm_url('classement') ?>" class="comm-tab <?= $_tab === 'classement' ? 'active' : '' ?>">
       Zonautes<?php if ($cl_total > 0): ?><span class="comm-tab-count"><?= $cl_total ?></span><?php endif; ?>
     </a>
-    <a href="<?= comm_url('recompenses') ?>" class="comm-tab <?= $_tab === 'recompenses' ? 'active' : '' ?>">🏅 Récompenses</a>
+    <a href="<?= comm_url('recompenses') ?>" class="comm-tab <?= $_tab === 'recompenses' ? 'active' : '' ?>">🏅 Trophées &amp; Badges</a>
   </nav>
 </div>
 
@@ -953,8 +953,8 @@ $cn_total_pts    = array_sum(array_column($clan_rankings, 'season_points'));
   <!-- Barre de bataille -->
   <div class="cn-battle">
     <div class="cn-battle-inner">
-      <div class="cn-battle-title">La Bataille des Clans</div>
-      <div class="cn-battle-sub">Saison en cours — chaque action compte pour ton clan</div>
+      <div class="cn-battle-title">Le Classement des Clans</div>
+      <div class="cn-battle-sub">Classement annuel — chaque participation fait avancer votre clan</div>
       <?php if (!empty($clan_rankings) && $cn_total_pts > 0): ?>
       <div class="cn-battle-bar">
         <?php foreach ($clan_rankings as $cr_seg):
@@ -1047,7 +1047,7 @@ $cn_total_pts    = array_sum(array_column($clan_rankings, 'season_points'));
         </div>
         <?php endforeach; ?>
       </div>
-      <p style="margin-top:14px;font-size:.78rem;color:var(--text-muted,#6b7f96)">Le classement est remis à zéro à chaque nouvelle saison. Tout est possible !</p>
+      <p style="margin-top:14px;font-size:.78rem;color:var(--text-muted,#6b7f96)">Le classement est annuel. Chaque participation validée compte — le podium final est révélé en fin d'année.</p>
     </div>
   </div>
 </div>

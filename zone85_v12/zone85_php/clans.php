@@ -4,8 +4,8 @@
 // Refonte complète : podium, histoires, comment aider, historique
 // UTF-8 sans BOM
 // ============================================================
-$page_title       = 'La Bataille des Clans';
-$page_description = 'Bocage, Littoral, Marais — trois clans vendéens s\'affrontent chaque saison dans la Bataille des Clans. Découvre leur identité et rejoins le tien.';
+$page_title       = 'Les Clans — Bocage, Littoral, Marais';
+$page_description = 'Bocage, Littoral, Marais — trois clans vendéens qui avancent ensemble au fil des saisons. Découvre leur identité et rejoins le tien.';
 $page_canonical   = 'https://www.zone85.fr/clans.php';
 $page_robots      = 'index,follow';
 $page_og_image    = 'assets/img/ZONE852025.png';
@@ -391,8 +391,8 @@ require_once 'includes/nav.php';
         Zone85 &mdash; Vendée
       <?php endif; ?>
     </p>
-    <h1>La Bataille&nbsp;des&nbsp;Clans</h1>
-    <p class="hero-sub">Trois clans. Une seule Vendée.<br>Qui mènera la danse cette saison&nbsp;?</p>
+    <h1>Les Clans&nbsp;Vend&eacute;ens</h1>
+    <p class="hero-sub">Trois clans. Une seule Vendée.<br>Ils avancent ensemble, saison après saison.</p>
   </div>
 </section>
 

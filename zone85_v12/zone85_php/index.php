@@ -331,21 +331,21 @@ $_xp_pct  = $_xp_next > $_xp_prev
 
     <div class="idx-eyebrow">
       <span class="idx-eyebrow-dot"></span>
-      <?= !empty($active_season['title']) ? e($active_season['title']) : 'Zone85 · L\'Esprit Vendée' ?>
+      Le QG des Zonautes<?= !empty($active_season['title']) ? ' · ' . e($active_season['title']) : ' · Camp d\'été' ?>
     </div>
 
-    <h1 class="idx-h1">La <em>Vendée</em>.<br>Pas en surface.</h1>
+    <h1 class="idx-h1">Le QG des <em>Zonautes</em>.</h1>
 
     <p class="idx-tagline">
-      Les réseaux sociaux vous montrent la Vendée. Zone85 vous la fait vivre — les chemins, les histoires, les objets, les gens.
+      Des randos à explorer, des récits à découvrir, des Échos à suivre… et une communauté qui participe, à son rythme, aux aventures de la Zone.
     </p>
 
     <div class="idx-ctas">
       <?php if ($_is_guest): ?>
-        <a href="inscription.php" class="idx-btn-primary">Rejoindre la Zone →</a>
-        <a href="comment-ca-marche.php" class="idx-btn-secondary">Comment ça marche ?</a>
+        <a href="randos.php" class="idx-btn-primary">🗺️ Découvrir les randos →</a>
+        <a href="inscription.php" class="idx-btn-secondary">Rejoindre les Zonautes</a>
       <?php else: ?>
-        <a href="missions.php" class="idx-btn-primary">🎯 Voir mes missions →</a>
+        <a href="randos.php" class="idx-btn-primary">🗺️ Voir les randos →</a>
         <a href="les-echos.php" class="idx-btn-secondary">📰 Les Échos</a>
         <a href="comment-ca-marche.php" class="idx-btn-secondary">Comment ça marche ?</a>
       <?php endif; ?>
@@ -435,14 +435,14 @@ $_md_xp_pct       = ($_md_xp_next > $_md_xp_prev)
 
       <!-- Carte 1 — Prochaine mission -->
       <div class="mini-dash-card">
-        <div class="mini-dash-label">🎯 Prochaine mission</div>
+        <div class="mini-dash-label">🗺️ Prochaine participation</div>
         <?php if ($_md_mission): ?>
           <div class="mini-dash-title"><?= e($_md_mission['title']) ?></div>
           <div><span class="mini-dash-xp">+<?= (int)$_md_mission['xp_participation'] ?> XP</span></div>
           <div class="mini-dash-sub"><?= e(mission_type_label($_md_mission['mission_type'])) ?></div>
-          <a href="missions.php" class="mini-dash-cta">Voir les missions →</a>
+          <a href="missions.php" class="mini-dash-cta">Voir les participations →</a>
         <?php else: ?>
-          <div class="mini-dash-empty">Pas de mission active</div>
+          <div class="mini-dash-empty">Pas de participation active</div>
           <a href="missions.php" class="mini-dash-cta">Explorer →</a>
         <?php endif; ?>
       </div>
@@ -516,11 +516,11 @@ $_md_xp_pct       = ($_md_xp_next > $_md_xp_prev)
       <!-- Colonne Zone85 -->
       <div class="idx-iceberg-col idx-iceberg-col-zone">
         <div class="idx-iceberg-col-title">
-          <span>🎯</span>
+          <span>🗺️</span>
           Sur Zone85
         </div>
         <ul class="idx-iceberg-list">
-          <li>Vous marchez ce chemin — et gagnez des XP</li>
+          <li>Vous marchez ce chemin — bocage, littoral, marais</li>
           <li>Vous lisez l'histoire vraie dans Les Échos</li>
           <li>Vous identifiez l'objet dans le KTC</li>
           <li>Vous contribuez à votre clan, vous laissez une trace</li>
@@ -536,9 +536,9 @@ $_md_xp_pct       = ($_md_xp_next > $_md_xp_prev)
 <section class="page-section" style="background:var(--beige)">
   <div class="container">
     <div class="page-section-head">
-      <div class="page-section-eyebrow">Ce qu'on fait</div>
-      <h2 class="page-section-title">Rentrer vraiment dans la Vendée</h2>
-      <p class="page-section-sub">Pas du contenu à consommer. Des expériences à vivre.</p>
+      <div class="page-section-eyebrow">Trois façons d'entrer dans la Zone</div>
+      <h2 class="page-section-title">Explorer, découvrir, participer.</h2>
+      <p class="page-section-sub">À votre rythme. Sans pression. Quand l'envie vient.</p>
     </div>
 
     <div class="idx-vraiment-grid">
@@ -565,10 +565,10 @@ $_md_xp_pct       = ($_md_xp_next > $_md_xp_prev)
       </div>
 
       <div class="idx-vraiment-card">
-        <span class="idx-vraiment-icon">⚔️</span>
-        <div class="idx-vraiment-title">Contribuer vraiment</div>
-        <p class="idx-vraiment-desc">Chaque participation fait avancer votre score et celui de votre clan. Vous ne consommez pas — vous construisez.</p>
-        <a href="missions.php" class="idx-vraiment-link">Voir les missions →</a>
+        <span class="idx-vraiment-icon">🎯</span>
+        <div class="idx-vraiment-title">Participer, à son rythme</div>
+        <p class="idx-vraiment-desc">Une photo, un quiz, une piste… Les participations se réveillent au fil des saisons. Chacun contribue quand l'envie vient.</p>
+        <a href="missions.php" class="idx-vraiment-link">Participer →</a>
       </div>
 
     </div>

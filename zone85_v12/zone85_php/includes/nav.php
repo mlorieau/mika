@@ -9,42 +9,42 @@ $_nav_direct = [
     ['slug' => 'les-echos',  'label' => 'Les Échos',  'file' => 'les-echos.php'],
     ['slug' => 'randos',     'label' => 'Randos',     'file' => 'randos.php'],
     ['slug' => 'ktc',        'label' => 'Kétokole',   'file' => 'ktc.php'],
-    ['slug' => 'missions',   'label' => 'Missions',   'file' => 'missions.php'],
+    ['slug' => 'missions',   'label' => 'Participer', 'file' => 'missions.php'],
     ['slug' => 'communaute', 'label' => 'Clans & Classements', 'file' => 'communaute.php'],
 ];
 
 // Contenu du mega menu (3 colonnes)
 $_mega_sections = [
     [
-        'label' => 'La Zone',
+        'label' => 'Le QG',
         'emoji' => '🗺️',
         'links' => [
-            ['file' => 'index.php',      'label' => 'Accueil',         'desc' => 'La Vendée Joue',              'icon' => '🏠'],
-            ['file' => 'les-echos.php',  'label' => 'Les Échos',       'desc' => 'Le magazine de la Zone',      'icon' => '📰'],
-            ['file' => 'trophees.php',   'label' => 'Trophées',        'desc' => 'Palmarès des clans',          'icon' => '🥇'],
+            ['file' => 'index.php',           'label' => 'Accueil',            'desc' => 'Le QG des Zonautes',          'icon' => '🏠'],
+            ['file' => 'les-echos.php',        'label' => 'Les Échos',          'desc' => 'Le magazine de la Zone',      'icon' => '📰'],
+            ['file' => 'trophees.php',         'label' => 'Trophées',           'desc' => 'Podium & palmarès des clans', 'icon' => '🥇'],
+            ['file' => 'comment-ca-marche.php','label' => 'Comment ça marche ?','desc' => 'Le QG en 6 étapes',          'icon' => '❓'],
         ],
     ],
     [
-        'label' => 'Jouer',
-        'emoji' => '⚡',
+        'label' => 'Explorer',
+        'emoji' => '🥾',
         'links' => [
-            ['file' => 'missions.php',   'label' => 'Missions',        'desc' => 'Tous les défis actifs',       'icon' => '🎯'],
-            ['file' => 'randos.php',     'label' => 'Randos',          'desc' => 'Aventures terrain & GPX',     'icon' => '🥾'],
+            ['file' => 'randos.php',     'label' => 'Randos',          'desc' => 'Parcours & traces GPX',       'icon' => '🥾'],
+            ['file' => 'missions.php',   'label' => 'Participer',      'desc' => 'Participations ponctuelles',  'icon' => '🎯'],
             ['file' => 'ktc.php',        'label' => 'KTC',             'desc' => 'L\'objet mystère du mois',    'icon' => '🔍'],
-            ['file' => 'evenements.php', 'label' => 'Événements',      'desc' => 'Flash events & bonus XP',    'icon' => '🎉'],
+            ['file' => 'evenements.php', 'label' => 'Événements',      'desc' => 'Rendez-vous de la Zone',      'icon' => '🎉'],
         ],
     ],
     [
         'label' => 'Communauté',
         'emoji' => '🛡️',
         'links' => [
-            ['file' => 'profil.php',                        'label' => 'Mon Passeport',   'desc' => 'Identité, niveau & badges',   'icon' => '🪪'],
-            ['file' => 'communaute.php',                    'label' => 'Fil de la Zone',  'desc' => 'Activité en temps réel',      'icon' => '🌍'],
-            ['file' => 'clans.php',                         'label' => 'Les Clans',       'desc' => 'Bocage · Littoral · Marais',  'icon' => '⚔️'],
-            ['file' => 'communaute.php?tab=classement',     'label' => 'Classement',      'desc' => 'Top 50 Zonautes',             'icon' => '📊'],
-            ['file' => 'recompenses.php',                   'label' => 'XP & Récompenses',   'desc' => 'Niveaux, badges et points clan', 'icon' => '🏅'],
-            ['file' => 'comment-ca-marche.php',             'label' => 'Comment ça marche ?', 'desc' => 'Comprendre Zone85 en 30 sec', 'icon' => '❓'],
-            ['file' => 'aide.php',                          'label' => 'Centre d\'aide',      'desc' => 'FAQ & questions fréquentes',  'icon' => '💬'],
+            ['file' => 'profil.php',                    'label' => 'Mon Passeport',      'desc' => 'Mon carnet de route Zonaute',    'icon' => '🪪'],
+            ['file' => 'communaute.php',                'label' => 'Fil de la Zone',     'desc' => 'Activité de la communauté',      'icon' => '🌍'],
+            ['file' => 'clans.php',                     'label' => 'Les Clans',          'desc' => 'Bocage · Littoral · Marais',     'icon' => '🛡️'],
+            ['file' => 'communaute.php?tab=classement', 'label' => 'Classement annuel',  'desc' => 'Le podium des Zonautes',         'icon' => '📊'],
+            ['file' => 'recompenses.php',               'label' => 'Trophées & badges',  'desc' => 'Coups de cœur & récompenses',    'icon' => '🏅'],
+            ['file' => 'aide.php',                      'label' => 'Centre d\'aide',     'desc' => 'FAQ & questions fréquentes',     'icon' => '💬'],
         ],
     ],
 ];
@@ -177,10 +177,10 @@ if (isset($active_season) && !empty($active_season['title'])) {
     <a href="les-echos.php">Les Échos</a>
     <a href="randos.php">Randos</a>
     <a href="ktc.php">Kétokole</a>
-    <a href="missions.php">Missions</a>
+    <a href="missions.php">Participer</a>
     <a href="communaute.php">Clans &amp; Classements</a>
     <a href="comment-ca-marche.php">Comment ça marche ?</a>
-    <a href="recompenses.php">🏅 XP &amp; Récompenses</a>
+    <a href="recompenses.php">🏅 Trophées &amp; Badges</a>
     <a href="aide.php">❓ Aide</a>
     <a href="feedback.php">📝 Donner mon avis (bêta)</a>
   </div>
@@ -189,8 +189,8 @@ if (isset($active_season) && !empty($active_season['title'])) {
     <div class="mmenu-section-label">Communauté</div>
     <a href="communaute.php?tab=passeport">🪪 Mon Passeport</a>
     <a href="communaute.php">🌍 Le Fil</a>
-    <a href="communaute.php?tab=clans">🛡 Classement Clans</a>
-    <a href="communaute.php?tab=classement">📊 Classement Zonautes</a>
+    <a href="communaute.php?tab=clans">🛡 Clans &amp; Classement</a>
+    <a href="communaute.php?tab=classement">📊 Classement annuel</a>
   </div>
 
   <div class="mmenu-section">

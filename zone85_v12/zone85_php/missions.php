@@ -867,20 +867,20 @@ require_once 'includes/nav.php';
       <!-- Colonne texte -->
       <div class="mh-text">
         <?php if (!empty($active_season)): ?>
-        <span class="hero-eyebrow"><?= e($active_season['title']) ?> · Saison en cours</span>
+        <span class="hero-eyebrow">Participer à la Zone<?= !empty($active_season['title']) ? ' · ' . e($active_season['title']) : '' ?></span>
         <?php endif; ?>
-        <h1>Missions &amp; Actions</h1>
-        <p class="hero-phrase">Je progresse pour moi. Je fais gagner mon clan.</p>
+        <h1>Participer &agrave; la Zone</h1>
+        <p class="hero-phrase">Des participations légères, au fil des saisons, à votre rythme.</p>
         <div class="hero-mode-pills">
-          <span class="mode-pill mode-pill-perso">⚡ Mode Personnel — XP à vie</span>
-          <span class="mode-pill mode-pill-collectif">🛡️ Mode Collectif — Score de saison</span>
+          <span class="mode-pill mode-pill-perso">⚡ XP permanents — jamais perdus</span>
+          <span class="mode-pill mode-pill-collectif">🛡️ Points de clan — classement annuel</span>
         </div>
       </div>
 
       <!-- Colonne visuelle : carte saison -->
       <div class="mh-visual">
         <div class="mh-visual-card">
-          <div class="mh-visual-card-title">🗓️ Cette saison</div>
+          <div class="mh-visual-card-title">🗓️ Participations ouvertes</div>
           <?php
           $mh_mission_count = count($missions_list ?? []);
           $mh_xp_total = array_sum(array_map(fn($m)=>(int)($m['xp_participation']??0)+(int)($m['xp_success']??0), $missions_list ?? []));
@@ -893,7 +893,7 @@ require_once 'includes/nav.php';
           <div class="mh-stat">
             <div class="mh-stat-icon">🎯</div>
             <div>
-              <div class="mh-stat-label">Missions disponibles</div>
+              <div class="mh-stat-label">Participations disponibles</div>
               <div class="mh-stat-val"><?= $mh_mission_count ?> mission<?= $mh_mission_count > 1 ? 's' : '' ?></div>
             </div>
           </div>
@@ -977,7 +977,7 @@ require_once 'includes/nav.php';
       <?php else: ?>
       <a href="mission.php?id=<?= (int)$grand_defi['id'] ?>" class="btn btn-primary">Rejoindre le défi →</a>
       <?php endif; ?>
-      <a href="#mission-list" class="btn btn-outline" style="border-color:rgba(255,255,255,.25);color:rgba(255,255,255,.7)">Toutes les missions</a>
+      <a href="#mission-list" class="btn btn-outline" style="border-color:rgba(255,255,255,.25);color:rgba(255,255,255,.7)">Toutes les participations ouvertes</a>
     </div>
 
     <!-- Compte à rebours -->

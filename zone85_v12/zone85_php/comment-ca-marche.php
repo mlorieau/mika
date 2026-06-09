@@ -1,6 +1,6 @@
 <?php
-$page_title       = 'Comment ça marche ? — Zone85';
-$page_description = 'Comprends Zone85 en moins de 30 secondes : compte, clan, missions, XP, classement.';
+$page_title       = 'Le QG des Zonautes — Comment ça marche ?';
+$page_description = 'Le QG des Zonautes s\'installe doucement. Randos, récits, Échos, participations ponctuelles, clans… Tout comprendre en quelques lignes.';
 $page_canonical   = 'https://www.zone85.fr/comment-ca-marche.php';
 $page_robots      = 'index,follow';
 $current_page     = 'comment-ca-marche';
@@ -71,63 +71,72 @@ require_once 'includes/nav.php';
 <!-- HERO ──────────────────────────────────────────────────── -->
 <section class="ccm-hero">
   <div class="ccm-hero-inner">
-    <div class="ccm-eyebrow">📖 Guide rapide</div>
+    <div class="ccm-eyebrow">🗺️ Le QG des Zonautes</div>
     <h1>Zone85, <em>comment ça marche&nbsp;?</em></h1>
-    <p class="ccm-hero-sub">En moins de 30 secondes, comprends l'essentiel.</p>
+    <p class="ccm-hero-sub">Pas besoin d'être là tous les jours. Zone85 fonctionne au rythme des saisons, des randos, des photos et des surprises qui apparaissent au fil de l'année.</p>
   </div>
 </section>
 
 
-<!-- 5 ÉTAPES ──────────────────────────────────────────────── -->
+<!-- 6 ÉTAPES ──────────────────────────────────────────────── -->
 <section class="ccm-steps">
   <div class="ccm-steps-inner">
-    <h2 class="ccm-steps-title">5 étapes, c'est tout.</h2>
+    <h2 class="ccm-steps-title">6 étapes légères, à votre rythme.</h2>
 
     <div class="ccm-grid">
 
       <div class="ccm-step">
         <div class="ccm-step-header">
           <div class="ccm-step-num">1</div>
-          <span class="ccm-step-emoji">🙋</span>
-          <div class="ccm-step-title">Je crée mon compte</div>
+          <span class="ccm-step-emoji">🗺️</span>
+          <div class="ccm-step-title">Je découvre les contenus Zone85</div>
         </div>
-        <p class="ccm-step-desc">Inscription gratuite, aucune carte bleue, aucune appli à télécharger.</p>
+        <p class="ccm-step-desc">Randos vendéennes, Les Échos, Victor le livre mystère, Les Invisibles… Tout est accessible librement, sans compte.</p>
       </div>
 
       <div class="ccm-step">
         <div class="ccm-step-header">
           <div class="ccm-step-num">2</div>
-          <span class="ccm-step-emoji">🛡️</span>
-          <div class="ccm-step-title">Je choisis mon clan</div>
+          <span class="ccm-step-emoji">🙋</span>
+          <div class="ccm-step-title">Je crée mon compte Zonaute</div>
         </div>
-        <p class="ccm-step-desc">Bocage, Littoral ou Marais : chaque clan représente un territoire vendéen. Tu joues pour lui.</p>
+        <p class="ccm-step-desc">Inscription gratuite, aucune carte bleue. Je deviens membre de la communauté Zone85 et je reçois mon Passeport Vendéen.</p>
       </div>
 
       <div class="ccm-step">
         <div class="ccm-step-header">
           <div class="ccm-step-num">3</div>
-          <span class="ccm-step-emoji">🎯</span>
-          <div class="ccm-step-title">Je participe à des missions, des randos ou des défis</div>
+          <span class="ccm-step-emoji">🛡️</span>
+          <div class="ccm-step-title">Je choisis mon clan</div>
         </div>
-        <p class="ccm-step-desc">Des activités courtes ou longues, à faire seul ou en famille, en Vendée.</p>
+        <p class="ccm-step-desc">Bocage, Littoral ou Marais : chaque clan représente un territoire vendéen. Je rejoins celui qui me ressemble.</p>
       </div>
 
       <div class="ccm-step">
         <div class="ccm-step-header">
           <div class="ccm-step-num">4</div>
-          <span class="ccm-step-emoji">⭐</span>
-          <div class="ccm-step-title">Je gagne des XP</div>
+          <span class="ccm-step-emoji">🎯</span>
+          <div class="ccm-step-title">Je prends part aux participations</div>
         </div>
-        <p class="ccm-step-desc">Chaque participation rapporte des points d'expérience. Plus tu participes, plus tu progresses.</p>
+        <p class="ccm-step-desc">Missions photo, quiz, jeux de pistes, randos… Les participations se réveillent au fil des saisons. Je participe quand l'envie vient.</p>
       </div>
 
-      <div class="ccm-step" style="grid-column:1/-1">
+      <div class="ccm-step">
         <div class="ccm-step-header">
           <div class="ccm-step-num">5</div>
-          <span class="ccm-step-emoji">🤝</span>
-          <div class="ccm-step-title">Je fais avancer mon clan</div>
+          <span class="ccm-step-emoji">📔</span>
+          <div class="ccm-step-title">Mon passeport garde la trace</div>
         </div>
-        <p class="ccm-step-desc">Tes XP contribuent aussi au classement de ton clan. Ensemble, vous montez.</p>
+        <p class="ccm-step-desc">Chaque participation validée laisse une trace dans mon Passeport Vendéen : randos, photos, badges, points gagnés.</p>
+      </div>
+
+      <div class="ccm-step">
+        <div class="ccm-step-header">
+          <div class="ccm-step-num">6</div>
+          <span class="ccm-step-emoji">🤝</span>
+          <div class="ccm-step-title">Mon clan avance doucement</div>
+        </div>
+        <p class="ccm-step-desc">Chaque participation validée fait aussi avancer mon clan dans le classement annuel. Le podium se révèle en fin d'année.</p>
       </div>
 
     </div>
@@ -138,12 +147,14 @@ require_once 'includes/nav.php';
 <!-- CTA ───────────────────────────────────────────────────── -->
 <section class="ccm-cta">
   <div class="ccm-cta-inner">
-    <h2>Prêt à rejoindre la Zone&nbsp;?</h2>
-    <p class="ccm-cta-sub">C'est gratuit, c'est vendéen, ça se passe maintenant.</p>
+    <h2>Prêt à explorer la Zone&nbsp;?</h2>
+    <p class="ccm-cta-sub">C'est gratuit, c'est vendéen, ça commence par une rando ou un article.</p>
     <?php if (is_logged_in()): ?>
-      <a href="missions.php" class="ccm-cta-link">🎯 Voir mes missions →</a>
+      <a href="randos.php" class="ccm-cta-link">🗺️ Voir les randos →</a>
+      <a href="missions.php" class="ccm-cta-secondary">Voir les participations →</a>
     <?php else: ?>
-      <a href="inscription.php" class="ccm-cta-link">Créer mon compte →</a>
+      <a href="randos.php" class="ccm-cta-link">🗺️ Découvrir les randos →</a>
+      <a href="inscription.php" class="ccm-cta-secondary">Rejoindre les Zonautes →</a>
     <?php endif; ?>
   </div>
 </section>
@@ -156,48 +167,48 @@ require_once 'includes/nav.php';
     <p class="ccm-faq-intro">Tout ce qu'on nous demande souvent — en clair et sans jargon.</p>
 
     <details>
+      <summary>Zone85.fr remplace-t-il Facebook ?</summary>
+      <div class="ccm-faq-answer">Non. Zone85.fr et la page Facebook sont complémentaires. Facebook reste le moteur quotidien de la communauté. Zone85.fr est le camp de base durable : on y retrouve les randos, les récits, Les Échos et les participations.</div>
+    </details>
+
+    <details>
+      <summary>Dois-je me connecter tous les jours ?</summary>
+      <div class="ccm-faq-answer">Pas du tout. Zone85 fonctionne par éclats de participation : une photo de temps en temps, une rando, un quiz quand il apparaît. Aucune pression, aucune obligation.</div>
+    </details>
+
+    <details>
       <summary>Zone85 est-il gratuit ?</summary>
       <div class="ccm-faq-answer">Oui, totalement gratuit. Aucune carte bleue, aucun abonnement, aucune surprise.</div>
     </details>
 
     <details>
-      <summary>C'est quoi un clan ?</summary>
-      <div class="ccm-faq-answer">Un groupe territorial. Bocage, Littoral ou Marais — tu rejoins l'un des trois à l'inscription et tu joues pour lui toute la saison.</div>
+      <summary>À quoi servent les clans ?</summary>
+      <div class="ccm-faq-answer">Les clans ajoutent une touche de jeu et de fierté locale. Bocage, Littoral ou Marais — chaque participation validée fait doucement avancer votre clan dans le classement annuel. En fin d'année, un podium révèle les résultats.</div>
     </details>
 
     <details>
-      <summary>Est-ce que je peux changer de clan ?</summary>
-      <div class="ccm-faq-answer">Non. Une fois choisi, c'est pour la saison. Réfléchis bien — mais pas trop longtemps non plus. 😄</div>
+      <summary>Comment fonctionne le classement annuel ?</summary>
+      <div class="ccm-faq-answer">Le classement des clans se construit tranquillement toute l'année. Chaque participation validée — rando, photo, quiz — rapporte des points à votre clan. Le podium final est annoncé en fin d'année.</div>
     </details>
 
     <details>
-      <summary>C'est quoi les XP ?</summary>
-      <div class="ccm-faq-answer">Des points d'expérience qui mesurent ta participation. Plus tu t'impliques dans les missions, les randos et les défis, plus tu en gagnes.</div>
+      <summary>Est-ce qu'il y aura des missions toute l'année ?</summary>
+      <div class="ccm-faq-answer">Non — et c'est voulu. Les participations se réveillent au fil des saisons : une mission photo l'été, un quiz à l'automne, un jeu de pistes en hiver… Suivez les annonces sur Facebook et dans Les Échos.</div>
     </details>
 
     <details>
-      <summary>Comment valider une rando ?</summary>
-      <div class="ccm-faq-answer">Tu télécharges la trace GPX, tu fais la rando, tu postes une photo souvenir. Simple.</div>
+      <summary>Comment valider une randonnée ?</summary>
+      <div class="ccm-faq-answer">Téléchargez la trace GPX depuis la fiche de la rando, faites le parcours, envoyez une photo souvenir. Le tampon est ajouté instantanément à votre Passeport Vendéen.</div>
     </details>
 
     <details>
-      <summary>C'est quoi une trace GPX ?</summary>
-      <div class="ccm-faq-answer">Un fichier de parcours que tu ouvres dans une application GPS comme Komoot ou GPX Viewer. Il te guide sur le chemin, comme une carte interactive.</div>
+      <summary>Puis-je changer de clan ?</summary>
+      <div class="ccm-faq-answer">Non. Une fois choisi à l'inscription, votre clan vous suit toute l'année. Réfléchissez bien — mais pas trop longtemps. 😄</div>
     </details>
 
     <details>
       <summary>Est-ce que je dois installer une application ?</summary>
-      <div class="ccm-faq-answer">Non. Zone85 fonctionne dans ton navigateur. Tu peux l'ajouter à ton écran d'accueil comme une appli, sans passer par le store.</div>
-    </details>
-
-    <details>
-      <summary>Est-ce que mes photos sont publiques ?</summary>
-      <div class="ccm-faq-answer">Tes photos de participation sont visibles par la communauté Zone85.</div>
-    </details>
-
-    <details>
-      <summary>Comment supprimer mon compte ?</summary>
-      <div class="ccm-faq-answer">Via Mon Compte &gt; Supprimer mon compte, ou en écrivant à <a href="mailto:contact@zone85.fr" style="color:var(--primary)">contact@zone85.fr</a>.</div>
+      <div class="ccm-faq-answer">Non. Zone85 fonctionne dans votre navigateur. Vous pouvez l'ajouter à votre écran d'accueil comme une appli, sans passer par le store.</div>
     </details>
 
   </div>
