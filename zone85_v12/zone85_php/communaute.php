@@ -868,7 +868,7 @@ require_once 'includes/nav.php';
         ['+25 XP',     'Terminer une randonnée'],
         ['+5 XP',      'Voter pour un KTC'],
         ['+10 XP',     'Proposer un KTC'],
-        ['+50+ XP',    'Gagner le KTC du mois'],
+        ['+50+ XP',    'Être retenu par le QG'],
         ['Variable',   'Débloquer un badge'],
       ] as [$xp_val, $xp_lbl]): ?>
       <div class="pp-howto-item">
@@ -1037,7 +1037,7 @@ $cn_total_pts    = array_sum(array_column($clan_rankings, 'season_points'));
         <?php foreach ([
           ['+50 pts', 'Valider une mission',        'Chaque participation validée rapporte des points à ton clan pour l\'année.'],
           ['+30 pts', 'Terminer une randonnée',      'Les randos GPX validées comptent pour le total du clan.'],
-          ['+40 pts', 'Gagner un KTC',               'Identifier l\'objet mystère en premier rapporte gros.'],
+          ['+40 pts', 'Participer à un KTC',           'Réponse retenue par le QG lors d\'un épisode Kétokole Tchè.'],
           ['+20 pts', 'Participer à un flash event', 'Les événements éclair boostent le clan.'],
         ] as [$pts, $lbl, $desc]): ?>
         <div class="cn-howto-card">
@@ -1218,14 +1218,14 @@ $cn_total_pts    = array_sum(array_column($clan_rankings, 'season_points'));
     ['🥾', 'Terminer une randonnée',            '+25 XP',         'Par rando'],
     ['🔍', 'Proposer pour un KTC',              '+10 XP',         'Par épisode'],
     ['🗳', 'Voter pour un KTC',                 '+5 XP',          'Par épisode'],
-    ['🏆', 'Gagner le KTC du mois',             '+50 à +200 XP',  'Par mois'],
+    ['🏆', 'Être retenu par le QG',              '+50 à +200 XP',  'Par épisode KTC'],
     ['✍️', 'Commenter Les Échos',               '+5 XP',          'Par article'],
     ['🏅', 'Débloquer un badge',                'Variable',        'Selon badge'],
   ];
   $rw_clan_rows = [
     ['🎯', 'Valider une mission',           '+50 pts'],
     ['🥾', 'Terminer une randonnée',        '+30 pts'],
-    ['🏆', 'Gagner un KTC',                 '+40 pts'],
+    ['🏆', 'Participer à un KTC',            '+40 pts'],
     ['⚡', 'Participer à un flash event',  '+20 pts'],
   ];
   $rw_rarity_labels = [

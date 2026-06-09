@@ -1274,7 +1274,7 @@ require_once 'includes/nav.php';
         <p class="ktc-teaser-text">Un objet, un lieu, un d&eacute;tail vend&eacute;en &mdash; K&eacute;tokole Tch&egrave;&nbsp;? Chaque &eacute;pisode lance un appel collectif&nbsp;: proposez une piste, identifiez le myst&egrave;re, r&eacute;veillez un souvenir.</p>
       </div>
       <div class="ktc-teaser-cta">
-        <a href="ktc.php" class="btn btn-primary">Jouer au KTC →</a>
+        <a href="ktc.php" class="btn btn-primary">Voir Kétokole Tchè →</a>
       </div>
     </div>
   </div>

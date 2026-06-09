@@ -656,7 +656,7 @@ require_once 'includes/nav.php';
             <?php if ($clan_html): ?>
               <span class="contributor-clan"><?= $clan_html ?></span>
             <?php endif; ?>
-            <div class="contributor-pts"><?= $pts ?> <small>pts saison</small></div>
+            <div class="contributor-pts"><?= $pts ?> <small>pts cumulés</small></div>
           </div>
         <?php endforeach; ?>
       <?php else: ?>
@@ -717,11 +717,11 @@ require_once 'includes/nav.php';
 <!-- ===================== ARCHIVES SAISONS ===================== -->
 <section class="hall-section hall-section-dark">
   <div class="container">
-    <span class="hall-section-eyebrow gold">&#x1F4DC; Memoire</span>
+    <span class="hall-section-eyebrow gold">&#x1F4DC; Mémoire</span>
     <h2 class="hall-section-title light">
-      <span class="sec-icon">&#x1F3FA;</span> Archives des saisons
+      <span class="sec-icon">&#x1F3FA;</span> Mémoire du QG
     </h2>
-    <p class="hall-section-sub light">Les clans vainqueurs des saisons passees.</p>
+    <p class="hall-section-sub light">Les podiums et temps forts gardés dans la mémoire du QG.</p>
 
     <?php if (!empty($hall_trophies)): ?>
       <div class="archives-timeline">

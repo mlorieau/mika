@@ -560,8 +560,8 @@ $_md_xp_pct       = ($_md_xp_next > $_md_xp_prev)
       <div class="idx-vraiment-card">
         <span class="idx-vraiment-icon">🔍</span>
         <div class="idx-vraiment-title">Découvrir vraiment</div>
-        <p class="idx-vraiment-desc">Le KTC — Kéto Kolé Tché : un objet mystère par semaine. Une histoire cachée dans la mémoire vendéenne.</p>
-        <a href="ktc.php" class="idx-vraiment-link">Jouer →</a>
+        <p class="idx-vraiment-desc">Le Kétokole Tchè — un objet, un lieu, un détail vendéen. Une enquête collective sur la mémoire du territoire.</p>
+        <a href="ktc.php" class="idx-vraiment-link">Voir Kétokole Tchè →</a>
       </div>
 
       <div class="idx-vraiment-card">

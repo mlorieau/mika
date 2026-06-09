@@ -563,7 +563,7 @@ require_once 'includes/nav.php';
       <div class="clan-help-card">
         <span class="chc-icon">&#9989;</span>
         <div class="chc-title">Réussir les missions</div>
-        <p class="chc-desc">Valide une réponse, dépose une photo, vote — chaque mission réussie multiplie ta contribution au score de saison.</p>
+        <p class="chc-desc">Valide une réponse, dépose une photo, vote — chaque mission réussie contribue au classement annuel.</p>
         <span class="chc-badge">+pts réussite</span>
       </div>
       <div class="clan-help-card">
@@ -576,13 +576,13 @@ require_once 'includes/nav.php';
   </div>
 </section>
 
-<!-- ===================== HISTORIQUE DES SAISONS ===================== -->
+<!-- ===================== MÉMOIRE DU CLASSEMENT ===================== -->
 <section class="seasons-history">
   <div class="container">
     <div class="section-header">
       <p class="overline-label">Palmarès</p>
-      <h2>Historique des saisons</h2>
-      <p class="section-sub">Les victoires passées appartiennent à l'histoire de Zone85.</p>
+      <h2>Mémoire du classement</h2>
+      <p class="section-sub">Les podiums passés font partie de la mémoire de Zone85.</p>
     </div>
     <div class="seasons-grid">
       <?php foreach ($archived_seasons as $s):
@@ -612,7 +612,7 @@ require_once 'includes/nav.php';
         <div class="shc-header shc-header-none">
           <p class="shc-season-label"><?= e($active_season['title']) ?></p>
           <div class="shc-winner" style="font-size:.9rem;">&#8987; En cours</div>
-          <span class="shc-winner-badge shc-badge-none">Saison active</span>
+          <span class="shc-winner-badge shc-badge-none">En cours</span>
         </div>
         <div class="shc-body">
           <p class="shc-period"><?= e($active_season['period'] ?? '') ?></p>

@@ -18,7 +18,7 @@
 
         <div class="score-clan-right">
             <div class="score-pts"><?= e(format_score($clan['season_score'])) ?></div>
-            <div class="score-meta">Score de saison</div>
+            <div class="score-meta">Score annuel</div>
             <div class="score-members"><?= (int)$clan['members_count'] ?> membres</div>
         </div>
     </div>

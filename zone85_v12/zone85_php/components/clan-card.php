@@ -20,7 +20,7 @@
     <div class="clan-stats-mini">
         <div class="clan-stat-mini">
             <strong><?= e(format_score($clan['season_score'])) ?></strong>
-            <span>Score de saison</span>
+            <span>Score annuel</span>
         </div>
         <div class="clan-stat-mini">
             <strong><?= e((string)$clan['members_count']) ?></strong>

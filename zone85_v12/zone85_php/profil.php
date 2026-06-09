@@ -842,9 +842,9 @@ require_once 'includes/nav.php';
         $_szn_next  = get_level_name($_szn_lvl + 1);
         ?>
         <div class="profil-card" style="margin-bottom:20px">
-          <div class="profil-card-title">🗓 Progression cette saison</div>
+          <div class="profil-card-title">🗓 Progression dans le QG</div>
           <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
-            <span style="font-size:1.6rem;font-weight:900;color:var(--navy-dark)"><?= number_format($_szn_xp, 0, ',', ' ') ?> <span style="font-size:.85rem;font-weight:600;color:var(--text-muted)">XP saison</span></span>
+            <span style="font-size:1.6rem;font-weight:900;color:var(--navy-dark)"><?= number_format($_szn_xp, 0, ',', ' ') ?> <span style="font-size:.85rem;font-weight:600;color:var(--text-muted)">XP du moment</span></span>
             <a href="communaute.php?tab=classement" style="font-size:.78rem;font-weight:700;color:var(--primary);text-decoration:none">Voir classement →</a>
           </div>
           <!-- Barre XP saison vers prochain niveau -->
@@ -948,7 +948,7 @@ require_once 'includes/nav.php';
                 <td class="xp-amount">+5 – 15</td>
               </tr>
               <tr>
-                <td>Mission saison</td>
+                <td>Temps fort du QG</td>
                 <td class="xp-amount">+100 – 300</td>
                 <td>Identification parfaite</td>
                 <td class="xp-amount">+80 – 150</td>
@@ -1195,7 +1195,7 @@ require_once 'includes/nav.php';
           <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:14px">
             <?php
             $passport_stats = [
-              ['🗓️', 'Saisons vécues',  $_passport['seasons_lived'] ?? 0, ''],
+              ['🗓️', 'Temps forts vécus', $_passport['seasons_lived'] ?? 0, ''],
               ['🏆', 'Trophées clan',    $_passport['clan_trophies'] ?? 0, ''],
               ['🎯', 'Missions validées',$_passport['missions_total'] ?? 0,''],
               ['🗝️', 'Objets trouvés',  $_passport['collectibles'] ?? 0,  ''],
@@ -1213,10 +1213,10 @@ require_once 'includes/nav.php';
           </div>
         </div>
 
-        <!-- Saisons vécues -->
+        <!-- Temps forts vécus -->
         <?php if (!empty($_passport['seasons_list'])): ?>
         <div class="profil-card">
-          <div class="profil-card-title">📅 Saisons vécues</div>
+          <div class="profil-card-title">📅 Temps forts vécus</div>
           <div style="display:flex;flex-direction:column;gap:0">
             <?php foreach ($_passport['seasons_list'] as $_ps): ?>
             <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--beige-dark)">
@@ -1402,7 +1402,7 @@ require_once 'includes/nav.php';
             $toggles = [
               ['newsletter_optin','Newsletter Zone85',  'Actualités et nouvelles fonctionnalités'],
               ['notif_missions',  'Emails nouvelles missions','À chaque nouvelle mission'],
-              ['notif_saisons',   'Emails saisons',     'Début/fin de saison'],
+              ['notif_saisons',   'Emails temps forts', 'Ouverture de nouveaux temps forts'],
               ['notif_clan',      'Notifications clan', 'Classement et activité clan'],
               ['notif_push',      'Notifications push', 'Si Zone85 est installée'],
               ['digest_hebdo',    'Résumé hebdomadaire','Un email par semaine'],

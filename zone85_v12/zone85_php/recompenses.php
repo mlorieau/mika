@@ -203,9 +203,9 @@ require_once 'includes/nav.php';
             <td><span class="rw-freq">Par épisode</span></td>
           </tr>
           <tr>
-            <td>🏆 Gagner le KTC du mois</td>
+            <td>🏆 Être retenu par le QG</td>
             <td><span class="rw-xp-badge">+50 à +200 XP</span></td>
-            <td><span class="rw-freq">Par mois</span></td>
+            <td><span class="rw-freq">Par épisode KTC</span></td>
           </tr>
           <tr>
             <td>✍️ Commenter Les Échos</td>
@@ -239,7 +239,7 @@ require_once 'includes/nav.php';
         </div>
         <div class="rw-clan-card">
           <div class="rw-clan-ico">🏆</div>
-          <div class="rw-clan-label">Gagner un KTC</div>
+          <div class="rw-clan-label">Participer à un KTC</div>
           <div class="rw-clan-pts">+40 pts</div>
         </div>
         <div class="rw-clan-card">
@@ -349,7 +349,7 @@ require_once 'includes/nav.php';
         <div style="text-align:center;padding:48px 24px;color:var(--text-muted)">
           <div style="font-size:3rem;margin-bottom:12px">🏅</div>
           <p style="font-weight:700;color:var(--navy-dark);margin-bottom:8px">Badges bientôt disponibles</p>
-          <p style="font-size:.88rem">Les badges arrivent avec les prochaines saisons.</p>
+          <p style="font-size:.88rem">Les badges arrivent avec les prochains temps forts du QG.</p>
         </div>
       <?php endif; ?>
     </div>

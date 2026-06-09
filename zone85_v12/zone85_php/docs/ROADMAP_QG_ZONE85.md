@@ -113,6 +113,13 @@ Zone85.fr devient le **camp de base durable** : on y retrouve les randos, les r�
 | Défi | Appel lancé aux Zonautes |
 | Joueurs | Zonautes |
 | Plateforme | QG |
+| Saison en cours | Temps fort du QG |
+| XP saison / XP cette saison | XP du moment / XP dans le QG |
+| Score de saison | Score annuel |
+| Historique des saisons | Mémoire du classement |
+| Saisons vécues | Temps forts vécus |
+| Gagner le KTC du mois | Être retenu par le QG |
+| Jouer au KTC | Chercher & identifier / Voir Kétokole Tchè |
 
 ---
 
@@ -123,3 +130,4 @@ Zone85.fr devient le **camp de base durable** : on y retrouve les randos, les r�
 - Les XP personnels restent permanents (ne pas modifier)
 - La gamification reste en place techniquement — c'est l'éditorial qui change de ton
 - Vérifier cohérence nav + footer + meta descriptions après repositionnement
+- **Règle terminologie "saison" :** Le mot *saison* est autorisé dans le code (BDD, PHP, CSS) mais INTERDIT dans les textes publics visibles. Chaque ajout de contenu doit utiliser les équivalents V13 ci-dessus.

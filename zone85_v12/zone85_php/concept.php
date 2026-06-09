@@ -396,7 +396,7 @@ require_once 'includes/nav.php';
         </div>
         <div class="cp-pillar-body">
           <p class="cp-pillar-desc">"Qu'est-ce que c'est que ça ?" en vendéen populaire. Objets mystères, lieux à identifier, expressions à deviner. Court, fun, local — et souvent plus difficile qu'il n'y paraît.</p>
-          <a href="ktc.php" class="cp-pillar-link">Jouer au KTC →</a>
+          <a href="ktc.php" class="cp-pillar-link">Chercher &amp; identifier →</a>
         </div>
       </div>
 

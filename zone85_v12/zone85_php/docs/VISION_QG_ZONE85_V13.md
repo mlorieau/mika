@@ -193,6 +193,16 @@ Le vocabulaire utilisé sur le site et dans la communication reflète l'esprit Q
 | Enquête collective | Concours |
 | Mettre en avant | Récompenser |
 | L'équipe Zone85 | Les administrateurs |
+| Temps fort du QG | Saison en cours |
+| Temps forts vécus | Saisons vécues |
+| XP du moment / XP dans le QG | XP saison / XP cette saison |
+| Classement annuel | Score de saison / classement de saison |
+| Mémoire du classement | Historique des saisons / archives des saisons |
+| Score annuel | Score de saison |
+| Être retenu par le QG | Gagner le KTC du mois |
+| Kétokole Tchè (Chercher & identifier) | KTC comme jeu hebdomadaire / mensuel autonome |
+
+**Règle absolue sur "saison" :** Le mot *saison* peut exister dans le code (noms de colonnes BDD, variables PHP, classes CSS) mais ne doit **jamais** apparaître tel quel dans les textes visibles par les visiteurs. Chaque occurrence publique doit être remplacée par l'un des termes ci-dessus selon le contexte.
 
 Ce vocabulaire n'est pas une contrainte — c'est un repère. Il aide à garder le ton juste : chaleureux, local, artisanal, sans froideur de gamification.
 

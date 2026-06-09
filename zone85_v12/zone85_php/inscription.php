@@ -511,7 +511,7 @@ require_once 'includes/nav.php';
           </div>
         </div>
 
-        <p class="clan-pts-note">* Les pts de saison repartent à zéro chaque saison.</p>
+        <p class="clan-pts-note">* Chaque participation validée peut faire avancer votre clan dans le classement annuel.</p>
 
         <div class="step-actions">
           <button class="btn btn-ghost" onclick="goStep(3)">← Retour</button>
