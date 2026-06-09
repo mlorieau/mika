@@ -124,14 +124,17 @@ $missions_list = array_values(array_filter($missions, fn($m) =>
 // Map mission_type → CSS tag class (pour les badges et tags)
 function mission_type_tag_class(string $type): string {
     return [
-        'photo_challenge' => 'photo',
-        'quiz'            => 'quiz',
-        'rando'           => 'rando',
-        'keto_kole_tche'  => 'ktc',
-        'weather_mission' => 'meteo',
-        'investigation'   => 'enquete',
-        'vote'            => 'rapide',
-    ][$type] ?? 'rapide';
+        'photo_challenge'     => 'capturer',
+        'keto_kole_tche'      => 'chercher',
+        'investigation'       => 'chercher',
+        'quiz'                => 'quiz',
+        'weather_mission'     => 'quiz',
+        'vote'                => 'pistes',
+        'hidden_hunt'         => 'pistes',
+        'rando'               => 'rando',
+        'seasonal_collective' => 'saison',
+        'zone_wake'           => 'zone-wake',
+    ][$type] ?? 'quiz';
 }
 
 // Map mission status → CSS class + label
@@ -153,17 +156,19 @@ function mission_status_label(string $status): string {
     ][$status] ?? $status;
 }
 
-// Map mission data-filter value from mission_type
+// Map mission data-filter value from mission_type (4 familles V13)
 function mission_filter_type(string $type): string {
     return [
-        'photo_challenge' => 'photo',
-        'quiz'            => 'quiz',
-        'rando'           => 'rando',
-        'keto_kole_tche'  => 'ktc',
-        'weather_mission' => 'meteo',
-        'investigation'   => 'enquete',
-        'vote'            => 'vote',
-    ][$type] ?? 'vote';
+        'photo_challenge'     => 'capturer',
+        'keto_kole_tche'      => 'chercher',
+        'investigation'       => 'chercher',
+        'quiz'                => 'quiz',
+        'weather_mission'     => 'quiz',
+        'vote'                => 'pistes',
+        'hidden_hunt'         => 'pistes',
+        'rando'               => 'rando',
+        'zone_wake'           => 'capturer',
+    ][$type] ?? 'quiz';
 }
 
 $page_styles = '<style>
@@ -491,6 +496,31 @@ $page_styles = '<style>
   font-size: .85rem;
   color: var(--text-muted);
 }
+.missions-families-grid {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 24px;
+  margin-bottom: 4px;
+}
+.missions-family {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: #fff;
+  border: 1.5px solid var(--beige-dark, #e8e0d4);
+  border-radius: 12px;
+  padding: 14px 18px;
+  min-width: 128px;
+  text-align: center;
+  flex: 1 1 128px;
+  max-width: 180px;
+}
+.missions-family .mf-icon { font-size: 1.5rem; line-height: 1; }
+.missions-family strong   { font-size: .78rem; font-weight: 800; color: var(--navy-dark); line-height: 1.3; }
+.missions-family span     { font-size: .7rem; color: var(--text-muted); line-height: 1.4; }
 
 /* Tabs filtres améliorés */
 .filter-tabs-v2 {
@@ -587,15 +617,21 @@ $page_styles = '<style>
   padding: 4px 10px;
   border-radius: 5px;
 }
+.tag-capturer  { background: rgba(99,102,241,.12);  color: #4f46e5; }
+.tag-chercher  { background: rgba(201,150,42,.15);  color: #8a6020; }
+.tag-pistes    { background: rgba(168,85,247,.1);   color: #7c3aed; }
+.tag-quiz      { background: rgba(234,86,73,.1);    color: var(--primary); }
+.tag-rando     { background: rgba(30,92,48,.12);    color: #1e5c30; }
+.tag-saison    { background: rgba(201,150,42,.15);  color: #8a6020; border: 1px solid rgba(201,150,42,.25); }
+.tag-zone-wake { background: rgba(234,86,73,.12);   color: #c04d42; border: 1px solid rgba(234,86,73,.2); }
+/* legacy aliases kept for possible existing data */
 .tag-photo    { background: rgba(99,102,241,.12);  color: #4f46e5; }
-.tag-quiz     { background: rgba(234,86,73,.1);    color: var(--primary); }
-.tag-rando    { background: rgba(30,92,48,.12);    color: #1e5c30; }
 .tag-ktc      { background: rgba(201,150,42,.15);  color: #8a6020; }
-.tag-meteo    { background: rgba(14,165,233,.12);  color: #0369a1; }
 .tag-enquete  { background: rgba(168,85,247,.1);   color: #7c3aed; }
-.tag-saison   { background: rgba(201,150,42,.15);  color: #8a6020; border: 1px solid rgba(201,150,42,.25); }
 .tag-vote     { background: rgba(234,86,73,.08);   color: var(--text-mid); }
 .tag-rapide   { background: rgba(234,86,73,.08);   color: var(--text-mid); }
+.status-zone-wake  { background: rgba(234,86,73,.1);   color: #c04d42; }
+.status-coup-coeur { background: rgba(201,150,42,.12);  color: #8a6020; }
 
 .mission-already-badge {
   display: inline-flex;
@@ -870,10 +906,10 @@ require_once 'includes/nav.php';
         <span class="hero-eyebrow">Participer à la Zone<?= !empty($active_season['title']) ? ' · ' . e($active_season['title']) : '' ?></span>
         <?php endif; ?>
         <h1>Participer &agrave; la Zone</h1>
-        <p class="hero-phrase">Des participations légères, au fil des saisons, à votre rythme.</p>
+        <p class="hero-phrase">Des appels lanc&eacute;s aux Zonautes, au fil des saisons &mdash; &agrave; votre rythme.</p>
         <div class="hero-mode-pills">
-          <span class="mode-pill mode-pill-perso">⚡ XP permanents — jamais perdus</span>
-          <span class="mode-pill mode-pill-collectif">🛡️ Points de clan — classement annuel</span>
+          <span class="mode-pill mode-pill-perso">⚡ XP permanents &mdash; jamais perdus</span>
+          <span class="mode-pill mode-pill-collectif">🛡️ Points de clan &mdash; classement annuel</span>
         </div>
       </div>
 
@@ -1023,32 +1059,52 @@ require_once 'includes/nav.php';
 <section id="mission-filters-section">
   <div class="container">
     <div class="filter-header reveal">
-      <p class="overline-label">Tous les formats de participation</p>
-      <h2>Explore les missions</h2>
-      <p>Filtre par catégorie et trouve ce qui t'inspire.</p>
+      <p class="overline-label">Participer &agrave; la Zone</p>
+      <h2>Des appels aux Zonautes</h2>
+      <p>Partager une photo, identifier un objet, suivre une piste ou r&eacute;pondre &agrave; un quiz &mdash; au fil des saisons, &agrave; votre rythme.</p>
+
+      <div class="missions-families-grid">
+        <div class="missions-family">
+          <span class="mf-icon">📸</span>
+          <strong>Capturer la Vend&eacute;e</strong>
+          <span>Photos, souvenirs, paysages</span>
+        </div>
+        <div class="missions-family">
+          <span class="mf-icon">🔍</span>
+          <strong>Chercher &amp; identifier</strong>
+          <span>K&eacute;tokole Tch&egrave;, enqu&ecirc;tes collectives</span>
+        </div>
+        <div class="missions-family">
+          <span class="mf-icon">🗝️</span>
+          <strong>Suivre les pistes</strong>
+          <span>Objets myst&egrave;res, chasses aux indices</span>
+        </div>
+        <div class="missions-family">
+          <span class="mf-icon">🧠</span>
+          <strong>Quiz &amp; d&eacute;fis flash</strong>
+          <span>Questions rapides, animation Facebook</span>
+        </div>
+      </div>
     </div>
 
     <div class="filter-tabs-v2 reveal" id="mission-filters">
       <button class="filter-tab-v2 active" data-filter="all" onclick="filterMissions(this,'all')">
         <span class="tab-icon">🗺️</span> Tout voir
       </button>
-      <button class="filter-tab-v2" data-filter="quiz" onclick="filterMissions(this,'quiz')">
-        <span class="tab-icon">🧠</span> Quiz
+      <button class="filter-tab-v2" data-filter="capturer" onclick="filterMissions(this,'capturer')">
+        <span class="tab-icon">📸</span> Capturer
       </button>
-      <button class="filter-tab-v2" data-filter="photo" onclick="filterMissions(this,'photo')">
-        <span class="tab-icon">📸</span> Défi Photo
+      <button class="filter-tab-v2" data-filter="chercher" onclick="filterMissions(this,'chercher')">
+        <span class="tab-icon">🔍</span> Chercher
+      </button>
+      <button class="filter-tab-v2" data-filter="pistes" onclick="filterMissions(this,'pistes')">
+        <span class="tab-icon">🗝️</span> Pistes
+      </button>
+      <button class="filter-tab-v2" data-filter="quiz" onclick="filterMissions(this,'quiz')">
+        <span class="tab-icon">🧠</span> Quiz &amp; Flash
       </button>
       <button class="filter-tab-v2" data-filter="rando" onclick="filterMissions(this,'rando')">
         <span class="tab-icon">🥾</span> Rando
-      </button>
-      <button class="filter-tab-v2" data-filter="meteo" onclick="filterMissions(this,'meteo')">
-        <span class="tab-icon">🌤️</span> Météo
-      </button>
-      <button class="filter-tab-v2" data-filter="enquete" onclick="filterMissions(this,'enquete')">
-        <span class="tab-icon">🔍</span> Enquête
-      </button>
-      <button class="filter-tab-v2" data-filter="vote" onclick="filterMissions(this,'vote')">
-        <span class="tab-icon">🗳️</span> Vote
       </button>
     </div>
   </div>
@@ -1064,19 +1120,23 @@ require_once 'includes/nav.php';
           'quiz'            => '🧠',
           'photo_challenge' => '📸',
           'rando'           => '🥾',
-          'keto_kole_tche'  => '🥐',
+          'keto_kole_tche'  => '🔍',
           'weather_mission' => '🌤️',
           'investigation'   => '🔍',
           'vote'            => '🗳️',
+          'zone_wake'       => '⚡',
+          'hidden_hunt'     => '🗝️',
       ];
       $cta_labels = [
           'quiz'            => 'Jouer',
           'photo_challenge' => 'Envoyer',
           'rando'           => 'Participer',
-          'keto_kole_tche'  => 'Proposer',
+          'keto_kole_tche'  => 'Identifier',
           'weather_mission' => 'Participer',
           'investigation'   => 'Enquêter',
           'vote'            => 'Voter',
+          'zone_wake'       => 'Participer',
+          'hidden_hunt'     => 'Suivre la piste',
       ];
       foreach ($missions_list as $i => $mission):
           $tag_class    = mission_type_tag_class($mission['mission_type']);
@@ -1175,7 +1235,7 @@ require_once 'includes/nav.php';
           <?php if ($mission['status'] === 'active' && !$participated): ?>
           <a href="mission.php?id=<?= (int)$mission['id'] ?>" class="mission-cta-link"><?= e($cta_label) ?></a>
           <?php elseif ($mission['status'] === 'archived' && !empty($mission['display_in_hall'])): ?>
-          <a href="<?= page_url('hall') ?>" class="mission-cta-link">Voir le Hall</a>
+          <span class="mission-status status-coup-coeur">&#x2665; Coup de c&oelig;ur</span>
           <?php endif; ?>
         </div>
       </div>
@@ -1209,9 +1269,9 @@ require_once 'includes/nav.php';
   <div class="container" style="padding-top:64px">
     <div class="ktc-teaser reveal">
       <div class="ktc-teaser-body">
-        <span class="ktc-teaser-eyebrow">Le Mystère de la Saison</span>
-        <div class="ktc-teaser-title">🥐 LE MYSTÈRE DE LA SAISON</div>
-        <p class="ktc-teaser-text">Chaque saison, un objet étrange apparaît. À vous de découvrir son origine.</p>
+        <span class="ktc-teaser-eyebrow">Chercher &amp; identifier · K&eacute;tokole Tch&egrave;</span>
+        <div class="ktc-teaser-title">🔍 K&eacute;TOKOLE TCH&Egrave; ?</div>
+        <p class="ktc-teaser-text">Un objet, un lieu, un d&eacute;tail vend&eacute;en &mdash; K&eacute;tokole Tch&egrave;&nbsp;? Chaque &eacute;pisode lance un appel collectif&nbsp;: proposez une piste, identifiez le myst&egrave;re, r&eacute;veillez un souvenir.</p>
       </div>
       <div class="ktc-teaser-cta">
         <a href="ktc.php" class="btn btn-primary">Jouer au KTC →</a>

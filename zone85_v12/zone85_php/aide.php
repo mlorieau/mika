@@ -354,6 +354,54 @@ require_once 'includes/nav.php';
           </div>
         </details>
 
+        <details>
+          <summary>C&rsquo;est quoi une mission saisonni&egrave;re&nbsp;?</summary>
+          <div class="aide-accordion-answer">
+            <p>Une mission saisonni&egrave;re est une participation qui s&rsquo;ouvre &agrave; un moment pr&eacute;cis de l&rsquo;ann&eacute;e et reste disponible plusieurs semaines. Elle n&rsquo;est pas permanente&nbsp;: une fois la p&eacute;riode pass&eacute;e, elle se ferme.</p>
+            <p>Exemples&nbsp;: une mission photo estivale ouverte jusqu&rsquo;en septembre, un quiz automnal, un jeu de pistes hivernal. <strong>Il n&rsquo;est pas n&eacute;cessaire de les faire toutes</strong> &mdash; participez &agrave; ce qui vous inspire, &agrave; votre rythme.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>C&rsquo;est quoi un R&eacute;veil de Zone&nbsp;?</summary>
+          <div class="aide-accordion-answer">
+            <p>Un R&eacute;veil de Zone est une petite mission flash, li&eacute;e &agrave; un article, une rando, un portrait ou une actualit&eacute; vend&eacute;enne. Elle appara&icirc;t pour quelques jours seulement.</p>
+            <p>Exemples&nbsp;: un article pr&eacute;sente un artisan local &mdash; une question flash est associ&eacute;e. Un lieu est mis en avant &mdash; un tirage au sort est ouvert aux Zonautes. Ces &eacute;clats sont optionnels, rapides et fun.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>C&rsquo;est quoi le K&eacute;tokole Tch&egrave;&nbsp;?</summary>
+          <div class="aide-accordion-answer">
+            <p>K&eacute;tokole Tch&egrave; (en vend&eacute;en&nbsp;: <em>&laquo;&nbsp;Qu&rsquo;est-ce que c&rsquo;est donc &agrave;&nbsp;&raquo;</em>) est une famille de missions de recherche collective. Une photo est publi&eacute;e &mdash; un objet, un lieu, un d&eacute;tail vendéen &mdash; et les Zonautes proposent leurs pistes, leurs souvenirs, leurs explications.</p>
+            <p>L&rsquo;&eacute;quipe Zone85 s&eacute;lectionne les meilleures contributions et attribue XP et coups de c&oelig;ur. Le but n&rsquo;est pas de gagner mais de <strong>r&eacute;veiller la m&eacute;moire locale ensemble</strong>.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Comment participer &agrave; une mission photo&nbsp;?</summary>
+          <div class="aide-accordion-answer">
+            <p>Depuis la fiche de la mission, envoyez votre photo avec le lieu et une courte description. Cochez la case d&rsquo;autorisation d&rsquo;affichage si vous acceptez que votre photo soit publi&eacute;e sur Zone85.fr.</p>
+            <p>L&rsquo;&eacute;quipe examine les contributions et peut s&eacute;lectionner des <strong>coups de c&oelig;ur</strong> mis en avant sur le site ou partag&eacute;s sur Facebook (avec votre accord).</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Est-ce que mes photos peuvent &ecirc;tre publi&eacute;es sur Facebook&nbsp;?</summary>
+          <div class="aide-accordion-answer">
+            <p>Uniquement si vous l&rsquo;acceptez explicitement lors de l&rsquo;envoi. Une case &laquo;&nbsp;J&rsquo;accepte que ma photo soit relay&eacute;e sur la page Facebook de Zone85&nbsp;&raquo; est pr&eacute;sente dans le formulaire.</p>
+            <p>Sans cette autorisation, votre photo reste visible uniquement sur Zone85.fr, dans la galerie de la mission.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Est-ce que les r&eacute;compenses sont toujours des lots mat&eacute;riels&nbsp;?</summary>
+          <div class="aide-accordion-answer">
+            <p>Non. Les r&eacute;compenses sur Zone85 sont avant tout&nbsp;: des XP permanents, des badges de participation, des coups de c&oelig;ur de l&rsquo;&eacute;quipe, des mises en avant sur le site ou Facebook, et des trophées symboliques pour les clans.</p>
+            <p>Des petits lots ponctuels peuvent appara&icirc;tre lors de missions sp&eacute;ciales, mais ce n&rsquo;est pas syst&eacute;matique. <strong>La vraie r&eacute;compense, c&rsquo;est la trace laiss&eacute;e dans votre Passeport Vend&eacute;en.</strong></p>
+          </div>
+        </details>
+
       </div>
     </div>
 

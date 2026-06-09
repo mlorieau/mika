@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!in_array($status,   ['draft','active','closed','archived'])) $errors[] = 'Statut invalide.';
 
         $valid_types = ['seasonal_collective','quiz','vote','photo_challenge','keto_kole_tche',
-                        'rando','weather_mission','investigation','hidden_hunt','premium_game'];
+                        'rando','weather_mission','investigation','hidden_hunt','premium_game','zone_wake'];
         if (!in_array($mtype, $valid_types)) $errors[] = 'Type de mission invalide.';
 
         // Générer slug si vide
@@ -287,14 +287,15 @@ require_once '_admin-header.php';
           <?php
           $types = [
             'seasonal_collective' => '🏆 Grande Mission de Saison',
-            'quiz'                => '🧠 Quiz',
-            'vote'                => '🗳️ Vote',
-            'photo_challenge'     => '📸 Photo',
-            'keto_kole_tche'      => '🥐 KTC',
+            'photo_challenge'     => '📸 Capturer la Vendée (photo)',
+            'keto_kole_tche'      => '🔍 Chercher & identifier (KTC)',
+            'investigation'       => '🔍 Chercher & identifier (enquête)',
+            'hidden_hunt'         => '🗝️ Suivre les pistes',
+            'vote'                => '🗳️ Suivre les pistes (vote)',
+            'quiz'                => '🧠 Quiz & défi flash',
+            'weather_mission'     => '🌤️ Quiz & défi flash (météo)',
+            'zone_wake'           => '⚡ Réveil de Zone (flash)',
             'rando'               => '🥾 Rando',
-            'weather_mission'     => '🌤️ Météo',
-            'investigation'       => '🔍 Enquête',
-            'hidden_hunt'         => '🗝️ Chasse cachée',
             'premium_game'        => '⭐ Jeu Premium',
           ];
           foreach ($types as $v => $l):

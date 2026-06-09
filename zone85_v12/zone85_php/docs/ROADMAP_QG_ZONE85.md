@@ -19,16 +19,19 @@ Zone85.fr devient le **camp de base durable** : on y retrouve les randos, les r�
 
 **Objectif :** Ouvrir progressivement le QG avec des contenus à explorer et des participations légères.
 
-- [ ] 8 randos actives disponibles
-- [ ] Victor disponible (livre mystère / récits historiques)
+- [ ] 8 à 10 randos actives disponibles
+- [ ] Victor disponible (livre PDF / récits historiques)
 - [ ] Les Échos actifs (magazine communautaire)
-- [ ] Mission photo jusqu'au 30 septembre : **"Vos plus belles vacances en Vendée"**
+- [ ] **Capturer la Vendée** — Mission photo jusqu'au 30 septembre : *"Vos plus belles vacances en Vendée"*
   - Photo + lieu + petite description + autorisation affichage
   - Validation admin — mise en avant sur le site et Facebook
   - Badge "Participant été" + XP de participation
-- [ ] Quiz classique : **"Connais-tu vraiment la Vendée ?"**
+- [ ] **Quiz & défi flash** — Quiz classique : *"Connais-tu vraiment la Vendée ?"*
   - 5 à 10 questions, résultat immédiat, badge selon score
-- [ ] Jeu d'août : **"L'objet mystère de l'été"** (4 pistes hebdomadaires, tirage au sort)
+- [ ] **Suivre les pistes** — Jeu d'août : *"L'objet mystère de l'été"* (4 pistes hebdomadaires, tirage au sort)
+- [ ] **Chercher & identifier** — Premier épisode Kétokole Tchè : objet ou lieu vendéen à identifier collectivement
+  - Photo + appel aux Zonautes — pistes, souvenirs, explications
+  - Coup de cœur de l'équipe — XP + badge pour les meilleures contributions
 - [ ] Clans ouverts — premiers points du classement annuel
 - [ ] Page d'accueil repositionnée : QG, randos en premier, participations douces
 - [ ] "Comment ça marche ?" revu : 6 étapes légères, no-pressure
@@ -81,12 +84,11 @@ Zone85.fr devient le **camp de base durable** : on y retrouve les randos, les r�
 - Victor (livre mystère / récits historiques)
 - Les Invisibles (projet immersif progressif)
 
-### Participer (actions légères et ponctuelles)
-- Missions photo
-- Quiz
-- Jeux de pistes / objet mystère
-- Dépôt de photo
-- Participation aux randos
+### Participer (4 familles de missions)
+- **📸 Capturer la Vendée** — photos, souvenirs, paysages
+- **🔍 Chercher & identifier** — Kétokole Tchè, enquêtes collectives, mémoire locale
+- **🗝️ Suivre les pistes** — objets mystères, chasses aux indices, jeux estivaux
+- **🧠 Quiz & défis flash** — questions rapides, animation Facebook, Réveils de Zone
 
 ### Appartenir (couche communautaire douce)
 - Compte membre / Passeport Vendéen
@@ -107,6 +109,10 @@ Zone85.fr devient le **camp de base durable** : on y retrouve les randos, les r�
 | XP comme promesse principale | Randos, récits, Échos |
 | Saisons permanentes | Classement annuel |
 | Récompenses | Coups de cœur, trophées |
+| KTC (seul) | Kétokole Tchè (dans la famille "Chercher & identifier") |
+| Défi | Appel lancé aux Zonautes |
+| Joueurs | Zonautes |
+| Plateforme | QG |
 
 ---
 

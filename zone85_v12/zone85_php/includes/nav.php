@@ -4,13 +4,13 @@
 
 // Liens directs toujours visibles dans la barre
 $_nav_direct = [
-    ['slug' => 'index',      'label' => 'Accueil',    'file' => 'index.php'],
-    ['slug' => 'concept',    'label' => 'Concept',    'file' => 'concept.php'],
-    ['slug' => 'les-echos',  'label' => 'Les Échos',  'file' => 'les-echos.php'],
-    ['slug' => 'randos',     'label' => 'Randos',     'file' => 'randos.php'],
-    ['slug' => 'ktc',        'label' => 'Kétokole',   'file' => 'ktc.php'],
-    ['slug' => 'missions',   'label' => 'Participer', 'file' => 'missions.php'],
+    ['slug' => 'index',      'label' => 'Accueil',             'file' => 'index.php'],
+    ['slug' => 'randos',     'label' => 'Randos',              'file' => 'randos.php'],
+    ['slug' => 'les-echos',  'label' => 'Les Échos',           'file' => 'les-echos.php'],
+    ['slug' => 'ktc',        'label' => 'Victor & KTC',        'file' => 'victor.php'],
+    ['slug' => 'missions',   'label' => 'Participer',          'file' => 'missions.php'],
     ['slug' => 'communaute', 'label' => 'Clans & Classements', 'file' => 'communaute.php'],
+    ['slug' => 'aide',       'label' => 'Aide',                'file' => 'aide.php'],
 ];
 
 // Contenu du mega menu (3 colonnes)
@@ -19,20 +19,22 @@ $_mega_sections = [
         'label' => 'Le QG',
         'emoji' => '🗺️',
         'links' => [
-            ['file' => 'index.php',           'label' => 'Accueil',            'desc' => 'Le QG des Zonautes',          'icon' => '🏠'],
-            ['file' => 'les-echos.php',        'label' => 'Les Échos',          'desc' => 'Le magazine de la Zone',      'icon' => '📰'],
-            ['file' => 'trophees.php',         'label' => 'Trophées',           'desc' => 'Podium & palmarès des clans', 'icon' => '🥇'],
-            ['file' => 'comment-ca-marche.php','label' => 'Comment ça marche ?','desc' => 'Le QG en 6 étapes',          'icon' => '❓'],
+            ['file' => 'index.php',            'label' => 'Accueil',             'desc' => 'Le QG des Zonautes',          'icon' => '🏠'],
+            ['file' => 'les-echos.php',         'label' => 'Les Échos',           'desc' => 'Le magazine de la Zone',      'icon' => '📰'],
+            ['file' => 'concept.php',           'label' => 'Le Concept',          'desc' => 'Zone85 en quelques lignes',   'icon' => '💡'],
+            ['file' => 'trophees.php',          'label' => 'Trophées',            'desc' => 'Podium & palmarès des clans', 'icon' => '🥇'],
+            ['file' => 'comment-ca-marche.php', 'label' => 'Comment ça marche ?', 'desc' => 'Le QG en 6 étapes',          'icon' => '❓'],
         ],
     ],
     [
         'label' => 'Explorer',
         'emoji' => '🥾',
         'links' => [
-            ['file' => 'randos.php',     'label' => 'Randos',          'desc' => 'Parcours & traces GPX',       'icon' => '🥾'],
-            ['file' => 'missions.php',   'label' => 'Participer',      'desc' => 'Participations ponctuelles',  'icon' => '🎯'],
-            ['file' => 'ktc.php',        'label' => 'KTC',             'desc' => 'L\'objet mystère du mois',    'icon' => '🔍'],
-            ['file' => 'evenements.php', 'label' => 'Événements',      'desc' => 'Rendez-vous de la Zone',      'icon' => '🎉'],
+            ['file' => 'randos.php',     'label' => 'Randos',          'desc' => 'Parcours & traces GPX',            'icon' => '🥾'],
+            ['file' => 'missions.php',   'label' => 'Participer',      'desc' => 'Participations ponctuelles',       'icon' => '🎯'],
+            ['file' => 'victor.php',     'label' => 'Victor',          'desc' => 'Le livre PDF de la Zone',          'icon' => '📖'],
+            ['file' => 'ktc.php',        'label' => 'Kétokole Tchè',   'desc' => 'Chercher & identifier',            'icon' => '🔍'],
+            ['file' => 'evenements.php', 'label' => 'Événements',      'desc' => 'Rendez-vous de la Zone',           'icon' => '🎉'],
         ],
     ],
     [
@@ -171,18 +173,14 @@ if (isset($active_season) && !empty($active_season['title'])) {
 <div class="mobile-menu" id="mobileMenu">
 
   <div class="mmenu-section">
-    <div class="mmenu-section-label">Zone85</div>
+    <div class="mmenu-section-label">Le QG</div>
     <a href="index.php">Accueil</a>
-    <a href="concept.php">Concept</a>
     <a href="les-echos.php">Les Échos</a>
     <a href="randos.php">Randos</a>
-    <a href="ktc.php">Kétokole</a>
-    <a href="missions.php">Participer</a>
+    <a href="missions.php">🎯 Participer</a>
+    <a href="victor.php">📖 Victor</a>
+    <a href="ktc.php">🔍 Kétokole Tchè</a>
     <a href="communaute.php">Clans &amp; Classements</a>
-    <a href="comment-ca-marche.php">Comment ça marche ?</a>
-    <a href="recompenses.php">🏅 Trophées &amp; Badges</a>
-    <a href="aide.php">❓ Aide</a>
-    <a href="feedback.php">📝 Donner mon avis (bêta)</a>
   </div>
 
   <div class="mmenu-section">
@@ -198,6 +196,10 @@ if (isset($active_season) && !empty($active_season['title'])) {
     <a href="trophees.php">Trophées</a>
     <a href="clans.php">Les Clans</a>
     <a href="evenements.php">Événements</a>
+    <a href="concept.php">Le Concept</a>
+    <a href="comment-ca-marche.php">Comment ça marche ?</a>
+    <a href="recompenses.php">🏅 Trophées &amp; Badges</a>
+    <a href="aide.php">❓ Aide</a>
   </div>
 
   <div class="mmenu-section" style="border-top:1px solid rgba(0,0,0,.08)">
