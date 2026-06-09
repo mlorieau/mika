@@ -152,7 +152,7 @@ if (isset($active_season) && !empty($active_season['title'])) {
       <a href="missions.php" class="mega-season-card">
         <span class="mega-season-dot"></span>
         <span>
-          <span class="mega-season-label">Saison en cours</span>
+          <span class="mega-season-label">En ce moment dans le QG</span>
           <span class="mega-season-title"><?= e($_nav_season['title']) ?></span>
         </span>
         <?php if (!empty($_nav_season['main_mission'])): ?>

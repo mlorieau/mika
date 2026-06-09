@@ -842,7 +842,7 @@ require_once 'includes/nav.php';
     <div class="pp-week-card">
       <div class="pp-week-xp">+<?= number_format($pp_xp_week, 0, ',', ' ') ?></div>
       <div class="pp-week-lbl">XP cette semaine</div>
-      <div class="pp-season-xp"><?= number_format($pp_xp_season, 0, ',', ' ') ?> XP cette saison</div>
+      <div class="pp-season-xp"><?= number_format($pp_xp_season, 0, ',', ' ') ?> XP dans le QG</div>
     </div>
 
     <!-- Historique XP -->
@@ -950,7 +950,7 @@ $clan_medals     = ['🥇', '🥈', '🥉'];
 $cn_total_pts    = array_sum(array_column($clan_rankings, 'season_points'));
 ?>
 <div class="cn-wrap">
-  <!-- Barre de bataille -->
+  <!-- Barre classement clans -->
   <div class="cn-battle">
     <div class="cn-battle-inner">
       <div class="cn-battle-title">Le Classement des Clans</div>
@@ -1146,7 +1146,7 @@ $cn_total_pts    = array_sum(array_column($clan_rankings, 'season_points'));
     </div>
     <?php endif; ?>
 
-    <p style="font-size:.82rem;color:var(--text-muted,#6b7f96);margin-bottom:20px">Top <?= count($leaderboard) ?> sur <?= number_format($cl_total, 0, ',', ' ') ?> Zonaute<?= $cl_total > 1 ? 's' : '' ?> — classement par XP saison</p>
+    <p style="font-size:.82rem;color:var(--text-muted,#6b7f96);margin-bottom:20px">Top <?= count($leaderboard) ?> sur <?= number_format($cl_total, 0, ',', ' ') ?> Zonaute<?= $cl_total > 1 ? 's' : '' ?> — classement annuel par XP</p>
 
     <!-- Table rang 4–50 -->
     <?php $table_rows = array_slice($leaderboard, 3); ?>
@@ -1160,7 +1160,7 @@ $cn_total_pts    = array_sum(array_column($clan_rankings, 'season_points'));
             <th class="hide-sm">Clan</th>
             <th class="hide-sm">Niveau</th>
             <th class="num hide-sm">Missions</th>
-            <th class="num">XP Saison</th>
+            <th class="num">XP annuel</th>
           </tr>
         </thead>
         <tbody>
@@ -1340,7 +1340,7 @@ $cn_total_pts    = array_sum(array_column($clan_rankings, 'season_points'));
                   'rando_validated' => ['auto',   '⚡', $cv2.' rando'.($cv2>1?'s':'').' terminée'.($cv2>1?'s':'')],
                   'randos_count'    => ['auto',   '⚡', $cv2.' rando'.($cv2>1?'s':'').' terminée'.($cv2>1?'s':'')],
                   'registration'    => ['auto',   '⚡', 'À l\'inscription'],
-                  'season'          => ['auto',   '⚡', 'Participer à une saison'],
+                  'season'          => ['auto',   '⚡', 'Participer à un temps fort du QG'],
                   'mission_reward'  => ['reward', '🎯', 'Récompense de mission'],
                   'manual'          => ['manual', '👤', 'Attribué par l\'équipe'],
                   'special'         => ['special','✨', 'Condition spéciale'],

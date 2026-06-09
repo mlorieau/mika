@@ -924,7 +924,7 @@ require_once 'includes/nav.php';
           if (!empty($active_season['end_date'])) {
               $mh_days = max(0, (int)ceil((strtotime($active_season['end_date']) - time()) / 86400));
           }
-          $mh_season_label = $active_season['title'] ?? 'Saison en cours';
+          $mh_season_label = $active_season['title'] ?? 'En ce moment dans le QG';
           ?>
           <div class="mh-stat">
             <div class="mh-stat-icon">🎯</div>
@@ -1029,7 +1029,7 @@ require_once 'includes/nav.php';
 
     <!-- Course des clans -->
     <div class="gd-clan-section reveal">
-      <div class="gd-clan-section-title">Course des clans · Saison en cours</div>
+      <div class="gd-clan-section-title">Course des clans · classement annuel</div>
       <div class="gd-clan-rows">
         <?php
         $clan_display = [

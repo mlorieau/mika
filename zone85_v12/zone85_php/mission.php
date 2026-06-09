@@ -927,7 +927,7 @@ if (in_array($mission['mission_type'], ['quiz','vote']) && db_enabled()) {
       <div class="mission-info-card">
         <div class="md-card-title" style="margin-bottom:10px">⚡ XP à vie</div>
         <p style="font-size:.82rem;color:var(--text-muted);line-height:1.6;margin:0">
-          Tes XP de participation sont permanents. Ils construisent ta progression personnelle indépendamment des saisons.
+          Tes XP de participation sont permanents. Ils gardent la trace de ton parcours dans le QG.
         </p>
         <?php if ($clan_pts > 0): ?>
         <p style="font-size:.82rem;color:var(--text-muted);line-height:1.6;margin-top:10px;padding-top:10px;border-top:1px solid var(--beige-dark)">

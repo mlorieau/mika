@@ -5,7 +5,7 @@
 ?>
 <div class="season-banner">
 
-    <div class="season-banner-eyebrow">Saison en cours</div>
+    <div class="season-banner-eyebrow">En ce moment dans le QG</div>
 
     <h3 class="season-banner-title"><?= e($season['title']) ?></h3>
 

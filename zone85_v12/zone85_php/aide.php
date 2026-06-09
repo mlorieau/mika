@@ -243,8 +243,8 @@ require_once 'includes/nav.php';
         <details>
           <summary>Peut-on changer de clan apr&egrave;s l&rsquo;inscription&nbsp;?</summary>
           <div class="aide-accordion-answer">
-            <p>Le clan est choisi &agrave; l&rsquo;inscription et repr&eacute;sente votre territoire en Vend&eacute;e (Bocage, Littoral, Marais). <strong>Le changement de clan n&rsquo;est pas autoris&eacute; en cours de saison</strong> afin de garantir l&rsquo;&eacute;quilibre des comp&eacute;titions.</p>
-            <p>Si vous estimez avoir commis une erreur lors du choix, contactez l&rsquo;&eacute;quipe Zone85 via la page <a href="contact.php">Contact</a> en d&eacute;but de saison.</p>
+            <p>Le clan est choisi &agrave; l&rsquo;inscription et repr&eacute;sente votre territoire en Vend&eacute;e (Bocage, Littoral, Marais). <strong>Le changement de clan n&rsquo;est pas pr&eacute;vu librement afin de pr&eacute;server l&rsquo;&eacute;quilibre du classement annuel.</strong></p>
+            <p>Si vous pensez avoir fait une erreur au moment du choix, contactez l&rsquo;&eacute;quipe Zone85 via la page <a href="contact.php">Contact</a>.</p>
           </div>
         </details>
 
@@ -282,7 +282,7 @@ require_once 'includes/nav.php';
               &#x2022; <strong>Participant &agrave; des &eacute;v&eacute;nements flash</strong> (bonus XP temporaires)<br>
               &#x2022; <strong>R&eacute;pondant au KTC</strong> (Kétokole, mission d'identification collective)
             </p>
-            <p>Consultez la page <a href="recompenses.php">XP &amp; R&eacute;compenses</a> pour le d&eacute;tail complet.</p>
+            <p>Consultez la page <a href="recompenses.php">Troph&eacute;es &amp; coups de c&oelig;ur</a> pour le d&eacute;tail complet.</p>
           </div>
         </details>
 
@@ -422,7 +422,7 @@ require_once 'includes/nav.php';
         <details>
           <summary>Comment rejoindre un clan&nbsp;?</summary>
           <div class="aide-accordion-answer">
-            <p>Le clan est choisi <strong>lors de l&rsquo;inscription</strong> en fonction de votre territoire. Il repr&eacute;sente votre zone g&eacute;ographique en Vend&eacute;e. Vous ne pouvez pas le changer une fois la saison commenc&eacute;e.</p>
+            <p>Le clan est choisi <strong>lors de l&rsquo;inscription</strong> en fonction de votre territoire. Il repr&eacute;sente votre zone g&eacute;ographique en Vend&eacute;e. Vous ne pouvez pas le changer librement afin de pr&eacute;server l&rsquo;&eacute;quilibre du classement.</p>
           </div>
         </details>
 

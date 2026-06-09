@@ -295,7 +295,7 @@ require_once 'includes/nav.php';
               'rando_validated' => ['auto', '⚡ Automatique', 'Terminer ' . $cv . ' rando' . ($cv > 1 ? 's' : '')],
               'randos_count'   => ['auto', '⚡ Automatique', 'Terminer ' . $cv . ' rando' . ($cv > 1 ? 's' : '')],
               'registration'   => ['auto', '⚡ Automatique', 'S\'inscrire sur Zone85'],
-              'season'         => ['auto', '⚡ Automatique', 'Participer à une saison'],
+              'season'         => ['auto', '⚡ Automatique', 'Participer à un temps fort du QG'],
               'mission_reward' => ['reward', '🎯 Récompense', 'Récompense d\'une mission spécifique'],
               'manual'         => ['manual', '👤 Attribution', 'Attribué par l\'équipe Zone85'],
               'special'        => ['special', '✨ Spécial', 'Condition spéciale — voir description'],

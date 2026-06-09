@@ -651,7 +651,7 @@ require_once 'includes/nav.php';
             <p>Je progresse pour moi. Je fais gagner mon clan.</p>
           </div>
           <div class="welcome-season">
-            <div class="welcome-season-label">Saison en cours</div>
+            <div class="welcome-season-label">En ce moment dans le QG</div>
             <div class="welcome-season-name">☀️ <?= e($active_season['title']) ?></div>
           </div>
         </div>
@@ -867,7 +867,7 @@ require_once 'includes/nav.php';
             </div>
             <div style="flex:1;min-width:100px;background:rgba(234,86,73,.06);border-radius:8px;padding:10px 14px;text-align:center;border:1px solid rgba(234,86,73,.15)">
               <div style="font-size:1.1rem;font-weight:900;color:var(--primary)"><?= number_format($_szn_xp, 0, ',', ' ') ?></div>
-              <div style="font-size:.68rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">XP cette saison</div>
+              <div style="font-size:.68rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">XP dans le QG</div>
             </div>
             <div style="flex:1;min-width:100px;background:var(--beige-light);border-radius:8px;padding:10px 14px;text-align:center">
               <div style="font-size:1.1rem;font-weight:900;color:var(--navy-dark)"><?= (int)$user['participations'] ?></div>
@@ -1060,7 +1060,7 @@ require_once 'includes/nav.php';
               <div class="badge-prog"><?= number_format($_lb['_user_val'], 0, ',', ' ') ?> / <?= number_format($_lb['_val'], 0, ',', ' ') ?> <?= e($_cond_labels[$_lb['condition_type']] ?? '') ?></div>
               <div class="badge-prog-track"><div class="badge-prog-fill" style="width:<?= $_lb['_prog'] ?>%;background:<?= e($_lb_color) ?>"></div></div>
               <?php elseif ($_lb['condition_type'] === 'season'): ?>
-              <div class="badge-prog">Participer à une saison</div>
+              <div class="badge-prog">Participer à un temps fort du QG</div>
               <?php endif; ?>
             </div>
             <?php endforeach; ?>

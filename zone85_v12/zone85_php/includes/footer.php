@@ -38,7 +38,7 @@ $footer_active_season = $active_season ?? (function_exists('get_active_season') 
           <li><a href="mon-compte.php">Mon compte</a></li>
         </ul>
         <div style="margin-top:20px">
-          <div class="footer-col-title">Saison en cours</div>
+          <div class="footer-col-title">En ce moment dans le QG</div>
           <?php if ($footer_active_season): ?>
             <div style="font-size:.88rem;color:rgba(255,255,255,.65);font-weight:600"><?= e($footer_active_season['title']) ?></div>
             <div style="font-size:.75rem;color:var(--primary);font-weight:700;margin-top:4px"><?= e($footer_active_season['main_mission'] ?? '') ?></div>

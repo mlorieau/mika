@@ -386,7 +386,7 @@ require_once 'includes/nav.php';
   <div class="clans-hero-inner">
     <p class="overline-label">
       <?php if ($active_season): ?>
-        Saison en cours &middot; <?= e($active_season['title']) ?>
+        En ce moment dans le QG &middot; <?= e($active_season['title']) ?>
       <?php else: ?>
         Zone85 &mdash; Vendée
       <?php endif; ?>
@@ -523,7 +523,7 @@ require_once 'includes/nav.php';
               <?php endforeach; ?>
             </div>
             <!-- Top 5 membres -->
-            <p class="story-top5-title">Top membres &middot; Saison en cours</p>
+            <p class="story-top5-title">Top membres &middot; classement annuel</p>
             <?php if (!empty($c['top_members'])): ?>
             <ol class="story-top5-list">
               <?php foreach (array_slice($c['top_members'], 0, 5) as $i => $member): ?>

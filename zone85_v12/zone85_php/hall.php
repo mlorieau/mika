@@ -631,7 +631,7 @@ require_once 'includes/nav.php';
 <!-- ===================== ILS ONT MARQUE LA ZONE ===================== -->
 <section class="hall-section hall-section-light">
   <div class="container">
-    <span class="hall-section-eyebrow">&#x1F31F; Saison en cours</span>
+    <span class="hall-section-eyebrow">&#x1F31F; En ce moment dans le QG</span>
     <h2 class="hall-section-title">
       <span class="sec-icon">&#x1F3C6;</span> Ils ont marque la Zone
     </h2>
