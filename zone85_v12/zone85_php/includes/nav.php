@@ -7,7 +7,7 @@ $_nav_direct = [
     ['slug' => 'index',      'label' => 'Accueil',             'file' => 'index.php'],
     ['slug' => 'randos',     'label' => 'Randos',              'file' => 'randos.php'],
     ['slug' => 'les-echos',  'label' => 'Les Échos',           'file' => 'les-echos.php'],
-    ['slug' => 'ktc',        'label' => 'Victor & KTC',        'file' => 'victor.php'],
+    ['slug' => 'ktc',        'label' => 'Victor',               'file' => 'victor.php'],
     ['slug' => 'missions',   'label' => 'Participer',          'file' => 'missions.php'],
     ['slug' => 'communaute', 'label' => 'Clans & Classements', 'file' => 'communaute.php'],
     ['slug' => 'aide',       'label' => 'Aide',                'file' => 'aide.php'],

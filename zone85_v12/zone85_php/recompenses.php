@@ -1,6 +1,6 @@
 <?php
-$page_title       = 'Récompenses & XP — Zone85';
-$page_description = 'Tous les points XP à gagner, les niveaux à atteindre et les badges à débloquer sur Zone85.';
+$page_title       = 'Trophées & coups de cœur — Zone85';
+$page_description = 'XP permanents, trophées de clan, coups de cœur Zone85 : découvrez comment vos participations sont valorisées sur Zone85.';
 $page_canonical   = 'https://www.zone85.fr/recompenses.php';
 $page_robots      = 'index,follow';
 $current_page     = '';
@@ -166,7 +166,7 @@ require_once 'includes/nav.php';
     <!-- ════ SECTION XP ════ -->
     <div class="rw-section">
       <h2 class="rw-section-title">🎯 Comment gagner des XP</h2>
-      <p class="rw-section-sub">Chaque action compte. Les XP s'accumulent sur ton profil et font progresser ton niveau. Ils contribuent aussi aux points de ton clan dans la Bataille des Clans.</p>
+      <p class="rw-section-sub">Chaque action compte. Les XP s'accumulent sur ton profil et font progresser ton niveau. Ils contribuent aussi aux points de ton clan dans le classement annuel.</p>
 
       <table class="rw-xp-table">
         <thead>
@@ -224,7 +224,7 @@ require_once 'includes/nav.php';
     <!-- ════ SECTION CLAN POINTS ════ -->
     <div class="rw-section">
       <h2 class="rw-section-title">🛡 Points de clan</h2>
-      <p class="rw-section-sub">En plus de tes XP personnels, chaque action contribue aux points de ton clan dans la Bataille des Clans. Ces points sont saison­niers et remis à zéro à chaque nouvelle saison.</p>
+      <p class="rw-section-sub">En plus de tes XP personnels, chaque action contribue aux points de ton clan dans le classement annuel. Ces points s'accumulent tout au long de l'année.</p>
 
       <div class="rw-clan-grid">
         <div class="rw-clan-card">
@@ -356,7 +356,7 @@ require_once 'includes/nav.php';
 
     <!-- ════ NOTE ════ -->
     <div class="rw-note">
-      <strong>À noter :</strong> Les valeurs XP des missions varient selon la difficulté et le type. Les XP sont définitivement acquis et ne disparaissent pas. Les points de clan sont remis à zéro à chaque nouvelle saison. Certains badges ne peuvent être débloqués qu'une seule fois.
+      <strong>À noter :</strong> Les valeurs XP des missions varient selon la difficulté et le type. Les XP sont définitivement acquis et ne disparaissent pas. Le classement des clans est annuel. Certains badges ne peuvent être débloqués qu'une seule fois.
     </div>
 
     <!-- ════ CTA ════ -->

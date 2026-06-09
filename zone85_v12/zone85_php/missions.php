@@ -1,6 +1,6 @@
 <?php
 $page_title       = 'Missions';
-$page_description = 'Explore les missions vendéennes : quiz, défis photo, Kéto Kolé Tché, randos, météo-missions, enquêtes. Participe, gagne des XP, fais progresser ton clan.';
+$page_description = 'Participe à la Zone85 : photos de Vendée, Kétokole Tchè, pistes mystères, quiz flash. Des appels lancés aux Zonautes — à votre rythme, toute l\'année.';
 $page_canonical   = 'https://www.zone85.fr/missions.php';
 $page_robots      = 'index,follow';
 $page_og_image    = 'assets/img/ZONE852025.png';
@@ -1316,38 +1316,12 @@ require_once 'includes/nav.php';
   </div>
 </section>
 
-<!-- TYPES DE PARTICIPATION -->
-<section id="types-participation">
+<!-- ESPRIT DES MISSIONS -->
+<section id="esprit-missions">
   <div class="container">
-
-    <div class="reveal" style="margin-bottom:36px">
-      <p class="overline-label">Référence</p>
-      <h2>Les 8 types d'actions de la Zone</h2>
-    </div>
-
-    <div class="types-list">
-      <?php
-      $type_rows = [
-          ['icon' => '🏆', 'name' => 'Grande mission',    'desc' => 'Collective, une par saison, points clan + XP personnels. La mission qui décide du gagnant de la saison.'],
-          ['icon' => '🧠', 'name' => 'Quiz',              'desc' => '3 à 5 questions sur la Vendée. Validation automatique. XP personnel crédité immédiatement.'],
-          ['icon' => '🥐', 'name' => 'Kéto Kolé Tché',   'desc' => 'Objet mystère vendéen. Propose ton hypothèse, validation équipe. Les solutions sont archivées dans le Hall.'],
-          ['icon' => '🥾', 'name' => 'Rando',             'desc' => 'Fiche de randonnée + actions (avis, photo, j\'ai fait). XP personnel. Contributions archivables dans le Hall.'],
-          ['icon' => '🌤️', 'name' => 'Météo-mission',   'desc' => 'Mission éditoriale déclenchée par la météo. Rapide à réaliser. XP personnel uniquement.'],
-          ['icon' => '📸', 'name' => 'Défi photo',        'desc' => 'Upload une photo, modérée par l\'équipe, puis soumise au vote. XP personnel. Les meilleures entrent au Hall.'],
-          ['icon' => '🗳️', 'name' => 'Vote',             'desc' => 'Rapide, XP faible, validation automatique. Idéal pour participer facilement sans s\'engager longtemps.'],
-          ['icon' => '🔍', 'name' => 'Enquête',           'desc' => 'Indices, hypothèses collectives, résolution en communauté. Les enquêtes résolues sont archivées dans le Hall.'],
-      ];
-      foreach ($type_rows as $i => $row):
-          $delay = $i > 0 ? ' style="transition-delay:' . round($i * 0.04, 2) . 's"' : '';
-      ?>
-      <div class="type-row reveal"<?= $delay ?>>
-        <span class="type-row-icon"><?= $row['icon'] ?></span>
-        <div class="type-row-body">
-          <div class="type-row-name"><?= e($row['name']) ?></div>
-          <p class="type-row-desc"><?= e($row['desc']) ?></p>
-        </div>
-      </div>
-      <?php endforeach; ?>
+    <div class="reveal" style="max-width:720px;margin:0 auto 16px;text-align:center">
+      <p class="overline-label">L'esprit Zone85</p>
+      <p style="font-size:1.08rem;color:var(--navy-dark);line-height:1.7">Sur Zone85, les missions ne sont pas des devoirs à faire tous les jours. Ce sont des appels lancés aux Zonautes : partager une photo, identifier un objet, suivre une piste, répondre à un quiz ou réveiller un souvenir.</p>
     </div>
   </div>
 </section>

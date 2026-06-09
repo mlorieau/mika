@@ -76,27 +76,5 @@
       "label": "Zone85 Desktop"
     }
   ],
-  "shortcuts": [
-    {
-      "name": "Mes missions",
-      "short_name": "Missions",
-      "description": "Voir les missions actives",
-      "url": "/missions.php",
-      "icons": [{ "src": "assets/img/pwa/shortcut-missions.png", "sizes": "96x96" }]
-    },
-    {
-      "name": "Mon profil",
-      "short_name": "Profil",
-      "description": "Accéder à mon profil",
-      "url": "/profil.php",
-      "icons": [{ "src": "assets/img/pwa/shortcut-profil.png", "sizes": "96x96" }]
-    },
-    {
-      "name": "Classement",
-      "short_name": "Classement",
-      "description": "Voir le classement des clans",
-      "url": "/classement.php",
-      "icons": [{ "src": "assets/img/pwa/shortcut-classement.png", "sizes": "96x96" }]
-    }
-  ]
+  "shortcuts": []
 }

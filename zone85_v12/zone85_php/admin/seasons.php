@@ -2,7 +2,7 @@
 
 // ============================================================
 
-// admin/seasons.php � Gestion des saisons
+// admin/seasons.php — Gestion des saisons
 
 // ============================================================
 

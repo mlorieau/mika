@@ -1078,7 +1078,7 @@ $cn_total_pts    = array_sum(array_column($clan_rankings, 'season_points'));
     <?php if (empty($leaderboard)): ?>
     <div class="zo-empty">
       <div style="font-size:3rem;margin-bottom:12px">🔭</div>
-      <p style="font-size:1rem;font-weight:700;color:var(--navy-dark,#0c1e2e);margin-bottom:8px">Aucun joueur dans ce classement</p>
+      <p style="font-size:1rem;font-weight:700;color:var(--navy-dark,#0c1e2e);margin-bottom:8px">Aucun Zonaute dans ce classement</p>
       <p>Rejoins la Zone et commence à gagner des XP pour apparaître ici !</p>
     </div>
     <?php else:
@@ -1280,7 +1280,7 @@ $cn_total_pts    = array_sum(array_column($clan_rankings, 'season_points'));
     <!-- Clan points -->
     <div>
       <h2 style="font-size:1.05rem;font-weight:900;color:var(--navy-dark,#0c1e2e);margin-bottom:4px">🛡 Points de clan</h2>
-      <p style="font-size:.78rem;color:var(--text-muted,#6b7f96);margin-bottom:12px">Saisonniers — remis à zéro chaque saison</p>
+      <p style="font-size:.78rem;color:var(--text-muted,#6b7f96);margin-bottom:12px">Classement annuel — chaque participation compte</p>
       <div style="display:flex;flex-direction:column;gap:8px">
         <?php foreach ($rw_clan_rows as [$ico, $label, $pts]): ?>
         <div style="background:#fff;border-radius:10px;padding:12px 14px;border:1.5px solid var(--beige-dark,#e8e0d4);display:flex;align-items:center;gap:10px">
@@ -1371,7 +1371,7 @@ $cn_total_pts    = array_sum(array_column($clan_rankings, 'season_points'));
     <?php endif; ?>
 
     <p style="font-size:.78rem;color:var(--text-muted,#6b7f96);margin-top:20px;line-height:1.6">
-      XP acquis définitivement · Points clan remis à zéro chaque saison · Certains badges non cumulables.
+      XP acquis définitivement · Points clan dans le classement annuel · Certains badges non cumulables.
     </p>
   </div>
 
