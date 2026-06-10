@@ -352,69 +352,69 @@ renderGallery();
 function escHtml(s){return String(s||'').replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c;});}
 function blockLabel(t){return {text:'Texte enrichi',image:'Image seule',gallery:'Galerie',quote:'Citation',heading:'Intertitre',note:'Encart'}[t]||'Bloc';}
 function renderBlocks(){
-  var wrap=document.getElementById('echo_blocks_list');
-  var hidden=document.getElementById('content_blocks_json');
+  var wrap=document.getElementById(‘echo_blocks_list’);
+  var hidden=document.getElementById(‘content_blocks_json’);
   if(!wrap || !hidden) return;
   hidden.value=JSON.stringify(blocks||[]);
   if(!blocks || !blocks.length){
-    wrap.innerHTML='<p style="color:#8a98a8;font-size:.86rem;margin:0;padding:10px 0">Aucun bloc ajouté. Si vide, l’article utilise le corps principal ci-dessus.</p>';
+    wrap.innerHTML=’<p style="color:#8a98a8;font-size:.86rem;margin:0;padding:10px 0">Aucun bloc ajouté. Si vide, l\’article utilise le corps principal ci-dessus.</p>’;
     return;
   }
   wrap.innerHTML=blocks.map(function(b,i){
-    var t=b.type||'text';
-    var extra='';
-    if(t==='text') extra='<div style="border:1.5px solid #dde3ec;border-radius:8px;overflow:hidden;background:#fff"><div data-i="'+i+'" class="blk-quill-editor"></div></div>';
-    if(t==='image') extra=''
-      +'<div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">'
-      +'<label style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:9px 14px;background:#f0ece7;border:1.5px solid #d0cbc5;border-radius:8px;font-size:.78rem;font-weight:700;color:#3d5166;white-space:nowrap">📁 Choisir une photo<input type="file" accept=".jpg,.jpeg,.png,.webp" style="display:none" class="blk-img-up" data-bi="'+i+'" data-bk="src"></label>'
-      +(b.src?'<span style="font-size:.74rem;color:#6b7f96;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px">'+escHtml(b.src.split('/').pop())+'</span>':'<span style="font-size:.74rem;color:#aaa">Aucune photo</span>')
-      +'</div>'
-      +(b.src?'<div style="margin-bottom:10px"><img src="'+(b.src.startsWith('http')?b.src:baseUrl+'/'+b.src)+'" style="max-height:140px;border-radius:8px;object-fit:cover;border:1px solid rgba(0,0,0,.08)" loading="lazy"></div>':'')
-      +'<input data-i="'+i+'" data-k="caption" class="adm-input block-field" placeholder="Légende" value="'+escHtml(b.caption||'')+'" style="margin-bottom:8px">'
-      +'<input data-i="'+i+'" data-k="position" class="adm-input block-field" placeholder="Cadrage (ex: center top, 50% 30%)" value="'+escHtml(b.position||'center center')+'">';
-    if(t==='gallery') extra=''
-      +'<label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;padding:8px 13px;background:#f0ece7;border:1.5px solid #d0cbc5;border-radius:8px;font-size:.78rem;font-weight:700;color:#3d5166;margin-bottom:10px">📷 Ajouter des photos<input type="file" accept=".jpg,.jpeg,.png,.webp" multiple style="display:none" class="blk-gal-up" data-bi="'+i+'"></label>'
-      +(b.images&&b.images.length?'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">'+b.images.map(function(src,si){var u=src.startsWith('http')?src:baseUrl+'/'+src;return '<div style="position:relative"><img src="'+u+'" style="width:80px;height:60px;object-fit:cover;border-radius:5px;border:1px solid rgba(0,0,0,.08)" loading="lazy"><button type="button" onclick="removeBlockImg('+i+','+si+')" style="position:absolute;top:-5px;right:-5px;width:18px;height:18px;border-radius:50%;background:#c0392b;color:#fff;border:none;cursor:pointer;font-size:.6rem;line-height:1;display:flex;align-items:center;justify-content:center">✕</button></div>';}).join('')+'</div>':'')
-      +'<input data-i="'+i+'" data-k="caption" class="adm-input block-field" placeholder="Légende de galerie" value="'+escHtml(b.caption||'')+'">';
-    if(t==='quote') extra='<textarea data-i="'+i+'" data-k="text" rows="3" class="adm-textarea block-field" placeholder="Citation">'+escHtml(b.text||'')+'</textarea><input data-i="'+i+'" data-k="author" class="adm-input block-field" placeholder="Auteur / source" value="'+escHtml(b.author||'')+'" style="margin-top:8px">';
-    if(t==='heading') extra='<input data-i="'+i+'" data-k="text" class="adm-input block-field" placeholder="Intertitre" value="'+escHtml(b.text||'')+'">';
-    if(t==='note') extra='<input data-i="'+i+'" data-k="title" class="adm-input block-field" placeholder="Titre de l’encart" value="'+escHtml(b.title||'')+'"><textarea data-i="'+i+'" data-k="text" rows="3" class="adm-textarea block-field" placeholder="Contenu de l’encart" style="margin-top:8px">'+escHtml(b.text||'')+'</textarea>';
-    return '<div class="echo-block-admin" style="border:1px solid #d6dde6;border-radius:10px;padding:14px;margin:12px 0;background:#fff">'
-      +'<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px"><strong style="color:#0f1e2d">'+(i+1)+'. '+blockLabel(t)+'</strong><div style="display:flex;gap:6px"><button type="button" class="btn-adm btn-adm-light" onclick="moveBlock('+i+',-1)">↑</button><button type="button" class="btn-adm btn-adm-light" onclick="moveBlock('+i+',1)">↓</button><button type="button" class="btn-adm btn-adm-danger" onclick="removeBlock('+i+')">Supprimer</button></div></div>'
-      +extra+'</div>';
-  }).join('');
-  wrap.querySelectorAll('.block-field').forEach(function(el){
-    el.addEventListener('input',function(){
-      var i=parseInt(this.getAttribute('data-i'),10), k=this.getAttribute('data-k');
+    var t=b.type||’text’;
+    var extra=’’;
+    if(t===’text’) extra=’<div style="border:1.5px solid #dde3ec;border-radius:8px;overflow:hidden;background:#fff"><div data-i="’+i+’" class="blk-quill-editor"></div></div>’;
+    if(t===’image’) extra=’’
+      +’<div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">’
+      +’<label style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:9px 14px;background:#f0ece7;border:1.5px solid #d0cbc5;border-radius:8px;font-size:.78rem;font-weight:700;color:#3d5166;white-space:nowrap">📁 Choisir une photo<input type="file" accept=".jpg,.jpeg,.png,.webp" style="display:none" class="blk-img-up" data-bi="’+i+’" data-bk="src"></label>’
+      +(b.src?’<span style="font-size:.74rem;color:#6b7f96;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px">’+escHtml(b.src.split(‘/’).pop())+’</span>’:’<span style="font-size:.74rem;color:#aaa">Aucune photo</span>’)
+      +’</div>’
+      +(b.src?’<div style="margin-bottom:10px"><img src="’+(b.src.startsWith(‘http’)?b.src:baseUrl+’/’+b.src)+’" style="max-height:140px;border-radius:8px;object-fit:cover;border:1px solid rgba(0,0,0,.08)" loading="lazy"></div>’:’’)
+      +’<input data-i="’+i+’" data-k="caption" class="adm-input block-field" placeholder="Légende" value="’+escHtml(b.caption||’’)+’" style="margin-bottom:8px">’
+      +’<input data-i="’+i+’" data-k="position" class="adm-input block-field" placeholder="Cadrage (ex: center top, 50% 30%)" value="’+escHtml(b.position||’center center’)+’">’;
+    if(t===’gallery’) extra=’’
+      +’<label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;padding:8px 13px;background:#f0ece7;border:1.5px solid #d0cbc5;border-radius:8px;font-size:.78rem;font-weight:700;color:#3d5166;margin-bottom:10px">📷 Ajouter des photos<input type="file" accept=".jpg,.jpeg,.png,.webp" multiple style="display:none" class="blk-gal-up" data-bi="’+i+’"></label>’
+      +(b.images&&b.images.length?’<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">’+b.images.map(function(src,si){var u=src.startsWith(‘http’)?src:baseUrl+’/’+src;return ‘<div style="position:relative"><img src="’+u+’" style="width:80px;height:60px;object-fit:cover;border-radius:5px;border:1px solid rgba(0,0,0,.08)" loading="lazy"><button type="button" onclick="removeBlockImg(‘+i+’,’+si+’)" style="position:absolute;top:-5px;right:-5px;width:18px;height:18px;border-radius:50%;background:#c0392b;color:#fff;border:none;cursor:pointer;font-size:.6rem;line-height:1;display:flex;align-items:center;justify-content:center">✕</button></div>’;}).join(‘’)+’</div>’:’’)
+      +’<input data-i="’+i+’" data-k="caption" class="adm-input block-field" placeholder="Légende de galerie" value="’+escHtml(b.caption||’’)+’">’;
+    if(t===’quote’) extra=’<textarea data-i="’+i+’" data-k="text" rows="3" class="adm-textarea block-field" placeholder="Citation">’+escHtml(b.text||’’)+’</textarea><input data-i="’+i+’" data-k="author" class="adm-input block-field" placeholder="Auteur / source" value="’+escHtml(b.author||’’)+’" style="margin-top:8px">’;
+    if(t===’heading’) extra=’<input data-i="’+i+’" data-k="text" class="adm-input block-field" placeholder="Intertitre" value="’+escHtml(b.text||’’)+’">’;
+    if(t===’note’) extra=’<input data-i="’+i+’" data-k="title" class="adm-input block-field" placeholder="Titre de l\’encart" value="’+escHtml(b.title||’’)+’"><textarea data-i="’+i+’" data-k="text" rows="3" class="adm-textarea block-field" placeholder="Contenu de l\’encart" style="margin-top:8px">’+escHtml(b.text||’’)+’</textarea>’;
+    return ‘<div class="echo-block-admin" style="border:1px solid #d6dde6;border-radius:10px;padding:14px;margin:12px 0;background:#fff">’
+      +’<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px"><strong style="color:#0f1e2d">’+(i+1)+’. ‘+blockLabel(t)+’</strong><div style="display:flex;gap:6px"><button type="button" class="btn-adm btn-adm-light" onclick="moveBlock(‘+i+’,-1)">↑</button><button type="button" class="btn-adm btn-adm-light" onclick="moveBlock(‘+i+’,1)">↓</button><button type="button" class="btn-adm btn-adm-danger" onclick="removeBlock(‘+i+’)">Supprimer</button></div></div>’
+      +extra+’</div>’;
+  }).join(‘’);
+  wrap.querySelectorAll(‘.block-field’).forEach(function(el){
+    el.addEventListener(‘input’,function(){
+      var i=parseInt(this.getAttribute(‘data-i’),10), k=this.getAttribute(‘data-k’);
       if(!blocks[i]) return;
       blocks[i][k]=this.value;
       hidden.value=JSON.stringify(blocks||[]);
     });
   });
-  wrap.querySelectorAll('.blk-img-up').forEach(function(el){
-    el.addEventListener('change',function(){
+  wrap.querySelectorAll(‘.blk-img-up’).forEach(function(el){
+    el.addEventListener(‘change’,function(){
       if(!this.files[0]) return;
-      var bi=parseInt(this.getAttribute('data-bi'),10), bk=this.getAttribute('data-bk');
-      var lbl=this.parentElement; lbl.textContent='⏳…';
-      var fd=new FormData(); fd.append('file',this.files[0]); fd.append('csrf_token','{$csrf_val}');
-      fetch(baseUrl+'/ajax/echo-upload.php',{method:'POST',body:fd})
+      var bi=parseInt(this.getAttribute(‘data-bi’),10), bk=this.getAttribute(‘data-bk’);
+      var lbl=this.closest(‘label’); if(lbl) lbl.textContent=’⏳ Upload…’;
+      var fd=new FormData(); fd.append(‘file’,this.files[0]); fd.append(‘csrf_token’,’{$csrf_val}’);
+      fetch(baseUrl+’/ajax/echo-upload.php’,{method:’POST’,body:fd})
         .then(function(r){return r.json();})
         .then(function(d){
           if(d.ok){blocks[bi][bk]=d.path;renderBlocks();}
-          else{renderBlocks();alert('Erreur upload: '+(d.error||'inconnue'));}
+          else{renderBlocks();alert(‘Erreur upload: ‘+(d.error||’inconnue’));}
         })
-        .catch(function(){renderBlocks();alert('Erreur réseau');});
+        .catch(function(){renderBlocks();alert(‘Erreur réseau’);});
     });
   });
-  wrap.querySelectorAll('.blk-gal-up').forEach(function(el){
-    el.addEventListener('change',function(){
+  wrap.querySelectorAll(‘.blk-gal-up’).forEach(function(el){
+    el.addEventListener(‘change’,function(){
       var files=Array.from(this.files); if(!files.length) return;
-      var bi=parseInt(this.getAttribute('data-bi'),10);
+      var bi=parseInt(this.getAttribute(‘data-bi’),10);
       var pending=files.length;
       if(!blocks[bi].images) blocks[bi].images=[];
       files.forEach(function(file){
-        var fd=new FormData(); fd.append('file',file); fd.append('csrf_token','{$csrf_val}');
-        fetch(baseUrl+'/ajax/echo-upload.php',{method:'POST',body:fd})
+        var fd=new FormData(); fd.append(‘file’,file); fd.append(‘csrf_token’,’{$csrf_val}’);
+        fetch(baseUrl+’/ajax/echo-upload.php’,{method:’POST’,body:fd})
           .then(function(r){return r.json();})
           .then(function(d){
             if(d.ok) blocks[bi].images.push(d.path);
@@ -424,14 +424,14 @@ function renderBlocks(){
       });
     });
   });
-  wrap.querySelectorAll('.blk-quill-editor').forEach(function(el){
-    var idx=parseInt(el.getAttribute('data-i'),10);
+  wrap.querySelectorAll(‘.blk-quill-editor’).forEach(function(el){
+    var idx=parseInt(el.getAttribute(‘data-i’),10);
     var bq=new Quill(el,{
-      modules:{toolbar:[['bold','italic','underline','strike'],[{header:[2,3,false]}],['blockquote'],[{list:'ordered'},{list:'bullet'}],['link'],['clean']]},
-      theme:'snow'
+      modules:{toolbar:[[‘bold’,’italic’,’underline’,’strike’],[{header:[2,3,false]}],[‘blockquote’],[{list:’ordered’},{list:’bullet’}],[‘link’],[‘clean’]]},
+      theme:’snow’
     });
     if(blocks[idx]&&blocks[idx].html) bq.clipboard.dangerouslyPasteHTML(blocks[idx].html);
-    bq.on('text-change',function(){blocks[idx].html=bq.root.innerHTML;hidden.value=JSON.stringify(blocks);});
+    bq.on(‘text-change’,function(){blocks[idx].html=bq.root.innerHTML;hidden.value=JSON.stringify(blocks);});
   });
 }
 function removeBlockImg(bi,si){blocks[bi].images.splice(si,1);renderBlocks();}
