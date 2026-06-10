@@ -241,6 +241,13 @@ if (!empty($article['cover_image'])) {
     $hero_style = 'background:' . $rub_grad . ';';
 }
 
+// ── Blocs éditoriaux ─────────────────────────────────────────
+$content_blocks = [];
+if (!empty($article['content_blocks'])) {
+    $decoded = json_decode($article['content_blocks'], true);
+    if (is_array($decoded)) $content_blocks = $decoded;
+}
+
 // ── Méta SEO ─────────────────────────────────────────────────
 $page_title       = $article['title'] . ' — Les Échos Zone85';
 $page_description = $article['excerpt'] ?? '';
@@ -306,6 +313,36 @@ $page_styles = '<style>
   border-left:3px solid #ea5649; background:rgba(234,86,73,.04);
   border-radius:0 8px 8px 0; font-style:italic; color:#444;
 }
+
+/* BLOCS ÉDITORIAUX */
+.article-blocks { max-width:680px; }
+.article-block { margin-bottom:2em; }
+.article-block-text { font-size:1.02rem; line-height:1.85; color:#2a2a2a; }
+.article-block-text p  { margin:0 0 1.4em; }
+.article-block-text h2 { font-size:1.35rem; font-weight:800; color:#0c1e2e; margin:1.8em 0 .7em; }
+.article-block-text h3 { font-size:1.1rem; font-weight:700; color:#12314e; margin:1.5em 0 .6em; }
+.article-block-text a  { color:#ea5649; font-weight:600; }
+.article-block-text ul, .article-block-text ol { margin:0 0 1.4em 1.4em; }
+.article-block-text strong { font-weight:800; color:#1a1a1a; }
+.article-block-heading { font-size:1.35rem; font-weight:800; color:#0c1e2e; letter-spacing:-.3px; line-height:1.25; }
+.article-block-image figure { margin:0; }
+.article-block-image img { width:100%; border-radius:10px; display:block; }
+.article-block-image figcaption { font-size:.8rem; color:#6b7f96; margin-top:8px; font-style:italic; text-align:center; }
+.article-block-gallery-grid { display:flex; flex-wrap:wrap; gap:8px; }
+.article-block-gallery-grid img { height:180px; flex:1 1 200px; object-fit:cover; border-radius:8px; cursor:pointer; transition:opacity .2s; }
+.article-block-gallery-grid img:hover { opacity:.88; }
+.article-block-gallery figcaption { font-size:.8rem; color:#6b7f96; margin-top:8px; font-style:italic; text-align:center; }
+.article-block-quote blockquote {
+  margin:0; padding:20px 24px;
+  border-left:4px solid #ea5649; background:rgba(234,86,73,.05);
+  border-radius:0 10px 10px 0; font-style:italic; font-size:1.08rem; color:#333; line-height:1.7;
+}
+.article-block-quote cite { display:block; margin-top:10px; font-size:.82rem; font-weight:700; color:#ea5649; font-style:normal; }
+.article-block-note {
+  background:#f0f7ff; border:1.5px solid #c5d8f0; border-radius:10px;
+  padding:18px 22px; font-size:.92rem; line-height:1.7; color:#1a3a5c;
+}
+.article-block-note-title { font-weight:800; font-size:.95rem; color:#0c1e2e; margin-bottom:6px; }
 
 /* VIDÉO */
 .article-video-wrap {
@@ -555,6 +592,79 @@ require_once 'includes/nav.php';
       <div class="article-body-wrap">
         <div class="article-body-inner">
           <!-- Contenu — l'accroche n'est pas répétée ici -->
+          <?php if (!empty($content_blocks)): ?>
+          <div class="article-blocks">
+            <?php foreach ($content_blocks as $blk):
+              $bt = $blk['type'] ?? '';
+            ?>
+            <?php if ($bt === 'text'): ?>
+              <div class="article-block article-block-text"><?= $blk['html'] ?? '' ?></div>
+
+            <?php elseif ($bt === 'heading'): ?>
+              <h2 class="article-block article-block-heading"><?= e($blk['text'] ?? '') ?></h2>
+
+            <?php elseif ($bt === 'image'): ?>
+              <?php
+                $bsrc = $blk['src'] ?? '';
+                if ($bsrc !== '') {
+                    $burl = (strpos($bsrc,'http') === 0) ? $bsrc : $base_url.'/'.$bsrc;
+                    $bpos = htmlspecialchars($blk['position'] ?? 'center center', ENT_QUOTES, 'UTF-8');
+                    $bcap = $blk['caption'] ?? '';
+                ?>
+              <div class="article-block article-block-image">
+                <figure>
+                  <img src="<?= htmlspecialchars($burl, ENT_QUOTES, 'UTF-8') ?>"
+                       alt="<?= htmlspecialchars($bcap, ENT_QUOTES, 'UTF-8') ?>"
+                       style="object-position:<?= $bpos ?>"
+                       loading="lazy">
+                  <?php if ($bcap !== ''): ?>
+                    <figcaption><?= e($bcap) ?></figcaption>
+                  <?php endif; ?>
+                </figure>
+              </div>
+              <?php } ?>
+
+            <?php elseif ($bt === 'gallery'): ?>
+              <?php $gimgs = $blk['images'] ?? []; if (!empty($gimgs)): ?>
+              <div class="article-block article-block-gallery">
+                <figure>
+                  <div class="article-block-gallery-grid">
+                    <?php foreach ($gimgs as $gsrc):
+                      $gurl = (strpos($gsrc,'http') === 0) ? $gsrc : $base_url.'/'.$gsrc;
+                    ?>
+                      <img src="<?= htmlspecialchars($gurl, ENT_QUOTES, 'UTF-8') ?>"
+                           alt="" loading="lazy">
+                    <?php endforeach; ?>
+                  </div>
+                  <?php if (!empty($blk['caption'])): ?>
+                    <figcaption><?= e($blk['caption']) ?></figcaption>
+                  <?php endif; ?>
+                </figure>
+              </div>
+              <?php endif; ?>
+
+            <?php elseif ($bt === 'quote'): ?>
+              <div class="article-block article-block-quote">
+                <blockquote>
+                  <?= e($blk['text'] ?? '') ?>
+                  <?php if (!empty($blk['author'])): ?>
+                    <cite>— <?= e($blk['author']) ?></cite>
+                  <?php endif; ?>
+                </blockquote>
+              </div>
+
+            <?php elseif ($bt === 'note'): ?>
+              <div class="article-block article-block-note">
+                <?php if (!empty($blk['title'])): ?>
+                  <div class="article-block-note-title"><?= e($blk['title']) ?></div>
+                <?php endif; ?>
+                <?= e($blk['text'] ?? '') ?>
+              </div>
+
+            <?php endif; ?>
+            <?php endforeach; ?>
+          </div>
+          <?php else: ?>
           <div class="article-body-content">
             <?php
               $body = $article['body'] ?? '';
@@ -565,6 +675,7 @@ require_once 'includes/nav.php';
               }
             ?>
           </div>
+          <?php endif; ?>
 
           <?php if ($yt_id): ?>
           <div class="article-video-wrap">

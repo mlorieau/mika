@@ -529,7 +529,11 @@ require_once 'includes/nav.php';
                 $article_url = 'les-echos-article.php?id=' . (int)$art['id'];
             }
           ?>
-          <article class="echos-card" <?= $article_url ? '' : '' ?>>
+          <?php if ($article_url): ?>
+          <a href="<?= htmlspecialchars($article_url, ENT_QUOTES, 'UTF-8') ?>" class="echos-card">
+          <?php else: ?>
+          <article class="echos-card">
+          <?php endif; ?>
             <div class="echos-card-visual" style="background: <?= $grad ?>">
               <?php if (!empty($art['cover_image'])): ?>
                 <img src="<?= htmlspecialchars($art['cover_image'], ENT_QUOTES, 'UTF-8') ?>"
@@ -560,16 +564,17 @@ require_once 'includes/nav.php';
                   <?php if ($date_str): ?> &middot; <?= $date_str ?><?php endif; ?>
                 </span>
                 <?php if ($article_url): ?>
-                  <a href="<?= htmlspecialchars($article_url, ENT_QUOTES, 'UTF-8') ?>"
-                     class="echos-card-cta">
-                    Lire la suite &#x2192;
-                  </a>
+                  <span class="echos-card-cta">Lire la suite &#x2192;</span>
                 <?php else: ?>
                   <span class="echos-card-cta" style="opacity:.4">Bient&ocirc;t &#x2192;</span>
                 <?php endif; ?>
               </div>
             </div>
+          <?php if ($article_url): ?>
+          </a>
+          <?php else: ?>
           </article>
+          <?php endif; ?>
         <?php endforeach; ?>
       <?php endif; ?>
     </div>
