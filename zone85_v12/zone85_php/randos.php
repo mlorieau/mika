@@ -360,7 +360,7 @@ $page_styles = '<style>
 }
 .rando-card:hover { transform: translateY(-5px); box-shadow: 0 12px 32px rgba(0,0,0,.12); }
 .rando-card-visual {
-  height: 190px; display: flex; align-items: center;
+  aspect-ratio: 1 / 1; width: 100%; display: flex; align-items: center;
   justify-content: center; font-size: 3.2rem;
   position: relative; flex-shrink: 0; overflow: hidden;
 }
@@ -985,14 +985,12 @@ require_once 'includes/nav.php';
             }
             $rando_url = 'rando.php?slug=' . urlencode($r['slug']);
           ?>
-          <article class="rando-card">
-            <a href="<?= htmlspecialchars($rando_url, ENT_QUOTES, 'UTF-8') ?>"
-               class="rando-card-visual" style="background: <?= $grad ?>"
-               aria-label="<?= htmlspecialchars($r['title'], ENT_QUOTES, 'UTF-8') ?>">
+          <a href="<?= htmlspecialchars($rando_url, ENT_QUOTES, 'UTF-8') ?>" class="rando-card">
+            <div class="rando-card-visual" style="background: <?= $grad ?>">
               <?php if (!empty($r['cover_image'])): ?>
                 <img src="<?= e(media_url($r['cover_image'])) ?>"
                      alt="<?= htmlspecialchars($r['title'], ENT_QUOTES, 'UTF-8') ?>"
-                     loading="lazy" onerror="this.style.display='none';this.closest('.rando-card-visual')?.classList.add('rando-card-visual-fallback');">
+                     loading="lazy" onerror="this.style.display='none'">
               <?php else: ?>
                 <span class="rando-card-emoji"><?= $emoji ?></span>
               <?php endif; ?>
@@ -1011,13 +1009,10 @@ require_once 'includes/nav.php';
                 <?php elseif ($urp): ?>
                   <span class="rando-card-done-badge rando-card-done-stamped">&#x2713; Tamponnée</span>
                 <?php endif; ?>
-            </a>
+            </div>
             <div class="rando-card-body">
               <h3 class="rando-card-title">
-                <a href="<?= htmlspecialchars($rando_url, ENT_QUOTES, 'UTF-8') ?>"
-                   style="text-decoration:none;color:inherit">
-                  <?= htmlspecialchars($r['title'], ENT_QUOTES, 'UTF-8') ?>
-                </a>
+                <?= htmlspecialchars($r['title'], ENT_QUOTES, 'UTF-8') ?>
               </h3>
               <?php if ($summary): ?>
                 <p class="rando-card-summary">
@@ -1070,13 +1065,10 @@ require_once 'includes/nav.php';
                     &#x1F4CD; <?= htmlspecialchars($r['commune'], ENT_QUOTES, 'UTF-8') ?>
                   <?php endif; ?>
                 </span>
-                <a href="<?= htmlspecialchars($rando_url, ENT_QUOTES, 'UTF-8') ?>"
-                   class="rando-card-cta">
-                  Voir la fiche &#x2192;
-                </a>
+                <span class="rando-card-cta">Voir la fiche &#x2192;</span>
               </div>
             </div>
-          </article>
+          </a>
         <?php endforeach; ?>
       <?php endif; ?>
     </div>

@@ -363,13 +363,13 @@ function renderBlocks(){
   wrap.innerHTML=blocks.map(function(b,i){
     var t=b.type||'text';
     var extra='';
-    if(t==='text') extra='<textarea data-i="'+i+'" data-k="html" rows="5" class="adm-textarea block-field" placeholder="Texte HTML ou texte simple">'+escHtml(b.html||'')+'</textarea>';
+    if(t==='text') extra='<div style="border:1.5px solid #dde3ec;border-radius:8px;overflow:hidden;background:#fff"><div data-i="'+i+'" class="blk-quill-editor"></div></div>';
     if(t==='image') extra=''
-      +'<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">'
-      +'<input data-i="'+i+'" data-k="src" class="adm-input block-field" style="flex:1" placeholder="URL image (ou uploader ci-contre)" value="'+escHtml(b.src||'')+'">'
-      +'<label style="flex-shrink:0;cursor:pointer;display:inline-flex;align-items:center;gap:5px;padding:9px 13px;background:#f0ece7;border:1.5px solid #d0cbc5;border-radius:8px;font-size:.78rem;font-weight:700;color:#3d5166;white-space:nowrap">📁 Upload<input type="file" accept=".jpg,.jpeg,.png,.webp" style="display:none" class="blk-img-up" data-bi="'+i+'" data-bk="src"></label>'
+      +'<div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">'
+      +'<label style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:9px 14px;background:#f0ece7;border:1.5px solid #d0cbc5;border-radius:8px;font-size:.78rem;font-weight:700;color:#3d5166;white-space:nowrap">📁 Choisir une photo<input type="file" accept=".jpg,.jpeg,.png,.webp" style="display:none" class="blk-img-up" data-bi="'+i+'" data-bk="src"></label>'
+      +(b.src?'<span style="font-size:.74rem;color:#6b7f96;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px">'+escHtml(b.src.split('/').pop())+'</span>':'<span style="font-size:.74rem;color:#aaa">Aucune photo</span>')
       +'</div>'
-      +(b.src?'<div style="margin-bottom:8px"><img src="'+(b.src.startsWith('http')?b.src:baseUrl+'/'+b.src)+'" style="max-height:120px;border-radius:6px;object-fit:cover;border:1px solid rgba(0,0,0,.08)" loading="lazy"></div>':'')
+      +(b.src?'<div style="margin-bottom:10px"><img src="'+(b.src.startsWith('http')?b.src:baseUrl+'/'+b.src)+'" style="max-height:140px;border-radius:8px;object-fit:cover;border:1px solid rgba(0,0,0,.08)" loading="lazy"></div>':'')
       +'<input data-i="'+i+'" data-k="caption" class="adm-input block-field" placeholder="Légende" value="'+escHtml(b.caption||'')+'" style="margin-bottom:8px">'
       +'<input data-i="'+i+'" data-k="position" class="adm-input block-field" placeholder="Cadrage (ex: center top, 50% 30%)" value="'+escHtml(b.position||'center center')+'">';
     if(t==='gallery') extra=''
@@ -423,6 +423,15 @@ function renderBlocks(){
           .catch(function(){pending--;if(!pending) renderBlocks();});
       });
     });
+  });
+  wrap.querySelectorAll('.blk-quill-editor').forEach(function(el){
+    var idx=parseInt(el.getAttribute('data-i'),10);
+    var bq=new Quill(el,{
+      modules:{toolbar:[['bold','italic','underline','strike'],[{header:[2,3,false]}],['blockquote'],[{list:'ordered'},{list:'bullet'}],['link'],['clean']]},
+      theme:'snow'
+    });
+    if(blocks[idx]&&blocks[idx].html) bq.clipboard.dangerouslyPasteHTML(blocks[idx].html);
+    bq.on('text-change',function(){blocks[idx].html=bq.root.innerHTML;hidden.value=JSON.stringify(blocks);});
   });
 }
 function removeBlockImg(bi,si){blocks[bi].images.splice(si,1);renderBlocks();}

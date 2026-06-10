@@ -285,7 +285,7 @@ $page_styles = '<style>
 }
 .echos-card:hover { transform: translateY(-5px); box-shadow: 0 12px 32px rgba(0,0,0,.12); }
 .echos-card-visual {
-  height: 180px; display: flex; align-items: center;
+  aspect-ratio: 1 / 1; width: 100%; display: flex; align-items: center;
   justify-content: center; font-size: 3rem;
   position: relative; flex-shrink: 0;
   overflow: hidden;
