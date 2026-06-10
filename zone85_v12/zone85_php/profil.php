@@ -1697,7 +1697,9 @@ function switchTab(group, id) {
   });
 
   panels.forEach(panel => {
-    panel.classList.toggle('is-active', panel.dataset.panelId === id);
+    const isActive = panel.dataset.panelId === id;
+    panel.classList.toggle('is-active', isActive);
+    panel.classList.toggle('active', isActive);
   });
 
   if (group === 'profil' && id === 'activite' && typeof animateActivityChart === 'function') {
