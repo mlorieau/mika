@@ -719,5 +719,5 @@ HTACCESS;
 }
 
 
-
-
+// ── Système d'icônes SVG Zone85 ───────────────────────────────────────────
+require_once __DIR__ . '/../assets/icons/z85-icons.php';

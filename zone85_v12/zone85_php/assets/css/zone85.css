@@ -109,6 +109,26 @@ ul{list-style:none}
 .chip-littoral{background:rgba(29,79,122,.4);color:#7ab8e8}
 .chip-marais{background:rgba(122,78,32,.4);color:#d4a56a}
 
+/* ── SYSTÈME D'ICÔNES ZONE85 ── */
+.z85-icon{width:1.25em;height:1.25em;display:inline-flex;align-items:center;justify-content:center;vertical-align:-0.2em;flex-shrink:0}
+.z85-icon--xs{width:.9em;height:.9em}
+.z85-icon--sm{width:1em;height:1em}
+.z85-icon--md{width:1.5em;height:1.5em;vertical-align:-.35em}
+.z85-icon--lg{width:2em;height:2em;vertical-align:-.45em}
+.z85-icon--xl{width:2.5em;height:2.5em;vertical-align:-.5em}
+.z85-icon--coral{color:var(--primary)}
+.z85-icon--navy{color:var(--navy-dark)}
+.z85-icon--success{color:#2e8b57}
+.z85-icon--warning{color:#c8861b}
+.z85-icon--muted{color:var(--text-muted)}
+.z85-icon--white{color:#fff}
+.z85-icon--current{color:currentColor}
+.mega-item-icon.z85-icon{width:1.15rem;height:1.15rem;vertical-align:-0.15em;margin-top:2px;flex-shrink:0}
+.mega-col-icon.z85-icon{width:1.1rem;height:1.1rem;vertical-align:-0.1em}
+.mmenu-link-icon{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;flex-shrink:0;color:var(--text-muted);opacity:.8}
+.nav-notif-bell .z85-icon{width:1.1rem;height:1.1rem;vertical-align:middle}
+.notif-icon .z85-icon{width:1.5rem;height:1.5rem}
+
 /* ── NAVIGATION ── */
 #navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:var(--beige-light);border-bottom:3px solid var(--primary);transition:box-shadow .3s ease}
 #navbar.scrolled{box-shadow:0 4px 20px rgba(0,0,0,.1)}
@@ -293,7 +313,7 @@ ul{list-style:none}
 }
 .mobile-menu a{
   font-size:.92rem;font-weight:600;color:var(--text-mid);
-  padding:12px 8px;display:flex;align-items:center;min-height:48px;
+  padding:12px 8px;display:flex;align-items:center;gap:9px;min-height:48px;
   border-radius:7px;border-bottom:1px solid rgba(0,0,0,.04);
   transition:color .12s,background .12s
 }

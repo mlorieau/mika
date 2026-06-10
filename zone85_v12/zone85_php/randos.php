@@ -741,7 +741,7 @@ require_once 'includes/nav.php';
 
       <!-- Colonne texte -->
       <div>
-        <span class="randos-hero-badge">🥾 RandoZone</span>
+        <span class="randos-hero-badge"><?= zone85_icon('rando', 'z85-icon--xs') ?> RandoZone</span>
         <h1>RANDONN&Eacute;ES<br><span>ZONE85</span></h1>
         <p class="hero-sub">La Vendée à pied. Du bocage au littoral, des chemins commentés par la communauté.</p>
       </div>
@@ -808,7 +808,7 @@ require_once 'includes/nav.php';
           $filter_groups = [
             'secteur' => [
               'title' => 'Secteur',
-              'icon' => '&#x1F5FA;',
+              'icon' => zone85_icon('map-pin', 'z85-icon--xs'),
               'selected' => $secteur_filters,
               'labels' => [
                 'bocage' => '&#x1F333; Bocage',
@@ -820,7 +820,7 @@ require_once 'includes/nav.php';
             ],
             'difficulte' => [
               'title' => 'Difficulté',
-              'icon' => '&#x2B50;',
+              'icon' => zone85_icon('difficulty', 'z85-icon--xs'),
               'selected' => $difficulte_filters,
               'labels' => [
                 'facile' => '&#x2B50; Facile',
@@ -832,7 +832,7 @@ require_once 'includes/nav.php';
             ],
             'distance' => [
               'title' => 'Distance',
-              'icon' => '&#x1F97E;',
+              'icon' => zone85_icon('distance', 'z85-icon--xs'),
               'selected' => $distance_filters,
               'labels' => [
                 'moins5' => '< 5 km',
@@ -844,7 +844,7 @@ require_once 'includes/nav.php';
             ],
             'duree' => [
               'title' => 'Durée',
-              'icon' => '&#x23F1;',
+              'icon' => zone85_icon('duration', 'z85-icon--xs'),
               'selected' => $duration_filters,
               'labels' => [
                 'moins1h' => '< 1h',
@@ -891,16 +891,16 @@ require_once 'includes/nav.php';
       <?php if ($has_filters): ?>
         <div class="randos-active-filters" aria-label="Filtres actifs">
           <?php foreach ($secteur_filters as $value): ?>
-            <span><?= $secteur_emojis[$value] ?? '' ?> <?= e($secteur_labels[$value] ?? $value) ?></span>
+            <span><?= zone85_icon('map-pin', 'z85-icon--xs') ?> <?= e($secteur_labels[$value] ?? $value) ?></span>
           <?php endforeach; ?>
           <?php foreach ($difficulte_filters as $value): ?>
-            <span>★ <?= e($difficulte_labels[$value] ?? $value) ?></span>
+            <span><?= zone85_icon('difficulty', 'z85-icon--xs') ?> <?= e($difficulte_labels[$value] ?? $value) ?></span>
           <?php endforeach; ?>
           <?php foreach ($distance_filters as $value): ?>
-            <span>🥾 <?= e($distance_labels[$value] ?? $value) ?></span>
+            <span><?= zone85_icon('distance', 'z85-icon--xs') ?> <?= e($distance_labels[$value] ?? $value) ?></span>
           <?php endforeach; ?>
           <?php foreach ($duration_filters as $value): ?>
-            <span>⏱ <?= e($duration_labels[$value] ?? $value) ?></span>
+            <span><?= zone85_icon('duration', 'z85-icon--xs') ?> <?= e($duration_labels[$value] ?? $value) ?></span>
           <?php endforeach; ?>
         </div>
       <?php endif; ?>
@@ -946,7 +946,7 @@ require_once 'includes/nav.php';
     <div class="randos-grid">
       <?php if (empty($randos)): ?>
         <div class="randos-empty">
-          <div class="randos-empty-icon">&#x1F97E;</div>
+          <div class="randos-empty-icon"><?= zone85_icon('rando', 'z85-icon--xl z85-icon--muted') ?></div>
           <?php if ($has_filters): ?>
             <p class="randos-empty-title">Aucune randonn&eacute;e ne correspond &agrave; vos filtres.</p>
             <p class="randos-empty-text">Essayez de modifier ou r&eacute;initialiser vos crit&egrave;res de recherche.</p>
@@ -998,16 +998,16 @@ require_once 'includes/nav.php';
                 <?= htmlspecialchars($badge, ENT_QUOTES, 'UTF-8') ?>
               </span>
               <?php if (!empty($r['gpx_file']) || !empty($r['gpx_url'])): ?>
-              <span class="rando-card-gpx-badge">&#x1F5FA; GPX</span>
+              <span class="rando-card-gpx-badge"><?= zone85_icon('gpx', 'z85-icon--xs') ?> GPX</span>
               <?php endif; ?>
               <?php
                 $urp = $r['user_rp_status'] ?? null;
                 if ($urp === 'validated'): ?>
-                  <span class="rando-card-done-badge rando-card-done-validated">&#x1F3C6; +25 XP</span>
+                  <span class="rando-card-done-badge rando-card-done-validated"><?= zone85_icon('validated', 'z85-icon--xs') ?> +25 XP</span>
                 <?php elseif ($urp === 'pending'): ?>
-                  <span class="rando-card-done-badge rando-card-done-pending">&#x23F3; En validation</span>
+                  <span class="rando-card-done-badge rando-card-done-pending"><?= zone85_icon('pending', 'z85-icon--xs') ?> En validation</span>
                 <?php elseif ($urp): ?>
-                  <span class="rando-card-done-badge rando-card-done-stamped">&#x2713; Tamponnée</span>
+                  <span class="rando-card-done-badge rando-card-done-stamped"><?= zone85_icon('stamp', 'z85-icon--xs') ?> Tamponnée</span>
                 <?php endif; ?>
             </div>
             <div class="rando-card-body">
@@ -1023,10 +1023,10 @@ require_once 'includes/nav.php';
               <!-- Badges lisibilité -->
               <div class="rando-badges-row">
                 <?php if ($dist_str): ?>
-                  <span class="rando-badge">&#x1F4CD; <?= htmlspecialchars($dist_str, ENT_QUOTES, 'UTF-8') ?></span>
+                  <span class="rando-badge"><?= zone85_icon('distance', 'z85-icon--xs') ?> <?= htmlspecialchars($dist_str, ENT_QUOTES, 'UTF-8') ?></span>
                 <?php endif; ?>
                 <?php if ($dur_str): ?>
-                  <span class="rando-badge">&#x23F1; ~<?= htmlspecialchars($dur_str, ENT_QUOTES, 'UTF-8') ?></span>
+                  <span class="rando-badge"><?= zone85_icon('duration', 'z85-icon--xs') ?> ~<?= htmlspecialchars($dur_str, ENT_QUOTES, 'UTF-8') ?></span>
                 <?php endif; ?>
                 <?php
                   $diff_badge_class = 'rando-badge-diff-' . ($dif === 'difficile' ? 'difficile' : ($dif === 'moyen' ? 'moyen' : 'facile'));
@@ -1036,19 +1036,19 @@ require_once 'includes/nav.php';
                   <?= htmlspecialchars($diff_badge_labels[$dif] ?? ucfirst($dif), ENT_QUOTES, 'UTF-8') ?>
                 </span>
                 <?php if (!empty($r['gpx_file']) || !empty($r['gpx_url'])): ?>
-                  <span class="rando-badge rando-badge-gpx">&#x1F4CD; GPX</span>
+                  <span class="rando-badge rando-badge-gpx"><?= zone85_icon('gpx', 'z85-icon--xs') ?> GPX</span>
                 <?php endif; ?>
                 <?php if (!empty($r['famille_score']) && (int)$r['famille_score'] >= 3): ?>
-                  <span class="rando-badge rando-badge-fam">&#x1F46A; Famille</span>
+                  <span class="rando-badge rando-badge-fam"><?= zone85_icon('family', 'z85-icon--xs') ?> Famille</span>
                 <?php endif; ?>
               </div>
 
               <div class="rando-card-infos">
                 <?php if ($dist_str): ?>
-                  <span class="rando-card-info">&#x1F4CD; <?= htmlspecialchars($dist_str, ENT_QUOTES, 'UTF-8') ?></span>
+                  <span class="rando-card-info"><?= zone85_icon('distance', 'z85-icon--xs') ?> <?= htmlspecialchars($dist_str, ENT_QUOTES, 'UTF-8') ?></span>
                 <?php endif; ?>
                 <?php if ($dur_str): ?>
-                  <span class="rando-card-info">&#x23F1; <?= htmlspecialchars($dur_str, ENT_QUOTES, 'UTF-8') ?></span>
+                  <span class="rando-card-info"><?= zone85_icon('duration', 'z85-icon--xs') ?> <?= htmlspecialchars($dur_str, ENT_QUOTES, 'UTF-8') ?></span>
                 <?php endif; ?>
                 <span class="rando-card-info">
                   <span class="rando-card-stars" title="<?= htmlspecialchars($difficulte_labels[$dif] ?? $dif, ENT_QUOTES, 'UTF-8') ?>">
@@ -1062,7 +1062,7 @@ require_once 'includes/nav.php';
               <div class="rando-card-footer">
                 <span class="rando-card-commune">
                   <?php if (!empty($r['commune'])): ?>
-                    &#x1F4CD; <?= htmlspecialchars($r['commune'], ENT_QUOTES, 'UTF-8') ?>
+                    <?= zone85_icon('map-pin', 'z85-icon--xs') ?> <?= htmlspecialchars($r['commune'], ENT_QUOTES, 'UTF-8') ?>
                   <?php endif; ?>
                 </span>
                 <span class="rando-card-cta">Voir la fiche &#x2192;</span>
@@ -1078,7 +1078,7 @@ require_once 'includes/nav.php';
 <!-- ===================== CTA ===================== -->
 <section class="randos-cta-section">
   <div class="container randos-cta-inner">
-    <span class="randos-cta-icon">&#x1F97E;</span>
+    <span class="randos-cta-icon"><?= zone85_icon('rando', 'z85-icon--xl z85-icon--white') ?></span>
     <h2 class="randos-cta-title">
       <?= $is_logged_in ? 'Valide tes randonn&eacute;es en mission' : 'Rejoins la Zone pour valider tes randon&eacute;es' ?>
     </h2>
@@ -1093,10 +1093,10 @@ require_once 'includes/nav.php';
     </p>
     <div class="randos-cta-btns">
       <?php if ($is_logged_in): ?>
-        <a href="missions.php"    class="randos-btn-primary">&#x1F3AF; Voir les missions</a>
-        <a href="communaute.php" class="randos-btn-outline">&#x1F465; La communauté</a>
+        <a href="missions.php"    class="randos-btn-primary"><?= zone85_icon('missions', 'z85-icon--sm z85-icon--white') ?> Voir les missions</a>
+        <a href="communaute.php" class="randos-btn-outline"><?= zone85_icon('feed', 'z85-icon--sm') ?> La communauté</a>
       <?php else: ?>
-        <a href="inscription.php" class="randos-btn-primary">&#x1F331; Rejoindre la Zone</a>
+        <a href="inscription.php" class="randos-btn-primary"><?= zone85_icon('join', 'z85-icon--sm z85-icon--white') ?> Rejoindre la Zone</a>
         <a href="concept.php"     class="randos-btn-outline">D&eacute;couvrir le concept</a>
       <?php endif; ?>
     </div>

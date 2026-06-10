@@ -17,36 +17,35 @@ $_nav_direct = [
 $_mega_sections = [
     [
         'label' => 'Le QG',
-        'emoji' => '🗺️',
+        'icon'  => 'zone',
         'links' => [
-            ['file' => 'index.php',            'label' => 'Accueil',             'desc' => 'Le QG des Zonautes',          'icon' => '🏠'],
-            ['file' => 'les-echos.php',         'label' => 'Les Échos',           'desc' => 'Le magazine de la Zone',      'icon' => '📰'],
-            ['file' => 'concept.php',           'label' => 'Le Concept',          'desc' => 'Zone85 en quelques lignes',   'icon' => '💡'],
-            ['file' => 'trophees.php',          'label' => 'Trophées',            'desc' => 'Podium & palmarès des clans', 'icon' => '🥇'],
-            ['file' => 'comment-ca-marche.php', 'label' => 'Comment ça marche ?', 'desc' => 'Le QG en 6 étapes',          'icon' => '❓'],
+            ['file' => 'index.php',            'label' => 'Accueil',             'desc' => 'Le QG des Zonautes',          'icon' => 'home'],
+            ['file' => 'les-echos.php',         'label' => 'Les Échos',           'desc' => 'Le magazine de la Zone',      'icon' => 'echos'],
+            ['file' => 'concept.php',           'label' => 'Le Concept',          'desc' => 'Zone85 en quelques lignes',   'icon' => 'concept'],
+            ['file' => 'trophees.php',          'label' => 'Trophées',            'desc' => 'Podium & palmarès des clans', 'icon' => 'trophees'],
+            ['file' => 'comment-ca-marche.php', 'label' => 'Comment ça marche ?', 'desc' => 'Le QG en 6 étapes',          'icon' => 'how'],
         ],
     ],
     [
         'label' => 'Explorer',
-        'emoji' => '🥾',
+        'icon'  => 'rando',
         'links' => [
-            ['file' => 'randos.php',     'label' => 'Randos',          'desc' => 'Parcours & traces GPX',            'icon' => '🥾'],
-            ['file' => 'missions.php',   'label' => 'Participer',      'desc' => 'Participations ponctuelles',       'icon' => '🎯'],
-            ['file' => 'victor.php',     'label' => 'Victor',          'desc' => 'Le livre PDF de la Zone',          'icon' => '📖'],
-
-            ['file' => 'evenements.php', 'label' => 'Événements',      'desc' => 'Rendez-vous de la Zone',           'icon' => '🎉'],
+            ['file' => 'randos.php',     'label' => 'Randos',     'desc' => 'Parcours & traces GPX',          'icon' => 'rando'],
+            ['file' => 'missions.php',   'label' => 'Participer', 'desc' => 'Participations ponctuelles',     'icon' => 'participer'],
+            ['file' => 'victor.php',     'label' => 'Victor',     'desc' => 'Le livre PDF de la Zone',        'icon' => 'victor'],
+            ['file' => 'evenements.php', 'label' => 'Événements', 'desc' => 'Rendez-vous de la Zone',         'icon' => 'events'],
         ],
     ],
     [
         'label' => 'Communauté',
-        'emoji' => '🛡️',
+        'icon'  => 'clans',
         'links' => [
-            ['file' => 'profil.php',                    'label' => 'Mon Passeport',      'desc' => 'Mon carnet de route Zonaute',    'icon' => '🪪'],
-            ['file' => 'communaute.php',                'label' => 'Fil de la Zone',     'desc' => 'Activité de la communauté',      'icon' => '🌍'],
-            ['file' => 'clans.php',                     'label' => 'Les Clans',          'desc' => 'Bocage · Littoral · Marais',     'icon' => '🛡️'],
-            ['file' => 'communaute.php?tab=classement', 'label' => 'Classement annuel',  'desc' => 'Le podium des Zonautes',         'icon' => '📊'],
-            ['file' => 'recompenses.php',               'label' => 'Trophées & badges',  'desc' => 'Coups de cœur & récompenses',    'icon' => '🏅'],
-            ['file' => 'aide.php',                      'label' => 'Centre d\'aide',     'desc' => 'FAQ & questions fréquentes',     'icon' => '💬'],
+            ['file' => 'profil.php',                    'label' => 'Mon Passeport',     'desc' => 'Mon carnet de route Zonaute',  'icon' => 'passeport'],
+            ['file' => 'communaute.php',                'label' => 'Fil de la Zone',    'desc' => 'Activité de la communauté',    'icon' => 'feed'],
+            ['file' => 'clans.php',                     'label' => 'Les Clans',         'desc' => 'Bocage · Littoral · Marais',   'icon' => 'clans'],
+            ['file' => 'communaute.php?tab=classement', 'label' => 'Classement annuel', 'desc' => 'Le podium des Zonautes',       'icon' => 'ranking'],
+            ['file' => 'recompenses.php',               'label' => 'Trophées & badges', 'desc' => 'Coups de cœur & récompenses',  'icon' => 'badge'],
+            ['file' => 'aide.php',                      'label' => 'Centre d\'aide',    'desc' => 'FAQ & questions fréquentes',   'icon' => 'aide'],
         ],
     ],
 ];
@@ -93,8 +92,8 @@ if (isset($active_season) && !empty($active_season['title'])) {
     <div class="nav-right">
       <?php if ($_nav_user): ?>
         <a href="notifications.php" class="nav-notif-bell" title="Notifications"
-           style="position:relative;display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;text-decoration:none;font-size:1.1rem;color:var(--text-mid);transition:background .15s<?= ($_cp === 'notifications') ? ';background:rgba(234,86,73,.1)' : '' ?>">
-          🔔
+           style="position:relative;display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;text-decoration:none;color:var(--text-mid);transition:background .15s<?= ($_cp === 'notifications') ? ';background:rgba(234,86,73,.1)' : '' ?>">
+          <?= zone85_icon('notifications', 'z85-icon--md') ?>
           <?php if ($_nav_notif_count > 0): ?>
           <span style="position:absolute;top:2px;right:2px;min-width:16px;height:16px;background:var(--primary);color:#fff;border-radius:8px;font-size:.6rem;font-weight:900;display:flex;align-items:center;justify-content:center;padding:0 3px;line-height:1">
             <?= $_nav_notif_count > 9 ? '9+' : $_nav_notif_count ?>
@@ -131,12 +130,12 @@ if (isset($active_season) && !empty($active_season['title'])) {
     <?php foreach ($_mega_sections as $_ms): ?>
     <div class="mega-col">
       <div class="mega-col-title">
-        <span class="mega-col-emoji"><?= $_ms['emoji'] ?></span>
+        <?= zone85_icon($_ms['icon'], 'mega-col-icon z85-icon--white') ?>
         <?= $_ms['label'] ?>
       </div>
       <?php foreach ($_ms['links'] as $_ml): ?>
       <a href="<?= $_ml['file'] ?>" class="mega-item">
-        <span class="mega-item-icon"><?= $_ml['icon'] ?></span>
+        <?= zone85_icon($_ml['icon'], 'mega-item-icon') ?>
         <span>
           <span class="mega-item-label"><?= $_ml['label'] ?></span>
           <span class="mega-item-desc"><?= $_ml['desc'] ?></span>
@@ -174,40 +173,40 @@ if (isset($active_season) && !empty($active_season['title'])) {
 
   <div class="mmenu-section">
     <div class="mmenu-section-label">Le QG</div>
-    <a href="index.php"<?= $_cp==='index' ? ' class="current"' : '' ?>>🏠 Accueil</a>
-    <a href="les-echos.php"<?= $_cp==='les-echos' ? ' class="current"' : '' ?>>📰 Les Échos</a>
-    <a href="randos.php"<?= $_cp==='randos' ? ' class="current"' : '' ?>>🥾 Randos</a>
-    <a href="missions.php"<?= $_cp==='missions' ? ' class="current"' : '' ?>>🎯 Participer</a>
-    <a href="victor.php"<?= $_cp==='ktc' ? ' class="current"' : '' ?>>📖 Victor</a>
-    <a href="communaute.php"<?= $_cp==='communaute' ? ' class="current"' : '' ?>>🌍 Clans &amp; Classements</a>
+    <a href="index.php"<?= $_cp==='index' ? ' class="current"' : '' ?>><span class="mmenu-link-icon"><?= zone85_icon('home') ?></span>Accueil</a>
+    <a href="les-echos.php"<?= $_cp==='les-echos' ? ' class="current"' : '' ?>><span class="mmenu-link-icon"><?= zone85_icon('echos') ?></span>Les Échos</a>
+    <a href="randos.php"<?= $_cp==='randos' ? ' class="current"' : '' ?>><span class="mmenu-link-icon"><?= zone85_icon('rando') ?></span>Randos</a>
+    <a href="missions.php"<?= $_cp==='missions' ? ' class="current"' : '' ?>><span class="mmenu-link-icon"><?= zone85_icon('participer') ?></span>Participer</a>
+    <a href="victor.php"<?= $_cp==='ktc' ? ' class="current"' : '' ?>><span class="mmenu-link-icon"><?= zone85_icon('victor') ?></span>Victor</a>
+    <a href="communaute.php"<?= $_cp==='communaute' ? ' class="current"' : '' ?>><span class="mmenu-link-icon"><?= zone85_icon('feed') ?></span>Clans &amp; Classements</a>
   </div>
 
   <div class="mmenu-section">
     <div class="mmenu-section-label">Communauté</div>
-    <a href="communaute.php?tab=passeport">🪪 Mon Passeport</a>
-    <a href="communaute.php">🌍 Le Fil</a>
-    <a href="communaute.php?tab=clans">🛡 Clans &amp; Classement</a>
-    <a href="communaute.php?tab=classement">📊 Classement annuel</a>
+    <a href="communaute.php?tab=passeport"><span class="mmenu-link-icon"><?= zone85_icon('passeport') ?></span>Mon Passeport</a>
+    <a href="communaute.php"><span class="mmenu-link-icon"><?= zone85_icon('feed') ?></span>Le Fil</a>
+    <a href="communaute.php?tab=clans"><span class="mmenu-link-icon"><?= zone85_icon('clans') ?></span>Clans &amp; Classement</a>
+    <a href="communaute.php?tab=classement"><span class="mmenu-link-icon"><?= zone85_icon('ranking') ?></span>Classement annuel</a>
   </div>
 
   <div class="mmenu-section">
     <div class="mmenu-section-label">Découvrir</div>
-    <a href="trophees.php"<?= $_cp==='trophees' ? ' class="current"' : '' ?>>🥇 Trophées</a>
-    <a href="clans.php"<?= $_cp==='clans' ? ' class="current"' : '' ?>>🛡️ Les Clans</a>
-    <a href="evenements.php"<?= $_cp==='evenements' ? ' class="current"' : '' ?>>🎉 Événements</a>
-    <a href="concept.php"<?= $_cp==='concept' ? ' class="current"' : '' ?>>💡 Le Concept</a>
-    <a href="aide.php"<?= $_cp==='aide' ? ' class="current"' : '' ?>>❓ Aide</a>
+    <a href="trophees.php"<?= $_cp==='trophees' ? ' class="current"' : '' ?>><span class="mmenu-link-icon"><?= zone85_icon('trophees') ?></span>Trophées</a>
+    <a href="clans.php"<?= $_cp==='clans' ? ' class="current"' : '' ?>><span class="mmenu-link-icon"><?= zone85_icon('clans') ?></span>Les Clans</a>
+    <a href="evenements.php"<?= $_cp==='evenements' ? ' class="current"' : '' ?>><span class="mmenu-link-icon"><?= zone85_icon('events') ?></span>Événements</a>
+    <a href="concept.php"<?= $_cp==='concept' ? ' class="current"' : '' ?>><span class="mmenu-link-icon"><?= zone85_icon('concept') ?></span>Le Concept</a>
+    <a href="aide.php"<?= $_cp==='aide' ? ' class="current"' : '' ?>><span class="mmenu-link-icon"><?= zone85_icon('aide') ?></span>Aide</a>
   </div>
 
   <div class="mmenu-section" style="border-top:1px solid rgba(0,0,0,.08);margin-top:4px">
     <?php if ($_nav_user): ?>
-      <a href="profil.php">🪪 Mon Passeport — <?= e($_nav_user['pseudo']) ?></a>
-      <a href="mon-compte.php">⚙️ Mon Compte</a>
-      <a href="notifications.php">🔔 Notifications<?= $_nav_notif_count > 0 ? ' (' . $_nav_notif_count . ')' : '' ?></a>
-      <a href="logout.php" style="color:var(--text-muted)" onclick="return confirm('Se déconnecter ?')">Déconnexion</a>
+      <a href="profil.php"><span class="mmenu-link-icon"><?= zone85_icon('passeport') ?></span>Mon Passeport — <?= e($_nav_user['pseudo']) ?></a>
+      <a href="mon-compte.php"><span class="mmenu-link-icon"><?= zone85_icon('settings') ?></span>Mon Compte</a>
+      <a href="notifications.php"><span class="mmenu-link-icon"><?= zone85_icon('notifications') ?></span>Notifications<?= $_nav_notif_count > 0 ? ' (' . $_nav_notif_count . ')' : '' ?></a>
+      <a href="logout.php" style="color:var(--text-muted)" onclick="return confirm('Se déconnecter ?')"><span class="mmenu-link-icon"><?= zone85_icon('logout') ?></span>Déconnexion</a>
     <?php else: ?>
-      <a href="login.php">Connexion</a>
-      <a href="inscription.php" style="color:var(--primary);font-weight:800">Rejoindre la Zone →</a>
+      <a href="login.php"><span class="mmenu-link-icon"><?= zone85_icon('login') ?></span>Connexion</a>
+      <a href="inscription.php" style="color:var(--primary);font-weight:800"><span class="mmenu-link-icon"><?= zone85_icon('join') ?></span>Rejoindre la Zone →</a>
     <?php endif; ?>
   </div>
 
