@@ -23,7 +23,7 @@ $rubrique_options = [
     'evenements'     => 'Événements',
 ];
 
-// ── Auto-migration : gallery + video_url ──────────────────────
+// ── Auto-migration : galerie, cadrage images + blocs éditoriaux ─────────
 if ($pdo) {
     try {
         $cols = array_column($pdo->query("SHOW COLUMNS FROM articles")->fetchAll(), 'Field');
@@ -32,6 +32,18 @@ if ($pdo) {
         }
         if (!in_array('video_url', $cols)) {
             $pdo->exec("ALTER TABLE articles ADD COLUMN video_url VARCHAR(500) NULL AFTER gallery");
+        }
+        if (!in_array('thumb_image', $cols)) {
+            $pdo->exec("ALTER TABLE articles ADD COLUMN thumb_image VARCHAR(500) NULL AFTER cover_image");
+        }
+        if (!in_array('cover_position', $cols)) {
+            $pdo->exec("ALTER TABLE articles ADD COLUMN cover_position VARCHAR(50) NULL AFTER thumb_image");
+        }
+        if (!in_array('thumb_position', $cols)) {
+            $pdo->exec("ALTER TABLE articles ADD COLUMN thumb_position VARCHAR(50) NULL AFTER cover_position");
+        }
+        if (!in_array('content_blocks', $cols)) {
+            $pdo->exec("ALTER TABLE articles ADD COLUMN content_blocks JSON NULL AFTER body");
         }
     } catch (PDOException $e) { /* table absente */ }
 }
@@ -79,6 +91,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
         $f_excerpt   = safe_input($_POST['excerpt']     ?? '', 500);
         $f_body      = $_POST['body']        ?? '';  // HTML Quill, non échappé
         $f_cover     = safe_input($_POST['cover_image'] ?? '', 500);
+        $f_thumb     = safe_input($_POST['thumb_image'] ?? '', 500);
+        $f_cover_pos = safe_input($_POST['cover_position'] ?? 'center center', 50) ?: 'center center';
+        $f_thumb_pos = safe_input($_POST['thumb_position'] ?? 'center center', 50) ?: 'center center';
+        $f_blocks    = $_POST['content_blocks_json'] ?? '[]';
         $f_gallery   = $_POST['gallery_json'] ?? '[]';
         $f_video_url = safe_input($_POST['video_url']   ?? '', 500);
         $f_status    = in_array($_POST['status'] ?? '', ['draft', 'published'], true)
@@ -106,6 +122,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
         $gallery_arr = json_decode($f_gallery, true);
         if (!is_array($gallery_arr)) $f_gallery = '[]';
 
+        // Valider JSON blocs éditoriaux
+        $blocks_arr = json_decode($f_blocks, true);
+        if (!is_array($blocks_arr)) $f_blocks = '[]';
+
         // Date de publication
         $published_at = null;
         if ($f_status === 'published') {
@@ -123,6 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
         } else {
             try {
                 $gallery_val   = ($f_gallery !== '[]') ? $f_gallery : null;
+                $blocks_val    = ($f_blocks !== '[]') ? $f_blocks : null;
                 $video_val     = $f_video_url ?: null;
 
                 if ($is_edit) {
@@ -130,7 +151,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
                         UPDATE articles SET
                             title=:title, slug=:slug, rubrique=:rub, author_name=:author,
                             excerpt=:excerpt, body=:body, cover_image=:cover,
-                            gallery=:gallery, video_url=:video,
+                            thumb_image=:thumb, cover_position=:cover_pos, thumb_position=:thumb_pos,
+                            content_blocks=:blocks, gallery=:gallery, video_url=:video,
                             status=:status, published_at=:pub, season_id=:season
                         WHERE id=:id
                     ');
@@ -139,6 +161,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
                         ':rub'     => $f_rubrique, ':author'  => $f_author,
                         ':excerpt' => $f_excerpt ?: null, ':body' => $f_body ?: null,
                         ':cover'   => $f_cover ?: null,
+                        ':thumb'   => $f_thumb ?: null,
+                        ':cover_pos' => $f_cover_pos ?: 'center center',
+                        ':thumb_pos' => $f_thumb_pos ?: 'center center',
+                        ':blocks'  => $blocks_val,
                         ':gallery' => $gallery_val, ':video'  => $video_val,
                         ':status'  => $f_status,   ':pub'    => $published_at,
                         ':season'  => $f_season_id, ':id'    => $article['id'],
@@ -148,10 +174,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
                     $s = $pdo->prepare('
                         INSERT INTO articles
                             (title, slug, rubrique, season_id, author_name, excerpt, body,
-                             cover_image, gallery, video_url, status, published_at)
+                             cover_image, thumb_image, cover_position, thumb_position, content_blocks,
+                             gallery, video_url, status, published_at)
                         VALUES
                             (:title, :slug, :rub, :season, :author, :excerpt, :body,
-                             :cover, :gallery, :video, :status, :pub)
+                             :cover, :thumb, :cover_pos, :thumb_pos, :blocks,
+                             :gallery, :video, :status, :pub)
                     ');
                     $s->execute([
                         ':title'   => $f_title,   ':slug'    => $f_slug,
@@ -159,6 +187,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $pdo) {
                         ':author'  => $f_author,
                         ':excerpt' => $f_excerpt ?: null, ':body' => $f_body ?: null,
                         ':cover'   => $f_cover ?: null,
+                        ':thumb'   => $f_thumb ?: null,
+                        ':cover_pos' => $f_cover_pos ?: 'center center',
+                        ':thumb_pos' => $f_thumb_pos ?: 'center center',
+                        ':blocks'  => $blocks_val,
                         ':gallery' => $gallery_val, ':video'  => $video_val,
                         ':status'  => $f_status,   ':pub'    => $published_at,
                     ]);
@@ -185,6 +217,11 @@ $v_author    = $_POST['author_name'] ?? ($article['author_name'] ?? 'Équipe Zon
 $v_excerpt   = $_POST['excerpt']     ?? ($article['excerpt']     ?? '');
 $v_body      = $_POST['body']        ?? ($article['body']        ?? '');
 $v_cover     = $_POST['cover_image'] ?? ($article['cover_image'] ?? '');
+$v_thumb     = $_POST['thumb_image'] ?? ($article['thumb_image'] ?? '');
+$v_cover_pos = $_POST['cover_position'] ?? ($article['cover_position'] ?? 'center center');
+$v_thumb_pos = $_POST['thumb_position'] ?? ($article['thumb_position'] ?? 'center center');
+$v_blocks    = json_decode($_POST['content_blocks_json'] ?? ($article['content_blocks'] ?? '[]'), true);
+if (!is_array($v_blocks)) $v_blocks = [];
 $v_gallery   = json_decode($article['gallery'] ?? '[]', true);
 if (!is_array($v_gallery)) $v_gallery = [];
 $v_video_url = $_POST['video_url']   ?? ($article['video_url']  ?? '');
@@ -198,6 +235,7 @@ if (!empty($_POST['published_at'])) $v_pub_at = $_POST['published_at'];
 
 $csrf_val        = e(csrf_token());
 $v_gallery_json  = json_encode($v_gallery, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT);
+$v_blocks_json   = json_encode($v_blocks, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT);
 $v_body_js       = json_encode($v_body);
 $base_url_js     = json_encode(defined('BASE_URL') ? rtrim(BASE_URL, '/') : '');
 
@@ -251,6 +289,7 @@ document.getElementById('cover_file_input').addEventListener('change', function(
 
 // ── Galerie ────────────────────────────────────────────────────
 var gallery = {$v_gallery_json};
+var blocks = {$v_blocks_json};
 var baseUrl = {$base_url_js};
 
 function renderGallery(){
@@ -306,7 +345,57 @@ function uploadGalleryFile(file){
         });
 }
 
+
 renderGallery();
+
+// ── Blocs éditoriaux des Échos ────────────────────────────────
+function escHtml(s){return String(s||'').replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c;});}
+function blockLabel(t){return {text:'Texte enrichi',image:'Image seule',gallery:'Galerie',quote:'Citation',heading:'Intertitre',note:'Encart'}[t]||'Bloc';}
+function renderBlocks(){
+  var wrap=document.getElementById('echo_blocks_list');
+  var hidden=document.getElementById('content_blocks_json');
+  if(!wrap || !hidden) return;
+  hidden.value=JSON.stringify(blocks||[]);
+  if(!blocks || !blocks.length){
+    wrap.innerHTML='<p style="color:#8a98a8;font-size:.86rem;margin:0;padding:10px 0">Aucun bloc ajouté. Si vide, l’article utilise le corps principal ci-dessus.</p>';
+    return;
+  }
+  wrap.innerHTML=blocks.map(function(b,i){
+    var t=b.type||'text';
+    var extra='';
+    if(t==='text') extra='<textarea data-i="'+i+'" data-k="html" rows="5" class="adm-textarea block-field" placeholder="Texte HTML ou texte simple">'+escHtml(b.html||'')+'</textarea>';
+    if(t==='image') extra='<input data-i="'+i+'" data-k="src" class="adm-input block-field" placeholder="URL image" value="'+escHtml(b.src||'')+'"><input data-i="'+i+'" data-k="caption" class="adm-input block-field" placeholder="Légende" value="'+escHtml(b.caption||'')+'" style="margin-top:8px"><input data-i="'+i+'" data-k="position" class="adm-input block-field" placeholder="Position image ex: center center" value="'+escHtml(b.position||'center center')+'" style="margin-top:8px">';
+    if(t==='gallery') extra='<textarea data-i="'+i+'" data-k="images" rows="4" class="adm-textarea block-field" placeholder="Une URL image par ligne">'+escHtml((b.images||[]).join('\n'))+'</textarea><input data-i="'+i+'" data-k="caption" class="adm-input block-field" placeholder="Légende de galerie" value="'+escHtml(b.caption||'')+'" style="margin-top:8px">';
+    if(t==='quote') extra='<textarea data-i="'+i+'" data-k="text" rows="3" class="adm-textarea block-field" placeholder="Citation">'+escHtml(b.text||'')+'</textarea><input data-i="'+i+'" data-k="author" class="adm-input block-field" placeholder="Auteur / source" value="'+escHtml(b.author||'')+'" style="margin-top:8px">';
+    if(t==='heading') extra='<input data-i="'+i+'" data-k="text" class="adm-input block-field" placeholder="Intertitre" value="'+escHtml(b.text||'')+'">';
+    if(t==='note') extra='<input data-i="'+i+'" data-k="title" class="adm-input block-field" placeholder="Titre de l’encart" value="'+escHtml(b.title||'')+'"><textarea data-i="'+i+'" data-k="text" rows="3" class="adm-textarea block-field" placeholder="Contenu de l’encart" style="margin-top:8px">'+escHtml(b.text||'')+'</textarea>';
+    return '<div class="echo-block-admin" style="border:1px solid #d6dde6;border-radius:10px;padding:14px;margin:12px 0;background:#fff">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px"><strong style="color:#0f1e2d">'+(i+1)+'. '+blockLabel(t)+'</strong><div style="display:flex;gap:6px"><button type="button" class="btn-adm btn-adm-light" onclick="moveBlock('+i+',-1)">↑</button><button type="button" class="btn-adm btn-adm-light" onclick="moveBlock('+i+',1)">↓</button><button type="button" class="btn-adm btn-adm-danger" onclick="removeBlock('+i+')">Supprimer</button></div></div>'
+      +extra+'</div>';
+  }).join('');
+  wrap.querySelectorAll('.block-field').forEach(function(el){
+    el.addEventListener('input',function(){
+      var i=parseInt(this.getAttribute('data-i'),10), k=this.getAttribute('data-k');
+      if(!blocks[i]) return;
+      if(k==='images') blocks[i][k]=this.value.split('\n').map(function(v){return v.trim();}).filter(Boolean);
+      else blocks[i][k]=this.value;
+      hidden.value=JSON.stringify(blocks||[]);
+    });
+  });
+}
+function addEchoBlock(type){
+  var b={type:type};
+  if(type==='text') b.html='';
+  if(type==='image') b={type:'image',src:'',caption:'',position:'center center'};
+  if(type==='gallery') b={type:'gallery',images:[],caption:''};
+  if(type==='quote') b={type:'quote',text:'',author:''};
+  if(type==='heading') b={type:'heading',text:''};
+  if(type==='note') b={type:'note',title:'À retenir',text:''};
+  blocks.push(b); renderBlocks();
+}
+function removeBlock(i){ if(confirm('Supprimer ce bloc ?')){blocks.splice(i,1);renderBlocks();} }
+function moveBlock(i,d){ var j=i+d; if(j<0||j>=blocks.length)return; var t=blocks[i];blocks[i]=blocks[j];blocks[j]=t;renderBlocks(); }
+renderBlocks();
 
 // ── Aperçu YouTube ─────────────────────────────────────────────
 var ytInput = document.getElementById('f_video_url');
@@ -615,6 +704,30 @@ require_once __DIR__ . '/_admin-header.php';
                value="<?= e($v_cover) ?>">
         <span class="adm-hint">Laissez vide pour afficher le dégradé de la rubrique.</span>
       </div>
+
+      <div class="adm-field">
+        <label class="adm-label" for="f_thumb">Image vignette listing (optionnel)</label>
+        <input id="f_thumb" type="text" name="thumb_image" class="adm-input"
+               placeholder="Si vide, la couverture est utilisée"
+               value="<?= e($v_thumb) ?>">
+        <span class="adm-hint">Utile si l’image de couverture ne fonctionne pas bien en carré.</span>
+      </div>
+
+      <div class="adm-field">
+        <label class="adm-label" for="f_cover_pos">Cadrage couverture</label>
+        <input id="f_cover_pos" type="text" name="cover_position" class="adm-input"
+               placeholder="center center, center top, 50% 30%..."
+               value="<?= e($v_cover_pos ?: 'center center') ?>">
+        <span class="adm-hint">Pilote le cadrage du hero article avec object-position.</span>
+      </div>
+
+      <div class="adm-field">
+        <label class="adm-label" for="f_thumb_pos">Cadrage vignette</label>
+        <input id="f_thumb_pos" type="text" name="thumb_position" class="adm-input"
+               placeholder="center center, center top, 50% 30%..."
+               value="<?= e($v_thumb_pos ?: 'center center') ?>">
+        <span class="adm-hint">Pilote le cadrage des cartes carrées dans la liste des Échos.</span>
+      </div>
     </div>
   </div>
 
@@ -642,6 +755,24 @@ require_once __DIR__ . '/_admin-header.php';
     <span class="adm-hint" style="margin-top:6px;display:block">
       Barre d'outils : <strong>Gras</strong>, <em>Italique</em>, Souligné, Barré, H2/H3, Blockquote, Listes, Lien, Effacer la mise en forme.
     </span>
+  </div>
+
+  <!-- ── Blocs éditoriaux modulaires ───────────────────────── -->
+  <div class="adm-card">
+    <p class="adm-card-title">Blocs éditoriaux modulaires</p>
+    <p class="adm-hint" style="margin-bottom:12px;display:block">
+      Optionnel. Si tu ajoutes des blocs ici, ils seront affichés dans l’article à la place du corps principal classique. Pratique pour alterner texte, images, galerie, citation et encarts.
+    </p>
+    <input type="hidden" name="content_blocks_json" id="content_blocks_json" value="<?= e($v_blocks_json) ?>">
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+      <button type="button" class="btn-adm btn-adm-light" onclick="addEchoBlock('text')">+ Texte</button>
+      <button type="button" class="btn-adm btn-adm-light" onclick="addEchoBlock('image')">+ Image</button>
+      <button type="button" class="btn-adm btn-adm-light" onclick="addEchoBlock('gallery')">+ Galerie</button>
+      <button type="button" class="btn-adm btn-adm-light" onclick="addEchoBlock('quote')">+ Citation</button>
+      <button type="button" class="btn-adm btn-adm-light" onclick="addEchoBlock('heading')">+ Intertitre</button>
+      <button type="button" class="btn-adm btn-adm-light" onclick="addEchoBlock('note')">+ Encart</button>
+    </div>
+    <div id="echo_blocks_list"></div>
   </div>
 
   <!-- ── Galerie photo ─────────────────────────────────────── -->

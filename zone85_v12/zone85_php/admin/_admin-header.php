@@ -223,6 +223,7 @@ $_adm_nav = [
   .btn-adm-ghost   { background: #fff; color: #0c1e2e; border: 1.5px solid #d0cbc5; }
   .btn-adm-success { background: #2a9d5c; color: #fff; }
   .btn-adm-danger  { background: #c0392b; color: #fff; }
+  .btn-adm-light   { background: #f0ece7; color: #0c1e2e; border: 1.5px solid #d0cbc5; }
   .btn-adm-sm { padding: 7px 14px; font-size: .76rem; }
 
   /* Cards */
