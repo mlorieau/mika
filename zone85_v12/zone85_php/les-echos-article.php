@@ -328,9 +328,15 @@ $page_styles = '<style>
 .article-block-image figure { margin:0; }
 .article-block-image img { width:100%; border-radius:10px; display:block; }
 .article-block-image figcaption { font-size:.8rem; color:#6b7f96; margin-top:8px; font-style:italic; text-align:center; }
-.article-block-gallery-grid { display:flex; flex-wrap:wrap; gap:8px; }
-.article-block-gallery-grid img { height:180px; flex:1 1 200px; object-fit:cover; border-radius:8px; cursor:pointer; transition:opacity .2s; }
-.article-block-gallery-grid img:hover { opacity:.88; }
+.article-block-gallery-masonry { columns: 3 160px; column-gap: 8px; }
+.article-block-gallery-masonry img {
+  width: 100%; height: auto; display: block;
+  margin-bottom: 8px; border-radius: 8px;
+  break-inside: avoid; cursor: pointer;
+  transition: opacity .2s;
+}
+.article-block-gallery-masonry img:hover { opacity: .85; }
+@media (max-width: 600px) { .article-block-gallery-masonry { columns: 2; } }
 .article-block-gallery figcaption { font-size:.8rem; color:#6b7f96; margin-top:8px; font-style:italic; text-align:center; }
 .article-block-quote blockquote {
   margin:0; padding:20px 24px;
@@ -628,7 +634,7 @@ require_once 'includes/nav.php';
               <?php $gimgs = $blk['images'] ?? []; if (!empty($gimgs)): ?>
               <div class="article-block article-block-gallery">
                 <figure>
-                  <div class="article-block-gallery-grid">
+                  <div class="article-block-gallery-masonry">
                     <?php foreach ($gimgs as $gsrc):
                       $gurl = (strpos($gsrc,'http') === 0) ? $gsrc : $base_url.'/'.$gsrc;
                     ?>
