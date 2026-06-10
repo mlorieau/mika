@@ -364,8 +364,18 @@ function renderBlocks(){
     var t=b.type||'text';
     var extra='';
     if(t==='text') extra='<textarea data-i="'+i+'" data-k="html" rows="5" class="adm-textarea block-field" placeholder="Texte HTML ou texte simple">'+escHtml(b.html||'')+'</textarea>';
-    if(t==='image') extra='<input data-i="'+i+'" data-k="src" class="adm-input block-field" placeholder="URL image" value="'+escHtml(b.src||'')+'"><input data-i="'+i+'" data-k="caption" class="adm-input block-field" placeholder="Légende" value="'+escHtml(b.caption||'')+'" style="margin-top:8px"><input data-i="'+i+'" data-k="position" class="adm-input block-field" placeholder="Position image ex: center center" value="'+escHtml(b.position||'center center')+'" style="margin-top:8px">';
-    if(t==='gallery') extra='<textarea data-i="'+i+'" data-k="images" rows="4" class="adm-textarea block-field" placeholder="Une URL image par ligne">'+escHtml((b.images||[]).join('\\n'))+'</textarea><input data-i="'+i+'" data-k="caption" class="adm-input block-field" placeholder="Légende de galerie" value="'+escHtml(b.caption||'')+'" style="margin-top:8px">';
+    if(t==='image') extra=''
+      +'<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">'
+      +'<input data-i="'+i+'" data-k="src" class="adm-input block-field" style="flex:1" placeholder="URL image (ou uploader ci-contre)" value="'+escHtml(b.src||'')+'">'
+      +'<label style="flex-shrink:0;cursor:pointer;display:inline-flex;align-items:center;gap:5px;padding:9px 13px;background:#f0ece7;border:1.5px solid #d0cbc5;border-radius:8px;font-size:.78rem;font-weight:700;color:#3d5166;white-space:nowrap">📁 Upload<input type="file" accept=".jpg,.jpeg,.png,.webp" style="display:none" class="blk-img-up" data-bi="'+i+'" data-bk="src"></label>'
+      +'</div>'
+      +(b.src?'<div style="margin-bottom:8px"><img src="'+(b.src.startsWith('http')?b.src:baseUrl+'/'+b.src)+'" style="max-height:120px;border-radius:6px;object-fit:cover;border:1px solid rgba(0,0,0,.08)" loading="lazy"></div>':'')
+      +'<input data-i="'+i+'" data-k="caption" class="adm-input block-field" placeholder="Légende" value="'+escHtml(b.caption||'')+'" style="margin-bottom:8px">'
+      +'<input data-i="'+i+'" data-k="position" class="adm-input block-field" placeholder="Cadrage (ex: center top, 50% 30%)" value="'+escHtml(b.position||'center center')+'">';
+    if(t==='gallery') extra=''
+      +'<label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;padding:8px 13px;background:#f0ece7;border:1.5px solid #d0cbc5;border-radius:8px;font-size:.78rem;font-weight:700;color:#3d5166;margin-bottom:10px">📷 Ajouter des photos<input type="file" accept=".jpg,.jpeg,.png,.webp" multiple style="display:none" class="blk-gal-up" data-bi="'+i+'"></label>'
+      +(b.images&&b.images.length?'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">'+b.images.map(function(src,si){var u=src.startsWith('http')?src:baseUrl+'/'+src;return '<div style="position:relative"><img src="'+u+'" style="width:80px;height:60px;object-fit:cover;border-radius:5px;border:1px solid rgba(0,0,0,.08)" loading="lazy"><button type="button" onclick="removeBlockImg('+i+','+si+')" style="position:absolute;top:-5px;right:-5px;width:18px;height:18px;border-radius:50%;background:#c0392b;color:#fff;border:none;cursor:pointer;font-size:.6rem;line-height:1;display:flex;align-items:center;justify-content:center">✕</button></div>';}).join('')+'</div>':'')
+      +'<input data-i="'+i+'" data-k="caption" class="adm-input block-field" placeholder="Légende de galerie" value="'+escHtml(b.caption||'')+'">';
     if(t==='quote') extra='<textarea data-i="'+i+'" data-k="text" rows="3" class="adm-textarea block-field" placeholder="Citation">'+escHtml(b.text||'')+'</textarea><input data-i="'+i+'" data-k="author" class="adm-input block-field" placeholder="Auteur / source" value="'+escHtml(b.author||'')+'" style="margin-top:8px">';
     if(t==='heading') extra='<input data-i="'+i+'" data-k="text" class="adm-input block-field" placeholder="Intertitre" value="'+escHtml(b.text||'')+'">';
     if(t==='note') extra='<input data-i="'+i+'" data-k="title" class="adm-input block-field" placeholder="Titre de l’encart" value="'+escHtml(b.title||'')+'"><textarea data-i="'+i+'" data-k="text" rows="3" class="adm-textarea block-field" placeholder="Contenu de l’encart" style="margin-top:8px">'+escHtml(b.text||'')+'</textarea>';
@@ -377,12 +387,45 @@ function renderBlocks(){
     el.addEventListener('input',function(){
       var i=parseInt(this.getAttribute('data-i'),10), k=this.getAttribute('data-k');
       if(!blocks[i]) return;
-      if(k==='images') blocks[i][k]=this.value.split('\\n').map(function(v){return v.trim();}).filter(Boolean);
-      else blocks[i][k]=this.value;
+      blocks[i][k]=this.value;
       hidden.value=JSON.stringify(blocks||[]);
     });
   });
+  wrap.querySelectorAll('.blk-img-up').forEach(function(el){
+    el.addEventListener('change',function(){
+      if(!this.files[0]) return;
+      var bi=parseInt(this.getAttribute('data-bi'),10), bk=this.getAttribute('data-bk');
+      var lbl=this.parentElement; lbl.textContent='⏳…';
+      var fd=new FormData(); fd.append('file',this.files[0]); fd.append('csrf_token','{$csrf_val}');
+      fetch(baseUrl+'/ajax/echo-upload.php',{method:'POST',body:fd})
+        .then(function(r){return r.json();})
+        .then(function(d){
+          if(d.ok){blocks[bi][bk]=d.path;renderBlocks();}
+          else{renderBlocks();alert('Erreur upload: '+(d.error||'inconnue'));}
+        })
+        .catch(function(){renderBlocks();alert('Erreur réseau');});
+    });
+  });
+  wrap.querySelectorAll('.blk-gal-up').forEach(function(el){
+    el.addEventListener('change',function(){
+      var files=Array.from(this.files); if(!files.length) return;
+      var bi=parseInt(this.getAttribute('data-bi'),10);
+      var pending=files.length;
+      if(!blocks[bi].images) blocks[bi].images=[];
+      files.forEach(function(file){
+        var fd=new FormData(); fd.append('file',file); fd.append('csrf_token','{$csrf_val}');
+        fetch(baseUrl+'/ajax/echo-upload.php',{method:'POST',body:fd})
+          .then(function(r){return r.json();})
+          .then(function(d){
+            if(d.ok) blocks[bi].images.push(d.path);
+            pending--; if(!pending) renderBlocks();
+          })
+          .catch(function(){pending--;if(!pending) renderBlocks();});
+      });
+    });
+  });
 }
+function removeBlockImg(bi,si){blocks[bi].images.splice(si,1);renderBlocks();}
 function addEchoBlock(type){
   var b={type:type};
   if(type==='text') b.html='';
