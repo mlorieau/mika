@@ -151,10 +151,11 @@ ul{list-style:none}
 .nav-btn:hover{background:var(--primary-dark)}
 
 /* Hamburger */
-.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px;flex-shrink:0;border:none;background:none}
-.hamburger span{width:22px;height:2px;background:var(--text);border-radius:2px;transition:all .3s}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:10px;flex-shrink:0;border:none;background:none;min-width:44px;min-height:44px;align-items:center;justify-content:center;border-radius:8px;transition:background .15s}
+.hamburger:hover,.hamburger:focus-visible{background:rgba(0,0,0,.07);outline:none}
+.hamburger span{width:22px;height:2px;background:var(--text);border-radius:2px;transition:transform .28s cubic-bezier(.4,0,.2,1),opacity .2s}
 .hamburger.active span:nth-child(1){transform:translateY(7px) rotate(45deg)}
-.hamburger.active span:nth-child(2){opacity:0}
+.hamburger.active span:nth-child(2){opacity:0;transform:scaleX(0)}
 .hamburger.active span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
 
 /* ── MEGA MENU TRIGGER ── */
@@ -270,29 +271,44 @@ ul{list-style:none}
 
 /* ── MOBILE MENU ── */
 .mobile-menu{
-  display:none;position:fixed;top:72px;left:0;right:0;
-  background:var(--beige-light);border-bottom:1px solid var(--beige-dark);
-  padding:12px 0 16px;z-index:998;
-  flex-direction:column;
-  box-shadow:0 8px 32px rgba(0,0,0,.12);
-  max-height:calc(100svh - 72px);overflow-y:auto
+  display:flex;flex-direction:column;
+  position:fixed;top:72px;left:0;right:0;
+  background:var(--beige-light);border-bottom:2px solid var(--beige-dark);
+  padding:4px 0 24px;z-index:998;
+  box-shadow:0 12px 40px rgba(0,0,0,.18);
+  max-height:calc(100svh - 72px);overflow-y:auto;
+  /* Animation fermé → ouvert */
+  opacity:0;visibility:hidden;pointer-events:none;
+  transform:translateY(-8px);
+  transition:opacity .22s ease,visibility .22s,transform .22s cubic-bezier(.4,0,.2,1)
 }
-.mobile-menu.open{display:flex}
-.mmenu-section{padding:8px 20px}
+.mobile-menu.open{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0)}
+.mmenu-section{padding:6px 18px}
 .mmenu-section-label{
-  font-size:.62rem;font-weight:800;text-transform:uppercase;
-  letter-spacing:.1em;color:var(--text-muted);
-  padding:10px 0 6px;
+  font-size:.6rem;font-weight:900;text-transform:uppercase;
+  letter-spacing:.12em;color:var(--text-muted);
+  padding:12px 0 5px;
   border-bottom:1px solid var(--beige-dark);
-  margin-bottom:4px
+  margin-bottom:2px
 }
 .mobile-menu a{
-  font-size:.9rem;font-weight:600;color:var(--text-mid);
-  padding:9px 4px;display:block;
-  border-bottom:1px solid rgba(0,0,0,.04)
+  font-size:.92rem;font-weight:600;color:var(--text-mid);
+  padding:12px 8px;display:flex;align-items:center;min-height:48px;
+  border-radius:7px;border-bottom:1px solid rgba(0,0,0,.04);
+  transition:color .12s,background .12s
 }
 .mobile-menu a:last-child{border-bottom:none}
-.mobile-menu a:hover{color:var(--primary)}
+.mobile-menu a:hover,.mobile-menu a:focus-visible{color:var(--primary);background:rgba(234,86,73,.06);outline:none}
+.mobile-menu a.current{color:var(--primary);font-weight:800}
+/* Overlay backdrop */
+.mobile-overlay{
+  display:none;position:fixed;inset:0;z-index:997;
+  background:rgba(0,0,0,.42);
+  opacity:0;transition:opacity .22s ease
+}
+.mobile-overlay.active{display:block;opacity:1}
+/* Scroll lock */
+body.menu-open{overflow:hidden}
 
 /* LIVE BADGE */
 .live-badge{background:var(--primary);color:#fff;font-size:.68rem;font-weight:800;padding:4px 10px;border-radius:4px;letter-spacing:.1em;text-transform:uppercase;animation:blink 1.5s infinite}
@@ -942,8 +958,7 @@ body,#navbar,.mobile-menu,.profil-card,.ev-card,.race-card,.cf-widget{
   textarea,select{font-size:16px !important}
 }
 
-/* ── Mobile menu : touch targets 44px ── */
-.mobile-menu a{min-height:44px;display:flex;align-items:center}
+/* Mobile menu : top déjà géré via media query ci-dessous */
 
 /* ── Hero très petit écran ── */
 @media(max-width:430px){

@@ -117,7 +117,7 @@ if (isset($active_season) && !empty($active_season['title'])) {
         <a href="login.php" style="font-size:.84rem;font-weight:700;color:var(--text-mid);text-decoration:none;white-space:nowrap">Connexion</a>
         <a href="inscription.php" class="nav-btn">Rejoindre</a>
       <?php endif; ?>
-      <div class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu"><span></span><span></span><span></span></div>
+      <button class="hamburger" id="hamburger" type="button" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mobileMenu" onclick="toggleMenu()"><span></span><span></span><span></span></button>
     </div>
 
   </div>
@@ -170,16 +170,16 @@ if (isset($active_season) && !empty($active_season['title'])) {
 
 
 <!-- ── MENU MOBILE ─────────────────────────────────────────────── -->
-<div class="mobile-menu" id="mobileMenu">
+<nav class="mobile-menu" id="mobileMenu" aria-hidden="true" aria-label="Navigation mobile">
 
   <div class="mmenu-section">
     <div class="mmenu-section-label">Le QG</div>
-    <a href="index.php">Accueil</a>
-    <a href="les-echos.php">Les Échos</a>
-    <a href="randos.php">Randos</a>
-    <a href="missions.php">🎯 Participer</a>
-    <a href="victor.php">📖 Victor</a>
-    <a href="communaute.php">Clans &amp; Classements</a>
+    <a href="index.php"<?= $_cp==='index' ? ' class="current"' : '' ?>>🏠 Accueil</a>
+    <a href="les-echos.php"<?= $_cp==='les-echos' ? ' class="current"' : '' ?>>📰 Les Échos</a>
+    <a href="randos.php"<?= $_cp==='randos' ? ' class="current"' : '' ?>>🥾 Randos</a>
+    <a href="missions.php"<?= $_cp==='missions' ? ' class="current"' : '' ?>>🎯 Participer</a>
+    <a href="victor.php"<?= $_cp==='ktc' ? ' class="current"' : '' ?>>📖 Victor</a>
+    <a href="communaute.php"<?= $_cp==='communaute' ? ' class="current"' : '' ?>>🌍 Clans &amp; Classements</a>
   </div>
 
   <div class="mmenu-section">
@@ -192,16 +192,14 @@ if (isset($active_season) && !empty($active_season['title'])) {
 
   <div class="mmenu-section">
     <div class="mmenu-section-label">Découvrir</div>
-    <a href="trophees.php">Trophées</a>
-    <a href="clans.php">Les Clans</a>
-    <a href="evenements.php">Événements</a>
-    <a href="concept.php">Le Concept</a>
-    <a href="comment-ca-marche.php">Comment ça marche ?</a>
-    <a href="recompenses.php">🏅 Trophées &amp; Badges</a>
-    <a href="aide.php">❓ Aide</a>
+    <a href="trophees.php"<?= $_cp==='trophees' ? ' class="current"' : '' ?>>🥇 Trophées</a>
+    <a href="clans.php"<?= $_cp==='clans' ? ' class="current"' : '' ?>>🛡️ Les Clans</a>
+    <a href="evenements.php"<?= $_cp==='evenements' ? ' class="current"' : '' ?>>🎉 Événements</a>
+    <a href="concept.php"<?= $_cp==='concept' ? ' class="current"' : '' ?>>💡 Le Concept</a>
+    <a href="aide.php"<?= $_cp==='aide' ? ' class="current"' : '' ?>>❓ Aide</a>
   </div>
 
-  <div class="mmenu-section" style="border-top:1px solid rgba(0,0,0,.08)">
+  <div class="mmenu-section" style="border-top:1px solid rgba(0,0,0,.08);margin-top:4px">
     <?php if ($_nav_user): ?>
       <a href="profil.php">🪪 Mon Passeport — <?= e($_nav_user['pseudo']) ?></a>
       <a href="mon-compte.php">⚙️ Mon Compte</a>
@@ -213,7 +211,9 @@ if (isset($active_season) && !empty($active_season['title'])) {
     <?php endif; ?>
   </div>
 
-</div>
+</nav>
+<!-- Overlay backdrop mobile -->
+<div class="mobile-overlay" id="mobile-overlay" onclick="closeMenu()"></div>
 
 
 <!-- Toast container -->
@@ -240,6 +240,7 @@ if (isset($active_season) && !empty($active_season['title'])) {
 
   function openMega(){
     clearTimeout(leaveTimer);
+    closeMenu();
     trigger.classList.add('active');
     trigger.setAttribute('aria-expanded','true');
     panel.classList.add('open');
@@ -269,20 +270,30 @@ if (isset($active_season) && !empty($active_season['title'])) {
 
   // Fermer sur overlay ou Escape
   if(overlay) overlay.addEventListener('click', closeMega);
-  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeMega(); });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape'){ closeMega(); closeMenu(); } });
   document.addEventListener('click', function(e){
     if(!trigger.contains(e.target) && !panel.contains(e.target)) closeMega();
   });
 })();
 
 /* ── Mobile menu ── */
-function toggleMenu(){
-  var m = document.getElementById('mobileMenu');
-  var h = document.getElementById('hamburger');
-  if(!m) return;
-  var open = m.classList.toggle('open');
-  if(h) h.classList.toggle('active', open);
+function openMenu(){
+  var m=document.getElementById('mobileMenu'),h=document.getElementById('hamburger'),o=document.getElementById('mobile-overlay');
+  if(!m||m.classList.contains('open')) return;
+  m.classList.add('open'); m.setAttribute('aria-hidden','false');
+  if(h){h.classList.add('active');h.setAttribute('aria-expanded','true');h.setAttribute('aria-label','Fermer le menu');}
+  if(o) o.classList.add('active');
+  document.body.classList.add('menu-open');
 }
+function closeMenu(){
+  var m=document.getElementById('mobileMenu'),h=document.getElementById('hamburger'),o=document.getElementById('mobile-overlay');
+  if(!m||!m.classList.contains('open')) return;
+  m.classList.remove('open'); m.setAttribute('aria-hidden','true');
+  if(h){h.classList.remove('active');h.setAttribute('aria-expanded','false');h.setAttribute('aria-label','Ouvrir le menu');}
+  if(o) o.classList.remove('active');
+  document.body.classList.remove('menu-open');
+}
+function toggleMenu(){ document.getElementById('mobileMenu')?.classList.contains('open') ? closeMenu() : openMenu(); }
 
 /* ── Toast global ── */
 window.z85Toast = function(msg, type, duration){
