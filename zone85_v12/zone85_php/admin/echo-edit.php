@@ -365,7 +365,7 @@ function renderBlocks(){
     var extra='';
     if(t==='text') extra='<textarea data-i="'+i+'" data-k="html" rows="5" class="adm-textarea block-field" placeholder="Texte HTML ou texte simple">'+escHtml(b.html||'')+'</textarea>';
     if(t==='image') extra='<input data-i="'+i+'" data-k="src" class="adm-input block-field" placeholder="URL image" value="'+escHtml(b.src||'')+'"><input data-i="'+i+'" data-k="caption" class="adm-input block-field" placeholder="Légende" value="'+escHtml(b.caption||'')+'" style="margin-top:8px"><input data-i="'+i+'" data-k="position" class="adm-input block-field" placeholder="Position image ex: center center" value="'+escHtml(b.position||'center center')+'" style="margin-top:8px">';
-    if(t==='gallery') extra='<textarea data-i="'+i+'" data-k="images" rows="4" class="adm-textarea block-field" placeholder="Une URL image par ligne">'+escHtml((b.images||[]).join('\n'))+'</textarea><input data-i="'+i+'" data-k="caption" class="adm-input block-field" placeholder="Légende de galerie" value="'+escHtml(b.caption||'')+'" style="margin-top:8px">';
+    if(t==='gallery') extra='<textarea data-i="'+i+'" data-k="images" rows="4" class="adm-textarea block-field" placeholder="Une URL image par ligne">'+escHtml((b.images||[]).join('\\n'))+'</textarea><input data-i="'+i+'" data-k="caption" class="adm-input block-field" placeholder="Légende de galerie" value="'+escHtml(b.caption||'')+'" style="margin-top:8px">';
     if(t==='quote') extra='<textarea data-i="'+i+'" data-k="text" rows="3" class="adm-textarea block-field" placeholder="Citation">'+escHtml(b.text||'')+'</textarea><input data-i="'+i+'" data-k="author" class="adm-input block-field" placeholder="Auteur / source" value="'+escHtml(b.author||'')+'" style="margin-top:8px">';
     if(t==='heading') extra='<input data-i="'+i+'" data-k="text" class="adm-input block-field" placeholder="Intertitre" value="'+escHtml(b.text||'')+'">';
     if(t==='note') extra='<input data-i="'+i+'" data-k="title" class="adm-input block-field" placeholder="Titre de l’encart" value="'+escHtml(b.title||'')+'"><textarea data-i="'+i+'" data-k="text" rows="3" class="adm-textarea block-field" placeholder="Contenu de l’encart" style="margin-top:8px">'+escHtml(b.text||'')+'</textarea>';
@@ -377,7 +377,7 @@ function renderBlocks(){
     el.addEventListener('input',function(){
       var i=parseInt(this.getAttribute('data-i'),10), k=this.getAttribute('data-k');
       if(!blocks[i]) return;
-      if(k==='images') blocks[i][k]=this.value.split('\n').map(function(v){return v.trim();}).filter(Boolean);
+      if(k==='images') blocks[i][k]=this.value.split('\\n').map(function(v){return v.trim();}).filter(Boolean);
       else blocks[i][k]=this.value;
       hidden.value=JSON.stringify(blocks||[]);
     });
