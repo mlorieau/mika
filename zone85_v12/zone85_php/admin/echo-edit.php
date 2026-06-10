@@ -490,6 +490,7 @@ if(bodyContent) quill.clipboard.dangerouslyPasteHTML(bodyContent);
 // Synchroniser avant soumission
 document.getElementById('echo_form').addEventListener('submit',function(){
     document.getElementById('f_body').value = quill.root.innerHTML;
+    document.getElementById('content_blocks_json').value = JSON.stringify(blocks||[]);
 });
 
 // Style Quill dans l'interface admin
