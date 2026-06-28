@@ -1072,6 +1072,129 @@
 }
 
 /* ================================================================
+   COCKPIT V2.1 — classes générées par la refonte moteur
+   ================================================================ */
+
+/* Overall score badge in header */
+.ck-overall-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  border: 2px solid var(--c-border);
+  gap: 0;
+}
+
+/* Story bar */
+.ck-story-bar {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--c-surface);
+  border-radius: var(--r-xl);
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  border: 1px solid var(--c-border);
+}
+.ck-story-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.ck-story-lines { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.ck-story-line {
+  font-size: 13px;
+  color: var(--c-text-2);
+  line-height: 1.4;
+  padding: 2px 10px;
+  background: var(--c-border);
+  border-radius: var(--r-md);
+}
+
+/* Alert rows */
+.ck-alert-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--c-border);
+}
+.ck-alert-row:last-of-type { border-bottom: none; }
+.ck-alert-icon { font-size: 16px; flex-shrink: 0; }
+.ck-alert-msg { flex: 1; font-size: 13px; color: var(--c-text-2); line-height: 1.4; }
+
+/* Unified timeline */
+.ck-tl-list { display: flex; flex-direction: column; }
+.ck-tl-row {
+  display: grid;
+  grid-template-columns: 10px 70px 22px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border-bottom: 1px solid var(--c-border);
+  cursor: pointer;
+  border-radius: var(--r-md);
+  transition: background var(--dur-fast) var(--ease);
+}
+.ck-tl-row:hover { background: var(--c-bg); }
+.ck-tl-row:last-child { border-bottom: none; }
+.ck-tl-past { opacity: 0.5; }
+.ck-tl-today { font-weight: 600; }
+.ck-tl-dot { width: 8px; height: 8px; border-radius: 50%; }
+.ck-tl-date { font-size: 11px; color: var(--c-text-3); font-weight: 500; white-space: nowrap; }
+.ck-tl-date-today { color: var(--c-budget); font-weight: 700; }
+.ck-tl-icon { font-size: 14px; text-align: center; }
+.ck-tl-label { font-size: 13px; color: var(--c-text-1); line-height: 1.3; }
+.ck-tl-amount { font-size: 12px; font-weight: 600; white-space: nowrap; }
+
+/* Bottom grid: timeline + widget column */
+.ck-bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 20px;
+  margin-top: 20px;
+}
+.ck-widget-col { display: flex; flex-direction: column; gap: 16px; }
+
+/* KPI rows inside widgets */
+.ck-kpi-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--c-border);
+  font-size: 13px;
+}
+.ck-kpi-row:last-child { border-bottom: none; }
+.ck-kpi-label { color: var(--c-text-3); }
+.ck-kpi-value { font-weight: 600; color: var(--c-text-1); }
+
+/* Tile score + story */
+.ck-tile-score { margin-bottom: 2px; }
+.ck-tile-story {
+  font-size: 11px;
+  color: var(--c-text-3);
+  line-height: 1.4;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* Score ring (renderScoreRing helper) */
+.ck-score-ring-wrap { position: relative; width: 110px; height: 110px; flex-shrink: 0; }
+.ck-score-ring-center {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+}
+.ck-score-ring-value { font-size: 22px; font-weight: 700; }
+.ck-score-ring-label { font-size: 11px; color: var(--c-text-3); }
+.ck-score-sublabel { font-size: 12px; font-weight: 600; text-align: center; margin-top: 4px; }
+
+/* ================================================================
    RESPONSIVE COCKPIT
    ================================================================ */
 
@@ -1084,6 +1207,13 @@
 }
 @media (max-width: 1100px) {
   .ck-main-grid { grid-template-columns: 1fr; }
+  .ck-bottom-grid { grid-template-columns: 1fr; }
   .ck-tiles { grid-template-columns: repeat(2, 1fr); }
   .kpi-grid  { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 700px) {
+  .ck-tiles { grid-template-columns: 1fr; }
+  .ck-bottom-grid { grid-template-columns: 1fr; }
+  .ck-tl-row { grid-template-columns: 10px 60px 18px 1fr; }
+  .ck-tl-amount { display: none; }
 }

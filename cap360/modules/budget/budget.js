@@ -1327,7 +1327,7 @@ CAP360.Budget = (function () {
     `;
   }
 
-  /* ---- Public budget data accessor for cockpit ---- */
+  /* ---- Public budget data accessor (legacy) ---- */
 
   function getStats() {
     loadState();
@@ -1344,6 +1344,118 @@ CAP360.Budget = (function () {
     };
   }
 
-  return { mount, getStats };
+  /* ---- getHealth() — contrat Platform ---- */
+
+  function getHealth() {
+    loadState();
+
+    const bal     = balanceReal();
+    const low     = lowFuture();
+    const lowM    = findLowMonth();
+    const score   = healthScore();
+    const inc     = monthlyIncome();
+    const exp     = monthlyExpenses();
+    const dr      = debtRatio();
+    const sr      = savingsRate();
+    const sav     = totalSavings();
+    const today   = new Date().toISOString().slice(0, 10);
+    const in30    = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
+    const in60    = new Date(Date.now() + 60 * 86400000).toISOString().slice(0, 10);
+
+    /* Treasury history (60 jours) */
+    let treasuryHistory = [];
+    try {
+      if (CAP360.Engine && CAP360.Engine.getDailyBalanceHistory) {
+        treasuryHistory = CAP360.Engine.getDailyBalanceHistory(60);
+      }
+    } catch (e) { /* ignore */ }
+
+    /* Category breakdown (mois courant) */
+    let categoryBreakdown = [];
+    try {
+      if (CAP360.Engine && CAP360.Engine.getCategoryBreakdown) {
+        const startM = today.slice(0, 7) + '-01';
+        const endM   = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toISOString().slice(0, 10);
+        categoryBreakdown = CAP360.Engine.getCategoryBreakdown(startM, endM);
+      }
+    } catch (e) { /* ignore */ }
+
+    /* Upcoming transactions (timeline) */
+    const upcoming = futurePlans()
+      .filter(p => p.date >= today && p.date <= in60)
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .slice(0, 20);
+
+    /* Alerts */
+    const alerts = [];
+    if (bal < 0) {
+      alerts.push({ level: 'danger', message: 'Solde négatif : ' + fmtCurrency(bal), action: { label: 'Voir Budget', module: 'budget' } });
+    } else if (bal < 500) {
+      alerts.push({ level: 'warning', message: 'Solde faible : ' + fmtCurrency(bal), action: { label: 'Voir Budget', module: 'budget' } });
+    }
+    if (low < 0) {
+      alerts.push({ level: 'danger', message: 'Solde prévisionnel négatif : ' + fmtCurrency(low) + (lowM ? ' en ' + lowM : ''), action: { label: 'Voir Prévisions', module: 'budget' } });
+    }
+    if (dr > 33) {
+      alerts.push({ level: 'warning', message: 'Taux d\'endettement élevé : ' + dr + '%', action: { label: 'Voir Budget', module: 'budget' } });
+    }
+    if (sr < 5 && inc > 0) {
+      alerts.push({ level: 'info', message: 'Taux d\'épargne faible : ' + sr + '%', action: { label: 'Voir Budget', module: 'budget' } });
+    }
+
+    /* Timeline events */
+    const timeline = upcoming.map(p => ({
+      date:   p.date,
+      type:   'transaction',
+      label:  p.label,
+      amount: p.amount,
+      icon:   p.amount >= 0 ? '💰' : getCategoryIcon(p.category || p.family),
+      color:  p.amount >= 0 ? '#30D158' : '#FF3B30',
+    }));
+
+    /* Story */
+    const storyParts = [];
+    storyParts.push('Solde ' + fmtCurrency(bal) + '.');
+    if (lowM && low < bal) {
+      storyParts.push('Point bas prévu en ' + lowM + ' (' + fmtCurrency(low) + ').');
+    }
+    if (sr > 0) storyParts.push('Épargne ' + sr + '% du revenu.');
+    if (dr > 20) storyParts.push('Endettement ' + dr + '%.');
+
+    return {
+      id:      'budget',
+      label:   'Budget',
+      icon:    '💰',
+      accent:  '#007AFF',
+      weight:  30,
+      score,
+      kpis: {
+        balance: bal,
+        lowBalance: low,
+        income: inc,
+        expenses: exp,
+        debtRatio: dr,
+        savingsRate: sr,
+        totalSavings: sav,
+        txCount: _state.transactions.length,
+        treasuryHistory,
+        categoryBreakdown,
+      },
+      alerts,
+      timeline,
+      story: storyParts.join(' '),
+    };
+  }
+
+  function fmtCurrency(v) {
+    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(v);
+  }
+
+  function getCategoryIcon(cat) {
+    const map = { Logement: '🏠', Alimentation: '🛒', Transport: '🚌', Assurances: '🛡️', Abonnements: '📱', Santé: '💊', Loisirs: '🎉', Revenus: '💰' };
+    return map[cat] || '📋';
+  }
+
+  return { mount, getStats, getHealth };
 
 }());

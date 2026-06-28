@@ -320,6 +320,70 @@ CAP360.Sante = (function () {
 
   /* ---- Public API ---- */
 
+  /* ---- getHealth() — contrat Platform ---- */
+
+  function getHealth() {
+    const d     = data();
+    const stats = getStats();
+    const today = new Date().toISOString().slice(0, 10);
+    const in60  = new Date(Date.now() + 60 * 86400000).toISOString().slice(0, 10);
+
+    /* Score 0-100 */
+    const score = Math.round(stats.score * 10);
+
+    /* Alerts */
+    const alerts = [];
+    const upcomingAppts = (d.appointments || []).filter(a => a.date >= today && a.date <= in60).sort((a, b) => a.date.localeCompare(b.date));
+    upcomingAppts.forEach(a => {
+      const diff = Math.round((new Date(a.date) - new Date()) / 86400000);
+      alerts.push({ level: diff <= 7 ? 'warning' : 'info', message: 'RDV ' + a.type + (a.doctor ? ' — ' + a.doctor : '') + ' dans ' + diff + ' jour(s)', action: { label: 'Voir Santé', module: 'sante' } });
+    });
+    if (stats.stepsAvg > 0 && stats.stepsAvg < 5000) {
+      alerts.push({ level: 'info', message: 'Activité faible : ' + stats.stepsAvg.toLocaleString('fr-FR') + ' pas/jour en moyenne', action: { label: 'Voir Santé', module: 'sante' } });
+    }
+    if (stats.sleepAvg > 0 && stats.sleepAvg < 6) {
+      alerts.push({ level: 'warning', message: 'Sommeil insuffisant : ' + stats.sleepAvg + 'h en moyenne', action: { label: 'Voir Santé', module: 'sante' } });
+    }
+
+    /* Timeline: rendez-vous à venir */
+    const timeline = (d.appointments || [])
+      .filter(a => a.date >= today && a.date <= in60)
+      .map(a => ({
+        date:   a.date,
+        type:   'appointment',
+        label:  a.type + (a.doctor ? ' — ' + a.doctor : ''),
+        icon:   '🏥',
+        color:  '#30D158',
+        amount: null,
+      }));
+
+    /* Story */
+    const storyParts = [];
+    if (stats.score > 0) storyParts.push('Score santé ' + stats.score + '/10.');
+    if (stats.sleepAvg > 0) storyParts.push('Sommeil moyen ' + stats.sleepAvg + 'h.');
+    if (stats.stepsAvg > 0) storyParts.push(stats.stepsAvg.toLocaleString('fr-FR') + ' pas/jour.');
+    if (stats.nextAppt) storyParts.push('Prochain RDV : ' + stats.nextAppt.type + '.');
+
+    return {
+      id:     'sante',
+      label:  'Santé',
+      icon:   '❤️',
+      accent: '#30D158',
+      weight: 20,
+      score,
+      kpis: {
+        score:     stats.score,
+        stepsAvg:  stats.stepsAvg,
+        sleepAvg:  stats.sleepAvg,
+        weight:    stats.weight,
+        nextAppt:  stats.nextAppt,
+      },
+      alerts,
+      timeline,
+      story: storyParts.join(' ') || null,
+    };
+  }
+
   window.S = {
     tab:           t => { _tab = t; _view.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === t)); renderTabContent(); },
     openAddMetric: openAddMetric,
@@ -328,6 +392,6 @@ CAP360.Sante = (function () {
     deleteAppt:    deleteAppt,
   };
 
-  return { mount, getStats };
+  return { mount, getStats, getHealth };
 
 }());

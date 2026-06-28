@@ -501,6 +501,88 @@ CAP360.Vehicules = (function () {
     renderTabContent();
   }
 
+  /* ---- getHealth() — contrat Platform ---- */
+
+  function getHealth() {
+    const d      = data();
+    const stats  = getStats();
+    const today  = new Date().toISOString().slice(0, 10);
+    const in30   = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
+    const in60   = new Date(Date.now() + 60 * 86400000).toISOString().slice(0, 10);
+    const items  = d.items || [];
+
+    /* Score 0-100 */
+    let score = stats.count === 0 ? 75 : 100;
+    items.forEach(v => {
+      if (v.controleTechniqueDate && v.controleTechniqueDate < today) score -= 25;
+      else if (v.controleTechniqueDate && v.controleTechniqueDate <= in30) score -= 10;
+      if (v.assuranceDate && v.assuranceDate < today) score -= 25;
+      else if (v.assuranceDate && v.assuranceDate <= in30) score -= 10;
+    });
+    score = Math.max(0, Math.min(100, score));
+
+    /* Alerts */
+    const alerts = [];
+    items.forEach(v => {
+      if (v.controleTechniqueDate) {
+        if (v.controleTechniqueDate < today) {
+          alerts.push({ level: 'danger', message: 'CT expiré pour ' + v.name + ' depuis le ' + v.controleTechniqueDate, action: { label: 'Voir Véhicules', module: 'vehicules' } });
+        } else if (v.controleTechniqueDate <= in30) {
+          const diff = Math.round((new Date(v.controleTechniqueDate) - new Date()) / 86400000);
+          alerts.push({ level: 'warning', message: 'CT ' + v.name + ' dans ' + diff + ' jour(s) (' + v.controleTechniqueDate + ')', action: { label: 'Voir Véhicules', module: 'vehicules' } });
+        }
+      }
+      if (v.assuranceDate) {
+        if (v.assuranceDate < today) {
+          alerts.push({ level: 'danger', message: 'Assurance expirée pour ' + v.name, action: { label: 'Voir Véhicules', module: 'vehicules' } });
+        } else if (v.assuranceDate <= in30) {
+          const diff = Math.round((new Date(v.assuranceDate) - new Date()) / 86400000);
+          alerts.push({ level: 'warning', message: 'Renouvellement assurance ' + v.name + ' dans ' + diff + ' jour(s)', action: { label: 'Voir Véhicules', module: 'vehicules' } });
+        }
+      }
+    });
+
+    /* Timeline */
+    const timeline = [];
+    items.forEach(v => {
+      if (v.controleTechniqueDate && v.controleTechniqueDate >= today && v.controleTechniqueDate <= in60) {
+        timeline.push({ date: v.controleTechniqueDate, type: 'deadline', label: 'Contrôle technique — ' + v.name, icon: '🔧', color: '#FF3B30', amount: null });
+      }
+      if (v.assuranceDate && v.assuranceDate >= today && v.assuranceDate <= in60) {
+        timeline.push({ date: v.assuranceDate, type: 'deadline', label: 'Renouvellement assurance — ' + v.name, icon: '🛡️', color: '#FF9500', amount: null });
+      }
+    });
+
+    /* Story */
+    const storyParts = [];
+    if (items.length === 0) {
+      storyParts.push('Aucun véhicule enregistré.');
+    } else if (stats.allOk) {
+      storyParts.push(items.length + ' véhicule(s) — tout est à jour.');
+    } else {
+      storyParts.push(stats.alerts.length + ' alerte(s) véhicule à traiter.');
+    }
+
+    return {
+      id:     'vehicules',
+      label:  'Véhicules',
+      icon:   '🚗',
+      accent: '#FF3B30',
+      weight: 10,
+      score,
+      kpis: {
+        count:   items.length,
+        allOk:   stats.allOk,
+        alerts:  stats.alerts,
+        items:   items,
+        monthCosts: getMonthCosts(),
+      },
+      alerts,
+      timeline,
+      story: storyParts.join(' ') || null,
+    };
+  }
+
   window.V = {
     tab:              t => { _tab = t; _view.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === t)); renderTabContent(); },
     openAddVehicle:   openAddVehicle,
@@ -513,6 +595,6 @@ CAP360.Vehicules = (function () {
     deleteFuel:       deleteFuel,
   };
 
-  return { mount, getStats };
+  return { mount, getStats, getHealth };
 
 }());

@@ -310,6 +310,87 @@ CAP360.Projets = (function () {
     renderTabContent();
   }
 
+  /* ---- getHealth() — contrat Platform ---- */
+
+  function getHealth() {
+    const d     = data();
+    const stats = getStats();
+    const today = new Date().toISOString().slice(0, 10);
+    const in60  = new Date(Date.now() + 60 * 86400000).toISOString().slice(0, 10);
+    const items = d.items || [];
+    const active = items.filter(p => p.status !== 'done' && p.status !== 'cancelled');
+    const done   = items.filter(p => p.status === 'done');
+
+    /* Score 0-100 */
+    let score = 70;
+    if (stats.late === 0 && stats.active > 0) score += 15;
+    score -= stats.late * 15;
+    if (done.length > 0) score += Math.min(15, done.length * 5);
+    score = Math.max(0, Math.min(100, score));
+
+    /* Alerts */
+    const alerts = [];
+    const late = active.filter(p => p.dueDate && p.dueDate < today);
+    late.forEach(p => {
+      const diff = Math.round((new Date() - new Date(p.dueDate)) / 86400000);
+      alerts.push({ level: 'warning', message: 'Objectif "' + p.name + '" en retard de ' + diff + ' jour(s)', action: { label: 'Voir Projets', module: 'projets' } });
+    });
+    const soon = active.filter(p => p.dueDate && p.dueDate >= today && p.dueDate <= in60);
+    soon.forEach(p => {
+      const diff = Math.round((new Date(p.dueDate) - new Date()) / 86400000);
+      alerts.push({ level: 'info', message: 'Échéance "' + p.name + '" dans ' + diff + ' jour(s)', action: { label: 'Voir Projets', module: 'projets' } });
+    });
+
+    /* Timeline */
+    const timeline = active
+      .filter(p => p.dueDate && p.dueDate >= today && p.dueDate <= in60)
+      .map(p => {
+        const pct = p.target > 0 ? Math.round((p.current || 0) / p.target * 100) : (p.progress || 0);
+        return {
+          date:   p.dueDate,
+          type:   'milestone',
+          label:  p.name + ' — ' + pct + '%',
+          icon:   '🎯',
+          color:  '#BF5AF2',
+          amount: p.target || null,
+        };
+      });
+
+    /* Story */
+    const storyParts = [];
+    if (stats.active > 0) {
+      storyParts.push(stats.active + ' objectif(s) en cours.');
+    }
+    if (stats.late > 0) {
+      storyParts.push(stats.late + ' en retard.');
+    }
+    if (done.length > 0) {
+      storyParts.push(done.length + ' terminé(s).');
+    }
+    if (stats.active === 0 && done.length === 0) {
+      storyParts.push('Aucun objectif défini.');
+    }
+
+    return {
+      id:     'projets',
+      label:  'Projets',
+      icon:   '🎯',
+      accent: '#BF5AF2',
+      weight: 15,
+      score,
+      kpis: {
+        count:  stats.count,
+        active: stats.active,
+        late:   stats.late,
+        done:   done.length,
+        items:  active.slice(0, 3),
+      },
+      alerts,
+      timeline,
+      story: storyParts.join(' ') || null,
+    };
+  }
+
   window.P = {
     tab:      t => { _tab = t; _view.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === t)); renderTabContent(); },
     openAdd:  openAdd,
@@ -317,6 +398,6 @@ CAP360.Projets = (function () {
     delete:   deleteItem,
   };
 
-  return { mount, getStats };
+  return { mount, getStats, getHealth };
 
 }());

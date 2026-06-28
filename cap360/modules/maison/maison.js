@@ -371,6 +371,77 @@ CAP360.Maison = (function () {
     renderTabContent();
   }
 
+  /* ---- getHealth() — contrat Platform ---- */
+
+  function getHealth() {
+    const d      = data();
+    const stats  = getStats();
+    const today  = new Date().toISOString().slice(0, 10);
+    const in60   = new Date(Date.now() + 60 * 86400000).toISOString().slice(0, 10);
+    const projects = d.projects || [];
+
+    /* Score 0-100 */
+    let score = 75;
+    const overBudget = projects.filter(p => p.budget > 0 && (p.spent || 0) > p.budget * 1.1);
+    score -= overBudget.length * 15;
+    if (stats.activeCount > 0 && stats.pct <= 80) score += 10;
+    if (projects.filter(p => p.status === 'done').length > 0) score += 5;
+    score = Math.max(0, Math.min(100, score));
+
+    /* Alerts */
+    const alerts = [];
+    overBudget.forEach(p => {
+      const pct = Math.round((p.spent || 0) / p.budget * 100);
+      alerts.push({ level: 'warning', message: 'Projet "' + p.name + '" dépassé : ' + pct + '% du budget', action: { label: 'Voir Maison', module: 'maison' } });
+    });
+
+    /* Timeline: deadlines projets */
+    const timeline = projects
+      .filter(p => p.dueDate && p.dueDate >= today && p.dueDate <= in60)
+      .map(p => ({
+        date:   p.dueDate,
+        type:   'deadline',
+        label:  'Fin prévue : ' + p.name,
+        icon:   '🏗️',
+        color:  '#FF9500',
+        amount: null,
+      }));
+
+    /* Story */
+    const storyParts = [];
+    if (stats.activeCount > 0) {
+      storyParts.push(stats.activeCount + ' projet(s) en cours.');
+      if (stats.totalBudget > 0) {
+        storyParts.push(stats.pct + '% du budget consommé (' + fmtCurrency(stats.totalSpent) + ' / ' + fmtCurrency(stats.totalBudget) + ').');
+      }
+    } else {
+      storyParts.push('Aucun projet en cours.');
+    }
+
+    return {
+      id:     'maison',
+      label:  'Maison',
+      icon:   '🏡',
+      accent: '#FF9500',
+      weight: 15,
+      score,
+      kpis: {
+        projectCount: stats.projectCount,
+        activeCount:  stats.activeCount,
+        totalBudget:  stats.totalBudget,
+        totalSpent:   stats.totalSpent,
+        pct:          stats.pct,
+      },
+      alerts,
+      timeline,
+      story: storyParts.join(' ') || null,
+    };
+  }
+
+  function fmtCurrency(v) {
+    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(v);
+  }
+
   window.M = {
     tab:             t => { _tab = t; _view.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === t)); renderTabContent(); },
     openAddProject:  openAddProject,
@@ -380,6 +451,6 @@ CAP360.Maison = (function () {
     deleteRoom:      deleteRoom,
   };
 
-  return { mount, getStats };
+  return { mount, getStats, getHealth };
 
 }());

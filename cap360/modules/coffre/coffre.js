@@ -229,6 +229,72 @@ CAP360.Coffre = (function () {
     render();
   }
 
+  /* ---- getHealth() — contrat Platform ---- */
+
+  function getHealth() {
+    const d     = data();
+    const stats = getStats();
+    const docs  = d.documents || [];
+    const today = new Date().toISOString().slice(0, 10);
+    const in30  = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
+    const in60  = new Date(Date.now() + 60 * 86400000).toISOString().slice(0, 10);
+
+    /* Expired and expiring */
+    const expired  = docs.filter(doc => doc.expiryDate && doc.expiryDate < today);
+    const expiring = docs.filter(doc => doc.expiryDate && doc.expiryDate >= today && doc.expiryDate <= in30);
+
+    /* Score 0-100 */
+    let score = docs.length === 0 ? 70 : 100;
+    score -= expired.length * 20;
+    score -= expiring.length * 8;
+    score = Math.max(0, Math.min(100, score));
+
+    /* Alerts */
+    const alerts = [];
+    expired.forEach(doc => {
+      alerts.push({ level: 'danger', message: '"' + doc.name + '" expiré' + (doc.expiryDate ? ' le ' + doc.expiryDate : ''), action: { label: 'Voir Coffre', module: 'coffre' } });
+    });
+    expiring.forEach(doc => {
+      const diff = Math.round((new Date(doc.expiryDate) - new Date()) / 86400000);
+      alerts.push({ level: 'warning', message: '"' + doc.name + '" expire dans ' + diff + ' jour(s)', action: { label: 'Voir Coffre', module: 'coffre' } });
+    });
+
+    /* Timeline */
+    const timeline = docs
+      .filter(doc => doc.expiryDate && doc.expiryDate >= today && doc.expiryDate <= in60)
+      .map(doc => ({
+        date:   doc.expiryDate,
+        type:   'document',
+        label:  'Expiration : ' + doc.name + (doc.provider ? ' (' + doc.provider + ')' : ''),
+        icon:   doc.icon || '📄',
+        color:  '#5AC8FA',
+        amount: null,
+      }));
+
+    /* Story */
+    const storyParts = [];
+    storyParts.push(docs.length + ' document(s) dans le coffre.');
+    if (expired.length > 0) storyParts.push(expired.length + ' expiré(s).');
+    if (expiring.length > 0) storyParts.push(expiring.length + ' expire(nt) dans 30 jours.');
+
+    return {
+      id:     'coffre',
+      label:  'Coffre-fort',
+      icon:   '📁',
+      accent: '#5AC8FA',
+      weight: 10,
+      score,
+      kpis: {
+        count:        docs.length,
+        expiringSoon: stats.expiringSoon,
+        expired:      stats.expired,
+      },
+      alerts,
+      timeline,
+      story: storyParts.join(' ') || null,
+    };
+  }
+
   window.CF = {
     openAdd:  openAdd,
     openEdit: openEdit,
@@ -241,6 +307,6 @@ CAP360.Coffre = (function () {
     search:   (q) => { _search = q; render(); },
   };
 
-  return { mount, getStats };
+  return { mount, getStats, getHealth };
 
 }());
