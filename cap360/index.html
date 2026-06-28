@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="CAP360 — Votre cockpit de vie personnel">
+  <meta name="theme-color" content="#111113">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="CAP360">
+  <title>CAP360 — Cockpit de Vie</title>
+
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="assets/icons/icon-192.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+
+  <link rel="stylesheet" href="assets/styles/main.css">
+  <link rel="stylesheet" href="assets/styles/components.css">
+
+  <!-- Chart.js 4.4.4 -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div id="app">
+
+    <!-- Sidebar -->
+    <nav id="sidebar">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-mark">C</div>
+        <div>
+          <div class="sidebar-logo-text">CAP 360</div>
+          <div class="sidebar-logo-sub">Cockpit de vie</div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <!-- Main modules -->
+        <div class="sidebar-label">Tableau de bord</div>
+
+        <div class="nav-item active" data-module="cockpit">
+          <div class="nav-icon">🏠</div>
+          <span>Cockpit</span>
+          <div class="nav-dot"></div>
+        </div>
+
+        <div class="sidebar-label" style="margin-top:8px">Modules</div>
+
+        <div class="nav-item" data-module="budget">
+          <div class="nav-icon">💰</div>
+          <span>Budget</span>
+          <div class="nav-dot"></div>
+        </div>
+
+        <div class="nav-item" data-module="sante">
+          <div class="nav-icon">❤️</div>
+          <span>Santé</span>
+          <div class="nav-dot"></div>
+        </div>
+
+        <div class="nav-item" data-module="maison">
+          <div class="nav-icon">🏡</div>
+          <span>Maison</span>
+          <div class="nav-dot"></div>
+        </div>
+
+        <div class="nav-item" data-module="vehicules">
+          <div class="nav-icon">🚗</div>
+          <span>Véhicules</span>
+          <div class="nav-dot"></div>
+        </div>
+
+        <div class="nav-item" data-module="projets">
+          <div class="nav-icon">🎯</div>
+          <span>Projets</span>
+          <div class="nav-dot"></div>
+        </div>
+
+        <div class="nav-item" data-module="coffre">
+          <div class="nav-icon">📁</div>
+          <span>Coffre-fort</span>
+          <div class="nav-dot"></div>
+        </div>
+      </div>
+
+      <!-- Sidebar footer -->
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="sidebar-user-avatar" id="sidebar-avatar">M</div>
+          <div>
+            <div class="sidebar-user-name" id="sidebar-name">Mickaël</div>
+            <div class="sidebar-user-role">CAP360 v2</div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main content -->
+    <main id="main-content">
+      <div id="module-content"></div>
+    </main>
+
+  </div>
+
+  <!-- Toast container -->
+  <div id="toast-container"></div>
+
+  <!-- Offline banner -->
+  <div id="offline-banner">⚡ Mode hors-ligne — vos données sont sauvegardées localement</div>
+
+  <!-- ======================================================
+       Core modules — load order matters
+       ====================================================== -->
+  <script>
+    window.CAP360 = window.CAP360 || {};
+  </script>
+
+  <!-- Core: Storage first (no deps) -->
+  <script src="core/storage.js"></script>
+  <!-- Core: Migration (depends on Storage) -->
+  <script src="core/migration.js"></script>
+  <!-- Core: Engine (depends on Storage) -->
+  <script src="core/engine.js"></script>
+  <!-- Core: Charts (depends on Chart.js) -->
+  <script src="core/charts.js"></script>
+  <!-- Core: UI utilities -->
+  <script src="core/ui.js"></script>
+  <!-- Core: Router (depends on UI) -->
+  <script src="core/router.js"></script>
+
+  <!-- Feature modules -->
+  <script src="modules/budget/budget.js"></script>
+  <script src="modules/cockpit/cockpit.js"></script>
+  <script src="modules/sante/sante.js"></script>
+  <script src="modules/maison/maison.js"></script>
+  <script src="modules/projets/projets.js"></script>
+  <script src="modules/vehicules/vehicules.js"></script>
+  <script src="modules/coffre/coffre.js"></script>
+
+  <!-- App bootstrap -->
+  <script>
+    (function () {
+      'use strict';
+
+      /* ---- Init storage & migration ---- */
+      try {
+        CAP360.Storage.init();
+        if (CAP360.Migration) CAP360.Migration.run();
+      } catch (e) {
+        console.error('[Boot] Storage init failed:', e);
+      }
+
+      /* ---- Register modules ---- */
+      CAP360.Router.register('cockpit',   CAP360.Cockpit);
+      CAP360.Router.register('budget',    CAP360.Budget);
+      CAP360.Router.register('sante',     CAP360.Sante);
+      CAP360.Router.register('maison',    CAP360.Maison);
+      CAP360.Router.register('projets',   CAP360.Projets);
+      CAP360.Router.register('vehicules', CAP360.Vehicules);
+      CAP360.Router.register('coffre',    CAP360.Coffre);
+
+      /* ---- Update sidebar user info ---- */
+      function updateSidebarUser() {
+        try {
+          const d = CAP360.Storage.get();
+          const name = (d && d.budgetSettings && d.budgetSettings.userName) || 'Mickaël';
+          const el = document.getElementById('sidebar-name');
+          const av = document.getElementById('sidebar-avatar');
+          if (el) el.textContent = name;
+          if (av) av.textContent = name.charAt(0).toUpperCase();
+        } catch (e) { /* ignore */ }
+      }
+
+      updateSidebarUser();
+
+      /* ---- Boot router ---- */
+      CAP360.Router.boot();
+
+      /* ---- PWA: Service Worker ---- */
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').catch(e => {
+          console.warn('[SW] Registration failed:', e);
+        });
+      }
+
+      /* ---- Offline banner ---- */
+      const banner = document.getElementById('offline-banner');
+      window.addEventListener('offline', () => banner && banner.classList.add('show'));
+      window.addEventListener('online',  () => banner && banner.classList.remove('show'));
+
+    })();
+  </script>
+</body>
+</html>
