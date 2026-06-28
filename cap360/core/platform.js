@@ -16,10 +16,9 @@ CAP360.Platform = (function () {
   const _registry = {};
 
   const WEIGHTS = {
-    budget:    30,
-    sante:     20,
+    budget:    35,
+    projets:   30,
     maison:    15,
-    projets:   15,
     vehicules: 10,
     coffre:    10,
   };
@@ -46,7 +45,6 @@ CAP360.Platform = (function () {
   function getFinancialHealth()  { return _health('budget'); }
   function getProjectHealth()    { return _health('projets'); }
   function getVehicleHealth()    { return _health('vehicules'); }
-  function getHealthScore()      { return _health('sante'); }
   function getDocumentsHealth()  { return _health('coffre'); }
   function getHomeHealth()       { return _health('maison'); }
 
@@ -177,7 +175,6 @@ CAP360.Platform = (function () {
     getFinancialHealth,
     getProjectHealth,
     getVehicleHealth,
-    getHealthScore,
     getDocumentsHealth,
     getHomeHealth,
     getOverallScore,

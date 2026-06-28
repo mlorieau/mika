@@ -15,11 +15,11 @@ CAP360.Charts = (function () {
   }
 
   function baseGrid() {
-    return { color: 'rgba(60,60,67,0.07)', borderDash: [3, 3] };
+    return { color: 'rgba(255,255,255,0.05)', borderDash: [3, 3] };
   }
 
   function baseTick() {
-    return { color: '#aeaeb2', font: baseFont() };
+    return { color: '#5A5C61', font: baseFont() };
   }
 
   function destroy(id) {
@@ -41,10 +41,10 @@ CAP360.Charts = (function () {
     const labels  = data.map(d => CAP360.Engine.dateShort(d.date));
     const values  = data.map(d => d.balance);
     const isPos   = values[values.length - 1] >= 0;
-    const color   = isPos ? '#34C759' : '#FF3B30';
+    const color   = isPos ? '#9FCFC5' : '#D9796B';
 
     const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 300);
-    gradient.addColorStop(0, isPos ? 'rgba(52,199,89,0.2)' : 'rgba(255,59,48,0.2)');
+    gradient.addColorStop(0, isPos ? 'rgba(159,207,197,0.18)' : 'rgba(217,121,107,0.18)');
     gradient.addColorStop(1, 'rgba(0,0,0,0)');
 
     instances[canvasId] = new Chart(ctx, {
@@ -73,9 +73,9 @@ CAP360.Charts = (function () {
         plugins: {
           legend: { display: false },
           tooltip: {
-            backgroundColor: '#1c1c1e',
-            titleColor: '#aeaeb2',
-            bodyColor: '#ffffff',
+            backgroundColor: '#242A31',
+            titleColor: '#5A5C61',
+            bodyColor: '#F3F1EC',
             bodyFont: { size: 14, weight: '600' },
             padding: 12,
             cornerRadius: 10,
@@ -122,8 +122,8 @@ CAP360.Charts = (function () {
         datasets: [{
           data:             values,
           backgroundColor:  colors,
-          borderColor:      '#ffffff',
-          borderWidth:      3,
+          borderColor:      '#1B1F24',
+          borderWidth:      2,
           hoverOffset:      6,
         }],
       },
@@ -135,9 +135,9 @@ CAP360.Charts = (function () {
         plugins: {
           legend: { display: false },
           tooltip: {
-            backgroundColor: '#1c1c1e',
-            titleColor: '#aeaeb2',
-            bodyColor: '#ffffff',
+            backgroundColor: '#242A31',
+            titleColor: '#5A5C61',
+            bodyColor: '#F3F1EC',
             bodyFont: { size: 13, weight: '600' },
             padding: 10,
             cornerRadius: 10,
@@ -193,9 +193,9 @@ CAP360.Charts = (function () {
             labels: { font: baseFont(), color: '#636366', boxWidth: 10, boxHeight: 10, borderRadius: 5, useBorderRadius: true, padding: 16 },
           },
           tooltip: {
-            backgroundColor: '#1c1c1e',
-            titleColor: '#aeaeb2',
-            bodyColor: '#ffffff',
+            backgroundColor: '#242A31',
+            titleColor: '#5A5C61',
+            bodyColor: '#F3F1EC',
             bodyFont: { size: 13 },
             padding: 10,
             cornerRadius: 10,

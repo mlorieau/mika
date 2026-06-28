@@ -1,5 +1,5 @@
 /* ============================================
-   CAP360 Cockpit — Vue pure, zéro calcul
+   CAP360 Cockpit V3 — Vue pure 4 questions
    Toutes les données viennent de CAP360.Platform.
    ============================================ */
 
@@ -9,32 +9,29 @@ CAP360.Cockpit = (function () {
 
   let _view = null;
 
-  /* ---- Utilitaires de rendu ---- */
+  /* ---- Helpers ---- */
 
-  function fmt(v, decimals) {
+  function fmt(v) {
     if (v === null || v === undefined) return '—';
-    if (typeof v === 'number') {
-      return new Intl.NumberFormat('fr-FR', {
-        style: 'currency', currency: 'EUR',
-        maximumFractionDigits: decimals ?? 0,
-      }).format(v);
-    }
-    return String(v);
+    if (typeof v !== 'number') return String(v);
+    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(v);
   }
 
-  function scoreColor(score) {
-    if (score === null || score === undefined) return '#aeaeb2';
-    if (score >= 75) return '#30D158';
-    if (score >= 50) return '#FF9500';
-    return '#FF3B30';
+  function pct(v) { return v !== null && v !== undefined ? Math.round(v) + '%' : '—'; }
+
+  function scoreColor(s) {
+    if (s === null || s === undefined) return 'var(--c-text-3)';
+    if (s >= 75) return 'var(--c-positive)';
+    if (s >= 50) return 'var(--c-warning)';
+    return 'var(--c-negative)';
   }
 
-  function scoreLabel(score) {
-    if (score === null || score === undefined) return 'Aucune donnée';
-    if (score >= 85) return 'Excellent';
-    if (score >= 70) return 'Très bien';
-    if (score >= 55) return 'Bien';
-    if (score >= 40) return 'À améliorer';
+  function scoreLabel(s) {
+    if (s === null || s === undefined) return 'Aucune donnée';
+    if (s >= 85) return 'Excellent';
+    if (s >= 70) return 'Très bien';
+    if (s >= 55) return 'Bien';
+    if (s >= 40) return 'À améliorer';
     return 'Critique';
   }
 
@@ -42,34 +39,15 @@ CAP360.Cockpit = (function () {
     return { danger: '🔴', warning: '🟠', info: '🔵', success: '🟢' }[level] || '⚪';
   }
 
-  function alertBadge(level) {
-    const map = { danger: 'badge-danger', warning: 'badge-warning', info: 'badge-info', success: 'badge-success' };
-    return map[level] || 'badge-info';
-  }
-
-  function typeIcon(type) {
-    const map = {
-      transaction:  null,      // uses event icon
-      appointment:  '🏥',
-      deadline:     '📅',
-      milestone:    '🏁',
-      document:     '📄',
-      maintenance:  '🔧',
-      event:        '📌',
-    };
-    return map[type] || '📌';
-  }
-
   function dateShort(d) {
     if (!d) return '';
-    try { return new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }); }
+    try { return new Date(d + 'T00:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }); }
     catch (e) { return d; }
   }
 
   function greeting() {
     const h = new Date().getHours();
-    if (h >= 5  && h < 12) return 'Bonjour';
-    if (h >= 12 && h < 18) return 'Bonjour';
+    if (h >= 5  && h < 18) return 'Bonjour';
     if (h >= 18 && h < 22) return 'Bonsoir';
     return 'Bonne nuit';
   }
@@ -82,160 +60,213 @@ CAP360.Cockpit = (function () {
   }
 
   /* ================================================================
-     RENDU — chaque fonction lit uniquement Platform
+     4 QUESTIONS — cartes de synthèse
      ================================================================ */
 
-  /* ---- Score global ---- */
-
-  function renderScoreRing(score) {
-    const color = scoreColor(score);
-    const label = scoreLabel(score);
-    const pct   = score !== null ? score : 0;
-    const r = 44;
-    const circ = 2 * Math.PI * r;
-    const dash = (pct / 100) * circ;
-
-    return `
-      <div class="ck-score-ring-wrap">
-        <svg width="110" height="110" viewBox="0 0 110 110">
-          <circle cx="55" cy="55" r="${r}" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="8"/>
-          <circle cx="55" cy="55" r="${r}" fill="none"
-            stroke="${color}" stroke-width="8"
-            stroke-dasharray="${dash} ${circ}"
-            stroke-dashoffset="${circ / 4}"
-            stroke-linecap="round"
-            style="transition:stroke-dasharray 0.8s ease"/>
-        </svg>
-        <div class="ck-score-ring-center">
-          <span class="ck-score-ring-value" style="color:${color}">${score !== null ? score : '—'}</span>
-          <span class="ck-score-ring-label">/100</span>
-        </div>
-      </div>
-      <div class="ck-score-sublabel" style="color:${color}">${label}</div>
-    `;
-  }
-
-  /* ---- Module tiles (génériques) ---- */
-
-  function renderTile(name, health) {
-    const score = health.score;
+  function renderQ1Projects(projets) {
+    const k     = projets ? (projets.kpis || {}) : {};
+    const score = projets ? projets.score : null;
     const color = scoreColor(score);
 
+    const canStart = k.items ? k.items.filter(p => p.budgetPlanned > 0).length : 0;
+
     return `
-      <div class="ck-tile" style="--tile-accent:${health.accent}" onclick="CAP360.Router.navigate('${name}')">
-        <div class="ck-tile-head">
-          <span class="ck-tile-icon">${health.icon}</span>
-          <span class="ck-tile-label" style="color:${health.accent}">${health.label}</span>
+      <div class="ck3-question" onclick="CAP360.Router.navigate('projets')">
+        <div class="ck3-q-icon">🎯</div>
+        <div class="ck3-q-title">Puis-je réaliser mes projets ?</div>
+        <div class="ck3-q-value" style="color:${color}">${k.active !== undefined ? k.active : '—'}</div>
+        <div class="ck3-q-sub">
+          ${k.active !== undefined ? `${k.active} en cours` : 'Aucune donnée'}
+          ${k.late > 0 ? ` · <span style="color:var(--c-negative)">${k.late} en retard</span>` : ''}
         </div>
-        <div class="ck-tile-score">
-          <span style="font-size:28px;font-weight:700;letter-spacing:-1px;color:${color}">${score !== null ? score : '—'}</span>
-          <span style="font-size:12px;color:var(--c-text-3)">/100</span>
-        </div>
-        <div class="ck-metric-bar" style="margin:8px 0 6px">
-          <div class="ck-metric-fill" style="width:${score || 0}%;background:${color}"></div>
-        </div>
-        <div class="ck-tile-story">${health.story ? health.story.split('.')[0] + '.' : scoreLabel(score)}</div>
       </div>
     `;
   }
+
+  function renderQ2Risks(alerts) {
+    const dangers  = alerts.filter(a => a.level === 'danger').length;
+    const warnings = alerts.filter(a => a.level === 'warning').length;
+    const total    = alerts.length;
+    const color    = dangers > 0 ? 'var(--c-negative)' : warnings > 0 ? 'var(--c-warning)' : 'var(--c-positive)';
+
+    return `
+      <div class="ck3-question">
+        <div class="ck3-q-icon">⚠️</div>
+        <div class="ck3-q-title">Quels sont les risques ?</div>
+        <div class="ck3-q-value" style="color:${color}">${total}</div>
+        <div class="ck3-q-sub">
+          ${total === 0 ? '🟢 Aucune alerte' : `${dangers > 0 ? `<span style="color:var(--c-negative)">${dangers} critique${dangers > 1 ? 's' : ''}</span>` : ''}${warnings > 0 ? ` · ${warnings} avertissement${warnings > 1 ? 's' : ''}` : ''}`}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderQ3Actions(alerts, timeline) {
+    const today    = new Date().toISOString().slice(0, 10);
+    const inWeek   = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
+    const upcoming = timeline.filter(e => e.date >= today && e.date <= inWeek).slice(0, 3);
+    const urgent   = alerts.filter(a => a.level === 'danger' || a.level === 'warning').slice(0, 2);
+    const count    = upcoming.length + urgent.length;
+
+    return `
+      <div class="ck3-question">
+        <div class="ck3-q-icon">📋</div>
+        <div class="ck3-q-title">Que faire cette semaine ?</div>
+        <div class="ck3-q-value">${count}</div>
+        <div class="ck3-q-sub">
+          ${upcoming.length > 0 ? `${upcoming.length} échéance${upcoming.length > 1 ? 's' : ''} cette semaine` : 'Rien d\'imminent'}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderQ4Trajectory(overall, financial) {
+    const color = scoreColor(overall);
+    const label = scoreLabel(overall);
+    const sr    = financial ? (financial.kpis || {}).savingsRate : null;
+
+    return `
+      <div class="ck3-question">
+        <div class="ck3-q-icon">📈</div>
+        <div class="ck3-q-title">Ma trajectoire est-elle bonne ?</div>
+        <div class="ck3-q-value" style="color:${color}">${overall !== null ? overall : '—'}<span style="font-size:14px;color:var(--c-text-3)">/100</span></div>
+        <div class="ck3-q-sub">
+          ${label}${sr !== null ? ` · Épargne ${Math.round(sr || 0)}%` : ''}
+        </div>
+      </div>
+    `;
+  }
+
+  /* ================================================================
+     SECTIONS PRINCIPALES
+     ================================================================ */
 
   /* ---- Header ---- */
 
   function renderHeader(overall, story) {
-    const todayStr = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    const todayStr = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
     const color    = scoreColor(overall);
+    const firstLine = story && story.length > 0 ? story[0] : '';
 
     return `
-      <div class="ck-header">
-        <div class="ck-header-left">
-          <h1 class="ck-greeting">${greeting()} ${userName()} 👋</h1>
-          <p class="ck-quote" id="ck-story-line">${story[0] || ''}</p>
+      <div class="ck3-header">
+        <div>
+          <h1 class="ck3-greeting">${greeting()}, ${userName()} 👋</h1>
+          <p class="ck3-subline">${todayStr}${firstLine ? ' — ' + firstLine : ''}</p>
         </div>
-        <div class="ck-header-right">
-          <div class="ck-overall-badge" style="border-color:${color}20;background:${color}10">
-            <span style="font-size:22px;font-weight:700;color:${color}">${overall !== null ? overall : '—'}</span>
-            <span style="font-size:11px;color:var(--c-text-3);margin-top:2px">Score global<br>/100</span>
-          </div>
-          <div>
-            <div class="ck-sync"><span class="ck-dot"></span> En local</div>
-            <div class="ck-date">${todayStr}</div>
-          </div>
+        <div class="ck3-score-badge" style="border-color:${color}30;background:${color}08">
+          <span class="ck3-score-num" style="color:${color}">${overall !== null ? overall : '—'}</span>
+          <span class="ck3-score-label">Score global</span>
         </div>
       </div>
     `;
   }
 
-  /* ---- Story lines ---- */
+  /* ---- Treasury chart ---- */
 
-  function renderStory(lines) {
-    if (!lines || lines.length <= 1) return '';
-    return `
-      <div class="ck-story-bar">
-        <span class="ck-story-icon">💬</span>
-        <div class="ck-story-lines">
-          ${lines.slice(1).map(l => `<span class="ck-story-line">${l}</span>`).join('')}
-        </div>
-      </div>
-    `;
-  }
-
-  /* ---- Financial charts ---- */
-
-  function renderFinancialCard(financial) {
+  function renderTreasury(financial) {
     if (!financial) {
       return `
-        <div class="ck-card ck-card-treasury">
-          <div class="ck-card-head"><span class="ck-card-title">Trésorerie</span></div>
-          <div class="ck-empty-sm">Aucune donnée budgétaire — importez vos transactions.</div>
+        <div class="ck3-card">
+          <div class="ck3-card-head"><span class="ck3-card-title">Trésorerie</span></div>
+          <div class="ck3-empty">Importez vos transactions dans le module Budget.</div>
         </div>
       `;
     }
-
     const kpis  = financial.kpis || {};
     const bal   = kpis.balance;
     const inc   = kpis.income;
     const exp   = kpis.expenses;
     const sr    = kpis.savingsRate;
-    const color = bal >= 0 ? 'pos' : 'neg';
 
     return `
-      <div class="ck-card ck-card-treasury">
-        <div class="ck-card-head">
-          <span class="ck-card-title">Trésorerie</span>
-          <div class="ck-legend">
-            <span class="ck-legend-item"><span class="ck-legend-dot" style="background:#34C759"></span> Réel</span>
-            <span class="ck-legend-item"><span class="ck-legend-dot" style="background:#FF9500"></span> Prévisionnel</span>
-          </div>
+      <div class="ck3-card">
+        <div class="ck3-card-head">
+          <span class="ck3-card-title">Trésorerie</span>
+          <button class="ck3-link" onclick="CAP360.Router.navigate('budget')">Voir Budget →</button>
         </div>
-        <div class="ck-chart-wrap" style="height:220px"><canvas id="ck-treasury"></canvas></div>
-        <div class="ck-treasury-stats">
-          <div class="ck-tstat">
-            <span class="ck-tstat-label">Solde actuel</span>
-            <span class="ck-tstat-val ${color}">${fmt(bal)}</span>
+        <div style="position:relative;height:200px"><canvas id="ck3-treasury"></canvas></div>
+        <div class="ck3-treasury-stats">
+          <div class="ck3-tstat">
+            <span class="ck3-tstat-l">Solde</span>
+            <span class="ck3-tstat-v ${(bal || 0) >= 0 ? 'pos' : 'neg'}">${fmt(bal)}</span>
           </div>
-          <div class="ck-tstat">
-            <span class="ck-tstat-label">Revenus / mois</span>
-            <span class="ck-tstat-val pos">${fmt(inc)}</span>
+          <div class="ck3-tstat">
+            <span class="ck3-tstat-l">Revenus/mois</span>
+            <span class="ck3-tstat-v pos">${fmt(inc)}</span>
           </div>
-          <div class="ck-tstat">
-            <span class="ck-tstat-label">Dépenses / mois</span>
-            <span class="ck-tstat-val neg">${fmt(exp)}</span>
+          <div class="ck3-tstat">
+            <span class="ck3-tstat-l">Dépenses/mois</span>
+            <span class="ck3-tstat-v neg">${fmt(exp)}</span>
           </div>
-          <div class="ck-tstat">
-            <span class="ck-tstat-label">Taux d'épargne</span>
-            <span class="ck-tstat-val ${(sr || 0) >= 0 ? 'pos' : 'neg'}">${sr !== undefined ? Math.round(sr) + '%' : '—'}</span>
+          <div class="ck3-tstat">
+            <span class="ck3-tstat-l">Épargne</span>
+            <span class="ck3-tstat-v ${(sr || 0) >= 0 ? 'pos' : 'neg'}">${pct(sr)}</span>
           </div>
         </div>
       </div>
     `;
   }
 
-  function renderSpendingCard(financial) {
+  /* ---- Active projects panel ---- */
+
+  function renderProjectsPanel(projets) {
+    if (!projets) {
+      return `
+        <div class="ck3-card">
+          <div class="ck3-card-head"><span class="ck3-card-title">Projets</span></div>
+          <div class="ck3-empty">Aucun projet défini.</div>
+          <button class="ck3-link" onclick="CAP360.Router.navigate('projets')">Créer un projet →</button>
+        </div>
+      `;
+    }
+
+    const activeItems = (projets.kpis || {}).items || [];
+    const color       = scoreColor(projets.score);
+
+    return `
+      <div class="ck3-card">
+        <div class="ck3-card-head">
+          <span class="ck3-card-title">Projets actifs</span>
+          <span style="font-size:13px;font-weight:700;color:${color}">${projets.kpis.active || 0}</span>
+        </div>
+        ${activeItems.length === 0 ? `
+          <div class="ck3-empty">Aucun projet en cours.</div>
+        ` : activeItems.map(p => renderCkProjectRow(p)).join('')}
+        <button class="ck3-link" onclick="CAP360.Router.navigate('projets')">Tous les projets →</button>
+      </div>
+    `;
+  }
+
+  function renderCkProjectRow(p) {
+    const planned = p.budgetPlanned || p.target || 0;
+    const real    = p.budgetReal    || p.current || 0;
+    const pctVal  = planned > 0 ? Math.min(100, Math.round(real / planned * 100)) : (p.progress || 0);
+    const today   = new Date().toISOString().slice(0, 10);
+    const isLate  = p.dueDate && p.dueDate < today;
+
+    return `
+      <div class="ck3-proj-row" onclick="CAP360.Router.navigate('projets')">
+        <div class="ck3-proj-name">${p.name}</div>
+        <div class="ck3-proj-bar-wrap">
+          <div class="ck3-proj-bar">
+            <div class="ck3-proj-fill" style="width:${pctVal}%;background:${isLate ? 'var(--c-negative)' : 'var(--c-projets)'}"></div>
+          </div>
+          <span class="ck3-proj-pct">${pctVal}%</span>
+        </div>
+        ${p.dueDate ? `<span class="ck3-proj-date ${isLate ? 'neg' : ''}">${isLate ? '⚠️ ' : ''}${dateShort(p.dueDate)}</span>` : ''}
+      </div>
+    `;
+  }
+
+  /* ---- Spending donut ---- */
+
+  function renderDonut(financial) {
     if (!financial || !(financial.kpis || {}).categoryBreakdown || !financial.kpis.categoryBreakdown.length) {
       return `
-        <div class="ck-card ck-card-donut">
-          <div class="ck-card-head"><span class="ck-card-title">Dépenses du mois</span></div>
-          <div class="ck-empty-sm">Aucune dépense ce mois.</div>
+        <div class="ck3-card">
+          <div class="ck3-card-head"><span class="ck3-card-title">Dépenses du mois</span></div>
+          <div class="ck3-empty">Aucune dépense ce mois.</div>
         </div>
       `;
     }
@@ -244,47 +275,39 @@ CAP360.Cockpit = (function () {
     const total = Math.abs(financial.kpis.expenses || 0);
 
     return `
-      <div class="ck-card ck-card-donut">
-        <div class="ck-card-head">
-          <span class="ck-card-title">Dépenses du mois</span>
-          <span class="ck-card-total neg">${fmt(total)}</span>
+      <div class="ck3-card">
+        <div class="ck3-card-head">
+          <span class="ck3-card-title">Dépenses du mois</span>
+          <span class="neg" style="font-size:13px;font-weight:700">${fmt(total)}</span>
         </div>
-        <div class="ck-donut-layout">
-          <div class="ck-chart-wrap" style="height:160px;flex:0 0 160px"><canvas id="ck-donut"></canvas></div>
-          <div id="ck-donut-legend" class="ck-donut-legend"></div>
-        </div>
-        <button class="ck-widget-link" onclick="CAP360.Router.navigate('budget')">Voir le détail →</button>
+        <div style="position:relative;height:150px"><canvas id="ck3-donut"></canvas></div>
+        <div id="ck3-donut-legend" class="ck3-donut-legend"></div>
+        <button class="ck3-link" onclick="CAP360.Router.navigate('budget')">Voir le détail →</button>
       </div>
     `;
   }
 
   /* ---- Unified alerts ---- */
 
-  function renderAlertsCard(alerts) {
-    const visible = alerts.slice(0, 8);
-    if (visible.length === 0) {
-      return `
-        <div class="ck-card">
-          <div class="ck-card-head"><span class="ck-card-title">Alertes</span></div>
-          <div class="ck-empty-sm">🟢 Aucune alerte — tout est sous contrôle.</div>
-        </div>
-      `;
-    }
+  function renderAlertsPanel(alerts) {
+    const visible = alerts.slice(0, 6);
 
     return `
-      <div class="ck-card">
-        <div class="ck-card-head">
-          <span class="ck-card-title">Alertes</span>
-          <span class="badge badge-danger">${alerts.length}</span>
+      <div class="ck3-card">
+        <div class="ck3-card-head">
+          <span class="ck3-card-title">Alertes</span>
+          ${alerts.length > 0 ? `<span class="badge badge-danger">${alerts.length}</span>` : ''}
         </div>
-        ${visible.map(a => `
-          <div class="ck-alert-row">
-            <span class="ck-alert-icon">${alertIcon(a.level)}</span>
-            <span class="ck-alert-msg">${a.message}</span>
-            ${a.action ? `<button class="ck-widget-link" style="margin:0;flex-shrink:0" onclick="CAP360.Router.navigate('${a.action.module}')">${a.action.label}</button>` : ''}
+        ${visible.length === 0 ? `
+          <div class="ck3-empty">🟢 Aucune alerte — tout est sous contrôle.</div>
+        ` : visible.map(a => `
+          <div class="ck3-alert-row">
+            <span>${alertIcon(a.level)}</span>
+            <span class="ck3-alert-msg">${a.message}</span>
+            ${a.action ? `<button class="ck3-link" style="margin:0;white-space:nowrap" onclick="CAP360.Router.navigate('${a.action.module}')">${a.action.label}</button>` : ''}
           </div>
         `).join('')}
-        ${alerts.length > 8 ? `<div class="ck-empty-sm">+${alerts.length - 8} alerte(s) supplémentaire(s)</div>` : ''}
+        ${alerts.length > 6 ? `<div class="ck3-empty" style="font-size:12px">+${alerts.length - 6} autre(s) alerte(s)</div>` : ''}
       </div>
     `;
   }
@@ -292,156 +315,60 @@ CAP360.Cockpit = (function () {
   /* ---- Unified timeline ---- */
 
   function renderTimeline(events) {
-    const today   = new Date().toISOString().slice(0, 10);
-    const past    = events.filter(e => e.date < today).reverse().slice(0, 3);
-    const future  = events.filter(e => e.date >= today).slice(0, 10);
-    const all     = [...past.reverse(), ...future];
-
-    if (all.length === 0) {
-      return `
-        <div class="ck-card">
-          <div class="ck-card-head"><span class="ck-card-title">Timeline</span></div>
-          <div class="ck-empty-sm">Aucun événement à venir. Ajoutez des données dans vos modules.</div>
-        </div>
-      `;
-    }
+    const today  = new Date().toISOString().slice(0, 10);
+    const past   = events.filter(e => e.date < today).reverse().slice(0, 2).reverse();
+    const future = events.filter(e => e.date >= today).slice(0, 8);
+    const all    = [...past, ...future];
 
     return `
-      <div class="ck-card">
-        <div class="ck-card-head">
-          <span class="ck-card-title">Timeline</span>
-          <span class="badge badge-info">${future.length} à venir</span>
+      <div class="ck3-card">
+        <div class="ck3-card-head">
+          <span class="ck3-card-title">Timeline</span>
+          ${future.length > 0 ? `<span class="badge badge-info">${future.length} à venir</span>` : ''}
         </div>
-        <div class="ck-tl-list">
-          ${all.map(e => {
-            const isPast = e.date < today;
-            const isToday = e.date === today;
-            return `
-              <div class="ck-tl-row${isPast ? ' ck-tl-past' : ''}${isToday ? ' ck-tl-today' : ''}" onclick="CAP360.Router.navigate('${e.module}')">
-                <div class="ck-tl-dot" style="background:${isPast ? 'var(--c-border-med)' : e.color}"></div>
-                <div class="ck-tl-date ${isToday ? 'ck-tl-date-today' : ''}">${isToday ? "Aujourd'hui" : dateShort(e.date)}</div>
-                <div class="ck-tl-icon">${e.icon || typeIcon(e.type)}</div>
-                <div class="ck-tl-label">${e.label}</div>
-                ${e.amount !== null ? `<div class="ck-tl-amount ${e.amount >= 0 ? 'pos' : 'neg'}">${e.amount >= 0 ? '+' : ''}${fmt(e.amount)}</div>` : ''}
-              </div>
-            `;
-          }).join('')}
-        </div>
+        ${all.length === 0 ? `
+          <div class="ck3-empty">Aucun événement à venir. Ajoutez des données dans vos modules.</div>
+        ` : `
+          <div class="ck3-tl">
+            ${all.map(e => {
+              const isPast  = e.date < today;
+              const isToday = e.date === today;
+              return `
+                <div class="ck3-tl-row ${isPast ? 'ck3-tl-past' : ''}" onclick="CAP360.Router.navigate('${e.module}')">
+                  <div class="ck3-tl-dot" style="background:${isPast ? 'var(--c-border)' : e.color}"></div>
+                  <div class="ck3-tl-date ${isToday ? 'ck3-tl-today' : ''}">${isToday ? "Auj." : dateShort(e.date)}</div>
+                  <div class="ck3-tl-icon">${e.icon}</div>
+                  <div class="ck3-tl-label">${e.label}</div>
+                  ${e.amount !== null ? `<div class="ck3-tl-amt ${e.amount >= 0 ? 'pos' : 'neg'}">${fmt(e.amount)}</div>` : ''}
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `}
       </div>
     `;
   }
 
-  /* ---- Module mini-widgets (génériques) ---- */
-
-  function renderModuleWidget(name, health) {
-    const kpis  = health.kpis || {};
-    const score = health.score;
-    const color = scoreColor(score);
-
-    return `
-      <div class="ck-card ck-widget" onclick="CAP360.Router.navigate('${name}')" style="cursor:pointer">
-        <div class="ck-widget-header">
-          <span class="ck-widget-icon">${health.icon}</span>
-          <span class="ck-widget-title">${health.label}</span>
-          <span style="font-size:14px;font-weight:700;color:${color}">${score !== null ? score : '—'}<span style="font-size:10px;color:var(--c-text-3)">/100</span></span>
-        </div>
-        <div class="ck-metric-bar" style="margin-bottom:10px">
-          <div class="ck-metric-fill" style="width:${score || 0}%;background:${color}"></div>
-        </div>
-        <div class="ck-widget-body">
-          ${health.story ? `<div style="font-size:12px;color:var(--c-text-2);line-height:1.5">${health.story}</div>` : ''}
-          ${renderKpiRows(kpis, name)}
-        </div>
-        <button class="ck-widget-link">Voir ${health.label} →</button>
-      </div>
-    `;
-  }
-
-  function renderKpiRows(kpis, name) {
-    // Financial KPIs
-    if (name === 'budget') {
-      return [
-        kpis.income    ? kpiRow('Revenus/mois', fmt(kpis.income)) : '',
-        kpis.expenses  ? kpiRow('Dépenses/mois', fmt(kpis.expenses)) : '',
-        kpis.debtRatio ? kpiRow('Endettement', kpis.debtRatio + '%') : '',
-      ].filter(Boolean).join('');
-    }
-    // Health KPIs
-    if (name === 'sante') {
-      return [
-        kpis.stepsAvg ? kpiRow('Pas/jour', (kpis.stepsAvg || 0).toLocaleString('fr-FR')) : '',
-        kpis.sleepAvg ? kpiRow('Sommeil', kpis.sleepAvg + ' h') : '',
-        kpis.weight   ? kpiRow('Poids', kpis.weight + ' kg') : '',
-      ].filter(Boolean).join('');
-    }
-    // Home KPIs
-    if (name === 'maison') {
-      return [
-        kpis.activeCount !== undefined ? kpiRow('Projets actifs', kpis.activeCount) : '',
-        kpis.totalBudget ? kpiRow('Budget total', fmt(kpis.totalBudget)) : '',
-        kpis.pct !== undefined ? kpiRow('Consommé', kpis.pct + '%') : '',
-      ].filter(Boolean).join('');
-    }
-    // Project KPIs
-    if (name === 'projets') {
-      return [
-        kpis.active !== undefined ? kpiRow('En cours', kpis.active) : '',
-        kpis.late   !== undefined ? kpiRow('En retard', kpis.late, kpis.late > 0 ? 'neg' : '') : '',
-        kpis.done   !== undefined ? kpiRow('Terminés', kpis.done, 'pos') : '',
-      ].filter(Boolean).join('');
-    }
-    // Vehicle KPIs
-    if (name === 'vehicules') {
-      return [
-        kpis.count  !== undefined ? kpiRow('Véhicules', kpis.count) : '',
-        kpis.allOk  !== undefined ? kpiRow('Statut', kpis.allOk ? '✅ OK' : '⚠️ Alerte', kpis.allOk ? 'pos' : 'neg') : '',
-        kpis.monthCosts ? kpiRow('Coûts ce mois', fmt(kpis.monthCosts)) : '',
-      ].filter(Boolean).join('');
-    }
-    // Documents KPIs
-    if (name === 'coffre') {
-      return [
-        kpis.count        !== undefined ? kpiRow('Documents', kpis.count) : '',
-        kpis.expired      ? kpiRow('Expirés', kpis.expired, 'neg') : '',
-        kpis.expiringSoon ? kpiRow('Expirent bientôt', kpis.expiringSoon, 'neg') : '',
-      ].filter(Boolean).join('');
-    }
-    return '';
-  }
-
-  function kpiRow(label, value, cls) {
-    return `
-      <div class="ck-kpi-row">
-        <span class="ck-kpi-label">${label}</span>
-        <span class="ck-kpi-value ${cls || ''}">${value}</span>
-      </div>
-    `;
-  }
-
-  /* ================================================================
-     CHARTS — rendus après DOM
-     ================================================================ */
+  /* ---- Charts ---- */
 
   function renderCharts(financial) {
     if (!financial) return;
     const kpis = financial.kpis || {};
 
-    // Treasury chart
     if (kpis.treasuryHistory && kpis.treasuryHistory.length > 0) {
-      CAP360.Charts.treasury('ck-treasury', kpis.treasuryHistory);
+      CAP360.Charts.treasury('ck3-treasury', kpis.treasuryHistory);
     }
 
-    // Spending donut
     if (kpis.categoryBreakdown && kpis.categoryBreakdown.length > 0) {
-      CAP360.Charts.donut('ck-donut', kpis.categoryBreakdown);
-      const legend = document.getElementById('ck-donut-legend');
+      CAP360.Charts.donut('ck3-donut', kpis.categoryBreakdown);
+      const legend = document.getElementById('ck3-donut-legend');
       if (legend) {
         const total = kpis.categoryBreakdown.reduce((s, c) => s + (c.total || c.spent || 0), 0);
-        legend.innerHTML = kpis.categoryBreakdown.slice(0, 6).map(c => `
-          <div class="ck-legend-cat">
-            <span class="ck-legend-swatch" style="background:${c.color}"></span>
-            <span class="ck-legend-name">${c.name}</span>
-            <span class="ck-legend-pct">${total > 0 ? Math.round((c.total || c.spent || 0) / total * 100) : 0}%</span>
+        legend.innerHTML = kpis.categoryBreakdown.slice(0, 5).map(c => `
+          <div class="ck3-legend-row">
+            <span class="ck3-legend-dot" style="background:${c.color}"></span>
+            <span class="ck3-legend-name">${c.name}</span>
+            <span class="ck3-legend-pct">${total > 0 ? Math.round((c.total || c.spent || 0) / total * 100) : 0}%</span>
           </div>
         `).join('');
       }
@@ -455,59 +382,42 @@ CAP360.Cockpit = (function () {
   function mount(container) {
     _view = container;
 
-    // Read all data from Platform — zero calcul ici
     const overall   = CAP360.Platform.getOverallScore();
     const financial = CAP360.Platform.getFinancialHealth();
+    const projets   = CAP360.Platform.getProjectHealth();
     const alerts    = CAP360.Platform.getAllAlerts();
-    const timeline  = CAP360.Platform.getTimeline({ past: 14, future: 45 });
+    const timeline  = CAP360.Platform.getTimeline({ past: 7, future: 60 });
     const story     = CAP360.Platform.getStory();
-    const all       = CAP360.Platform.getAll();
-
-    // Tiles : tous les modules enregistrés sauf budget (affiché via les charts)
-    const tileModules = Object.entries(all);
 
     _view.innerHTML = `
-      <div class="ck-wrap">
+      <div class="ck3-wrap">
 
         ${renderHeader(overall, story)}
 
-        ${renderStory(story)}
-
-        <!-- Module tiles (un par module) -->
-        <div class="ck-tiles">
-          ${tileModules.map(([name, health]) => renderTile(name, health)).join('')}
+        <!-- 4 questions -->
+        <div class="ck3-questions">
+          ${renderQ1Projects(projets)}
+          ${renderQ2Risks(alerts)}
+          ${renderQ3Actions(alerts, timeline)}
+          ${renderQ4Trajectory(overall, financial)}
         </div>
 
-        <!-- Grille principale -->
-        <div class="ck-main-grid">
-
-          <!-- Trésorerie -->
-          ${renderFinancialCard(financial)}
-
-          <!-- Colonne droite -->
-          <div class="ck-right-col">
-            ${renderSpendingCard(financial)}
-            ${renderAlertsCard(alerts)}
-          </div>
-
+        <!-- Grille principale : trésorerie + projets -->
+        <div class="ck3-main-grid">
+          ${renderTreasury(financial)}
+          ${renderProjectsPanel(projets)}
         </div>
 
-        <!-- Timeline unifiée + widgets modules -->
-        <div class="ck-bottom-grid">
-
+        <!-- Grille basse : dépenses + timeline + alertes -->
+        <div class="ck3-bottom-grid">
+          ${renderDonut(financial)}
           ${renderTimeline(timeline)}
-
-          <!-- Mini-widgets génériques -->
-          <div class="ck-widget-col">
-            ${tileModules.filter(([name]) => name !== 'budget').map(([name, health]) => renderModuleWidget(name, health)).join('')}
-          </div>
-
+          ${renderAlertsPanel(alerts)}
         </div>
 
       </div>
     `;
 
-    // Charts après DOM
     setTimeout(() => renderCharts(financial), 50);
   }
 

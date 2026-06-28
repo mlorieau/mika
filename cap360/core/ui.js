@@ -6,6 +6,8 @@
 
 CAP360.UI = (function () {
 
+  let _currentOverlay = null;
+
   /* ---- Toast notifications ---- */
 
   function toast(message, type = 'default', duration = 3000) {
@@ -38,6 +40,7 @@ CAP360.UI = (function () {
           ${bodyHTML}
         </div>
         <div class="modal-footer">
+          ${opts.extra || ''}
           <button class="btn btn-ghost" id="modal-cancel-btn">${opts.cancelLabel || 'Annuler'}</button>
           <button class="btn btn-primary" id="modal-confirm-btn">${opts.confirmLabel || 'Enregistrer'}</button>
         </div>
@@ -45,10 +48,11 @@ CAP360.UI = (function () {
     `;
 
     document.body.appendChild(overlay);
+    _currentOverlay = overlay;
 
     function close() {
       overlay.style.animation = 'overlayIn 200ms ease reverse forwards';
-      setTimeout(() => overlay.remove(), 200);
+      setTimeout(() => { overlay.remove(); if (_currentOverlay === overlay) _currentOverlay = null; }, 200);
     }
 
     overlay.querySelector('#modal-close-btn').onclick   = close;
@@ -88,6 +92,13 @@ CAP360.UI = (function () {
     });
   }
 
-  return { toast, modal, confirm };
+  function closeModal() {
+    if (_currentOverlay) {
+      _currentOverlay.style.animation = 'overlayIn 200ms ease reverse forwards';
+      setTimeout(() => { if (_currentOverlay) { _currentOverlay.remove(); _currentOverlay = null; } }, 200);
+    }
+  }
+
+  return { toast, modal, confirm, closeModal };
 
 }());

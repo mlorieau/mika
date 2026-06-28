@@ -1,5 +1,5 @@
 /* ============================================
-   CAP360 Projets — Objectifs & projets perso
+   CAP360 Projets V3 — Cœur du logiciel
    ============================================ */
 
 'use strict';
@@ -9,281 +9,426 @@ CAP360.Projets = (function () {
   let _view = null;
   let _tab  = 'dashboard';
 
-  const STATUS_LABELS = { active: 'En cours', planned: 'Planifié', done: 'Terminé', cancelled: 'Annulé', paused: 'En pause' };
-  const STATUS_COLORS = { active: '#BF5AF2', planned: '#007AFF', done: '#30D158', cancelled: '#aeaeb2', paused: '#FF9500' };
-  const CATEGORIES    = ['Financier', 'Personnel', 'Professionnel', 'Santé & Sport', 'Famille', 'Voyage', 'Formation', 'Autre'];
+  const CATEGORIES = [
+    { id: 'travaux',       label: 'Travaux',        icon: '🔨' },
+    { id: 'vacances',      label: 'Vacances',        icon: '✈️' },
+    { id: 'epargne',       label: 'Épargne',         icon: '💎' },
+    { id: 'lep',           label: 'LEP / Livret',    icon: '🏦' },
+    { id: 'voiture',       label: 'Voiture',         icon: '🚗' },
+    { id: 'professionnel', label: 'Professionnel',   icon: '💼' },
+    { id: 'immobilier',    label: 'Immobilier',      icon: '🏡' },
+    { id: 'administratif', label: 'Administratif',   icon: '📋' },
+    { id: 'autre',         label: 'Autre',           icon: '📌' },
+  ];
 
-  function data() { return CAP360.Storage.get().projets; }
+  const PRIORITIES = [
+    { id: 'high',   label: 'Haute',   color: '#D9796B' },
+    { id: 'medium', label: 'Moyenne', color: '#C8A96A' },
+    { id: 'low',    label: 'Basse',   color: '#8DB596' },
+  ];
 
-  /* ---- Stats for Cockpit ---- */
+  const STATUSES = [
+    { id: 'active',    label: 'En cours',  color: '#8DB596' },
+    { id: 'planned',   label: 'Planifié',  color: '#9FCFC5' },
+    { id: 'paused',    label: 'En pause',  color: '#C8A96A' },
+    { id: 'done',      label: 'Terminé',   color: '#5A5C61' },
+    { id: 'cancelled', label: 'Annulé',    color: '#2F363F' },
+  ];
 
-  function getStats() {
-    const d     = data();
-    const items = d.items || [];
-    const active = items.filter(p => p.status !== 'done' && p.status !== 'cancelled');
-    const late   = active.filter(p => p.dueDate && p.dueDate < new Date().toISOString().slice(0, 10));
-    return { count: items.length, active: active.length, late: late.length };
+  function data()   { return CAP360.Storage.get().projets; }
+  function items()  { return data().items || []; }
+
+  function catById(id)    { return CATEGORIES.find(c => c.id === id) || CATEGORIES[CATEGORIES.length - 1]; }
+  function prioById(id)   { return PRIORITIES.find(p => p.id === id) || PRIORITIES[1]; }
+  function statusById(id) { return STATUSES.find(s => s.id === id)   || STATUSES[0]; }
+
+  function fmt(v) {
+    if (v === null || v === undefined) return '—';
+    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(v);
   }
 
-  /* ---- Tab switching ---- */
+  /* ---- Budget intelligence ---- */
+
+  function computeFeasibility(project) {
+    const planned  = project.budgetPlanned || 0;
+    const spent    = project.budgetReal    || 0;
+    const remaining = planned - spent;
+
+    if (planned <= 0) return null;
+    if (remaining <= 0) return { status: 'funded', label: 'Budget constitué', color: '#8DB596' };
+
+    let financial = null;
+    try { financial = CAP360.Platform.getFinancialHealth(); } catch (e) {}
+
+    if (!financial || !financial.kpis) {
+      return { status: 'unknown', label: 'Données budget manquantes', color: '#5A5C61' };
+    }
+
+    const balance       = financial.kpis.balance  || 0;
+    const income        = financial.kpis.income   || 0;
+    const expenses      = Math.abs(financial.kpis.expenses || 0);
+    const monthlySavings = income - expenses;
+
+    if (balance >= remaining) {
+      return { status: 'now', label: 'Finançable immédiatement', color: '#8DB596', months: 0 };
+    }
+
+    if (monthlySavings < 50) {
+      return { status: 'risk', label: 'Épargne mensuelle insuffisante', color: '#D9796B', months: null };
+    }
+
+    const needed     = Math.ceil((remaining - Math.max(0, balance)) / monthlySavings);
+    const startDate  = new Date();
+    startDate.setMonth(startDate.getMonth() + needed);
+    const dateLabel  = startDate.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+
+    return {
+      status: 'future',
+      label:  'Démarrage possible en ' + dateLabel,
+      color:  '#C8A96A',
+      months: needed,
+      date:   startDate.toISOString().slice(0, 7),
+    };
+  }
+
+  function progressOf(p) {
+    if (p.budgetPlanned > 0) return Math.min(100, Math.round((p.budgetReal || 0) / p.budgetPlanned * 100));
+    if (p.target > 0)        return Math.min(100, Math.round((p.current    || 0) / p.target        * 100));
+    return p.progress || 0;
+  }
+
+  /* ---- Getters ---- */
+
+  function getStats() {
+    const all    = items();
+    const active = all.filter(p => p.status !== 'done' && p.status !== 'cancelled');
+    const today  = new Date().toISOString().slice(0, 10);
+    const late   = active.filter(p => p.dueDate && p.dueDate < today);
+    const done   = all.filter(p => p.status === 'done');
+    return { count: all.length, active: active.length, late: late.length, done: done.length };
+  }
+
+  /* ---- Tabs ---- */
 
   function setTab(tab) {
     _tab = tab;
-    _view.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-    renderTabContent();
+    _view.querySelectorAll('.pj3-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    renderContent();
   }
 
-  function renderTabContent() {
-    const area = _view.querySelector('#projets-content');
+  function renderContent() {
+    const area = _view.querySelector('#pj3-content');
     if (!area) return;
     if (_tab === 'dashboard') area.innerHTML = renderDashboard();
-    else if (_tab === 'list') area.innerHTML = renderList();
+    else                      area.innerHTML = renderAllProjects();
+    bindChecklistEvents();
   }
 
   /* ---- Dashboard ---- */
 
   function renderDashboard() {
-    const d     = data();
-    const stats = getStats();
-    const items = d.items || [];
-    const active = items.filter(p => p.status !== 'done' && p.status !== 'cancelled');
-    const done   = items.filter(p => p.status === 'done');
+    const all    = items();
+    const today  = new Date().toISOString().slice(0, 10);
+    const active = all.filter(p => p.status !== 'done' && p.status !== 'cancelled');
+    const late   = active.filter(p => p.dueDate && p.dueDate < today);
+    const done   = all.filter(p => p.status === 'done');
+    const stats  = getStats();
+
+    if (all.length === 0) {
+      return `
+        <div class="empty-state">
+          <div class="empty-icon">🎯</div>
+          <div class="empty-title">Aucun projet</div>
+          <div class="empty-desc">Créez votre premier projet de vie pour commencer à piloter vos ambitions.</div>
+          <button class="btn btn-primary" onclick="P.openAdd()">+ Créer un projet</button>
+        </div>
+      `;
+    }
 
     return `
-      <div>
-        <!-- KPIs -->
-        <div class="kpi-grid">
-          <div class="kpi-card"><div class="kpi-label">Objectifs actifs</div><div class="kpi-value">${stats.active}</div></div>
-          <div class="kpi-card"><div class="kpi-label">En retard</div><div class="kpi-value ${stats.late>0?'neg':''}">${stats.late}</div></div>
-          <div class="kpi-card"><div class="kpi-label">Terminés</div><div class="kpi-value pos">${done.length}</div></div>
-          <div class="kpi-card"><div class="kpi-label">Total</div><div class="kpi-value">${stats.count}</div></div>
+      <!-- KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Projets actifs</div>
+          <div class="kpi-value">${stats.active}</div>
         </div>
+        <div class="kpi-card">
+          <div class="kpi-label">En retard</div>
+          <div class="kpi-value ${stats.late > 0 ? 'neg' : ''}">${stats.late}</div>
+          ${stats.late > 0 ? '<div class="kpi-trend neg">Action requise</div>' : '<div class="kpi-trend pos">Dans les temps</div>'}
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Terminés</div>
+          <div class="kpi-value pos">${stats.done}</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Total</div>
+          <div class="kpi-value">${stats.count}</div>
+        </div>
+      </div>
 
-        <!-- Active objectives -->
-        <div class="card">
-          <div class="card-header">
-            <span class="card-title">Objectifs en cours</span>
-            <button class="btn-primary btn-sm" onclick="P.openAdd()">+ Nouveau</button>
+      ${late.length > 0 ? `
+        <div class="alert-card alert-danger" style="margin-bottom:20px">
+          ⚠️ <strong>${late.length} projet(s) en retard</strong> — nécessitent votre attention.
+        </div>
+      ` : ''}
+
+      <!-- Projets actifs -->
+      <div class="pj3-section-title">Projets en cours</div>
+      <div class="pj3-grid">
+        ${active.map(p => renderProjectCard(p)).join('')}
+      </div>
+
+      ${done.length > 0 ? `
+        <div class="pj3-section-title" style="margin-top:28px">Terminés</div>
+        <div class="pj3-grid">
+          ${done.map(p => renderProjectCard(p)).join('')}
+        </div>
+      ` : ''}
+    `;
+  }
+
+  function renderProjectCard(p) {
+    const cat    = catById(p.category);
+    const prio   = prioById(p.priority);
+    const status = statusById(p.status);
+    const pct    = progressOf(p);
+    const today  = new Date().toISOString().slice(0, 10);
+    const isLate = p.dueDate && p.dueDate < today && p.status !== 'done' && p.status !== 'cancelled';
+    const feasibility = p.status !== 'done' && p.status !== 'cancelled' ? computeFeasibility(p) : null;
+    const checklist   = p.checklist || [];
+    const doneTasks   = checklist.filter(t => t.done).length;
+    const isDone      = p.status === 'done';
+
+    return `
+      <div class="pj3-card ${isDone ? 'pj3-card-done' : ''}" onclick="P.openEdit('${p.id}')">
+        <div class="pj3-card-head">
+          <span class="pj3-cat-icon">${cat.icon}</span>
+          <div class="pj3-card-meta">
+            <span class="pj3-cat-label">${cat.label}</span>
+            ${p.priority ? `<span class="pj3-prio" style="color:${prio.color}">${prio.label}</span>` : ''}
           </div>
-          ${active.length === 0 ? '<div class="empty-state-sm">Aucun objectif en cours</div>' :
-            active.map(p => renderProjectRow(p)).join('')}
+          <span class="pj3-status-badge" style="background:${status.color}20;color:${status.color}">${status.label}</span>
         </div>
 
-        ${done.length > 0 ? `
-          <div class="card">
-            <div class="card-header"><span class="card-title">Terminés</span></div>
-            ${done.map(p => `
-              <div class="tx-row" style="opacity:0.6">
-                <span class="tx-icon">✅</span>
-                <div class="tx-info">
-                  <span class="tx-label">${p.name}</span>
-                  <span class="tx-sub">${p.category || ''}</span>
-                </div>
-                <span class="badge" style="background:#30D15820;color:#30D158">Terminé</span>
-              </div>
-            `).join('')}
+        <div class="pj3-card-name">${p.name}</div>
+        ${p.description ? `<div class="pj3-card-desc">${p.description}</div>` : ''}
+
+        ${(p.budgetPlanned > 0 || p.target > 0) ? `
+          <div class="pj3-budget-row">
+            <div class="pj3-budget-info">
+              ${p.budgetPlanned > 0
+                ? `<span>${fmt(p.budgetReal || 0)}</span><span style="color:var(--c-text-3)"> / ${fmt(p.budgetPlanned)}</span>`
+                : `<span>${fmt(p.current || 0)}</span><span style="color:var(--c-text-3)"> / ${fmt(p.target)}</span>`
+              }
+            </div>
+            <span class="pj3-pct" style="color:${isLate ? '#D9796B' : status.color}">${pct}%</span>
+          </div>
+          <div class="pj3-bar">
+            <div class="pj3-bar-fill" style="width:${pct}%;background:${isLate ? '#D9796B' : status.color}"></div>
           </div>
         ` : ''}
-      </div>
-    `;
-  }
 
-  function renderProjectRow(p) {
-    const today = new Date().toISOString().slice(0, 10);
-    const isLate = p.dueDate && p.dueDate < today;
-    const pct  = p.target > 0 ? Math.min(100, Math.round((p.current || 0) / p.target * 100)) : (p.progress || 0);
-    const color = isLate ? '#FF3B30' : STATUS_COLORS[p.status] || '#BF5AF2';
-
-    return `
-      <div class="projets-item" onclick="P.openEdit('${p.id}')">
-        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px">
-          <div>
-            <span style="font-weight:600">${p.name}</span>
-            ${p.category ? `<span style="font-size:11px;color:var(--c-text-3);margin-left:8px">${p.category}</span>` : ''}
+        ${feasibility ? `
+          <div class="pj3-feasibility" style="border-left-color:${feasibility.color}">
+            <span style="color:${feasibility.color}">💡</span>
+            <span>${feasibility.label}</span>
           </div>
-          <span style="font-weight:700;color:${color}">${pct}%</span>
-        </div>
-        <div class="ck-metric-bar">
-          <div class="ck-metric-fill" style="width:${pct}%;background:${color}"></div>
-        </div>
-        <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:12px;color:var(--c-text-2)">
-          ${p.target ? `<span>${CAP360.Engine.currency(p.current||0)} / ${CAP360.Engine.currency(p.target)}</span>` : `<span>${p.description||''}</span>`}
-          ${p.dueDate ? `<span ${isLate?'style="color:#FF3B30"':''}>${isLate ? '⚠️ ' : ''}Échéance: ${CAP360.Engine.dateShort(p.dueDate)}</span>` : ''}
+        ` : ''}
+
+        <div class="pj3-card-footer">
+          ${p.dueDate ? `
+            <span class="pj3-date ${isLate ? 'pj3-date-late' : ''}">
+              ${isLate ? '⚠️ ' : '📅 '}${CAP360.Engine.dateShort(p.dueDate)}
+            </span>
+          ` : ''}
+          ${checklist.length > 0 ? `
+            <span class="pj3-tasks">${doneTasks}/${checklist.length} tâches</span>
+          ` : ''}
         </div>
       </div>
     `;
   }
 
-  /* ---- List ---- */
+  /* ---- All projects ---- */
 
-  function renderList() {
-    const d = data();
-    const items = (d.items || []).slice().sort((a, b) => {
-      const ord = { active: 0, in_progress: 0, planned: 1, paused: 2, done: 3, cancelled: 4 };
-      return (ord[a.status]||0) - (ord[b.status]||0);
+  function renderAllProjects() {
+    const all = items().slice().sort((a, b) => {
+      const order = { active: 0, planned: 1, paused: 2, done: 3, cancelled: 4 };
+      return (order[a.status] || 0) - (order[b.status] || 0);
     });
 
     return `
-      <div>
-        <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
-          <button class="btn-primary" onclick="P.openAdd()">+ Nouvel objectif</button>
-        </div>
-        ${items.length === 0 ? `
-          <div class="empty-state">
-            <div class="empty-icon">🎯</div>
-            <div class="empty-title">Aucun objectif</div>
-            <div class="empty-desc">Définissez vos objectifs de vie pour les suivre ici.</div>
-            <button class="btn-primary" onclick="P.openAdd()">+ Créer un objectif</button>
-          </div>
-        ` : items.map(p => {
-          const pct = p.target > 0 ? Math.min(100, Math.round((p.current||0)/p.target*100)) : (p.progress||0);
-          return `
-            <div class="card" style="margin-bottom:12px;cursor:pointer" onclick="P.openEdit('${p.id}')">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-                <div>
-                  <span style="font-weight:600">${p.name}</span>
-                  <span class="badge" style="margin-left:8px;background:${STATUS_COLORS[p.status]||'#007AFF'}20;color:${STATUS_COLORS[p.status]||'#007AFF'}">${STATUS_LABELS[p.status]||p.status}</span>
-                </div>
-                <span style="font-size:18px;font-weight:700;color:${STATUS_COLORS[p.status]||'#BF5AF2'}">${pct}%</span>
-              </div>
-              ${p.target ? `
-                <div class="ck-metric-bar" style="margin-bottom:6px">
-                  <div class="ck-metric-fill" style="width:${pct}%;background:${STATUS_COLORS[p.status]||'#BF5AF2'}"></div>
-                </div>
-                <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--c-text-2)">
-                  <span>${CAP360.Engine.currency(p.current||0)}</span>
-                  <span>${CAP360.Engine.currency(p.target)}</span>
-                </div>
-              ` : ''}
-              ${p.description ? `<div style="font-size:12px;color:var(--c-text-3);margin-top:6px">${p.description}</div>` : ''}
-              <div style="display:flex;gap:8px;margin-top:12px">
-                <button class="btn-secondary btn-sm" onclick="event.stopPropagation();P.openEdit('${p.id}')">Modifier</button>
-                <button class="btn-ghost btn-sm" onclick="event.stopPropagation();P.delete('${p.id}')">Supprimer</button>
-              </div>
-            </div>
-          `;
-        }).join('')}
+      <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
+        <button class="btn btn-primary" onclick="P.openAdd()">+ Nouveau projet</button>
       </div>
+      ${all.length === 0 ? `
+        <div class="empty-state">
+          <div class="empty-icon">🎯</div>
+          <div class="empty-title">Aucun projet</div>
+          <div class="empty-desc">Ajoutez vos projets de vie ici.</div>
+        </div>
+      ` : `
+        <div class="pj3-grid">
+          ${all.map(p => renderProjectCard(p)).join('')}
+        </div>
+      `}
     `;
   }
 
   /* ---- Modals ---- */
 
-  function openAdd() {
-    CAP360.UI.modal('Nouvel objectif', `
+  function buildForm(p) {
+    const checklist = p ? (p.checklist || []) : [];
+    return `
       <div class="form-group">
-        <label class="form-label">Nom</label>
-        <input type="text" id="pr-name" class="form-input" placeholder="Remplir le LEP, Voyage au Japon...">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Catégorie</label>
-        <select id="pr-cat" class="form-select">
-          ${CATEGORIES.map(c => `<option>${c}</option>`).join('')}
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Statut</label>
-        <select id="pr-status" class="form-select">
-          <option value="active">En cours</option>
-          <option value="planned">Planifié</option>
-        </select>
+        <label class="form-label">Nom du projet</label>
+        <input type="text" id="pj-name" class="form-input" placeholder="Rénover la salle de bain..." value="${p ? p.name : ''}">
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Montant actuel (€)</label>
-          <input type="number" id="pr-current" class="form-input" placeholder="0">
+          <label class="form-label">Catégorie</label>
+          <select id="pj-cat" class="form-select">
+            ${CATEGORIES.map(c => `<option value="${c.id}" ${p && p.category === c.id ? 'selected' : ''}>${c.icon} ${c.label}</option>`).join('')}
+          </select>
         </div>
         <div class="form-group">
-          <label class="form-label">Objectif (€)</label>
-          <input type="number" id="pr-target" class="form-input" placeholder="10 000">
+          <label class="form-label">Priorité</label>
+          <select id="pj-prio" class="form-select">
+            ${PRIORITIES.map(pr => `<option value="${pr.id}" ${p && p.priority === pr.id ? 'selected' : ''}>${pr.label}</option>`).join('')}
+          </select>
         </div>
       </div>
-      <div class="form-group">
-        <label class="form-label">Échéance</label>
-        <input type="date" id="pr-due" class="form-input">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Statut</label>
+          <select id="pj-status" class="form-select">
+            ${STATUSES.map(s => `<option value="${s.id}" ${p && p.status === s.id ? 'selected' : ''}>${s.label}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Échéance</label>
+          <input type="date" id="pj-due" class="form-input" value="${p ? (p.dueDate || '') : ''}">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Budget prévu (€)</label>
+          <input type="number" id="pj-budget-planned" class="form-input" placeholder="0" value="${p ? (p.budgetPlanned || '') : ''}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Dépensé / Épargné (€)</label>
+          <input type="number" id="pj-budget-real" class="form-input" placeholder="0" value="${p ? (p.budgetReal || '') : ''}">
+        </div>
       </div>
       <div class="form-group">
         <label class="form-label">Description</label>
-        <textarea id="pr-desc" class="form-input" rows="2"></textarea>
+        <textarea id="pj-desc" class="form-input" rows="2" placeholder="Description du projet...">${p ? (p.description || '') : ''}</textarea>
       </div>
-    `, () => {
-      const name    = document.getElementById('pr-name').value.trim();
-      const cat     = document.getElementById('pr-cat').value;
-      const status  = document.getElementById('pr-status').value;
-      const current = parseFloat(document.getElementById('pr-current').value) || 0;
-      const target  = parseFloat(document.getElementById('pr-target').value) || 0;
-      const dueDate = document.getElementById('pr-due').value || null;
-      const desc    = document.getElementById('pr-desc').value.trim();
-      if (!name) { CAP360.UI.toast('Nom requis', 'error'); return false; }
-      CAP360.Storage.addNested('projets', 'items', { name, category: cat, status, current, target, dueDate, description: desc, progress: 0 });
-      CAP360.UI.toast('Objectif créé', 'success');
-      renderTabContent();
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <textarea id="pj-notes" class="form-input" rows="2" placeholder="Contacts, liens, informations pratiques...">${p ? (p.notes || '') : ''}</textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Checklist</label>
+        <div id="pj-checklist">
+          ${checklist.map((t, i) => `
+            <div class="pj3-checklist-row">
+              <input type="checkbox" ${t.done ? 'checked' : ''} id="pjck-${i}">
+              <input type="text" class="form-input" style="flex:1" value="${t.text}" id="pjct-${i}">
+              <button class="btn-ghost btn-sm" onclick="PJ.removeTask(${i})" style="flex-shrink:0">✕</button>
+            </div>
+          `).join('')}
+        </div>
+        <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="PJ.addTask()">+ Ajouter une tâche</button>
+      </div>
+    `;
+  }
+
+  function readForm(existingChecklist) {
+    const checklist = (existingChecklist || []).map((t, i) => {
+      const el = document.getElementById('pjct-' + i);
+      const cb = document.getElementById('pjck-' + i);
+      return { id: t.id, text: el ? el.value.trim() : t.text, done: cb ? cb.checked : t.done };
+    }).filter(t => t.text);
+
+    return {
+      name:          (document.getElementById('pj-name').value        || '').trim(),
+      category:       document.getElementById('pj-cat').value,
+      priority:       document.getElementById('pj-prio').value,
+      status:         document.getElementById('pj-status').value,
+      dueDate:        document.getElementById('pj-due').value        || null,
+      budgetPlanned:  parseFloat(document.getElementById('pj-budget-planned').value) || 0,
+      budgetReal:     parseFloat(document.getElementById('pj-budget-real').value)    || 0,
+      description:   (document.getElementById('pj-desc').value       || '').trim(),
+      notes:         (document.getElementById('pj-notes').value       || '').trim(),
+      checklist,
+    };
+  }
+
+  function openAdd() {
+    CAP360.UI.modal('Nouveau projet', buildForm(null), () => {
+      const fields = readForm([]);
+      if (!fields.name) { CAP360.UI.toast('Nom requis', 'error'); return false; }
+      CAP360.Storage.addNested('projets', 'items', { ...fields, progress: 0 });
+      CAP360.UI.toast('Projet créé', 'success');
+      renderContent();
     });
+    bindModalEvents(null);
   }
 
   function openEdit(id) {
-    const d = data();
-    const p = (d.items || []).find(x => x.id === id);
+    const p = items().find(x => x.id === id);
     if (!p) return;
-    CAP360.UI.modal('Modifier l\'objectif', `
-      <div class="form-group">
-        <label class="form-label">Nom</label>
-        <input type="text" id="pr-name" class="form-input" value="${p.name}">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Catégorie</label>
-        <select id="pr-cat" class="form-select">
-          ${CATEGORIES.map(c => `<option ${c===p.category?'selected':''}>${c}</option>`).join('')}
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Statut</label>
-        <select id="pr-status" class="form-select">
-          <option value="active" ${p.status==='active'?'selected':''}>En cours</option>
-          <option value="planned" ${p.status==='planned'?'selected':''}>Planifié</option>
-          <option value="paused" ${p.status==='paused'?'selected':''}>En pause</option>
-          <option value="done" ${p.status==='done'?'selected':''}>Terminé</option>
-          <option value="cancelled" ${p.status==='cancelled'?'selected':''}>Annulé</option>
-        </select>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Montant actuel (€)</label>
-          <input type="number" id="pr-current" class="form-input" value="${p.current||0}">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Objectif (€)</label>
-          <input type="number" id="pr-target" class="form-input" value="${p.target||0}">
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Échéance</label>
-        <input type="date" id="pr-due" class="form-input" value="${p.dueDate||''}">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Description</label>
-        <textarea id="pr-desc" class="form-input" rows="2">${p.description||''}</textarea>
-      </div>
-    `, () => {
-      const name    = document.getElementById('pr-name').value.trim();
-      const cat     = document.getElementById('pr-cat').value;
-      const status  = document.getElementById('pr-status').value;
-      const current = parseFloat(document.getElementById('pr-current').value) || 0;
-      const target  = parseFloat(document.getElementById('pr-target').value) || 0;
-      const dueDate = document.getElementById('pr-due').value || null;
-      const desc    = document.getElementById('pr-desc').value.trim();
-      if (!name) { CAP360.UI.toast('Nom requis', 'error'); return false; }
-      CAP360.Storage.updateNested('projets', 'items', id, { name, category: cat, status, current, target, dueDate, description: desc });
-      CAP360.UI.toast('Objectif mis à jour', 'success');
-      renderTabContent();
+    CAP360.UI.modal('Modifier le projet', buildForm(p), () => {
+      const fields = readForm(p.checklist || []);
+      if (!fields.name) { CAP360.UI.toast('Nom requis', 'error'); return false; }
+      CAP360.Storage.updateNested('projets', 'items', id, fields);
+      CAP360.UI.toast('Projet mis à jour', 'success');
+      renderContent();
+    }, {
+      extra: `<button class="btn btn-danger btn-sm" style="margin-right:auto" onclick="P.delete('${id}');CAP360.UI.closeModal()">Supprimer</button>`,
     });
+    bindModalEvents(p);
   }
 
   function deleteItem(id) {
-    if (!confirm('Supprimer cet objectif ?')) return;
+    if (!confirm('Supprimer ce projet ?')) return;
     CAP360.Storage.removeNested('projets', 'items', id);
-    renderTabContent();
+    CAP360.UI.toast('Projet supprimé');
+    renderContent();
   }
+
+  /* ---- Checklist helpers in modal ---- */
+
+  let _modalChecklist = [];
+
+  function bindModalEvents(existingProject) {
+    _modalChecklist = existingProject ? [...(existingProject.checklist || [])] : [];
+  }
+
+  window.PJ = {
+    addTask: function () {
+      const container = document.getElementById('pj-checklist');
+      if (!container) return;
+      const i = container.children.length;
+      const row = document.createElement('div');
+      row.className = 'pj3-checklist-row';
+      row.innerHTML = `
+        <input type="checkbox" id="pjck-${i}">
+        <input type="text" class="form-input" style="flex:1" id="pjct-${i}" placeholder="Nouvelle tâche...">
+        <button class="btn-ghost btn-sm" onclick="PJ.removeTask(${i})" style="flex-shrink:0">✕</button>
+      `;
+      container.appendChild(row);
+      row.querySelector('input[type=text]').focus();
+    },
+    removeTask: function (i) {
+      const el = document.querySelector(`#pjck-${i}`)?.closest('.pj3-checklist-row');
+      if (el) el.remove();
+    },
+  };
+
+  function bindChecklistEvents() {}
 
   /* ---- Mount ---- */
 
@@ -292,51 +437,52 @@ CAP360.Projets = (function () {
     _tab  = 'dashboard';
 
     _view.innerHTML = `
-      <div class="module-header" style="--mod-accent:var(--c-projets)">
-        <div class="module-header-inner">
-          <h1 class="module-title">🎯 Projets & Objectifs</h1>
-          <p class="module-subtitle">Suivez vos projets de vie</p>
+      <div class="module-header">
+        <div class="module-title-block">
+          <h1>🎯 Projets de vie</h1>
+          <p>Pilotez vos ambitions et suivez votre progression</p>
+        </div>
+        <div class="module-actions">
+          <button class="btn btn-primary" onclick="P.openAdd()">+ Nouveau projet</button>
         </div>
       </div>
-      <div class="module-body">
-        <div class="seg-control" style="margin-bottom:20px">
-          <button class="seg-btn active" data-tab="dashboard" onclick="P.tab('dashboard')">Vue d'ensemble</button>
-          <button class="seg-btn" data-tab="list" onclick="P.tab('list')">Tous les objectifs</button>
-        </div>
-        <div id="projets-content"></div>
+
+      <div class="seg-control" style="margin-bottom:24px">
+        <button class="pj3-tab-btn seg-btn active" data-tab="dashboard" onclick="P.tab('dashboard')">Vue d'ensemble</button>
+        <button class="pj3-tab-btn seg-btn" data-tab="all" onclick="P.tab('all')">Tous les projets</button>
       </div>
+
+      <div id="pj3-content"></div>
     `;
 
-    renderTabContent();
+    renderContent();
   }
 
   /* ---- getHealth() — contrat Platform ---- */
 
   function getHealth() {
-    const d     = data();
-    const stats = getStats();
-    const today = new Date().toISOString().slice(0, 10);
-    const in60  = new Date(Date.now() + 60 * 86400000).toISOString().slice(0, 10);
-    const items = d.items || [];
-    const active = items.filter(p => p.status !== 'done' && p.status !== 'cancelled');
-    const done   = items.filter(p => p.status === 'done');
+    const all    = items();
+    const stats  = getStats();
+    const today  = new Date().toISOString().slice(0, 10);
+    const in60   = new Date(Date.now() + 60 * 86400000).toISOString().slice(0, 10);
+    const active = all.filter(p => p.status !== 'done' && p.status !== 'cancelled');
+    const done   = all.filter(p => p.status === 'done');
+    const late   = active.filter(p => p.dueDate && p.dueDate < today);
 
     /* Score 0-100 */
     let score = 70;
-    if (stats.late === 0 && stats.active > 0) score += 15;
-    score -= stats.late * 15;
+    if (late.length === 0 && active.length > 0) score += 15;
+    score -= late.length * 15;
     if (done.length > 0) score += Math.min(15, done.length * 5);
     score = Math.max(0, Math.min(100, score));
 
     /* Alerts */
     const alerts = [];
-    const late = active.filter(p => p.dueDate && p.dueDate < today);
     late.forEach(p => {
       const diff = Math.round((new Date() - new Date(p.dueDate)) / 86400000);
-      alerts.push({ level: 'warning', message: 'Objectif "' + p.name + '" en retard de ' + diff + ' jour(s)', action: { label: 'Voir Projets', module: 'projets' } });
+      alerts.push({ level: 'warning', message: '"' + p.name + '" en retard de ' + diff + ' jour(s)', action: { label: 'Voir Projets', module: 'projets' } });
     });
-    const soon = active.filter(p => p.dueDate && p.dueDate >= today && p.dueDate <= in60);
-    soon.forEach(p => {
+    active.filter(p => p.dueDate && p.dueDate >= today && p.dueDate <= in60).forEach(p => {
       const diff = Math.round((new Date(p.dueDate) - new Date()) / 86400000);
       alerts.push({ level: 'info', message: 'Échéance "' + p.name + '" dans ' + diff + ' jour(s)', action: { label: 'Voir Projets', module: 'projets' } });
     });
@@ -344,55 +490,44 @@ CAP360.Projets = (function () {
     /* Timeline */
     const timeline = active
       .filter(p => p.dueDate && p.dueDate >= today && p.dueDate <= in60)
-      .map(p => {
-        const pct = p.target > 0 ? Math.round((p.current || 0) / p.target * 100) : (p.progress || 0);
-        return {
-          date:   p.dueDate,
-          type:   'milestone',
-          label:  p.name + ' — ' + pct + '%',
-          icon:   '🎯',
-          color:  '#BF5AF2',
-          amount: p.target || null,
-        };
-      });
+      .map(p => ({
+        date:   p.dueDate,
+        type:   'milestone',
+        label:  p.name,
+        icon:   catById(p.category).icon,
+        color:  statusById(p.status).color,
+        amount: p.budgetPlanned || p.target || null,
+      }));
 
     /* Story */
-    const storyParts = [];
-    if (stats.active > 0) {
-      storyParts.push(stats.active + ' objectif(s) en cours.');
-    }
-    if (stats.late > 0) {
-      storyParts.push(stats.late + ' en retard.');
-    }
-    if (done.length > 0) {
-      storyParts.push(done.length + ' terminé(s).');
-    }
-    if (stats.active === 0 && done.length === 0) {
-      storyParts.push('Aucun objectif défini.');
-    }
+    const parts = [];
+    if (active.length > 0) parts.push(active.length + ' projet(s) en cours.');
+    if (late.length > 0)   parts.push(late.length + ' en retard.');
+    if (done.length > 0)   parts.push(done.length + ' terminé(s).');
+    if (all.length === 0)  parts.push('Aucun projet défini.');
 
     return {
       id:     'projets',
       label:  'Projets',
       icon:   '🎯',
-      accent: '#BF5AF2',
-      weight: 15,
+      accent: '#8DB596',
+      weight: 30,
       score,
       kpis: {
-        count:  stats.count,
-        active: stats.active,
-        late:   stats.late,
+        count:  all.length,
+        active: active.length,
+        late:   late.length,
         done:   done.length,
         items:  active.slice(0, 3),
       },
       alerts,
       timeline,
-      story: storyParts.join(' ') || null,
+      story: parts.join(' ') || null,
     };
   }
 
   window.P = {
-    tab:      t => { _tab = t; _view.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === t)); renderTabContent(); },
+    tab:      t => setTab(t),
     openAdd:  openAdd,
     openEdit: openEdit,
     delete:   deleteItem,

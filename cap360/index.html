@@ -35,7 +35,6 @@
       </div>
 
       <div class="sidebar-section">
-        <!-- Main modules -->
         <div class="sidebar-label">Tableau de bord</div>
 
         <div class="nav-item active" data-module="cockpit">
@@ -46,15 +45,15 @@
 
         <div class="sidebar-label" style="margin-top:8px">Modules</div>
 
-        <div class="nav-item" data-module="budget">
-          <div class="nav-icon">💰</div>
-          <span>Budget</span>
+        <div class="nav-item" data-module="projets">
+          <div class="nav-icon">🎯</div>
+          <span>Projets</span>
           <div class="nav-dot"></div>
         </div>
 
-        <div class="nav-item" data-module="sante">
-          <div class="nav-icon">❤️</div>
-          <span>Santé</span>
+        <div class="nav-item" data-module="budget">
+          <div class="nav-icon">💰</div>
+          <span>Budget</span>
           <div class="nav-dot"></div>
         </div>
 
@@ -70,15 +69,17 @@
           <div class="nav-dot"></div>
         </div>
 
-        <div class="nav-item" data-module="projets">
-          <div class="nav-icon">🎯</div>
-          <span>Projets</span>
-          <div class="nav-dot"></div>
-        </div>
-
         <div class="nav-item" data-module="coffre">
           <div class="nav-icon">📁</div>
           <span>Coffre-fort</span>
+          <div class="nav-dot"></div>
+        </div>
+
+        <div class="sidebar-label" style="margin-top:8px">Configuration</div>
+
+        <div class="nav-item" data-module="parametres">
+          <div class="nav-icon">⚙️</div>
+          <span>Paramètres</span>
           <div class="nav-dot"></div>
         </div>
       </div>
@@ -133,11 +134,11 @@
   <!-- Feature modules -->
   <script src="modules/budget/budget.js"></script>
   <script src="modules/cockpit/cockpit.js"></script>
-  <script src="modules/sante/sante.js"></script>
   <script src="modules/maison/maison.js"></script>
   <script src="modules/projets/projets.js"></script>
   <script src="modules/vehicules/vehicules.js"></script>
   <script src="modules/coffre/coffre.js"></script>
+  <script src="modules/parametres/parametres.js"></script>
 
   <!-- App bootstrap -->
   <script>
@@ -154,20 +155,19 @@
 
       /* ---- Register data-producing modules with Platform ---- */
       CAP360.Platform.register('budget',    CAP360.Budget);
-      CAP360.Platform.register('sante',     CAP360.Sante);
       CAP360.Platform.register('maison',    CAP360.Maison);
       CAP360.Platform.register('projets',   CAP360.Projets);
       CAP360.Platform.register('vehicules', CAP360.Vehicules);
       CAP360.Platform.register('coffre',    CAP360.Coffre);
 
       /* ---- Register modules with Router ---- */
-      CAP360.Router.register('cockpit',   CAP360.Cockpit);
-      CAP360.Router.register('budget',    CAP360.Budget);
-      CAP360.Router.register('sante',     CAP360.Sante);
-      CAP360.Router.register('maison',    CAP360.Maison);
-      CAP360.Router.register('projets',   CAP360.Projets);
-      CAP360.Router.register('vehicules', CAP360.Vehicules);
-      CAP360.Router.register('coffre',    CAP360.Coffre);
+      CAP360.Router.register('cockpit',    CAP360.Cockpit);
+      CAP360.Router.register('budget',     CAP360.Budget);
+      CAP360.Router.register('projets',    CAP360.Projets);
+      CAP360.Router.register('maison',     CAP360.Maison);
+      CAP360.Router.register('vehicules',  CAP360.Vehicules);
+      CAP360.Router.register('coffre',     CAP360.Coffre);
+      CAP360.Router.register('parametres', CAP360.Parametres);
 
       /* ---- Update sidebar user info ---- */
       function updateSidebarUser() {
