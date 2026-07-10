@@ -1,0 +1,153 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  titre="La Maison"
+  description="SILLAGE est une maison de sélection d'objets qui ont traversé le temps et méritent encore une place dans une maison."
+>
+  <section class="page-entete apparait">
+    <div class="conteneur">
+      <p class="etiquette">La Maison</p>
+      <h1>Peu d'objets. Beaucoup de regard.</h1>
+    </div>
+  </section>
+
+  <section class="texte">
+    <div class="conteneur texte__grille">
+      <div class="texte__bloc apparait">
+        <p>
+          SILLAGE n'est pas une boutique. Ce n'est pas un catalogue, ni un
+          entrepôt d'objets triés par catégorie. C'est une sélection —
+          volontairement courte — de pièces qui ont déjà vécu une vie avant
+          la nôtre.
+        </p>
+        <p>
+          Nous ne remplissons pas des rayons. Nous choisissons, un objet à la
+          fois, ce qui mérite de continuer son chemin dans une maison plutôt
+          que de disparaître dans un tiroir, une brocante ou un débarras.
+        </p>
+      </div>
+
+      <div class="texte__bloc apparait">
+        <p>
+          Chaque pièce est photographiée deux fois. Une première image qui
+          fait rêver — la lumière, l'atmosphère, ce que l'objet évoque. Puis
+          des images suivantes qui montrent la réalité : la patine, les
+          marques d'usage, l'état exact. Nous ne cachons rien, parce qu'un
+          bel objet ancien n'a pas besoin d'être parfait pour être désirable.
+        </p>
+        <p>
+          Nous n'inventons jamais d'histoire. Quand nous ne savons pas
+          précisément d'où vient un objet, nous le disons. Ce que nous
+          racontons, c'est ce que l'objet évoque — pas ce que nous aimerions
+          qu'il ait vécu.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="principes apparait">
+    <div class="conteneur">
+      <hr class="filet" />
+      <ul class="principes__liste">
+        <li>Pas de catégories.</li>
+        <li>Pas de filtres.</li>
+        <li>Pas de moteur de recherche.</li>
+        <li>Pas de promotions.</li>
+        <li>Pas de « produits similaires ».</li>
+        <li>Chaque objet est unique. Il n'y en a pas deux.</li>
+      </ul>
+      <hr class="filet" />
+    </div>
+  </section>
+
+  <section class="cta apparait">
+    <div class="conteneur cta__contenu">
+      <h2>Une question sur une pièce, ou sur la maison ?</h2>
+      <a href="/contact" class="bouton">Nous écrire</a>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .page-entete {
+    padding-block: 5rem 3rem;
+  }
+
+  .page-entete h1 {
+    margin-top: 0.8rem;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    max-width: 18ch;
+  }
+
+  .texte {
+    padding-block: 3rem 5rem;
+  }
+
+  .texte__grille {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2rem, 6vw, 5rem);
+  }
+
+  .texte__bloc {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    font-size: 1.02rem;
+    line-height: 1.9;
+    color: var(--ivoire-att);
+  }
+
+  @media (max-width: 780px) {
+    .texte__grille {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
+  }
+
+  .principes {
+    padding-block: 4rem;
+  }
+
+  .principes__liste {
+    list-style: none;
+    margin: 2.5rem 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.2rem 2rem;
+    text-align: center;
+  }
+
+  .principes__liste li {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--or-clair);
+  }
+
+  @media (max-width: 720px) {
+    .principes__liste {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .cta {
+    padding-block: 5rem 8rem;
+    text-align: center;
+  }
+
+  .cta__contenu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.75rem;
+  }
+
+  .cta__contenu h2 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    max-width: 26ch;
+  }
+</style>

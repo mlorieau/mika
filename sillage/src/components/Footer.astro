@@ -1,0 +1,93 @@
+---
+const annee = new Date().getFullYear();
+---
+
+<footer class="pied">
+  <div class="conteneur pied__contenu">
+    <div class="pied__marque">
+      <img src="/images/logo/sillage-logo.png" alt="SILLAGE" width="90" height="60" loading="lazy" />
+      <p class="pied__signature">Le temps n'efface pas tout.</p>
+    </div>
+
+    <nav class="pied__nav" aria-label="Plan du site">
+      <a href="/">Sélection</a>
+      <a href="/la-maison">La Maison</a>
+      <a href="/archives">Les Archives</a>
+      <a href="/contact">Contact</a>
+    </nav>
+
+    <div class="pied__contact">
+      <a href="mailto:maison@sillage.fr">maison@sillage.fr</a>
+      <a href="https://instagram.com/sillage" target="_blank" rel="noopener noreferrer">Instagram</a>
+    </div>
+  </div>
+  <hr class="filet" />
+  <div class="conteneur pied__mentions">
+    <p>&copy; {annee} SILLAGE. Tous droits réservés.</p>
+  </div>
+</footer>
+
+<style>
+  .pied {
+    padding-top: 5rem;
+    border-top: 1px solid var(--trait);
+  }
+
+  .pied__contenu {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 2.5rem;
+    padding-block: 3rem;
+  }
+
+  .pied__marque img {
+    height: 40px;
+    width: auto;
+    opacity: 0.85;
+  }
+
+  .pied__signature {
+    margin-top: 1rem;
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--ivoire-att);
+  }
+
+  .pied__nav,
+  .pied__contact {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+
+  .pied__nav a,
+  .pied__contact a {
+    font-size: 0.82rem;
+    letter-spacing: 0.05em;
+    color: var(--ivoire-att);
+    transition: color 300ms ease;
+    width: fit-content;
+  }
+
+  .pied__nav a:hover,
+  .pied__contact a:hover {
+    color: var(--or-clair);
+  }
+
+  .pied__mentions {
+    padding-block: 1.5rem;
+  }
+
+  .pied__mentions p {
+    font-size: 0.72rem;
+    color: var(--ivoire-att);
+    opacity: 0.6;
+  }
+
+  @media (max-width: 720px) {
+    .pied__contenu {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+</style>

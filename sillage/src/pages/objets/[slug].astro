@@ -1,0 +1,198 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import { formatPrix, libelleStatut } from '../../lib/objets';
+
+export async function getStaticPaths() {
+  const objets = await getCollection('objets');
+  return objets.map((objet) => ({
+    params: { slug: objet.id },
+    props: { objet },
+  }));
+}
+
+const { objet } = Astro.props;
+const { titre, accroche, images, prix, devise, statut, epoque, origine, materiaux, dimensions, etat } = objet.data;
+const { Content } = await render(objet);
+
+const details = [
+  { label: 'Époque', valeur: epoque },
+  { label: 'Origine', valeur: origine },
+  { label: 'Matériaux', valeur: materiaux },
+  { label: 'Dimensions', valeur: dimensions },
+  { label: 'État', valeur: etat },
+].filter((d) => d.valeur);
+
+const disponible = statut === 'disponible';
+---
+
+<Layout titre={titre} description={accroche} image={images[0].src}>
+  <article class="piece">
+    <div class="conteneur piece__grille">
+      <div class="piece__galerie">
+        {
+          images.map((image, i) => (
+            <figure class={i === 0 ? 'piece__image piece__image--hero' : 'piece__image'}>
+              <img src={image.src} alt={image.alt} loading={i === 0 ? 'eager' : 'lazy'} />
+            </figure>
+          ))
+        }
+      </div>
+
+      <div class="piece__info">
+        <div class="piece__info-fixe">
+          <p class="etiquette">{origine ?? 'Sélection SILLAGE'}</p>
+          <h1 class="piece__titre">{titre}</h1>
+          <p class="piece__accroche">{accroche}</p>
+
+          <div class="piece__recit">
+            <Content />
+          </div>
+
+          {details.length > 0 && (
+            <dl class="piece__details">
+              {details.map((d) => (
+                <div class="piece__detail">
+                  <dt>{d.label}</dt>
+                  <dd>{d.valeur}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+
+          <div class="piece__acquisition">
+            <p class="piece__prix">{formatPrix(prix, devise)}</p>
+            {disponible ? (
+              <a href={`/contact?piece=${encodeURIComponent(titre)}`} class="bouton">
+                Se renseigner sur cette pièce
+              </a>
+            ) : (
+              <p class="piece__statut">{libelleStatut(statut)}</p>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  </article>
+</Layout>
+
+<style>
+  .piece {
+    padding-block: 3rem 6rem;
+  }
+
+  .piece__grille {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: start;
+  }
+
+  .piece__galerie {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .piece__image {
+    margin: 0;
+    background: var(--charbon-clair);
+    overflow: hidden;
+  }
+
+  .piece__image img {
+    width: 100%;
+    height: auto;
+  }
+
+  .piece__info-fixe {
+    position: sticky;
+    top: 7rem;
+  }
+
+  .piece__titre {
+    margin-top: 0.6rem;
+    font-size: clamp(1.8rem, 3.4vw, 2.6rem);
+  }
+
+  .piece__accroche {
+    margin-top: 1rem;
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--or-clair);
+    font-size: 1.05rem;
+  }
+
+  .piece__recit {
+    margin-top: 2rem;
+    color: var(--ivoire-att);
+    font-size: 0.98rem;
+    line-height: 1.85;
+  }
+
+  .piece__recit :global(p) {
+    margin-top: 1.1rem;
+  }
+
+  .piece__recit :global(p:first-child) {
+    margin-top: 0;
+  }
+
+  .piece__details {
+    margin: 2.5rem 0 0;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--trait);
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .piece__detail {
+    display: grid;
+    grid-template-columns: 9rem 1fr;
+    gap: 1rem;
+    font-size: 0.86rem;
+  }
+
+  .piece__detail dt {
+    color: var(--ivoire-att);
+    letter-spacing: 0.05em;
+  }
+
+  .piece__detail dd {
+    margin: 0;
+  }
+
+  .piece__acquisition {
+    margin-top: 2.5rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--trait);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .piece__prix {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    color: var(--or);
+  }
+
+  .piece__statut {
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ivoire-att);
+  }
+
+  @media (max-width: 860px) {
+    .piece__grille {
+      grid-template-columns: 1fr;
+    }
+
+    .piece__info-fixe {
+      position: static;
+    }
+  }
+</style>

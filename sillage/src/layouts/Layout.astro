@@ -1,0 +1,77 @@
+---
+import '@fontsource-variable/fraunces/standard.css';
+import '@fontsource-variable/fraunces/standard-italic.css';
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  titre: string;
+  description?: string;
+  image?: string;
+}
+
+const {
+  titre,
+  description = "SILLAGE — Une maison de sélection d'objets qui ont traversé le temps et méritent encore une place dans une maison.",
+  image = '/images/logo/sillage-og.jpg',
+} = Astro.props;
+
+const titrePage = titre === 'SILLAGE' ? titre : `${titre} — SILLAGE`;
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="/images/logo/sillage-favicon.png" />
+    <title>{titrePage}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#0c0b0a" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={titrePage} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={image} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site).toString()} />
+  </head>
+  <body>
+    <a href="#contenu" class="skip-link">Aller au contenu</a>
+    <Header />
+    <main id="contenu">
+      <slot />
+    </main>
+    <Footer />
+    <noscript>
+      <style>
+        .apparait {
+          opacity: 1 !important;
+          transform: none !important;
+        }
+      </style>
+    </noscript>
+    <script>
+      const elements = document.querySelectorAll('.apparait');
+
+      if ('IntersectionObserver' in window) {
+        const observateur = new IntersectionObserver(
+          (entrees) => {
+            for (const entree of entrees) {
+              if (entree.isIntersecting) {
+                entree.target.classList.add('visible');
+                observateur.unobserve(entree.target);
+              }
+            }
+          },
+          { threshold: 0.15 },
+        );
+        elements.forEach((el) => observateur.observe(el));
+      } else {
+        elements.forEach((el) => el.classList.add('visible'));
+      }
+    </script>
+  </body>
+</html>

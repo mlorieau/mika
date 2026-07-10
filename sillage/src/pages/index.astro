@@ -1,0 +1,249 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ObjetCarte from '../components/ObjetCarte.astro';
+import { getObjetsDisponibles } from '../lib/objets';
+
+const objets = await getObjetsDisponibles();
+---
+
+<Layout titre="SILLAGE">
+  <section class="heros">
+    <div class="heros__fond">
+      <img
+        src="/images/objets/jumelles-opera-bruxelles/01-hero.jpg"
+        alt=""
+        role="presentation"
+      />
+      <div class="heros__voile"></div>
+    </div>
+
+    <div class="heros__contenu conteneur">
+      <img
+        src="/images/logo/sillage-logo.png"
+        alt="SILLAGE"
+        class="heros__logo"
+        width="320"
+        height="213"
+      />
+      <p class="heros__signature">Le temps n'efface pas tout.</p>
+      <p class="heros__intro">
+        Une maison de sélection d'objets qui ont traversé le temps et méritent
+        encore une place dans une maison.
+      </p>
+      <a href="#selection" class="heros__flèche" aria-label="Découvrir la sélection">
+        <span></span>
+      </a>
+    </div>
+  </section>
+
+  <section class="philosophie apparait">
+    <div class="conteneur philosophie__grille">
+      <p class="philosophie__ligne">Peu d'objets.</p>
+      <p class="philosophie__ligne">Beaucoup de regard.</p>
+      <p class="philosophie__ligne philosophie__ligne--attenue">Pas de catégories. Pas de filtres. Pas de promotions.</p>
+    </div>
+  </section>
+
+  <section id="selection" class="selection">
+    <div class="conteneur">
+      <div class="selection__entete apparait">
+        <p class="etiquette">La sélection actuelle</p>
+        <h2>Peu de pièces. Chacune a été choisie seule.</h2>
+      </div>
+
+      <div class="selection__grille">
+        {objets.map((objet, i) => <ObjetCarte objet={objet} index={i} />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="invite apparait">
+    <div class="conteneur invite__contenu">
+      <h2>La première image fait rêver. Les suivantes disent la vérité.</h2>
+      <p>
+        Chaque objet est traité comme une pièce éditoriale — jamais comme un
+        article de catalogue. Découvrez la philosophie de la maison.
+      </p>
+      <a href="/la-maison" class="bouton bouton--discret">La Maison</a>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .heros {
+    position: relative;
+    height: 100svh;
+    min-height: 560px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .heros__fond {
+    position: absolute;
+    inset: 0;
+  }
+
+  .heros__fond img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    filter: saturate(0.85) brightness(0.55);
+    transform: scale(1.06);
+  }
+
+  .heros__voile {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to bottom, rgba(12, 11, 10, 0.55) 0%, rgba(12, 11, 10, 0.35) 40%, rgba(12, 11, 10, 0.92) 100%);
+  }
+
+  .heros__contenu {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1.4rem;
+    animation: monteeVoile 1.6s var(--easing-doux) both;
+  }
+
+  @keyframes monteeVoile {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .heros__logo {
+    width: min(280px, 60vw);
+    height: auto;
+  }
+
+  .heros__signature {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(1.1rem, 2vw, 1.4rem);
+    color: var(--or-clair);
+  }
+
+  .heros__intro {
+    max-width: 34ch;
+    font-size: 0.98rem;
+    color: var(--ivoire-att);
+  }
+
+  .heros__flèche {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 52px;
+  }
+
+  .heros__flèche span {
+    display: block;
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(to bottom, transparent, var(--or));
+    animation: pulseFlèche 2.4s ease-in-out infinite;
+  }
+
+  @keyframes pulseFlèche {
+    0%,
+    100% {
+      opacity: 0.3;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .philosophie {
+    padding-block: 6rem;
+  }
+
+  .philosophie__grille {
+    text-align: center;
+  }
+
+  .philosophie__ligne {
+    font-family: var(--serif);
+    font-size: clamp(1.5rem, 4vw, 2.4rem);
+  }
+
+  .philosophie__ligne--attenue {
+    margin-top: 1.5rem;
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    color: var(--ivoire-att);
+  }
+
+  .selection {
+    padding-block: 4rem 7rem;
+  }
+
+  .selection__entete {
+    margin-bottom: 3rem;
+    max-width: 42ch;
+  }
+
+  .selection__entete h2 {
+    margin-top: 0.8rem;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+  }
+
+  .selection__grille {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2.5rem 2rem;
+  }
+
+  @media (max-width: 900px) {
+    .selection__grille {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem 1.25rem;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .selection__grille {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .invite {
+    padding-block: 6rem 8rem;
+    border-top: 1px solid var(--trait);
+  }
+
+  .invite__contenu {
+    max-width: 52ch;
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+  }
+
+  .invite__contenu h2 {
+    font-size: clamp(1.6rem, 3.4vw, 2.2rem);
+  }
+
+  .invite__contenu p {
+    color: var(--ivoire-att);
+  }
+
+  .invite__contenu .bouton {
+    width: fit-content;
+    margin-top: 0.5rem;
+  }
+</style>

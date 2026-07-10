@@ -1,0 +1,89 @@
+---
+import { formatPrix, libelleStatut, type Objet } from '../lib/objets';
+
+interface Props {
+  objet: Objet;
+  index?: number;
+}
+
+const { objet, index = 0 } = Astro.props;
+const { titre, accroche, images, prix, devise, statut } = objet.data;
+const image = images[0];
+---
+
+<a href={`/objets/${objet.id}`} class="carte apparait" style={`transition-delay:${Math.min(index, 4) * 90}ms`}>
+  <div class="carte__image">
+    <img src={image.src} alt={image.alt} loading="lazy" />
+    {statut !== 'disponible' && (
+      <span class="carte__pastille">{libelleStatut(statut)}</span>
+    )}
+  </div>
+  <div class="carte__texte">
+    <h3 class="carte__titre">{titre}</h3>
+    <p class="carte__accroche">{accroche}</p>
+    <p class="carte__prix">{formatPrix(prix, devise)}</p>
+  </div>
+</a>
+
+<style>
+  .carte {
+    display: block;
+    color: inherit;
+  }
+
+  .carte__image {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    background: var(--charbon-clair);
+  }
+
+  .carte__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.1s var(--easing-doux), filter 1.1s var(--easing-doux);
+  }
+
+  .carte:hover .carte__image img {
+    transform: scale(1.045);
+    filter: brightness(1.05);
+  }
+
+  .carte__pastille {
+    position: absolute;
+    top: 0.9rem;
+    left: 0.9rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    background: rgba(12, 11, 10, 0.78);
+    color: var(--or-clair);
+    padding: 0.4rem 0.7rem;
+    border: 1px solid var(--trait);
+  }
+
+  .carte__texte {
+    padding-top: 1.1rem;
+  }
+
+  .carte__titre {
+    font-size: 1.15rem;
+    font-weight: 400;
+  }
+
+  .carte__accroche {
+    margin-top: 0.5rem;
+    font-size: 0.86rem;
+    color: var(--ivoire-att);
+    font-style: italic;
+    font-family: var(--serif);
+  }
+
+  .carte__prix {
+    margin-top: 0.75rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    color: var(--or);
+  }
+</style>

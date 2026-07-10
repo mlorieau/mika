@@ -1,0 +1,189 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  titre="Contact"
+  description="Une question sur une pièce, sur la maison, ou sur un objet que vous cherchez à faire disparaître dans de bonnes mains — écrivez-nous."
+>
+  <section class="page-entete apparait">
+    <div class="conteneur">
+      <p class="etiquette">Contact</p>
+      <h1>Écrivez-nous.</h1>
+      <p class="page-entete__texte">
+        Pour une question sur une pièce, une demande de réservation, ou pour
+        nous proposer un objet — un mot suffit.
+      </p>
+    </div>
+  </section>
+
+  <section class="contact">
+    <div class="conteneur contact__grille">
+      <form
+        name="contact"
+        method="POST"
+        data-netlify="true"
+        netlify-honeypot="societe"
+        class="formulaire apparait"
+        id="formulaire-contact"
+      >
+        <input type="hidden" name="form-name" value="contact" />
+        <p class="visually-hidden">
+          <label>Ne pas remplir : <input name="societe" /></label>
+        </p>
+
+        <div class="champ">
+          <label for="nom">Nom</label>
+          <input type="text" id="nom" name="nom" required autocomplete="name" />
+        </div>
+
+        <div class="champ">
+          <label for="email">E-mail</label>
+          <input type="email" id="email" name="email" required autocomplete="email" />
+        </div>
+
+        <div class="champ">
+          <label for="piece">Pièce concernée (facultatif)</label>
+          <input type="text" id="piece" name="piece" />
+        </div>
+
+        <div class="champ">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" rows="6" required></textarea>
+        </div>
+
+        <button type="submit" class="bouton">Envoyer</button>
+      </form>
+
+      <aside class="contact__info apparait">
+        <div>
+          <p class="etiquette">Par e-mail</p>
+          <a href="mailto:maison@sillage.fr" class="contact__lien">maison@sillage.fr</a>
+        </div>
+        <div>
+          <p class="etiquette">Ailleurs</p>
+          <a href="https://instagram.com/sillage" target="_blank" rel="noopener noreferrer" class="contact__lien">
+            Instagram
+          </a>
+        </div>
+        <p class="contact__delai">Nous répondons en général sous 48 heures.</p>
+      </aside>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const piece = params.get('piece');
+  if (piece) {
+    const champ = document.getElementById('piece') as HTMLInputElement | null;
+    const message = document.getElementById('message') as HTMLTextAreaElement | null;
+    if (champ) champ.value = piece;
+    if (message) message.value = `Bonjour, je me renseigne au sujet de « ${piece} ».`;
+  }
+</script>
+
+<style>
+  .page-entete {
+    padding-block: 5rem 3rem;
+  }
+
+  .page-entete h1 {
+    margin-top: 0.8rem;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+  }
+
+  .page-entete__texte {
+    margin-top: 1.25rem;
+    max-width: 46ch;
+    color: var(--ivoire-att);
+    line-height: 1.8;
+  }
+
+  .contact {
+    padding-block: 2rem 8rem;
+  }
+
+  .contact__grille {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: clamp(2rem, 6vw, 5rem);
+  }
+
+  .formulaire {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .champ {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .champ label {
+    font-size: 0.76rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ivoire-att);
+  }
+
+  .champ input,
+  .champ textarea {
+    background: var(--charbon-clair);
+    border: 1px solid var(--trait);
+    color: var(--ivoire);
+    font-family: var(--sans);
+    font-size: 0.95rem;
+    padding: 0.85rem 1rem;
+    resize: vertical;
+    transition: border-color 300ms ease;
+  }
+
+  .champ input:focus,
+  .champ textarea:focus {
+    outline: none;
+    border-color: var(--or);
+  }
+
+  .formulaire button {
+    width: fit-content;
+    margin-top: 0.5rem;
+  }
+
+  .contact__info {
+    display: flex;
+    flex-direction: column;
+    gap: 2.25rem;
+    padding-top: 0.3rem;
+  }
+
+  .contact__lien {
+    display: inline-block;
+    margin-top: 0.6rem;
+    font-family: var(--serif);
+    font-size: 1.2rem;
+    color: var(--or-clair);
+    border-bottom: 1px solid var(--trait);
+    padding-bottom: 0.2rem;
+    transition: border-color 300ms ease;
+  }
+
+  .contact__lien:hover {
+    border-color: var(--or);
+  }
+
+  .contact__delai {
+    font-size: 0.82rem;
+    color: var(--ivoire-att);
+    opacity: 0.75;
+  }
+
+  @media (max-width: 780px) {
+    .contact__grille {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+  }
+</style>

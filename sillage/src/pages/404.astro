@@ -1,0 +1,38 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout titre="Page introuvable">
+  <section class="introuvable apparait">
+    <div class="conteneur introuvable__contenu">
+      <p class="etiquette">404</p>
+      <h1>Cette pièce n'est plus là.</h1>
+      <p>Elle a peut-être rejoint les archives, ou n'a jamais existé ici.</p>
+      <a href="/" class="bouton">Retour à la sélection</a>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .introuvable {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+  }
+
+  .introuvable__contenu {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+    padding-block: 5rem;
+  }
+
+  .introuvable__contenu h1 {
+    font-size: clamp(2rem, 4vw, 2.8rem);
+  }
+
+  .introuvable__contenu p {
+    color: var(--ivoire-att);
+  }
+</style>

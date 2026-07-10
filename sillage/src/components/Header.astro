@@ -1,0 +1,146 @@
+---
+const liens = [
+  { href: '/', label: 'Sélection' },
+  { href: '/la-maison', label: 'La Maison' },
+  { href: '/archives', label: 'Les Archives' },
+  { href: '/contact', label: 'Contact' },
+];
+
+const cheminActuel = Astro.url.pathname;
+---
+
+<header class="entete" data-entete>
+  <div class="conteneur entete__contenu">
+    <a href="/" class="entete__logo" aria-label="SILLAGE — Accueil">
+      <img src="/images/logo/sillage-logo.png" alt="SILLAGE" width="140" height="93" />
+    </a>
+
+    <button class="entete__bascule" data-bascule-menu aria-expanded="false" aria-controls="menu-principal">
+      <span class="visually-hidden">Ouvrir le menu</span>
+      <span class="entete__bascule-trait"></span>
+      <span class="entete__bascule-trait"></span>
+    </button>
+
+    <nav class="entete__nav" id="menu-principal" data-menu>
+      <ul>
+        {
+          liens.map((lien) => (
+            <li>
+              <a href={lien.href} aria-current={cheminActuel === lien.href ? 'page' : undefined}>
+                {lien.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .entete {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: linear-gradient(to bottom, rgba(12, 11, 10, 0.92), rgba(12, 11, 10, 0.7) 70%, transparent);
+    backdrop-filter: blur(6px);
+  }
+
+  .entete__contenu {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-block: 1.1rem;
+  }
+
+  .entete__logo img {
+    height: 52px;
+    width: auto;
+  }
+
+  .entete__nav ul {
+    list-style: none;
+    display: flex;
+    gap: 2.5rem;
+    margin: 0;
+    padding: 0;
+  }
+
+  .entete__nav a {
+    font-size: 0.76rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ivoire-att);
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid transparent;
+    transition: color 400ms ease, border-color 400ms ease;
+  }
+
+  .entete__nav a:hover,
+  .entete__nav a[aria-current='page'] {
+    color: var(--or-clair);
+    border-color: var(--or);
+  }
+
+  .entete__bascule {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+  }
+
+  .entete__bascule-trait {
+    width: 24px;
+    height: 1px;
+    background: var(--ivoire);
+    transition: transform 300ms ease, opacity 300ms ease;
+  }
+
+  @media (max-width: 720px) {
+    .entete__bascule {
+      display: flex;
+    }
+
+    .entete__nav {
+      position: fixed;
+      inset: 0 0 0 auto;
+      width: min(78vw, 320px);
+      height: 100vh;
+      background: var(--charbon);
+      border-left: 1px solid var(--trait);
+      transform: translateX(100%);
+      transition: transform 500ms var(--easing-doux);
+      padding: 6rem 2rem 2rem;
+    }
+
+    .entete__nav[data-ouvert='true'] {
+      transform: translateX(0);
+    }
+
+    .entete__nav ul {
+      flex-direction: column;
+      gap: 1.75rem;
+    }
+  }
+</style>
+
+<script>
+  const bouton = document.querySelector('[data-bascule-menu]');
+  const menu = document.querySelector('[data-menu]');
+
+  bouton?.addEventListener('click', () => {
+    const ouvert = menu?.getAttribute('data-ouvert') === 'true';
+    menu?.setAttribute('data-ouvert', String(!ouvert));
+    bouton.setAttribute('aria-expanded', String(!ouvert));
+  });
+
+  menu?.querySelectorAll('a').forEach((lien) => {
+    lien.addEventListener('click', () => {
+      menu.setAttribute('data-ouvert', 'false');
+      bouton?.setAttribute('aria-expanded', 'false');
+    });
+  });
+</script>

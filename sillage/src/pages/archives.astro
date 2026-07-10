@@ -1,0 +1,87 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ObjetCarte from '../components/ObjetCarte.astro';
+import { getObjetsArchives } from '../lib/objets';
+
+const objets = await getObjetsArchives();
+---
+
+<Layout
+  titre="Les Archives"
+  description="Les pièces qui ont trouvé une maison. Elles ne sont plus à vendre, mais elles restent ici, en mémoire."
+>
+  <section class="page-entete apparait">
+    <div class="conteneur">
+      <p class="etiquette">Les Archives</p>
+      <h1>Elles ont trouvé une maison.</h1>
+      <p class="page-entete__texte">
+        Ces pièces ne sont plus disponibles. Nous les gardons ici, en
+        mémoire — parce qu'une sélection se juge aussi à ce qu'elle a laissé
+        passer.
+      </p>
+    </div>
+  </section>
+
+  <section class="grille-archives">
+    <div class="conteneur">
+      {objets.length > 0 ? (
+        <div class="grille-archives__grille">
+          {objets.map((objet, i) => <ObjetCarte objet={objet} index={i} />)}
+        </div>
+      ) : (
+        <p class="grille-archives__vide">Les archives sont encore vides.</p>
+      )}
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .page-entete {
+    padding-block: 5rem 3rem;
+  }
+
+  .page-entete h1 {
+    margin-top: 0.8rem;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+  }
+
+  .page-entete__texte {
+    margin-top: 1.25rem;
+    max-width: 48ch;
+    color: var(--ivoire-att);
+    line-height: 1.8;
+  }
+
+  .grille-archives {
+    padding-block: 2rem 7rem;
+  }
+
+  .grille-archives__grille {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2.5rem 2rem;
+  }
+
+  .grille-archives__grille :global(.carte__image) {
+    filter: grayscale(0.35) brightness(0.85);
+  }
+
+  .grille-archives__vide {
+    color: var(--ivoire-att);
+    font-style: italic;
+    font-family: var(--serif);
+  }
+
+  @media (max-width: 900px) {
+    .grille-archives__grille {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem 1.25rem;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .grille-archives__grille {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
