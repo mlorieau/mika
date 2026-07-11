@@ -1,6 +1,6 @@
 ---
 import { getCollection, render } from 'astro:content';
-import Layout from '../../layouts/Layout.astro';
+import LayoutImmersif from '../../layouts/LayoutImmersif.astro';
 import { formatPrix, libelleStatut } from '../../lib/objets';
 
 export async function getStaticPaths() {
@@ -12,187 +12,616 @@ export async function getStaticPaths() {
 }
 
 const { objet } = Astro.props;
-const { titre, accroche, images, prix, devise, statut, epoque, origine, materiaux, dimensions, etat } = objet.data;
+const {
+  titre,
+  accroche,
+  images,
+  imageReve,
+  prix,
+  devise,
+  statut,
+  fabricant,
+  epoque,
+  origine,
+  materiaux,
+  dimensions,
+  etat,
+  defauts,
+} = objet.data;
 const { Content } = await render(objet);
 
-const details = [
+const constats = [
+  { label: 'Fabricant', valeur: fabricant },
   { label: 'Époque', valeur: epoque },
   { label: 'Origine', valeur: origine },
   { label: 'Matériaux', valeur: materiaux },
   { label: 'Dimensions', valeur: dimensions },
   { label: 'État', valeur: etat },
-].filter((d) => d.valeur);
+  { label: 'Défauts', valeur: defauts },
+].filter((c) => c.valeur);
 
 const disponible = statut === 'disponible';
+const prixAffiche = formatPrix(prix, devise);
 ---
 
-<Layout titre={titre} description={accroche} image={images[0].src}>
-  <article class="piece">
-    <div class="conteneur piece__grille">
-      <div class="piece__galerie">
-        {
-          images.map((image, i) => (
-            <figure class={i === 0 ? 'piece__image piece__image--hero' : 'piece__image'}>
-              <img src={image.src} alt={image.alt} loading={i === 0 ? 'eager' : 'lazy'} />
-            </figure>
-          ))
-        }
+<LayoutImmersif titre={titre} description={accroche} image={(imageReve ?? images[0]).src}>
+  <article class="fiche">
+    {
+      imageReve && (
+        <>
+          <section class="arrivee">
+            <div class="arrivee__visuel">
+              <img src={imageReve.src} alt={imageReve.alt} />
+            </div>
+            <div class="arrivee__voile" />
+            <div class="arrivee__texte">
+              {fabricant && <p class="arrivee__fabricant">{fabricant}</p>}
+              <h1 class="arrivee__nom">{titre}</h1>
+              {epoque && <p class="arrivee__epoque">{epoque}</p>}
+            </div>
+            <div class="arrivee__indice" aria-hidden="true">
+              <span />
+            </div>
+          </section>
+
+          <section class="devoilement">
+            <div class="devoilement__sticky">
+              <img class="devoilement__verite" src={images[0].src} alt={images[0].alt} />
+              <img class="devoilement__reve" src={imageReve.src} alt="" aria-hidden="true" />
+              <p class="devoilement__mention">Faites défiler</p>
+            </div>
+          </section>
+        </>
+      )
+    }
+
+    <section class="recit">
+      <div class="conteneur recit__contenu">
+        {!imageReve && (
+          <>
+            <p class="etiquette">{fabricant ?? origine ?? 'Sélection SILLAGE'}</p>
+            <h1 class="recit__titre-simple">{titre}</h1>
+          </>
+        )}
+        <p class="recit__accroche">{accroche}</p>
+        <div class="recit__texte">
+          <Content />
+        </div>
       </div>
+    </section>
 
-      <div class="piece__info">
-        <div class="piece__info-fixe">
-          <p class="etiquette">{origine ?? 'Sélection SILLAGE'}</p>
-          <h1 class="piece__titre">{titre}</h1>
-          <p class="piece__accroche">{accroche}</p>
+    <section class="photographies">
+      <div class="conteneur">
+        <p class="etiquette">Les photographies</p>
+        <div class="photographies__pile">
+          {images.map((image) => (
+            <figure class="photographies__figure">
+              <img src={image.src} alt={image.alt} loading="lazy" />
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
 
-          <div class="piece__recit">
-            <Content />
+    {constats.length > 0 && (
+      <section class="constats">
+        <div class="conteneur">
+          <p class="etiquette">Les constats</p>
+          <dl class="constats__liste">
+            {constats.map((c) => (
+              <div class="constats__ligne">
+                <dt>{c.label}</dt>
+                <dd>{c.valeur}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
+    )}
+
+    <section class="adoption">
+      <div class="conteneur adoption__contenu">
+        <p class="adoption__prix">{prixAffiche}</p>
+        {disponible ? (
+          <button id="bouton-adopter" class="bouton-adopter" data-titre={titre} data-prix={prixAffiche} type="button">
+            <span>Adopter cet objet</span>
+          </button>
+        ) : (
+          <p class="adoption__statut">{libelleStatut(statut)}</p>
+        )}
+      </div>
+    </section>
+  </article>
+
+  {
+    disponible && (
+      <div class="panneau-selection" id="panneau-selection" aria-hidden="true">
+        <div class="panneau-selection__carte" role="dialog" aria-modal="true" aria-label="Sélection retenue">
+          <p class="etiquette">Sélection retenue</p>
+          <div class="panneau-selection__ligne">
+            <span>Objet sélectionné</span>
+            <span id="panneau-objet">{titre}</span>
           </div>
-
-          {details.length > 0 && (
-            <dl class="piece__details">
-              {details.map((d) => (
-                <div class="piece__detail">
-                  <dt>{d.label}</dt>
-                  <dd>{d.valeur}</dd>
-                </div>
-              ))}
-            </dl>
-          )}
-
-          <div class="piece__acquisition">
-            <p class="piece__prix">{formatPrix(prix, devise)}</p>
-            {disponible ? (
-              <a href={`/contact?piece=${encodeURIComponent(titre)}`} class="bouton">
-                Se renseigner sur cette pièce
-              </a>
-            ) : (
-              <p class="piece__statut">{libelleStatut(statut)}</p>
-            )}
+          <div class="panneau-selection__ligne">
+            <span>Prix</span>
+            <span>{prixAffiche}</span>
+          </div>
+          <div class="panneau-selection__ligne">
+            <span>Livraison</span>
+            <span>Remise en main propre ou expédition assurée</span>
+          </div>
+          <hr class="filet" />
+          <div class="panneau-selection__ligne panneau-selection__ligne--total">
+            <span>Total</span>
+            <span>{prixAffiche}</span>
+          </div>
+          <div class="panneau-selection__actions">
+            <button class="bouton bouton--discret" id="continuer-visite" type="button">
+              Continuer ma visite
+            </button>
+            <a class="bouton" id="finaliser-selection" href={`/contact?piece=${encodeURIComponent(titre)}`}>
+              Finaliser ma sélection
+            </a>
           </div>
         </div>
       </div>
-    </div>
-  </article>
-</Layout>
+    )
+  }
+</LayoutImmersif>
+
+<script>
+  // --- Dévoilement au scroll : l'image d'ambiance s'efface, la vérité reste ---
+  const devoilement = document.querySelector<HTMLElement>('.devoilement');
+  const reve = document.querySelector<HTMLElement>('.devoilement__reve');
+  const mention = document.querySelector<HTMLElement>('.devoilement__mention');
+
+  if (devoilement && reve) {
+    let enAttente = false;
+
+    const majDevoilement = () => {
+      const rect = devoilement.getBoundingClientRect();
+      const hauteurUtile = rect.height - window.innerHeight;
+      const progression = hauteurUtile > 0 ? Math.min(Math.max(-rect.top / hauteurUtile, 0), 1) : 0;
+      reve.style.opacity = String(1 - progression);
+      if (mention) mention.style.opacity = String(Math.max(1 - progression * 6, 0));
+      enAttente = false;
+    };
+
+    document.addEventListener(
+      'scroll',
+      () => {
+        if (!enAttente) {
+          window.requestAnimationFrame(majDevoilement);
+          enAttente = true;
+        }
+      },
+      { passive: true },
+    );
+    majDevoilement();
+  }
+
+  // --- Adoption : jamais de panier, une sélection retenue ---
+  const bouton = document.querySelector<HTMLButtonElement>('#bouton-adopter');
+  const panneau = document.querySelector<HTMLElement>('#panneau-selection');
+  const continuerBtn = document.querySelector<HTMLButtonElement>('#continuer-visite');
+
+  if (bouton && panneau) {
+    const ouvrirPanneau = () => {
+      bouton.classList.add('bouton-adopter--scintille');
+      window.setTimeout(() => bouton.classList.add('bouton-adopter--sortie'), 550);
+      window.setTimeout(() => {
+        panneau.setAttribute('aria-hidden', 'false');
+        panneau.classList.add('visible');
+      }, 900);
+    };
+
+    const fermerPanneau = () => {
+      panneau.classList.remove('visible');
+      panneau.setAttribute('aria-hidden', 'true');
+      window.setTimeout(() => {
+        bouton.classList.remove('bouton-adopter--sortie', 'bouton-adopter--scintille');
+      }, 400);
+    };
+
+    bouton.addEventListener('click', ouvrirPanneau);
+    continuerBtn?.addEventListener('click', fermerPanneau);
+  }
+</script>
 
 <style>
-  .piece {
-    padding-block: 3rem 6rem;
+  .fiche {
+    background: var(--platre);
   }
 
-  .piece__grille {
-    display: grid;
-    grid-template-columns: 1.3fr 1fr;
-    gap: clamp(2rem, 5vw, 5rem);
-    align-items: start;
-  }
-
-  .piece__galerie {
+  /* ---------- Arrivée ---------- */
+  .arrivee {
+    position: relative;
+    height: 100svh;
+    min-height: 560px;
     display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-  }
-
-  .piece__image {
-    margin: 0;
-    background: var(--charbon-clair);
+    align-items: center;
+    justify-content: center;
     overflow: hidden;
   }
 
-  .piece__image img {
+  .arrivee__visuel {
+    position: absolute;
+    inset: 0;
+  }
+
+  .arrivee__visuel img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .arrivee__voile {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(10, 8, 6, 0.25) 0%, rgba(10, 8, 6, 0.15) 45%, rgba(10, 8, 6, 0.7) 100%);
+  }
+
+  .arrivee__texte {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.85rem;
+    text-align: center;
+    animation: paraitre 1.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes paraitre {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .arrivee__fabricant {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--laiton-clair);
+  }
+
+  .arrivee__nom {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    color: var(--ivoire);
+  }
+
+  .arrivee__epoque {
+    font-family: var(--texte);
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--pierre-claire);
+  }
+
+  .arrivee__indice {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 46px;
+  }
+
+  .arrivee__indice span {
+    display: block;
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(to bottom, transparent, var(--pierre-claire));
+    animation: pulseIndice 2.4s ease-in-out infinite;
+  }
+
+  @keyframes pulseIndice {
+    0%,
+    100% {
+      opacity: 0.25;
+    }
+    50% {
+      opacity: 0.9;
+    }
+  }
+
+  /* ---------- Dévoilement ---------- */
+  .devoilement {
+    position: relative;
+    height: 230vh;
+  }
+
+  .devoilement__sticky {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    overflow: hidden;
+  }
+
+  .devoilement__verite,
+  .devoilement__reve {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .devoilement__reve {
+    will-change: opacity;
+  }
+
+  .devoilement__mention {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ivoire);
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+    transition: opacity 300ms ease;
+  }
+
+  /* ---------- Récit ---------- */
+  .recit {
+    padding-block: clamp(4rem, 10vw, 7rem);
+  }
+
+  .recit__contenu {
+    max-width: 640px;
+  }
+
+  .recit__titre-simple {
+    margin-top: 0.6rem;
+    font-size: clamp(1.9rem, 4vw, 2.8rem);
+  }
+
+  .recit__accroche {
+    margin-top: 1.25rem;
+    font-family: var(--texte);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 1.2rem;
+    color: var(--graphite);
+  }
+
+  .recit__texte {
+    margin-top: 2rem;
+    color: var(--graphite-att);
+    font-size: 1.05rem;
+    line-height: 1.85;
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+  }
+
+  /* ---------- Photographies ---------- */
+  .photographies {
+    padding-block: 2rem clamp(3rem, 8vw, 5rem);
+  }
+
+  .photographies__pile {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(2rem, 5vw, 3.5rem);
+  }
+
+  .photographies__figure {
+    margin: 0;
+    background: var(--pierre-claire);
+  }
+
+  .photographies__figure img {
     width: 100%;
     height: auto;
   }
 
-  .piece__info-fixe {
-    position: sticky;
-    top: 7rem;
+  /* ---------- Constats ---------- */
+  .constats {
+    padding-block: clamp(3rem, 8vw, 5rem);
+    border-top: 1px solid var(--pierre-claire);
   }
 
-  .piece__titre {
-    margin-top: 0.6rem;
-    font-size: clamp(1.8rem, 3.4vw, 2.6rem);
-  }
-
-  .piece__accroche {
-    margin-top: 1rem;
-    font-family: var(--serif);
-    font-style: italic;
-    color: var(--or-clair);
-    font-size: 1.05rem;
-  }
-
-  .piece__recit {
-    margin-top: 2rem;
-    color: var(--ivoire-att);
-    font-size: 0.98rem;
-    line-height: 1.85;
-  }
-
-  .piece__recit :global(p) {
-    margin-top: 1.1rem;
-  }
-
-  .piece__recit :global(p:first-child) {
-    margin-top: 0;
-  }
-
-  .piece__details {
-    margin: 2.5rem 0 0;
-    padding-top: 1.75rem;
-    border-top: 1px solid var(--trait);
+  .constats__liste {
+    margin: 2rem 0 0;
     display: grid;
-    gap: 0.9rem;
+    gap: 0;
+    max-width: 640px;
   }
 
-  .piece__detail {
+  .constats__ligne {
     display: grid;
-    grid-template-columns: 9rem 1fr;
-    gap: 1rem;
-    font-size: 0.86rem;
+    grid-template-columns: 10rem 1fr;
+    gap: 1.5rem;
+    padding-block: 0.9rem;
+    border-top: 1px solid var(--pierre-claire);
+    font-family: var(--mono);
+    font-size: 0.85rem;
   }
 
-  .piece__detail dt {
-    color: var(--ivoire-att);
-    letter-spacing: 0.05em;
+  .constats__ligne dt {
+    color: var(--graphite-att);
+    letter-spacing: 0.04em;
   }
 
-  .piece__detail dd {
+  .constats__ligne dd {
     margin: 0;
   }
 
-  .piece__acquisition {
-    margin-top: 2.5rem;
-    padding-top: 1.75rem;
-    border-top: 1px solid var(--trait);
+  /* ---------- Adoption ---------- */
+  .adoption {
+    padding-block: clamp(3rem, 8vw, 5rem) clamp(5rem, 10vw, 8rem);
+  }
+
+  .adoption__contenu {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1.5rem;
     flex-wrap: wrap;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--pierre-claire);
   }
 
-  .piece__prix {
-    font-family: var(--serif);
-    font-size: 1.5rem;
-    color: var(--or);
+  .adoption__prix {
+    font-family: var(--display);
+    font-size: 1.6rem;
+    color: var(--laiton);
   }
 
-  .piece__statut {
+  .adoption__statut {
+    font-family: var(--mono);
     font-size: 0.8rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--ivoire-att);
+    color: var(--graphite-att);
   }
 
-  @media (max-width: 860px) {
-    .piece__grille {
+  .bouton-adopter {
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ivoire);
+    background: var(--graphite);
+    border: 1px solid var(--graphite);
+    padding: 1rem 2rem;
+    cursor: pointer;
+    transition: opacity 500ms var(--easing-doux), transform 500ms var(--easing-doux), background 300ms ease;
+  }
+
+  .bouton-adopter:hover {
+    background: var(--laiton);
+    border-color: var(--laiton);
+  }
+
+  .bouton-adopter::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, 0.5) 50%, transparent 60%);
+    background-size: 250% 100%;
+    background-position: 150% 0;
+    pointer-events: none;
+  }
+
+  .bouton-adopter--scintille::after {
+    animation: scintillement 650ms ease-out;
+  }
+
+  @keyframes scintillement {
+    from {
+      background-position: 150% 0;
+    }
+    to {
+      background-position: -50% 0;
+    }
+  }
+
+  .bouton-adopter--sortie {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+    pointer-events: none;
+  }
+
+  /* ---------- Panneau « Sélection retenue » ---------- */
+  .panneau-selection {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 1.5rem;
+    background: rgba(20, 17, 13, 0);
+    pointer-events: none;
+    transition: background 500ms var(--easing-doux);
+  }
+
+  .panneau-selection.visible {
+    background: rgba(20, 17, 13, 0.35);
+    pointer-events: auto;
+  }
+
+  .panneau-selection__carte {
+    width: min(480px, 100%);
+    background: var(--ivoire);
+    border: 1px solid var(--pierre-claire);
+    padding: 2rem;
+    transform: translateY(24px);
+    opacity: 0;
+    transition: transform 600ms var(--easing-doux), opacity 600ms var(--easing-doux);
+  }
+
+  .panneau-selection.visible .panneau-selection__carte {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .panneau-selection__ligne {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1.1rem;
+    font-size: 0.92rem;
+  }
+
+  .panneau-selection__ligne span:first-child {
+    color: var(--graphite-att);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .panneau-selection__ligne--total {
+    margin-top: 1rem;
+    font-family: var(--display);
+    font-size: 1.2rem;
+  }
+
+  .panneau-selection__ligne--total span:first-child {
+    font-family: var(--mono);
+  }
+
+  .panneau-selection .filet {
+    margin-top: 1.25rem;
+  }
+
+  .panneau-selection__actions {
+    margin-top: 1.75rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 560px) {
+    .constats__ligne {
       grid-template-columns: 1fr;
+      gap: 0.35rem;
     }
 
-    .piece__info-fixe {
-      position: static;
+    .panneau-selection__actions {
+      flex-direction: column;
+    }
+
+    .panneau-selection__actions .bouton {
+      width: 100%;
+      justify-content: center;
     }
   }
 </style>

@@ -14,18 +14,30 @@ const objets = defineCollection({
     // Le récit éditorial (ce que l'objet évoque) s'écrit dans le corps
     // du fichier Markdown, sous le bloc d'informations ci-dessous.
 
-    // Informations factuelles, vérifiables, honnêtes
+    // Informations factuelles, vérifiables, honnêtes — les constats
+    fabricant: z.string().optional(),
     epoque: z.string().optional(),
     origine: z.string().optional(),
     materiaux: z.string().optional(),
     dimensions: z.string().optional(),
     etat: z.string().optional(),
+    defauts: z.string().optional(),
 
     // Prix affiché (V1 : sur demande possible si prix absent)
     prix: z.number().optional(),
     devise: z.string().default('EUR'),
 
-    // Images : la première fait rêver, les suivantes montrent la réalité
+    // Image d'ambiance (le rêve) — point de départ IA, retravaillée pour que
+    // l'objet reste le héros. Optionnelle : sans elle, la fiche saute
+    // directement à la vérité (pas de geste de dévoilement).
+    imageReve: z
+      .object({
+        src: z.string(),
+        alt: z.string(),
+      })
+      .optional(),
+
+    // Images réelles : toutes montrent l'objet tel qu'il est, défauts compris
     images: z
       .array(
         z.object({
